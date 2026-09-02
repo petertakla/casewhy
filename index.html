@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CaseWhy — Know what's happening with your USCIS case</title>
+<meta name="description" content="CaseWhy tracks your USCIS case and explains, in plain English, what changed and what to do about it.">
+<style>
+  :root{
+    --ink:#1a2233;
+    --ink-soft:#4b5568;
+    --bg:#fbfaf7;
+    --card:#ffffff;
+    --accent:#1f6f5c;
+    --accent-soft:#e6f2ee;
+    --border:#e6e2d8;
+    --warn-bg:#fbf3e6;
+    --warn-border:#e8d3a3;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;
+  }
+  a{color:var(--accent);}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px;}
+  header{padding:22px 0;border-bottom:1px solid var(--border);}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-weight:700;font-size:1.25rem;letter-spacing:-0.02em;color:var(--ink);text-decoration:none;}
+  .logo span{color:var(--accent);}
+  nav a{margin-left:24px;font-size:0.92rem;color:var(--ink-soft);text-decoration:none;}
+  nav a:hover{color:var(--ink);}
+
+  .hero{padding:72px 0 56px;text-align:center;}
+  .eyebrow{
+    display:inline-block;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:0.8rem;
+    font-weight:600;
+    padding:6px 14px;
+    border-radius:999px;
+    margin-bottom:22px;
+    letter-spacing:0.02em;
+  }
+  h1{
+    font-size:clamp(2rem,4.5vw,3.1rem);
+    line-height:1.15;
+    margin:0 0 18px;
+    letter-spacing:-0.02em;
+  }
+  .sub{
+    font-size:1.15rem;
+    color:var(--ink-soft);
+    max-width:620px;
+    margin:0 auto 36px;
+  }
+
+  form.waitlist{
+    display:flex;
+    gap:10px;
+    max-width:440px;
+    margin:0 auto;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  form.waitlist input[type=email]{
+    flex:1 1 260px;
+    padding:14px 16px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:1rem;
+    background:var(--card);
+  }
+  form.waitlist button{
+    padding:14px 22px;
+    border:none;
+    border-radius:8px;
+    background:var(--accent);
+    color:#fff;
+    font-size:1rem;
+    font-weight:600;
+    cursor:pointer;
+  }
+  form.waitlist button:hover{background:#18564a;}
+  .form-note{font-size:0.82rem;color:var(--ink-soft);margin-top:10px;}
+
+  section{padding:56px 0;}
+  .problem{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+  .problem .wrap{max-width:760px;text-align:center;}
+  .problem h2{font-size:1.6rem;margin-bottom:16px;}
+  .stat-row{
+    display:flex;
+    gap:18px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top:32px;
+  }
+  .stat{
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:18px 22px;
+    min-width:150px;
+  }
+  .stat .num{font-size:1.7rem;font-weight:700;color:var(--accent);}
+  .stat .label{font-size:0.85rem;color:var(--ink-soft);margin-top:4px;}
+
+  .features h2{text-align:center;font-size:1.6rem;margin-bottom:44px;}
+  .feature-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:24px;
+  }
+  .feature{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:28px 24px;
+  }
+  .feature .num-badge{
+    width:34px;height:34px;
+    border-radius:9px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;
+    margin-bottom:16px;
+  }
+  .feature h3{margin:0 0 10px;font-size:1.1rem;}
+  .feature p{margin:0;color:var(--ink-soft);font-size:0.95rem;}
+
+  .trust{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+  .trust .wrap{max-width:760px;}
+  .trust h2{text-align:center;font-size:1.6rem;margin-bottom:28px;}
+  .trust-item{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    margin-bottom:20px;
+  }
+  .trust-item .dot{
+    flex:0 0 8px;height:8px;border-radius:50%;
+    background:var(--accent);margin-top:8px;
+  }
+  .trust-item p{margin:0;color:var(--ink-soft);}
+  .trust-item strong{color:var(--ink);}
+
+  .disclaimer{
+    background:var(--warn-bg);
+    border:1px solid var(--warn-border);
+    border-radius:12px;
+    padding:18px 22px;
+    font-size:0.9rem;
+    color:#5c4a24;
+    margin-top:8px;
+  }
+
+  .cta{text-align:center;}
+  .cta h2{font-size:1.7rem;margin-bottom:14px;}
+  .cta p{color:var(--ink-soft);margin-bottom:32px;}
+
+  footer{border-top:1px solid var(--border);padding:32px 0;font-size:0.85rem;color:var(--ink-soft);}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;align-items:center;}
+  footer a{color:var(--ink-soft);text-decoration:none;margin-left:16px;}
+  footer a:hover{color:var(--accent);}
+
+  @media (max-width:760px){
+    .feature-grid{grid-template-columns:1fr;}
+    nav{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="logo" href="#top">Case<span>Why</span></a>
+    <nav>
+      <a href="#how-it-works">How it works</a>
+      <a href="#trust">Privacy</a>
+      <a href="#join">Join the waitlist</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Coming soon</span>
+    <h1>Know what's happening.<br>Know what's next.</h1>
+    <!-- Placeholder headline — swap once the tagline is finalized -->
+    <p class="sub">CaseWhy tracks your USCIS case through official channels and explains, in plain English, what changed and what to do about it — not just a status label.</p>
+
+    <form class="waitlist" id="join">
+      <input type="email" placeholder="you@email.com" required aria-label="Email address">
+      <button type="submit">Notify me at launch</button>
+    </form>
+    <p class="form-note">No spam. One email when CaseWhy is ready — that's it.</p>
+  </div>
+</div>
+
+<section class="problem">
+  <div class="wrap">
+    <h2>USCIS backlogs are the worst they've ever been</h2>
+    <p>Over 12 million cases are sitting in the system right now, and the official status page gives you a vague label and nothing else. You're left refreshing a page, guessing what "Case Is Being Actively Reviewed" actually means, and searching forums at midnight for someone in your exact situation.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="num">12M+</div><div class="label">pending USCIS cases</div></div>
+      <div class="stat"><div class="num">+42%</div><div class="label">backlog growth, year over year</div></div>
+      <div class="stat"><div class="num">1</div><div class="label">status label, zero explanation</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="how-it-works">
+  <div class="wrap">
+    <h2>What CaseWhy does differently</h2>
+    <div class="feature-grid">
+      <div class="feature">
+        <div class="num-badge">1</div>
+        <h3>Track</h3>
+        <p>Add your receipt number and we check it for you, every day, through USCIS's own official case status system — no manual refreshing.</p>
+      </div>
+      <div class="feature">
+        <div class="num-badge">2</div>
+        <h3>Understand</h3>
+        <p>The moment anything changes, we explain what it actually means — the real context behind it, not just a status code.</p>
+      </div>
+      <div class="feature">
+        <div class="num-badge">3</div>
+        <h3>Act</h3>
+        <p>We tell you the general next step people in your situation take — when a case inquiry helps, when it's time to loop in your representative, or when to call an attorney.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="trust" id="trust">
+  <div class="wrap">
+    <h2>Built to be trusted with something this personal</h2>
+    <div class="trust-item">
+      <div class="dot"></div>
+      <p><strong>Official data only.</strong> Case status comes from USCIS's own systems — we don't scrape or guess.</p>
+    </div>
+    <div class="trust-item">
+      <div class="dot"></div>
+      <p><strong>Your data isn't for sale.</strong> We don't sell or rent your information to anyone, ever.</p>
+    </div>
+    <div class="trust-item">
+      <div class="dot"></div>
+      <p><strong>Encrypted, and minimal by design.</strong> We store only what's needed to track your case and keep it encrypted.</p>
+    </div>
+    <div class="disclaimer">
+      <strong>CaseWhy is not a law firm and does not give legal advice.</strong> Everything CaseWhy tells you is general, informational guidance drawn from public USCIS process information. For anything specific to your case, we'll always point you toward a licensed immigration attorney.
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <h2>Be first to know when CaseWhy launches</h2>
+    <p>We're building this in the open — join the list and you'll hear from us the moment it's ready to try.</p>
+    <form class="waitlist">
+      <input type="email" placeholder="you@email.com" required aria-label="Email address">
+      <button type="submit">Notify me</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>&copy; 2026 CaseWhy. Not affiliated with or endorsed by USCIS or DHS.</span>
+    <div>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="mailto:hello@casewhy.com">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

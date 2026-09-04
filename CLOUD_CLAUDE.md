@@ -2,7 +2,7 @@
 
 This file is the standing handoff between the cloud Claude session (which owns business/planning work and the artifacts below) and Claude Code sessions running here on the Fedora machine (which own the codebase). Read this first; update it — and tell the user to mention updates back to the cloud session — whenever a status below changes.
 
-> **Last updated by Claude Code: Sep 4, 2026, ~11:15pm ET.** If you (cloud session) are reading a copy of this file fetched before that time, re-fetch it now before editing — an earlier stale-copy edit tonight silently reverted two already-resolved sections back to "unresolved" (see the process note under "Right now" below). Tonight's session, in order: shipped the plain-language explanation layer (fixing an AI Gateway 403 along the way), then persistent case tracking + magic-link auth (Neon Auth), then encrypted `tracked_cases.receipt_number` at rest per the standing compliance guardrail, then a file upload UI stub. All live on `casewhy-app.vercel.app`, CI green, everything pushed to `nextjs-app`. Only `npm run lint` and email notifications remain on the "Next build priorities" list.
+> **Last updated by Claude Code: Sep 4, 2026, ~11:40pm ET.** If you (cloud session) are reading a copy of this file fetched before that time, re-fetch it now before editing — an earlier stale-copy edit tonight silently reverted two already-resolved sections back to "unresolved" (see the process note under "Right now" below). Tonight's session, in order: shipped the plain-language explanation layer (fixing an AI Gateway 403 along the way), then persistent case tracking + magic-link auth (Neon Auth), then encrypted `tracked_cases.receipt_number` at rest per the standing compliance guardrail, then a file upload UI stub, then fixed `npm run lint` and added it to CI. All live on `casewhy-app.vercel.app`, CI green (typecheck + lint + build), everything pushed to `nextjs-app`. Only email notifications remain on the "Next build priorities" list. **Also new tonight: the user wants all CaseWhy email, sent or received, to use `info@casewhy.com` — not their personal address.**
 
 ## What this is
 
@@ -51,6 +51,7 @@ Full background:
   - Three real bugs hit and fixed along the way, all worth knowing about if Auth acts up again: (1) `@neondatabase/auth` peer-requires Next.js ≥16 while this app is on 15 — installed with `--legacy-peer-deps` and added `.npmrc` (`legacy-peer-deps=true`) so Vercel's build does the same; works fine in practice. (2) Neon Auth itself wasn't enabled on the project yet (Neon Console → project → Auth → "Enable Neon Auth"), and separately the **Magic Link plugin specifically** was off by default even after enabling Auth (Console → Auth → Plugins tab → toggle "Enable Magic Link" — email+password auth is on by default, magic link is not). (3) `NEON_AUTH_BASE_URL` in `.env.local`/Vercel was stale — pointed at a different, non-existent Auth endpoint hostname than the one Neon actually provisioned once Auth was enabled; had to re-pull the real "Auth URL" from Neon Console (Auth → Configuration tab) and fix it in both places. Also had to add `https://casewhy-app.vercel.app` to Neon Auth's trusted-domains allowlist (Console → Auth → Configuration → Domains) or every callback fails with `INVALID_CALLBACK_URL`.
   - ~~**Known gap against the compliance guardrails below:** `tracked_cases.receipt_number` was stored as plain text.~~ — **fixed Sep 4, 2026, same night**, user called it a hard requirement. `src/lib/db/crypto.ts` adds app-level AES-256-GCM (Node's built-in `crypto`, no new dependency) — encrypt on write in `trackCase()`, decrypt on read in `getTrackedReceiptNumber()`, with an undecryptable row (e.g. old pre-encryption data) treated as "no tracked case" rather than crashing. Key lives in a new `ENCRYPTION_KEY` env var (`.env.local`, Vercel Production/Preview, GitHub Actions secret — same three-places pattern as the other secrets). Verified in production: raw Postgres value is 56-byte ciphertext with no plaintext receipt number present, and decrypt round-trips correctly through the dashboard.
 - **File upload UI stub: done Sep 4, 2026 (late night)** — `src/app/dashboard/FileUploadStub.tsx`, rendered in `StatusCard` under "Supporting documents." Accepts a pdf/jpg/png and confirms receipt locally (no real endpoint yet, per the scope this priority was explicitly given). Verified in production: uploading a file renders "Received `<name>` (`<size>`)". This closes the last unstubbed criterion of the six the live USCIS demo evaluates (UI usability, file upload, JSON payload handling, OAuth 2.0, error handling, case status tracking) — all six now have working UI to show.
+- ~~`npm run lint` was broken repo-wide~~ — **fixed Sep 4, 2026, late night.** `eslint.config.mjs` was missing entirely (ESLint 9 dropped `.eslintrc.*` support by default) — added via `FlatCompat` (`next/core-web-vitals` + `next/typescript`), with `.next/`, `node_modules/`, and the auto-generated `next-env.d.ts` ignored. Lint runs clean; `npm run lint` is now a CI step between `tsc --noEmit` and `next build`.
 
 **Target:** provisionally pulled forward to ~Nov 13, 2026 (was Nov 30) — the roadmap Gantt was updated Sep 4, 2026 evening after an audit found it (and the Ideas project doc) had drifted from actual status. The affidavit can go in ~17 days earlier than first estimated (5-day traffic log finishes Sep 10, not ~Sep 25), so the whole downstream chain shifted with it. Still provisional — depends on USCIS's own review taking about the same ~4 weeks as originally estimated. See the roadmap artifact below for the full updated week-by-week plan.
 
@@ -78,9 +79,9 @@ Everything else open right now — the sandbox traffic log, the Florida LLC, the
 
 3. ~~**File upload UI stub.**~~ — **done Sep 4, 2026, late night.** `src/app/dashboard/FileUploadStub.tsx`, rendered inside the case's `StatusCard` under "Supporting documents": accepts a pdf/jpg/png, confirms receipt locally ("Received `<name>` (`<size>`)") — no real endpoint yet, matching the doc's own explicit scope for this pass. Verified end-to-end in production (uploaded a real file via the browser, confirmation rendered correctly). This closes the live-demo criterion gap; all six demo-evaluated things (UI usability, file upload, JSON payload handling, OAuth 2.0, error handling, case status tracking) are now covered.
 
-4. **START HERE — Fix `npm run lint`.** Missing `eslint.config.js` for ESLint 9 — quick fix, land before adding a lint step to CI.
+4. ~~**Fix `npm run lint`.**~~ — **done Sep 4, 2026, late night.** `eslint.config.mjs` added (ESLint 9 flat config via `FlatCompat`, `next/core-web-vitals` + `next/typescript`, `.next/`/`node_modules/`/`next-env.d.ts` ignored) — lint runs clean. `npm run lint` is now a CI step, between `tsc --noEmit` and `next build`.
 
-5. **Email notifications** (SendGrid or Postmark) on a detected status change. Naturally last — depends on persistent tracking (done above) existing first.
+5. **START HERE — Email notifications** (SendGrid or Postmark) on a detected status change. Depends on persistent tracking (done above) existing first — no longer blocked. **Note:** the user has said all CaseWhy-related email, sent or received (auth testing included), must use `info@casewhy.com`, never their personal address — keep that in mind when wiring up sending and when testing.
 
 ## Architecture (per the MVP scope doc)
 
@@ -117,6 +118,7 @@ Everything else open right now — the sandbox traffic log, the Florida LLC, the
 - `src/lib/config.ts` — env var loading/validation
 - `.env.local` — sandbox credentials + Neon/Auth vars (gitignored)
 - `.npmrc` — `legacy-peer-deps=true`, needed for `@neondatabase/auth`'s Next 16 peer requirement on this Next 15 app
+- `eslint.config.mjs` — ESLint 9 flat config (was missing entirely), done Sep 4 late night
 
 ## The fuller record
 
@@ -140,4 +142,5 @@ Everything else open right now — the sandbox traffic log, the Florida LLC, the
 11. ~~Build persistent case tracking + minimal auth~~ — done Sep 4, 2026 late evening, see Product build above
 12. ~~Decide and implement encryption-at-rest for `tracked_cases.receipt_number`~~ — done Sep 4, 2026, same night, see Product build above
 13. ~~Build the file upload UI stub~~ — done Sep 4, 2026, late night, see Product build above
-14. Work through the rest of the "Next build priorities" list above — lint fix → email notifications — none of it is blocked by 1, 4, or 7
+14. ~~Fix `npm run lint`~~ — done Sep 4, 2026, late night, see Product build above
+15. Build email notifications (SendGrid or Postmark) — last item on the "Next build priorities" list, not blocked by 1, 4, or 7. Use `info@casewhy.com` for anything email-related, not the user's personal address.

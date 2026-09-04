@@ -4,6 +4,7 @@ import { explainCaseStatus, type CaseExplanation } from "@/lib/ai/explain";
 import { auth } from "@/lib/auth/server";
 import { getTrackedReceiptNumber } from "./actions";
 import { TrackCaseButton } from "./TrackCaseButton";
+import { FileUploadStub } from "./FileUploadStub";
 
 export const dynamic = "force-dynamic";
 
@@ -131,6 +132,8 @@ function StatusCard({
           </ol>
         </div>
       )}
+
+      <FileUploadStub />
     </div>
   );
 }

@@ -1,5 +1,11 @@
+import Link from "next/link";
 import { getCaseStatus, UscisApiError, type CaseStatus } from "@/lib/uscis/client";
 import { explainCaseStatus, type CaseExplanation } from "@/lib/ai/explain";
+import { auth } from "@/lib/auth/server";
+import { getTrackedReceiptNumber } from "./actions";
+import { TrackCaseButton } from "./TrackCaseButton";
+
+export const dynamic = "force-dynamic";
 
 function friendlyErrorMessage(err: UscisApiError): string {
   if (err.status === 404) {
@@ -67,9 +73,11 @@ function ExplanationBox({ explanation }: { explanation: CaseExplanation }) {
 function StatusCard({
   status,
   explanation,
+  tracking,
 }: {
   status: CaseStatus;
   explanation: CaseExplanation | null;
+  tracking: { signedIn: boolean; alreadyTracked: boolean } | null;
 }) {
   return (
     <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
@@ -86,6 +94,24 @@ function StatusCard({
       </div>
 
       <p className="mt-4 text-neutral-700 dark:text-neutral-300">{status.statusDescription}</p>
+
+      {tracking && (
+        <div className="mt-3">
+          {tracking.signedIn ? (
+            <TrackCaseButton
+              receiptNumber={status.receiptNumber}
+              alreadyTracked={tracking.alreadyTracked}
+            />
+          ) : (
+            <p className="text-xs text-neutral-500">
+              <Link href="/auth/sign-in" className="font-semibold text-brand-600 dark:text-brand-500 hover:underline">
+                Sign in
+              </Link>{" "}
+              to save this case.
+            </p>
+          )}
+        </div>
+      )}
 
       {explanation && <ExplanationBox explanation={explanation} />}
 
@@ -123,7 +149,16 @@ export default async function DashboardPage({
   searchParams: Promise<{ receipt?: string }>;
 }) {
   const { receipt } = await searchParams;
-  const receiptNumber = receipt?.trim();
+  const { data: session } = await auth.getSession();
+
+  let trackedReceiptNumber: string | null = null;
+  if (session?.user) {
+    trackedReceiptNumber = await getTrackedReceiptNumber(session.user.id);
+  }
+
+  // An explicit ?receipt= search always wins (ad-hoc lookup); otherwise fall
+  // back to the signed-in user's saved case, if any.
+  const receiptNumber = receipt?.trim() || trackedReceiptNumber || undefined;
 
   let status: CaseStatus | null = null;
   let explanation: CaseExplanation | null = null;
@@ -154,7 +189,16 @@ export default async function DashboardPage({
       <SearchForm receiptNumber={receiptNumber} />
 
       <div className="mt-6">
-        {status && <StatusCard status={status} explanation={explanation} />}
+        {status && (
+          <StatusCard
+            status={status}
+            explanation={explanation}
+            tracking={{
+              signedIn: !!session?.user,
+              alreadyTracked: status.receiptNumber === trackedReceiptNumber,
+            }}
+          />
+        )}
         {errorMessage && <ErrorCard message={errorMessage} />}
         {!status && !errorMessage && !receiptNumber && (
           <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">

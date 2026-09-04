@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AuthHeader } from "@/components/AuthHeader";
 
 export const metadata: Metadata = {
   title: "CaseWhy — Understand your USCIS case",
@@ -12,7 +13,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <AuthHeader />
+        {children}
+      </body>
     </html>
   );
 }

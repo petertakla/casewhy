@@ -58,6 +58,8 @@ Full background:
 
 Both `/` and `/dashboard` verified responding `200` after the Sep 4 push (commit `cd27577`, the explanation-layer work). This is separate from casewhy.com, which is still the `main`-branch static landing page on a different Vercel project — no change there.
 
+**Update, same evening:** a real case lookup on that URL (`?receipt=EAC9999103403`) initially failed with "Something went wrong looking up your case" — the deployed app had no `USCIS_*` env vars set on Vercel at all (only the Neon Postgres integration vars were there; local `.env.local` and GitHub Actions CI secrets never got mirrored to the actual deployment). Added them via `vercel env add` — first attempt was itself broken (values in `.env.local` are double-quote-wrapped, e.g. `USCIS_CLIENT_ID="...ObeG"`, and the extraction script pushed the literal quote characters into Vercel, corrupting the OAuth client_id/secret); fixed by stripping the quotes and redeploying. **Verified working end-to-end in-browser** at `casewhy-app.vercel.app/dashboard?receipt=EAC9999103403`: status card, "What this means" explanation box, and history all render correctly. The dashboard + explanation layer are now genuinely checkable from anywhere, not just this machine.
+
 ## Next build priorities (added Sep 4, 2026, evening; #1 done later same evening)
 
 Everything else open right now — the sandbox traffic log, the Florida LLC, the FOIA ticket — is either waiting on USCIS, the state, or just needs to run out its own clock. None of it blocks code work. In priority order, all fully actionable now:

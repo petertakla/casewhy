@@ -14,13 +14,22 @@ export async function trackCase(receiptNumber: string): Promise<void> {
   }
 
   const db = getDb();
-  const encrypted = encryptField(receiptNumber);
+  const encryptedReceipt = encryptField(receiptNumber);
+  const encryptedEmail = encryptField(session.user.email);
   await db
     .insert(trackedCases)
-    .values({ userId: session.user.id, receiptNumber: encrypted })
+    .values({ userId: session.user.id, receiptNumber: encryptedReceipt, email: encryptedEmail })
     .onConflictDoUpdate({
       target: trackedCases.userId,
-      set: { receiptNumber: encrypted },
+      // Switching to a different case resets the notification baseline —
+      // otherwise the cron would compare the new case against the old
+      // case's last-seen status and fire a spurious "change" email.
+      set: {
+        receiptNumber: encryptedReceipt,
+        email: encryptedEmail,
+        lastStatusText: null,
+        lastCheckedAt: null,
+      },
     });
 
   revalidatePath("/dashboard");

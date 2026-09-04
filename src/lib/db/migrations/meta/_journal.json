@@ -8,6 +8,13 @@
       "when": 1788547836309,
       "tag": "0000_mysterious_machine_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788553909909,
+      "tag": "0001_abnormal_eddie_brock",
+      "breakpoints": true
     }
   ]
 }

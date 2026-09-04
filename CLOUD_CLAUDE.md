@@ -2,6 +2,8 @@
 
 This file is the standing handoff between the cloud Claude session (which owns business/planning work and the artifacts below) and Claude Code sessions running here on the Fedora machine (which own the codebase). Read this first; update it — and tell the user to mention updates back to the cloud session — whenever a status below changes.
 
+> **Last updated by Claude Code: Sep 4, 2026, ~10:05pm ET.** If you (cloud session) are reading a copy of this file fetched before that time, re-fetch it now before editing — an earlier stale-copy edit tonight silently reverted two already-resolved sections back to "unresolved" (see the process note under "Right now" below). Tonight's session, in order: shipped the plain-language explanation layer (fixing an AI Gateway 403 along the way), then persistent case tracking + magic-link auth (Neon Auth), then encrypted `tracked_cases.receipt_number` at rest per the standing compliance guardrail. All live on `casewhy-app.vercel.app`, CI green, everything pushed to `nextjs-app`.
+
 ## What this is
 
 CaseWhy is an AI-explained USCIS case-status tracking web app. Existing trackers (Lawfully, US Case Tracker, VisaWatch) poll USCIS and show status. CaseWhy's differentiator: turn a status change or policy shift into a plain-language explanation and a concrete next action, instead of just a timestamp. Free tier: one tracked case. Paid tier (~$7-15/mo): multiple cases, faster notifications, an "ask a question" AI chat (v2). Secondary revenue: attorney-referral warm handoff.

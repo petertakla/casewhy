@@ -24,3 +24,6 @@ jobs:
           USCIS_CLIENT_SECRET: ${{ secrets.USCIS_CLIENT_SECRET }}
           USCIS_SANDBOX_TOKEN_URL: https://api-int.uscis.gov/oauth/accesstoken
           USCIS_SANDBOX_API_BASE: https://api-int.uscis.gov
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEON_AUTH_BASE_URL: ${{ secrets.NEON_AUTH_BASE_URL }}
+          NEON_AUTH_COOKIE_SECRET: ${{ secrets.NEON_AUTH_COOKIE_SECRET }}

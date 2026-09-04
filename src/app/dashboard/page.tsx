@@ -1,4 +1,5 @@
 import { getCaseStatus, UscisApiError, type CaseStatus } from "@/lib/uscis/client";
+import { explainCaseStatus, type CaseExplanation } from "@/lib/ai/explain";
 
 function friendlyErrorMessage(err: UscisApiError): string {
   if (err.status === 404) {
@@ -41,7 +42,35 @@ function SearchForm({ receiptNumber }: { receiptNumber?: string }) {
   );
 }
 
-function StatusCard({ status }: { status: CaseStatus }) {
+function ExplanationBox({ explanation }: { explanation: CaseExplanation }) {
+  return (
+    <div className="mt-4 rounded-lg bg-brand-50 dark:bg-brand-700/10 border border-brand-100 dark:border-brand-700/30 p-4">
+      <p className="text-xs uppercase tracking-widest text-brand-600 dark:text-brand-500 mb-2">
+        What this means
+      </p>
+      <p className="text-sm text-neutral-700 dark:text-neutral-300">{explanation.explanation}</p>
+      {explanation.nextSteps.length > 0 && (
+        <ul className="mt-3 space-y-1 text-sm text-neutral-700 dark:text-neutral-300 list-disc list-inside">
+          {explanation.nextSteps.map((step, i) => (
+            <li key={i}>{step}</li>
+          ))}
+        </ul>
+      )}
+      <p className="mt-3 text-xs text-neutral-500">
+        General information, not legal advice. For guidance specific to your case, talk to a
+        licensed immigration attorney.
+      </p>
+    </div>
+  );
+}
+
+function StatusCard({
+  status,
+  explanation,
+}: {
+  status: CaseStatus;
+  explanation: CaseExplanation | null;
+}) {
   return (
     <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
       <div className="flex items-baseline justify-between gap-4 flex-wrap">
@@ -57,6 +86,8 @@ function StatusCard({ status }: { status: CaseStatus }) {
       </div>
 
       <p className="mt-4 text-neutral-700 dark:text-neutral-300">{status.statusDescription}</p>
+
+      {explanation && <ExplanationBox explanation={explanation} />}
 
       {status.history.length > 0 && (
         <div className="mt-6 border-t border-neutral-200 dark:border-neutral-800 pt-4">
@@ -95,11 +126,17 @@ export default async function DashboardPage({
   const receiptNumber = receipt?.trim();
 
   let status: CaseStatus | null = null;
+  let explanation: CaseExplanation | null = null;
   let errorMessage: string | null = null;
 
   if (receiptNumber) {
     try {
       status = await getCaseStatus(receiptNumber);
+      try {
+        explanation = await explainCaseStatus(status);
+      } catch {
+        // Explanation is a nice-to-have — show the raw status even if the model call fails.
+      }
     } catch (err) {
       errorMessage = err instanceof UscisApiError
         ? friendlyErrorMessage(err)
@@ -117,7 +154,7 @@ export default async function DashboardPage({
       <SearchForm receiptNumber={receiptNumber} />
 
       <div className="mt-6">
-        {status && <StatusCard status={status} />}
+        {status && <StatusCard status={status} explanation={explanation} />}
         {errorMessage && <ErrorCard message={errorMessage} />}
         {!status && !errorMessage && !receiptNumber && (
           <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">

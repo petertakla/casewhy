@@ -42,15 +42,17 @@ Full background:
 - Dashboard UI (`src/app/dashboard/page.tsx`): done Sep 4, 2026 — server component with a receipt-number search form (plain GET, no client JS needed), wired directly to `getCaseStatus()`. Renders status/description/history on success, a friendly message on failure, and an empty state before any search. Verified in-browser against the live sandbox. This unblocks the live USCIS demo prerequisite (CW-09) and the demo-ready milestone (CW-15).
 - Git-linked Sep 4, 2026: pushed to `petertakla/casewhy` on a new **`nextjs-app` branch**, not `main` — `main` is still the live static landing page deployed to casewhy.com, and this Next.js app isn't ready to replace it yet. Open a PR from `nextjs-app` when it is.
 - CI (`.github/workflows/ci.yml`): install → `tsc --noEmit` → `next build`, runs on push/PR to `nextjs-app`. Sandbox `USCIS_CLIENT_ID`/`USCIS_CLIENT_SECRET` are GitHub Actions secrets on the repo. First run passed clean.
+- **Plain-language explanation layer: done Sep 4, 2026 (evening)** — `explainCaseStatus()` (`src/lib/ai/explain.ts`, `ai` SDK + `Output.object`/zod, model `anthropic/claude-haiku-4.5` via AI Gateway, `claude-sonnet-5` documented as the upgrade path if quality is insufficient) wired into the dashboard: renders a plain-language explanation + general next steps next to the raw status, fails gracefully (raw status still shows) if the model call errors. Verified end-to-end against a real case via a temp isolated test route (deleted after use). Committed on `nextjs-app` (b47b0a0).
+  - Getting this working required fixing an AI Gateway 403 (`Free tier users do not have access to this model`, later `BYOK is available only with paid credits`): upgraded team to **Pro**, bought a **$20 one-time AI Gateway credit top-up** (separate from the Pro plan subscription itself — easy to conflate, the first attempt mistakenly paid the Pro invoice instead), then added a personal Anthropic API key via AI Gateway **BYOK**. Budget for further AI Gateway credit top-ups as usage grows.
 - Note: `npm run lint` is currently broken repo-wide (missing `eslint.config.js` for ESLint 9) — see next-build-priorities below.
 
 **Target:** paid-tier launch ~Nov 30, 2026 (~12 weeks from a Sep 7, 2026 start). See the roadmap artifact below for the full week-by-week plan.
 
-## Next build priorities (added Sep 4, 2026, evening)
+## Next build priorities (added Sep 4, 2026, evening; #1 done later same evening)
 
 Everything else open right now — the sandbox traffic log, the Florida LLC, the FOIA ticket — is either waiting on USCIS, the state, or just needs to run out its own clock. None of it blocks code work. In priority order, all fully actionable now:
 
-1. **Plain-language explanation layer — the actual product wedge.** This is the single most important unbuilt piece; everything else on this list is infrastructure around it. Add a Claude API call triggered when `getCaseStatus()` returns a status not previously seen for a given receipt number, passing the raw USCIS status text (a curated policy/case-law knowledge base can come later — ship without it first) and returning a plain-language explanation plus general next-step guidance. Keep the guardrails from the Legal section below: general and informational only, never a conclusion about *this specific user's* case, always route case-specific questions to "talk to an attorney." Surface it on the dashboard next to the raw status.
+1. ~~**Plain-language explanation layer.**~~ — **done Sep 4, 2026 evening**, see Product build above.
 
 2. **Persistent case tracking + minimal auth.** The dashboard is a one-off lookup right now — nothing is saved between visits. Needs: a way to save a receipt number as "the" tracked case (one free case per account per the MVP scope), some persistence (SQLite or a file-backed store is fine ahead of standing up real Postgres), and light auth — a magic-link/email flow beats building full password auth this early. This is also the prerequisite for scheduled polling and the status-change timeline described in the Architecture section below.
 
@@ -81,7 +83,8 @@ Everything else open right now — the sandbox traffic log, the Florida LLC, the
 - `README.md` — scaffold notes and the researched USCIS onboarding-process requirements (register → sandbox 5-day traffic → affidavit → live demo → production access)
 - `src/lib/uscis/client.ts` — OAuth 2.0 client-credentials flow + `getCaseStatus()`, wired to the sandbox
 - `src/lib/uscis/foia.ts` — FOIA Request and Status API client (`createFoiaCase()`, `getFoiaCaseStatus()`); implemented but live sandbox testing blocked, see above
-- `src/app/dashboard/page.tsx` — dashboard, wired to `getCaseStatus()` (done Sep 4) — next: wire in the explanation layer (#1 above)
+- `src/app/dashboard/page.tsx` — dashboard, wired to `getCaseStatus()` and `explainCaseStatus()` (both done Sep 4)
+- `src/lib/ai/explain.ts` — `explainCaseStatus()`, AI Gateway (Anthropic BYOK) + `ai` SDK + zod, done Sep 4
 - `src/app/page.tsx` — landing page (email capture, no backend wired)
 - `src/lib/config.ts` — env var loading/validation
 - `.env.local` — sandbox credentials (gitignored)
@@ -103,4 +106,5 @@ Everything else open right now — the sandbox traffic log, the Florida LLC, the
 6. ~~`git init`/link this working copy to the existing GitHub repo; set up CI with sandbox creds as Actions secrets~~ — done Sep 4, 2026 (pushed to `nextjs-app` branch, CI passing)
 7. Once the 5-day log is complete, email developersupport@uscis.dhs.gov to request the affidavit
 8. ~~Send the drafted FOIA product-binding support email~~ — done Sep 4, 2026; awaiting USCIS response
-9. Work through the "Next build priorities" list above (explanation layer → persistent tracking/auth → file upload stub → lint fix → email notifications) — none of it is blocked by 1, 4, or 7
+9. ~~Build the plain-language explanation layer~~ — done Sep 4, 2026 evening
+10. Work through the rest of the "Next build priorities" list above (persistent tracking/auth → file upload stub → lint fix → email notifications) — none of it is blocked by 1, 4, or 7

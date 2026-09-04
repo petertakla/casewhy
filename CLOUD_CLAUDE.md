@@ -40,8 +40,9 @@ Full background:
 
 - Next.js/TS/Tailwind scaffold: running locally in this folder — `npm install` and `npm run dev` both succeed  
 - Dashboard UI (`src/app/dashboard/page.tsx`): done Sep 4, 2026 — server component with a receipt-number search form (plain GET, no client JS needed), wired directly to `getCaseStatus()`. Renders status/description/history on success, a friendly message (using USCIS's own error text where available) on failure, and an empty state before any search. Verified in-browser against the live sandbox: empty state, a real approved-case result (EAC9999103403), and an invalid-receipt error all render correctly. This unblocks the live USCIS demo prerequisite (CW-09) and the demo-ready milestone (CW-15).  
-- This working copy is **not yet git-linked** to the existing GitHub repo (no `.git` here) — deferred on purpose rather than rushed for a one-off sandbox test  
-- CI / GitHub Actions secrets for sandbox credentials: not set up — depends on the repo link above; when this happens, sandbox `client_id`/`secret` go into Actions secrets, not a persisted config file
+- Git-linked Sep 4, 2026: pushed to `petertakla/casewhy` on a new **`nextjs-app` branch**, not `main` — `main` is still the live static landing page deployed to casewhy.com, and this Next.js app isn't ready to replace it yet. Open a PR from `nextjs-app` when it is.
+- CI (`.github/workflows/ci.yml`): install → `tsc --noEmit` → `next build`, runs on push/PR to `nextjs-app`. Sandbox `USCIS_CLIENT_ID`/`USCIS_CLIENT_SECRET` are GitHub Actions secrets on the repo (not a persisted config file). First run passed clean.
+- Note: `npm run lint` is currently broken repo-wide (missing `eslint.config.js` for ESLint 9) — pre-existing gap, not introduced by this work, and not yet in the CI workflow. Worth fixing before adding a lint step.
 
 **Target:** paid-tier launch \~Nov 30, 2026 (\~12 weeks from a Sep 7, 2026 start). See the roadmap artifact below for the full week-by-week plan.
 
@@ -85,7 +86,7 @@ Full background:
 3. Rename the business contact email to drop "uscis"; update it on the landing page and privacy policy  
 4. File the Florida LLC  
 5. ~~Build the dashboard UI against `getCaseStatus()`~~ — done Sep 4, 2026  
-6. `git init`/link this working copy to the existing GitHub repo; set up CI with sandbox creds as Actions secrets  
+6. ~~`git init`/link this working copy to the existing GitHub repo; set up CI with sandbox creds as Actions secrets~~ — done Sep 4, 2026 (pushed to `nextjs-app` branch, CI passing)  
 7. Once the 5-day log is complete, email [developersupport@uscis.dhs.gov](mailto:developersupport@uscis.dhs.gov) to request the affidavit
 8. ~~Send the drafted FOIA product-binding support email~~ — done Sep 4, 2026; awaiting USCIS response
 

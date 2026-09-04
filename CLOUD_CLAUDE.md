@@ -48,13 +48,23 @@ Full background:
 
 **Target:** paid-tier launch ~Nov 30, 2026 (~12 weeks from a Sep 7, 2026 start). See the roadmap artifact below for the full week-by-week plan.
 
+## Right now — confirm a checkable UI (do this first, it's quick)
+
+**Resolved Sep 4, 2026.** The `nextjs-app` branch isn't just previewed — the separate `casewhy-app` Vercel project (`.vercel/project.json` → `prj_Zjis1TjZJO8FGqF93t12q169UCN9`) has `nextjs-app` configured as its **Production** branch (`vercel inspect` shows `target: production`), so every push to it deploys straight to a stable production URL, not a throwaway preview link:
+
+- **https://casewhy-app.vercel.app** — stable alias, click this one
+- https://casewhy-app-smarticos.vercel.app — same deployment, alternate alias
+- https://casewhy-app-git-nextjs-app-smarticos.vercel.app — branch-specific alias, will always point at the latest `nextjs-app` push
+
+Both `/` and `/dashboard` verified responding `200` after the Sep 4 push (commit `cd27577`, the explanation-layer work). This is separate from casewhy.com, which is still the `main`-branch static landing page on a different Vercel project — no change there.
+
 ## Next build priorities (added Sep 4, 2026, evening; #1 done later same evening)
 
 Everything else open right now — the sandbox traffic log, the Florida LLC, the FOIA ticket — is either waiting on USCIS, the state, or just needs to run out its own clock. None of it blocks code work. In priority order, all fully actionable now:
 
 1. ~~**Plain-language explanation layer.**~~ — **done Sep 4, 2026 evening**, see Product build above.
 
-2. **Persistent case tracking + minimal auth.** The dashboard is a one-off lookup right now — nothing is saved between visits. Needs: a way to save a receipt number as "the" tracked case (one free case per account per the MVP scope), some persistence (SQLite or a file-backed store is fine ahead of standing up real Postgres), and light auth — a magic-link/email flow beats building full password auth this early. This is also the prerequisite for scheduled polling and the status-change timeline described in the Architecture section below.
+2. **START HERE — Persistent case tracking + minimal auth.** The dashboard is a one-off lookup right now — nothing is saved between visits. Needs: a way to save a receipt number as "the" tracked case (one free case per account per the MVP scope), some persistence (SQLite or a file-backed store is fine ahead of standing up real Postgres), and light auth — a magic-link/email flow beats building full password auth this early. This is also the prerequisite for scheduled polling and the status-change timeline described in the Architecture section below.
 
 3. **File upload UI stub.** The live USCIS demo evaluates six things: UI usability, file upload, JSON payload handling, OAuth 2.0, error handling, case status tracking. The dashboard already covers most of these; file upload has no stub yet. Doesn't need to hit a real endpoint — a working upload control that accepts a file and confirms receipt is enough to satisfy the demo criterion.
 
@@ -107,4 +117,5 @@ Everything else open right now — the sandbox traffic log, the Florida LLC, the
 7. Once the 5-day log is complete, email developersupport@uscis.dhs.gov to request the affidavit
 8. ~~Send the drafted FOIA product-binding support email~~ — done Sep 4, 2026; awaiting USCIS response
 9. ~~Build the plain-language explanation layer~~ — done Sep 4, 2026 evening
-10. Work through the rest of the "Next build priorities" list above (persistent tracking/auth → file upload stub → lint fix → email notifications) — none of it is blocked by 1, 4, or 7
+10. ~~Report the `nextjs-app` Vercel preview URL~~ — done Sep 4, 2026: it's a production URL, not a preview, see "Right now" above
+11. Work through the rest of the "Next build priorities" list above, starting with persistent tracking/auth (#2) → file upload stub → lint fix → email notifications — none of it is blocked by 1, 4, or 7

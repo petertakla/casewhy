@@ -25,23 +25,48 @@ function friendlyErrorMessage(err: UscisApiError): string {
   return "USCIS's case status service is temporarily unavailable. Please try again shortly.";
 }
 
+/** Semantic color for a status pill, matched loosely against USCIS's own wording. */
+function statusTone(statusText: string): { dot: string; text: string; bg: string } {
+  const s = statusText.toLowerCase();
+  if (s.includes("approved") || s.includes("card was delivered") || s.includes("naturalization oath")) {
+    return { dot: "bg-emerald-500", text: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10" };
+  }
+  if (s.includes("denied") || s.includes("rejected") || s.includes("terminated")) {
+    return { dot: "bg-red-500", text: "text-red-600 dark:text-red-400", bg: "bg-red-500/10" };
+  }
+  if (s.includes("request for evidence") || s.includes("rfe") || s.includes("interview")) {
+    return { dot: "bg-amber-500", text: "text-amber-600 dark:text-amber-400", bg: "bg-amber-500/10" };
+  }
+  return { dot: "bg-brand-500", text: "text-brand-600 dark:text-brand-400", bg: "bg-brand-500/10" };
+}
+
 function SearchForm({ receiptNumber }: { receiptNumber?: string }) {
   return (
-    <form action="/dashboard" method="get" className="flex flex-col sm:flex-row gap-3">
-      <input
-        type="text"
-        name="receipt"
-        required
-        defaultValue={receiptNumber}
-        placeholder="e.g. EAC9999103403"
-        autoCapitalize="characters"
-        autoComplete="off"
-        aria-label="USCIS receipt number"
-        className="flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-brand-500"
-      />
+    <form action="/dashboard" method="get" className="flex flex-col gap-3 sm:flex-row">
+      <div className="relative flex-1">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+        >
+          <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth={1.8} />
+          <path d="m21 21-4.3-4.3" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
+        </svg>
+        <input
+          type="text"
+          name="receipt"
+          required
+          defaultValue={receiptNumber}
+          placeholder="e.g. EAC9999103403"
+          autoCapitalize="characters"
+          autoComplete="off"
+          aria-label="USCIS receipt number"
+          className="w-full rounded-lg border border-border-strong bg-surface pl-10 pr-4 py-2.5 font-mono text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
+        />
+      </div>
       <button
         type="submit"
-        className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
+        className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
       >
         Track case
       </button>
@@ -51,22 +76,40 @@ function SearchForm({ receiptNumber }: { receiptNumber?: string }) {
 
 function ExplanationBox({ explanation }: { explanation: CaseExplanation }) {
   return (
-    <div className="mt-4 rounded-lg bg-brand-50 dark:bg-brand-700/10 border border-brand-100 dark:border-brand-700/30 p-4">
-      <p className="text-xs uppercase tracking-widest text-brand-600 dark:text-brand-500 mb-2">
-        What this means
-      </p>
-      <p className="text-sm text-neutral-700 dark:text-neutral-300">{explanation.explanation}</p>
-      {explanation.nextSteps.length > 0 && (
-        <ul className="mt-3 space-y-1 text-sm text-neutral-700 dark:text-neutral-300 list-disc list-inside">
-          {explanation.nextSteps.map((step, i) => (
-            <li key={i}>{step}</li>
-          ))}
-        </ul>
-      )}
-      <p className="mt-3 text-xs text-neutral-500">
-        General information, not legal advice. For guidance specific to your case, talk to a
-        licensed immigration attorney.
-      </p>
+    <div className="mt-5 overflow-hidden rounded-xl border border-brand-500/20 bg-surface-2">
+      <div className="flex gap-3 border-l-4 border-l-brand-500 p-4">
+        <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-brand-600 dark:text-brand-400">
+          <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5">
+            <path
+              d="M12 3a6 6 0 0 0-3.5 10.9c.4.3.5.6.5 1.1v1a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1c0-.5.1-.8.5-1.1A6 6 0 0 0 12 3ZM10 20h4"
+              stroke="currentColor"
+              strokeWidth={1.6}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
+            What this means
+          </p>
+          <p className="mt-1.5 text-sm text-foreground/90">{explanation.explanation}</p>
+          {explanation.nextSteps.length > 0 && (
+            <ul className="mt-3 space-y-1.5 text-sm text-foreground/90">
+              {explanation.nextSteps.map((step, i) => (
+                <li key={i} className="flex gap-2">
+                  <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-muted" />
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="mt-3 text-xs text-muted">
+            General information, not legal advice. For guidance specific to your case, talk to a
+            licensed immigration attorney.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -80,21 +123,28 @@ function StatusCard({
   explanation: CaseExplanation | null;
   tracking: { signedIn: boolean; alreadyTracked: boolean } | null;
 }) {
+  const tone = statusTone(status.statusText);
+
   return (
-    <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
-      <div className="flex items-baseline justify-between gap-4 flex-wrap">
+    <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-widest text-neutral-500">
+          <p className="font-mono text-xs uppercase tracking-widest text-muted">
             {status.formType} · {status.receiptNumber}
           </p>
-          <h2 className="text-xl font-bold mt-1">{status.statusText}</h2>
+          <div className="mt-2 flex items-center gap-2">
+            <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${tone.bg} ${tone.text}`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
+              {status.statusText}
+            </span>
+          </div>
         </div>
         {status.modifiedDate && (
-          <p className="text-xs text-neutral-500">Updated {status.modifiedDate}</p>
+          <p className="text-xs text-muted">Updated {status.modifiedDate}</p>
         )}
       </div>
 
-      <p className="mt-4 text-neutral-700 dark:text-neutral-300">{status.statusDescription}</p>
+      <p className="mt-4 text-sm leading-relaxed text-foreground/90">{status.statusDescription}</p>
 
       {tracking && (
         <div className="mt-3">
@@ -104,8 +154,8 @@ function StatusCard({
               alreadyTracked={tracking.alreadyTracked}
             />
           ) : (
-            <p className="text-xs text-neutral-500">
-              <Link href="/auth/sign-in" className="font-semibold text-brand-600 dark:text-brand-500 hover:underline">
+            <p className="text-xs text-muted">
+              <Link href="/auth/sign-in" className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
                 Sign in
               </Link>{" "}
               to save this case.
@@ -117,16 +167,18 @@ function StatusCard({
       {explanation && <ExplanationBox explanation={explanation} />}
 
       {status.history.length > 0 && (
-        <div className="mt-6 border-t border-neutral-200 dark:border-neutral-800 pt-4">
-          <p className="text-xs uppercase tracking-widest text-neutral-500 mb-3">History</p>
-          <ol className="space-y-3">
+        <div className="mt-6 border-t border-border pt-5">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted">History</p>
+          <ol className="relative space-y-5 border-l border-border pl-5">
             {status.history.map((entry, i) => (
-              <li key={i} className="text-sm">
-                <span className="text-neutral-500">{entry.date}</span>
-                <span className="mx-2 text-neutral-300 dark:text-neutral-700">·</span>
-                <span className="text-neutral-700 dark:text-neutral-300">
-                  {entry.completed_text_en}
-                </span>
+              <li key={i} className="relative text-sm">
+                <span
+                  className={`absolute -left-[23px] top-0.5 h-2.5 w-2.5 rounded-full ring-4 ring-surface ${
+                    i === 0 ? "bg-brand-500" : "bg-border-strong"
+                  }`}
+                />
+                <span className="block font-mono text-xs text-muted">{entry.date}</span>
+                <span className="mt-0.5 block text-foreground/90">{entry.completed_text_en}</span>
               </li>
             ))}
           </ol>
@@ -140,8 +192,8 @@ function StatusCard({
 
 function ErrorCard({ message }: { message: string }) {
   return (
-    <div className="rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/20 p-6">
-      <p className="text-sm text-red-700 dark:text-red-400">{message}</p>
+    <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6">
+      <p className="text-sm text-red-600 dark:text-red-400">{message}</p>
     </div>
   );
 }
@@ -183,9 +235,9 @@ export default async function DashboardPage({
   }
 
   return (
-    <main className="min-h-screen px-6 py-10 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-2">Your case</h1>
-      <p className="text-neutral-600 dark:text-neutral-400 mb-8">
+    <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+      <h1 className="text-2xl font-bold tracking-tight">Your case</h1>
+      <p className="mb-8 mt-2 text-muted">
         Enter your USCIS receipt number to see its current status.
       </p>
 
@@ -204,8 +256,8 @@ export default async function DashboardPage({
         )}
         {errorMessage && <ErrorCard message={errorMessage} />}
         {!status && !errorMessage && !receiptNumber && (
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
-            <p className="text-sm text-neutral-500">
+          <div className="rounded-2xl border border-dashed border-border-strong p-8 text-center">
+            <p className="text-sm text-muted">
               No case tracked yet — enter a receipt number above to get started.
             </p>
           </div>

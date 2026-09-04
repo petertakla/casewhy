@@ -24,33 +24,35 @@ export function FileUploadStub() {
   }
 
   return (
-    <div className="mt-6 border-t border-neutral-200 dark:border-neutral-800 pt-4">
-      <p className="text-xs uppercase tracking-widest text-neutral-500 mb-3">
+    <div className="mt-6 border-t border-border pt-5">
+      <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted">
         Supporting documents
       </p>
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col gap-3 rounded-xl border border-dashed border-border-strong bg-background/40 p-4 sm:flex-row sm:items-center">
         <input
           type="file"
           accept=".pdf,.jpg,.jpeg,.png"
           onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           aria-label="Upload a supporting document"
-          className="flex-1 text-sm text-neutral-600 dark:text-neutral-400 file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-100 dark:file:bg-neutral-800 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-neutral-700 dark:file:text-neutral-300"
+          className="flex-1 text-sm text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-surface-2 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-foreground"
         />
         <button
           type="button"
           onClick={handleUpload}
           disabled={!file}
-          className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Upload
         </button>
       </div>
 
       {received && (
-        <p className="mt-3 text-sm text-neutral-700 dark:text-neutral-300">
-          Received <span className="font-medium">{received.name}</span> (
-          {formatSize(received.size)}).
+        <p className="mt-3 flex items-center gap-1.5 text-sm text-foreground/90">
+          <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0 text-emerald-500">
+            <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Received <span className="font-medium">{received.name}</span> ({formatSize(received.size)}).
         </p>
       )}
     </div>

@@ -8,14 +8,27 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        background: "var(--background)",
+        surface: "var(--surface)",
+        "surface-2": "var(--surface-2)",
+        foreground: "var(--foreground)",
+        muted: "var(--muted-foreground)",
+        border: "var(--border)",
+        "border-strong": "var(--border-strong)",
         // Placeholder brand palette — swap once CaseWhy branding is finalized.
         brand: {
           50: "#eff6ff",
           100: "#dbeafe",
+          400: "#5b9eed",
           500: "#2a78d6",
           600: "#1d5fb0",
           700: "#164a8a",
+          800: "#123b6e",
         },
+      },
+      fontFamily: {
+        sans: ["var(--font-sans)"],
+        mono: ["var(--font-mono)"],
       },
     },
   },

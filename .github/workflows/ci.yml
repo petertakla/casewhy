@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [nextjs-app]
+  pull_request:
+    branches: [nextjs-app]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm run build
+        env:
+          USCIS_ENV: sandbox
+          USCIS_CLIENT_ID: ${{ secrets.USCIS_CLIENT_ID }}
+          USCIS_CLIENT_SECRET: ${{ secrets.USCIS_CLIENT_SECRET }}
+          USCIS_SANDBOX_TOKEN_URL: https://api-int.uscis.gov/oauth/accesstoken
+          USCIS_SANDBOX_API_BASE: https://api-int.uscis.gov

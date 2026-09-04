@@ -27,3 +27,4 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEON_AUTH_BASE_URL: ${{ secrets.NEON_AUTH_BASE_URL }}
           NEON_AUTH_COOKIE_SECRET: ${{ secrets.NEON_AUTH_COOKIE_SECRET }}
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}

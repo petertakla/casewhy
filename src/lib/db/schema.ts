@@ -12,6 +12,7 @@ export const trackedCases = pgTable(
     // Neon Auth's user id (from session.user.id). Unique — one free
     // tracked case per account, per the MVP scope.
     userId: text("user_id").notNull(),
+    // AES-256-GCM ciphertext (base64), not plaintext — see src/lib/db/crypto.ts.
     receiptNumber: text("receipt_number").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },

@@ -21,9 +21,9 @@ Full background:
 
 - Domain, DNS, SSL: done — casewhy.com live, Cloudflare registrar \+ DNS, code on GitHub, deployed via Vercel  
 - Landing page \+ draft privacy policy: done, live since Sep 2-3  
-- Google Workspace business email: in progress — TXT/MX records added, domain verification with Google still pending  
+- Google Workspace business email: done — casewhy.com shows Verified + Gmail activated in the Admin Console (confirmed Sep 4, 2026). info@casewhy.com is a live, working inbox.  
 - Florida LLC: not yet filed  
-- Open naming issue: the placeholder contact email `casewhy.uscis@gmail.com` needs to be renamed to drop "uscis" before it's used anywhere official (the affidavit, public contact links) — using "uscis" in a business-controlled address undercuts the not-affiliated-with-USCIS disclaimer and resembles scam-site patterns. Once Workspace verification completes and a final address is chosen, update the contact links on the landing page and privacy policy.
+- Open naming issue, narrower than previously noted: `casewhy.uscis@gmail.com` exists as a Google account (visible in the account chooser) but was **never actually used** on the live site — checked the deployed `index.html`/`privacy.html` directly (Sep 4, 2026): landing page uses `hello@casewhy.com`, privacy policy uses `privacy@casewhy.com`, neither contains "uscis". So the live contact links are already fine. Still avoid using `casewhy.uscis@gmail.com` anywhere official (the affidavit, etc.) per the same reasoning (undercuts the not-affiliated-with-USCIS disclaimer). Whether to consolidate `hello@`/`privacy@` to `info@casewhy.com` (the confirmed-live inbox) was raised and explicitly declined by the user for now — don't redo that ask without new information.
 
 **USCIS API access**
 
@@ -82,8 +82,8 @@ Full background:
 ## Immediate next actions (roughly in order)
 
 1. Log sandbox traffic Mon Sep 7 – Thu Sep 10 (days 2-5 of the 5-day requirement)  
-2. Resolve Google Workspace domain verification  
-3. Rename the business contact email to drop "uscis"; update it on the landing page and privacy policy  
+2. ~~Resolve Google Workspace domain verification~~ — confirmed done Sep 4, 2026 (Verified + Gmail activated)  
+3. ~~Rename the business contact email to drop "uscis"~~ — turned out unnecessary; the live pages never used the "uscis" placeholder (see note above)  
 4. File the Florida LLC  
 5. ~~Build the dashboard UI against `getCaseStatus()`~~ — done Sep 4, 2026  
 6. ~~`git init`/link this working copy to the existing GitHub repo; set up CI with sandbox creds as Actions secrets~~ — done Sep 4, 2026 (pushed to `nextjs-app` branch, CI passing)  

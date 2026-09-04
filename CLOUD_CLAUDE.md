@@ -21,7 +21,7 @@ Full background:
 
 - Domain, DNS, SSL: done — casewhy.com live, Cloudflare registrar \+ DNS, code on GitHub, deployed via Vercel  
 - Landing page \+ draft privacy policy: done, live since Sep 2-3  
-- Google Workspace business email: done — casewhy.com shows Verified + Gmail activated in the Admin Console (confirmed Sep 4, 2026). info@casewhy.com is a live, working inbox.  
+- Google Workspace business email: done — casewhy.com shows Verified + Gmail activated in the Admin Console (confirmed Sep 4, 2026). info@casewhy.com is the sole licensed user and primary inbox. `hello@casewhy.com` and `privacy@casewhy.com` are configured as email aliases on it (not separate licensed accounts), with Gmail filters auto-labeling incoming mail by "To" address ("Hello" / "Privacy" labels) so privacy-alias mail (data-subject/deletion requests) stays visibly distinct from general inquiries.  
 - Florida LLC: not yet filed  
 - Open naming issue, narrower than previously noted: `casewhy.uscis@gmail.com` exists as a Google account (visible in the account chooser) but was **never actually used** on the live site — checked the deployed `index.html`/`privacy.html` directly (Sep 4, 2026): landing page uses `hello@casewhy.com`, privacy policy uses `privacy@casewhy.com`, neither contains "uscis". So the live contact links are already fine. Still avoid using `casewhy.uscis@gmail.com` anywhere official (the affidavit, etc.) per the same reasoning (undercuts the not-affiliated-with-USCIS disclaimer). Whether to consolidate `hello@`/`privacy@` to `info@casewhy.com` (the confirmed-live inbox) was raised and explicitly declined by the user for now — don't redo that ask without new information.
 

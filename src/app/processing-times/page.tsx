@@ -3,6 +3,9 @@ import {
   PROCESSING_TIMES_AS_OF,
   PROCESSING_TIMES_SOURCE_URL,
   FIELD_OFFICE_ONLY_FORMS,
+  VISA_BULLETIN_TIED_NOTE,
+  OFFICE_LOCATOR_URL,
+  ASC_LOCATOR_URL,
 } from "@/lib/kb/processing-times";
 
 export default function ProcessingTimesPage() {
@@ -57,6 +60,37 @@ export default function ProcessingTimesPage() {
             </li>
           ))}
         </ul>
+        <p className="mt-4 text-sm text-muted">{VISA_BULLETIN_TIED_NOTE}</p>
+      </div>
+
+      <div className="mt-8 rounded-xl border border-border bg-surface p-5">
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+          Find your specific office
+        </p>
+        <p className="mt-2 text-sm text-muted">
+          The figures above are national numbers. For a field-office-dependent form (N-400,
+          family-based I-485) or to find where a biometrics appointment happens, look up your own
+          office directly on USCIS&apos;s site — it&apos;s the current, official source and not
+          something CaseWhy keeps a copy of:
+        </p>
+        <div className="mt-3 flex flex-wrap gap-3 text-sm">
+          <a
+            href={OFFICE_LOCATOR_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-600 dark:text-brand-400 hover:underline"
+          >
+            Find your field office
+          </a>
+          <a
+            href={ASC_LOCATOR_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-600 dark:text-brand-400 hover:underline"
+          >
+            Find your Application Support Center
+          </a>
+        </div>
       </div>
 
       <p className="mt-6 text-xs text-muted">

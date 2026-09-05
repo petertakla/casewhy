@@ -22,23 +22,32 @@ interface TokenResponse {
   expires_in: number; // seconds
 }
 
-let cachedToken: { value: string; expiresAt: number } | null = null;
+interface UscisCredentials {
+  tokenUrl: string;
+  apiBase: string;
+  clientId: string;
+  clientSecret: string;
+}
 
-async function getAccessToken(): Promise<string> {
+// Keyed by clientId — the Case Status and FOIA credential pairs (see
+// getUscisFoiaConfig() in src/lib/config.ts) are genuinely different Torch
+// apps under the hood, so each needs its own cached token.
+const tokenCache = new Map<string, { value: string; expiresAt: number }>();
+
+async function getAccessToken(creds: UscisCredentials): Promise<string> {
   const now = Date.now();
-  if (cachedToken && cachedToken.expiresAt > now + 30_000) {
-    return cachedToken.value;
+  const cached = tokenCache.get(creds.clientId);
+  if (cached && cached.expiresAt > now + 30_000) {
+    return cached.value;
   }
-
-  const { tokenUrl, clientId, clientSecret } = getUscisConfig();
 
   const body = new URLSearchParams({
     grant_type: "client_credentials",
-    client_id: clientId,
-    client_secret: clientSecret,
+    client_id: creds.clientId,
+    client_secret: creds.clientSecret,
   });
 
-  const res = await fetch(tokenUrl, {
+  const res = await fetch(creds.tokenUrl, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body,
@@ -51,19 +60,29 @@ async function getAccessToken(): Promise<string> {
   }
 
   const data = (await res.json()) as TokenResponse;
-  cachedToken = {
+  const token = {
     value: data.access_token,
     expiresAt: now + data.expires_in * 1000,
   };
-  return cachedToken.value;
+  tokenCache.set(creds.clientId, token);
+  return token.value;
 }
 
-/** Low-level authenticated request against the USCIS API base. Shared by every USCIS API client (Case Status, FOIA, ...). */
-export async function uscisRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const { apiBase } = getUscisConfig();
-  const token = await getAccessToken();
+/**
+ * Low-level authenticated request against the USCIS API base. Shared by
+ * every USCIS API client (Case Status, FOIA, ...) — pass `credentials` to
+ * use a Torch app other than the default Case Status one (see
+ * getUscisFoiaConfig()).
+ */
+export async function uscisRequest<T>(
+  path: string,
+  init: RequestInit = {},
+  credentials?: UscisCredentials
+): Promise<T> {
+  const creds = credentials ?? getUscisConfig();
+  const token = await getAccessToken(creds);
 
-  const res = await fetch(`${apiBase}${path}`, {
+  const res = await fetch(`${creds.apiBase}${path}`, {
     ...init,
     headers: {
       Authorization: `Bearer ${token}`,

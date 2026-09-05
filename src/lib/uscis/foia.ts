@@ -10,10 +10,12 @@
 //     `error` is inline and null on success). Query by caseControlNumber
 //     and/or requestNumber.
 //
-// NOT YET WIRED UP: the CaseWhy App's Torch credentials currently only have
-// the "Case Status API - Sandbox" product enabled. "FOIA Request and Status
-// API - Sandbox" must be added as a product on the app (developer.uscis.gov)
-// before these calls will authenticate — see createFoiaCase/getFoiaCaseStatus.
+// Uses its own credential pair (USCIS_FOIA_CLIENT_ID/SECRET), not the Case
+// Status one — USCIS confirmed Sep 5, 2026 that the credential previously
+// assumed to be an inert duplicate is the real, active FOIA credential; the
+// original 401s were from using the Case Status pair against this API,
+// which was never going to work regardless of the product-enablement
+// setting. See getUscisFoiaConfig() in src/lib/config.ts.
 //
 // Compliance note: USCIS requires specific disclosure text to be shown in
 // the UI near the request form, the email field, the document upload
@@ -22,11 +24,19 @@
 // current text from the docs page directly before shipping any UI for this.
 
 import { uscisRequest } from "@/lib/uscis/client";
+import { getUscisFoiaConfig } from "@/lib/config";
 
 const FOIA_BASE_PATH = "/first-case-sbox";
 const FOIA_CASE_CREATE_PATH = `${FOIA_BASE_PATH}/case`;
 const FOIA_CASE_STATUS_PATH = `${FOIA_BASE_PATH}/case-status`;
 
+/**
+ * `mailingCountry` (here and on InternationalAddress below) must be an ISO
+ * 3166-1 alpha-2 code (e.g. "US", not "USA") or "UNK"/"UNS" — confirmed via
+ * a real sandbox test, Sep 5, 2026: "USA" produced a cascade of confusing
+ * validation errors on unrelated fields, because the API silently treated
+ * the unrecognized value as "not US" rather than rejecting it directly.
+ */
 interface DomesticAddress {
   mailingCountry: string;
   mailingState: string;
@@ -148,11 +158,23 @@ export interface CaseCreateRequest {
   /** Must include one "F" (father) and one "M" (mother) entry; minItems 2. */
   family: FamilyMember[];
   aliases?: PersonName[];
+  /**
+   * Typed optional per the docs schema, but a real sandbox test (Sep 5,
+   * 2026, once the FOIA credential fix landed) 500'd with a null-pointer
+   * when this was omitted — the live API needs it even though the schema
+   * doesn't say so. Always send one.
+   */
   requester?: FoiaRequester;
   /** Receipt number(s) this request relates to, e.g. "IOE1234567890". */
   receiptNumber?: string[];
   receiptNumbers?: string[];
   representiveRoleToSubjectOfRecord?: RepresentiveRole;
+  /**
+   * Typed optional per the docs schema, but the live API 400s without a
+   * value it recognizes as "a valid MyAccount email" (sandbox test, Sep 5,
+   * 2026) — sign up for a USCIS MyAccount at myaccount.uscis.gov to get one
+   * to test with; not yet done as of this writing.
+   */
   digitalDelivery?: string;
   preferredConsentMethod?: string;
   courtProceedings?: boolean;
@@ -168,11 +190,15 @@ export interface CaseCreateRequest {
  * with that control number (or this request number) to see it appear.
  */
 export async function createFoiaCase(payload: CaseCreateRequest): Promise<string> {
-  const { data } = await uscisRequest<{ data: { requestNumber: string } }>(FOIA_CASE_CREATE_PATH, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  const { data } = await uscisRequest<{ data: { requestNumber: string } }>(
+    FOIA_CASE_CREATE_PATH,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    },
+    getUscisFoiaConfig()
+  );
   return data.requestNumber;
 }
 
@@ -215,5 +241,5 @@ export async function getFoiaCaseStatus(params: {
   const query = new URLSearchParams(
     Object.entries(params).filter((entry): entry is [string, string] => Boolean(entry[1]))
   );
-  return uscisRequest<FoiaCaseStatus>(`${FOIA_CASE_STATUS_PATH}?${query}`);
+  return uscisRequest<FoiaCaseStatus>(`${FOIA_CASE_STATUS_PATH}?${query}`, {}, getUscisFoiaConfig());
 }

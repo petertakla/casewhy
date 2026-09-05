@@ -23,6 +23,8 @@ jobs:
           USCIS_ENV: sandbox
           USCIS_CLIENT_ID: ${{ secrets.USCIS_CLIENT_ID }}
           USCIS_CLIENT_SECRET: ${{ secrets.USCIS_CLIENT_SECRET }}
+          USCIS_FOIA_CLIENT_ID: ${{ secrets.USCIS_FOIA_CLIENT_ID }}
+          USCIS_FOIA_CLIENT_SECRET: ${{ secrets.USCIS_FOIA_CLIENT_SECRET }}
           USCIS_SANDBOX_TOKEN_URL: https://api-int.uscis.gov/oauth/accesstoken
           USCIS_SANDBOX_API_BASE: https://api-int.uscis.gov
           DATABASE_URL: ${{ secrets.DATABASE_URL }}

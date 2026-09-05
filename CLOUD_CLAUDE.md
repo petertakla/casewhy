@@ -277,6 +277,34 @@ Checked the checklist DB and this file end to end just now. Consolidating everyt
 
 Everything else (Florida LLC, sandbox traffic log Mon-Thu, Postmark "Request approval," Gmail delegation) keeps running on its own clock, unchanged.
 
+## Next tasks for Claude Code — round 5, Sep 5/6 (overnight) — fix the sign-in email's branding
+
+Peter tried registering and got a real, unbranded sign-in email — worth fixing soon, it's a trust problem for exactly the audience CaseWhy is trying to reassure (an unfamiliar sender domain reads as suspicious to someone already anxious about their case, and this product's whole pitch is trustworthy information). The email: subject "Sign In to proud-wind-48334029", from `Neon Auth <auth@mail.myneon.app>` — both are Neon Auth defaults, not a bug, and both are documented as fixable:
+
+1. **Quick fix — the project name in the subject/body.** Neon Console → Auth → Configuration tab → Project Info panel → **Application Name** field. Per Neon's own docs, this defaults to the raw Neon project slug (explaining "proud-wind-48334029") and is exactly what shows up in user-facing auth emails. Set it to "CaseWhy". Two-minute fix, no code change, do this first.
+2. **Real fix — the sender domain.** Neon's docs (Auth production checklist) explicitly recommend replacing the shared `auth@mail.myneon.app` SMTP with a custom provider: *"Replace shared SMTP (`auth@mail.myneon.app`) with your own email service for reliable delivery and higher limits."* CaseWhy already has a fully verified Postmark sending domain for `casewhy.com` (DKIM + Return-Path done for CW-24's notification emails) — reuse that instead of setting up a new provider. Configure it as Neon Auth's custom SMTP provider in Auth production settings so sign-in emails come from something like `CaseWhy <auth@casewhy.com>` instead of Neon's domain.
+3. **Optional, bigger lift, not urgent: full template control.** Neon supports intercepting `send.otp`/`send.magic_link` webhook events and sending a fully custom-branded HTML email (real logo, real design-system colors) through Postmark directly instead of Neon's default template — covered in Neon's "Customize emails" doc. Worth doing eventually so the sign-in email actually looks like CaseWhy, but steps 1-2 alone fix the actual trust problem Peter hit and should ship first.
+
+**Ask:** do 1 and 2 now — both are config, not new code, and nothing blocks either. Report back once sender/subject are confirmed branded with a real test sign-in email. Scope 3 only if there's a natural opening; not worth interrupting other work for.
+
+**Done, Sep 6 (Claude Code, via Neon Console — no code change, config only).** Both 1 and 2 are set: Application Name → "CaseWhy"; Email provider → Custom SMTP provider, `smtp.postmarkapp.com:587`, sender `auth@casewhy.com`, reusing the same Postmark Server API Token already in `POSTMARK_API_TOKEN`. **Verified two ways:** Neon's own "Send test email" button reported success against `info@casewhy.com` (proves the SMTP credentials actually authenticate with Postmark — a wrong token would have errored there, not succeeded); and the config page itself now shows Server: "Custom SMTP provider" and Sender address: `auth@casewhy.com` (was "Shared" / `auth@mail.myneon.app`). **Not independently confirmed by Claude Code:** the actual received email's subject/sender text, since Claude Code doesn't have inbox access to `info@casewhy.com` (same Gmail-delegation gap noted elsewhere in this file) — Peter, worth a quick look at the real inbox to confirm the subject reads "Sign In to CaseWhy" (not the old project slug) and the sender shows as CaseWhy. Scope 3 (fully custom HTML templates) still not done — untouched, per the original "not urgent" framing.
+
+## Next tasks for Claude Code — round 6, Sep 6 — wire the landing page's email capture to something real
+
+Peter asked when the landing page can start actually capturing emails, since the marketing plan (Section 7 of the MVP doc, "CaseWhy Free Marketing Playbook" artifact) assumes the pre-launch email list is already live and building. Checked `src/app/page.tsx` directly: **it isn't wired to anything.** `EmailCaptureForm` is a plain `<form>` with an `<input type="email">` and a submit button — no `action`, no `onSubmit`, no server action. Submitting it today does the browser's default no-action behavior: reloads the page with the email appended to the URL as a query string (`?email=...`) and shows no confirmation. That's worse than doing nothing — the email isn't captured anywhere, and putting it in the URL is a minor exposure of its own (browser history, any referrer header sent to a script on the page).
+
+**What this needs — small, same pattern as everything else in the schema:**
+
+1. A new table (e.g. `email_subscribers`: email, source page, created_at, unique constraint on email so a repeat signup doesn't duplicate) via Drizzle, same as `tracked_cases`/`subscriptions`/`chat_usage`.
+2. A server action wired to both `EmailCaptureForm` instances on the page (the hero one and the "Be first to try CaseWhy" one at the bottom) that validates the email, inserts (or no-ops on a duplicate), and shows a real confirmation state instead of reloading.
+3. Basic hygiene, not urgent enough to block shipping: a honeypot field or simple rate-limit against bot spam, since this form has no auth in front of it at all (unlike everything else built so far).
+
+**Also check, don't assume:** the static `casewhy.com` site (`main` branch, a separate deployment from this one) has its own copy of this same email-capture section, ported from it — confirm whether *that* form is wired to anything real. If it isn't either, both need the fix (or point both forms at the same backend, whichever is simpler given the two are separate deployments right now).
+
+**Not needed yet, flagging so it isn't over-built:** no CRM, no email-sending integration for this list specifically — Postmark is already verified for transactional email, but nothing here requires marketing-email sending yet, just capturing addresses reliably. A basic way to export/view the list (even a one-off query) is enough for now. Worth remembering before real sends start, though: any future marketing email to this list needs a real unsubscribe path (CAN-SPAM), same honesty standard as everything else on this project.
+
+**Ask:** build 1 and 2 — this directly unblocks Phase 1 of the marketing plan, which assumes the list is already capturing signups. Report back once a real submission shows up in the table and the static site's form status is confirmed either way.
+
 ## Architecture (per the MVP scope doc)
 
 - Frontend: Next.js, mobile-responsive, ~~installable as a PWA~~ (not a native app for v1) — **done Sep 5 ~6:50am ET**, see "Next tasks for Claude Code" item 2 above

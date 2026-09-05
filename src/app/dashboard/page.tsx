@@ -2,8 +2,10 @@ import Link from "next/link";
 import { getCaseStatus, UscisApiError, type CaseStatus } from "@/lib/uscis/client";
 import { explainCaseStatus, type CaseExplanation } from "@/lib/ai/explain";
 import { auth } from "@/lib/auth/server";
-import { getTrackedReceiptNumber } from "./actions";
+import { getTrackedCases } from "./actions";
+import { getSubscriptionTier, TIER_LIMITS } from "@/lib/billing/tier";
 import { TrackCaseButton } from "./TrackCaseButton";
+import { CaseSwitcher } from "./CaseSwitcher";
 import { FileUploadStub } from "./FileUploadStub";
 
 export const dynamic = "force-dynamic";
@@ -143,7 +145,13 @@ function StatusCard({
 }: {
   status: CaseStatus;
   explanation: CaseExplanation | null;
-  tracking: { signedIn: boolean; alreadyTracked: boolean } | null;
+  tracking: {
+    signedIn: boolean;
+    alreadyTracked: boolean;
+    trackedCaseId?: string;
+    atCap: boolean;
+    maxCases: number;
+  } | null;
 }) {
   const tone = statusTone(status.statusText);
 
@@ -173,7 +181,10 @@ function StatusCard({
           {tracking.signedIn ? (
             <TrackCaseButton
               receiptNumber={status.receiptNumber}
+              trackedCaseId={tracking.trackedCaseId}
               alreadyTracked={tracking.alreadyTracked}
+              atCap={tracking.atCap}
+              maxCases={tracking.maxCases}
             />
           ) : (
             <p className="text-xs text-muted">
@@ -228,14 +239,18 @@ export default async function DashboardPage({
   const { receipt } = await searchParams;
   const { data: session } = await auth.getSession();
 
-  let trackedReceiptNumber: string | null = null;
+  let trackedCasesList: Awaited<ReturnType<typeof getTrackedCases>> = [];
+  let maxCases = TIER_LIMITS.free.maxCases;
   if (session?.user) {
-    trackedReceiptNumber = await getTrackedReceiptNumber(session.user.id);
+    trackedCasesList = await getTrackedCases(session.user.id);
+    const tier = await getSubscriptionTier(session.user.id);
+    maxCases = TIER_LIMITS[tier].maxCases;
   }
 
   // An explicit ?receipt= search always wins (ad-hoc lookup); otherwise fall
-  // back to the signed-in user's saved case, if any.
-  const receiptNumber = receipt?.trim() || trackedReceiptNumber || undefined;
+  // back to the signed-in user's first tracked case, if any (CW-36: could
+  // be one of several — see CaseSwitcher below for picking a different one).
+  const receiptNumber = receipt?.trim() || trackedCasesList[0]?.receiptNumber || undefined;
 
   let status: CaseStatus | null = null;
   let explanation: CaseExplanation | null = null;
@@ -265,6 +280,14 @@ export default async function DashboardPage({
 
       <SearchForm receiptNumber={receiptNumber} />
 
+      {trackedCasesList.length > 1 && (
+        <CaseSwitcher
+          cases={trackedCasesList}
+          activeReceiptNumber={receiptNumber}
+          basePath="/dashboard"
+        />
+      )}
+
       <div className="mt-6">
         {status && (
           <StatusCard
@@ -272,7 +295,10 @@ export default async function DashboardPage({
             explanation={explanation}
             tracking={{
               signedIn: !!session?.user,
-              alreadyTracked: status.receiptNumber === trackedReceiptNumber,
+              alreadyTracked: trackedCasesList.some((c) => c.receiptNumber === status.receiptNumber),
+              trackedCaseId: trackedCasesList.find((c) => c.receiptNumber === status.receiptNumber)?.id,
+              atCap: trackedCasesList.length >= maxCases,
+              maxCases,
             }}
           />
         )}

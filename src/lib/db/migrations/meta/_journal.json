@@ -15,6 +15,13 @@
       "when": 1788553909909,
       "tag": "0001_abnormal_eddie_brock",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788608452155,
+      "tag": "0002_messy_cyclops",
+      "breakpoints": true
     }
   ]
 }

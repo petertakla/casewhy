@@ -14,11 +14,20 @@ interface Message {
   content: string;
 }
 
-export function CaseChat() {
+interface UsageStatus {
+  used: number;
+  limit: number | null;
+  remaining: number | null;
+  limitReached: boolean;
+}
+
+export function CaseChat({ receiptNumber }: { receiptNumber: string }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [limitReached, setLimitReached] = useState(false);
+  const [usage, setUsage] = useState<UsageStatus | null>(null);
   // Deterministic per-case (see findRelevantPolicyContext), not per-question
   // — shown once, persistently, rather than attached to each reply, so it
   // doesn't look like it's the reason for an unrelated answer.
@@ -26,7 +35,7 @@ export function CaseChat() {
 
   async function send() {
     const text = input.trim();
-    if (!text || pending) return;
+    if (!text || pending || limitReached) return;
 
     const nextMessages: Message[] = [...messages, { role: "user", content: text }];
     setMessages(nextMessages);
@@ -38,11 +47,15 @@ export function CaseChat() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMessages }),
+        body: JSON.stringify({ receiptNumber, messages: nextMessages }),
       });
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.limitReached) {
+          setLimitReached(true);
+          if (data.usage) setUsage(data.usage);
+        }
         setError(typeof data.error === "string" ? data.error : "Something went wrong.");
         return;
       }
@@ -50,6 +63,9 @@ export function CaseChat() {
       setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
       if (Array.isArray(data.relatedPolicies)) {
         setRelatedPolicies(data.relatedPolicies);
+      }
+      if (data.usage) {
+        setUsage(data.usage);
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -119,19 +135,24 @@ export function CaseChat() {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask a question about your case…"
+            placeholder={limitReached ? "Free monthly question limit reached" : "Ask a question about your case…"}
             aria-label="Your question"
-            disabled={pending}
+            disabled={pending || limitReached}
             className="flex-1 rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500 disabled:opacity-60"
           />
           <button
             type="submit"
-            disabled={pending || !input.trim()}
+            disabled={pending || limitReached || !input.trim()}
             className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
           >
             Send
           </button>
         </form>
+        {usage && usage.limit !== null && !limitReached && (
+          <p className="mt-2 text-xs text-muted">
+            {usage.remaining} of {usage.limit} free questions left this month.
+          </p>
+        )}
         <p className="mt-3 text-xs text-muted">
           General information, not legal advice. For guidance specific to your case, talk to a
           licensed immigration attorney.

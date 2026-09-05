@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/server";
-import { getTrackedReceiptNumber } from "@/app/dashboard/actions";
+import { getTrackedCases } from "@/app/dashboard/actions";
+import { getSubscriptionTier } from "@/lib/billing/tier";
+import { getChatUsage, incrementChatUsage } from "@/lib/billing/chat-usage";
 import { getCaseStatus, UscisApiError } from "@/lib/uscis/client";
 import { chatAboutCase, type ChatMessage } from "@/lib/ai/chat";
 
@@ -29,16 +31,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Sign in to use this." }, { status: 401 });
   }
 
-  // Re-derived server-side from the authenticated session every time, not
-  // trusted from the client — the client only ever sends the conversation.
-  const receiptNumber = await getTrackedReceiptNumber(session.user.id);
-  if (!receiptNumber) {
-    return NextResponse.json(
-      { error: "Track a case on your dashboard first." },
-      { status: 400 }
-    );
-  }
-
   let body: unknown;
   try {
     body = await request.json();
@@ -46,11 +38,39 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const messages = (body as { messages?: unknown })?.messages;
+  const { receiptNumber, messages } = body as { receiptNumber?: unknown; messages?: unknown };
+  if (typeof receiptNumber !== "string" || !receiptNumber) {
+    return NextResponse.json({ error: "receiptNumber is required." }, { status: 400 });
+  }
   if (!isValidMessages(messages)) {
     return NextResponse.json(
       { error: "messages must be a non-empty array ending with a user message." },
       { status: 400 }
+    );
+  }
+
+  // Re-derived server-side from the authenticated session every time, not
+  // trusted from the client — the client only ever names which of its own
+  // tracked cases this conversation is about (CW-36: could be one of
+  // several), never supplies case data itself.
+  const trackedCasesList = await getTrackedCases(session.user.id);
+  if (trackedCasesList.length === 0) {
+    return NextResponse.json({ error: "Track a case on your dashboard first." }, { status: 400 });
+  }
+  if (!trackedCasesList.some((c) => c.receiptNumber === receiptNumber)) {
+    return NextResponse.json({ error: "That case isn't one of your tracked cases." }, { status: 403 });
+  }
+
+  const tier = await getSubscriptionTier(session.user.id);
+  const usage = await getChatUsage(session.user.id, tier);
+  if (usage.limitReached) {
+    return NextResponse.json(
+      {
+        error: `You've used all ${usage.limit} free questions this month. Upgrade to CaseWhy Plus for unlimited questions.`,
+        limitReached: true,
+        usage,
+      },
+      { status: 402 }
     );
   }
 
@@ -67,7 +87,9 @@ export async function POST(request: NextRequest) {
 
   try {
     const result = await chatAboutCase(status, messages);
-    return NextResponse.json(result);
+    await incrementChatUsage(session.user.id);
+    const updatedUsage = await getChatUsage(session.user.id, tier);
+    return NextResponse.json({ ...result, usage: updatedUsage });
   } catch {
     return NextResponse.json(
       { error: "The assistant is temporarily unavailable. Please try again shortly." },

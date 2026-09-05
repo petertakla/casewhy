@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth/server";
-import { getTrackedReceiptNumber } from "@/app/dashboard/actions";
+import { getTrackedCases } from "@/app/dashboard/actions";
+import { CaseSwitcher } from "@/app/dashboard/CaseSwitcher";
 import { getCaseStatus, UscisApiError } from "@/lib/uscis/client";
 import { CaseChat } from "./CaseChat";
 
@@ -14,7 +15,12 @@ function EmptyState({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default async function AskPage() {
+export default async function AskPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ receipt?: string }>;
+}) {
+  const { receipt } = await searchParams;
   const { data: session } = await auth.getSession();
 
   if (!session?.user) {
@@ -35,8 +41,8 @@ export default async function AskPage() {
     );
   }
 
-  const receiptNumber = await getTrackedReceiptNumber(session.user.id);
-  if (!receiptNumber) {
+  const trackedCasesList = await getTrackedCases(session.user.id);
+  if (trackedCasesList.length === 0) {
     return (
       <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
         <h1 className="text-2xl font-bold tracking-tight">Ask a question</h1>
@@ -53,6 +59,14 @@ export default async function AskPage() {
       </main>
     );
   }
+
+  // An explicit ?receipt= naming one of this user's own tracked cases wins
+  // (CW-36: could have several); otherwise default to the first.
+  const requested = receipt?.trim();
+  const receiptNumber =
+    requested && trackedCasesList.some((c) => c.receiptNumber === requested)
+      ? requested
+      : trackedCasesList[0].receiptNumber;
 
   let statusText: string | null = null;
   let formType: string | null = null;
@@ -76,6 +90,10 @@ export default async function AskPage() {
         base.
       </p>
 
+      {trackedCasesList.length > 1 && (
+        <CaseSwitcher cases={trackedCasesList} activeReceiptNumber={receiptNumber} basePath="/ask" />
+      )}
+
       {errorMessage ? (
         <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6">
           <p className="text-sm text-red-600 dark:text-red-400">{errorMessage}</p>
@@ -85,7 +103,7 @@ export default async function AskPage() {
           <p className="mb-4 font-mono text-xs uppercase tracking-widest text-muted">
             {formType} · {statusText}
           </p>
-          <CaseChat />
+          <CaseChat key={receiptNumber} receiptNumber={receiptNumber} />
         </>
       )}
     </main>

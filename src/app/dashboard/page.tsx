@@ -104,6 +104,28 @@ function ExplanationBox({ explanation }: { explanation: CaseExplanation }) {
               ))}
             </ul>
           )}
+          {explanation.relatedPolicies.length > 0 && (
+            <div className="mt-3 border-t border-brand-500/15 pt-3">
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+                Policy background referenced above
+              </p>
+              <ul className="mt-1.5 space-y-1 text-xs">
+                {explanation.relatedPolicies.map((p) => (
+                  <li key={p.id}>
+                    <a
+                      href={p.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-brand-600 dark:text-brand-400 hover:underline"
+                    >
+                      {p.title}
+                    </a>
+                    <span className="text-muted"> — {p.sourceTitle}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <p className="mt-3 text-xs text-muted">
             General information, not legal advice. For guidance specific to your case, talk to a
             licensed immigration attorney.

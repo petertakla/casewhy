@@ -139,43 +139,18 @@ Peter reviewed four logo concepts (built and published by the cloud session as a
 
 **Decision:** Logo = a rounded-square badge in CaseWhy green (`#1baf7a`) with a white checkmark. Tagline = **"Your USCIS case, explained!"**
 
-**Already done — the cloud session committed these directly, no action needed to get the favicon/app-icon live:**
+**Correction, Sep 5 ~5:20am ET: these were NOT actually committed — fixed now.** The files existed on disk (`src/app/icon.svg`/`favicon.ico`/`apple-icon.png`, `public/brand/*`) but `git log`/`git status` showed no commit ever added them; they were untracked local files only, so the favicon/app-icon would never have actually shipped, and `Logo.tsx`'s `<img src="/brand/mark.svg">` would have 404'd in production the moment it was wired up. Committed all of them together with the `Logo.tsx` change below so nothing's silently broken. If "the cloud session committed these directly" was based on an assumption rather than a verified push, worth double-checking that assumption elsewhere too.
 
 - `src/app/icon.svg`, `src/app/favicon.ico`, `src/app/apple-icon.png` — Next.js App Router auto-detects these special filenames in `src/app/` and wires up the browser-tab favicon and Apple touch icon automatically, zero code/metadata changes required. Should just appear on the next build.
 - `public/brand/mark.svg`, `public/brand/wordmark-lockup.svg`, `public/brand/icon-512.png`, `public/brand/icon-192.png` — same mark at other sizes plus a full icon+wordmark lockup SVG, for whenever a PWA manifest gets built (512/192 are the two standard manifest icon sizes) or for anything outside the app (docs, social, README). Not wired into any code yet.
 
-**Two small code changes still needed — both straightforward, exact diffs below since I already have the current file contents:**
+**Accent-color decision, Sep 5 (later that evening): keep blue. Resolved, not open anymore.** Raised the question of whether the site's interactive accent (buttons/links/active-nav, currently `brand-500` blue `#2a78d6`) should switch to match the new green logo. Recommendation was to keep it blue — blue and green are adjacent on the color wheel so the pairing isn't a clash, and more importantly the dashboard's status pills already use green for "approved" (red/amber/blue cover other outcomes); making buttons/links green too would make "click this" and "this case was approved" look like the same signal. Peter confirmed: **keep blue.**
 
-1. **`tailwind.config.ts`** — the `brand` color scale is still the placeholder blue from scaffolding (`500: "#2a78d6"`, comment literally says "swap once CaseWhy branding is finalized"). It's finalized now — replace the whole `brand` object with:
+**Both code changes done, Sep 5 ~5:20am ET:**
 
-   ```ts
-   brand: {
-     50: "#ecfdf6",
-     100: "#d0fae7",
-     400: "#34d399",
-     500: "#1baf7a",
-     600: "#148a61",
-     700: "#0f6b4c",
-     800: "#0b5039",
-   },
-   ```
+1. ~~`tailwind.config.ts`~~ — **no value change, as instructed.** Only the placeholder comment on the `brand` object was reworded to "CaseWhy's blue UI accent — kept deliberately distinct from the green logo, see CLOUD_CLAUDE.md" — the color values themselves untouched.
 
-   This is the same green as the new icon (`#1baf7a` at 500), built as an analogous scale to the blue one it replaces. Every existing `bg-brand-500`, `text-brand-600 dark:text-brand-400`, etc. usage (landing page CTA, header active-link underline, sign-in/sign-out links) picks up the new color automatically — no other files need touching for this part.
-
-2. **`src/components/Logo.tsx`** — currently a placeholder gradient "C" square (`bg-gradient-to-br from-brand-400 to-brand-700`) plus plain single-color "CaseWhy" text. Swap for the real mark and a two-tone wordmark ("Case" in the default foreground color, "Why" in brand green — matches the lockup in `public/brand/wordmark-lockup.svg`):
-
-   ```tsx
-   export function Logo({ className = "" }: { className?: string }) {
-     return (
-       <span className={`inline-flex items-center gap-2 font-semibold tracking-tight ${className}`}>
-         <img src="/brand/mark.svg" alt="" className="h-7 w-7 rounded-lg" />
-         <span>
-           Case<span className="text-brand-500">Why</span>
-         </span>
-       </span>
-     );
-   }
-   ```
+2. ~~**`src/components/Logo.tsx`**~~ — **swapped to the real mark + hardcoded-green wordmark, exact code as specified.** Verified in-browser (`npm run dev` + Claude in Chrome) on both the landing page and sign-in page — green rounded-square checkmark renders correctly, "Case" in default foreground / "Why" in the fixed `#1baf7a`. `tsc --noEmit` clean; `npm run lint` shows one pre-existing-pattern warning (`@next/next/no-img-element`, since this uses a plain `<img>` rather than `next/image` for the small SVG mark) — 0 errors, doesn't fail CI. Committed together with the brand asset files above since the component depends on `/brand/mark.svg` actually existing in the deployed build.
 
 **Copy changes — judgment calls, left to you, not urgent:**
 
@@ -261,3 +236,4 @@ No rush on any of this — it's cosmetic, doesn't block CW-32 or anything else i
 22. ~~build CW-34, visa bulletin tracking~~ — done Sep 5, ~4:15am ET, manual-update approach (both official sources are Cloudflare-blocked from automated fetch, see above) — needs a monthly manual refresh going forward.
 23. **Still open:** build CW-32, the "ask a question" AI chat, with the same legal guardrails as the explanation layer — deliberately not started this pass, see reasoning/estimate under CW-32 above. Next real build item.
 24. **New, Sep 5 (~4:15am ET):** refresh `src/lib/kb/visa-bulletin.ts` monthly (needs a real browser to load the source — see the Cloudflare note above) — first refresh due early October when the October 2026 bulletin is published.
+25. ~~update `src/components/Logo.tsx` to the real mark + hardcoded-green wordmark~~ — done Sep 5 ~5:20am ET, see "Branding decision" above. Also caught and fixed: the brand asset files it depends on were never actually committed (untracked local files only) — committed now, alongside. Left open, not urgent: the two "judgment call" copy changes noted under "Branding decision" (layout metadata + landing hero tagline placement).

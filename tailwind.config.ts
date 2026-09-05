@@ -15,7 +15,7 @@ const config: Config = {
         muted: "var(--muted-foreground)",
         border: "var(--border)",
         "border-strong": "var(--border-strong)",
-        // Placeholder brand palette — swap once CaseWhy branding is finalized.
+        // CaseWhy's blue UI accent — kept deliberately distinct from the green logo, see CLOUD_CLAUDE.md.
         brand: {
           50: "#eff6ff",
           100: "#dbeafe",

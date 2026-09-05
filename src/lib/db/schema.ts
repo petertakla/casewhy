@@ -1,7 +1,7 @@
 // Drizzle schema for CaseWhy's own tables. Neon Auth manages its own
 // `neon_auth` schema (users, sessions) separately — never migrated here.
 
-import { pgTable, pgEnum, text, timestamp, integer, index, primaryKey } from "drizzle-orm/pg-core";
+import { pgTable, pgEnum, text, timestamp, integer, index, primaryKey, unique } from "drizzle-orm/pg-core";
 
 export const trackedCases = pgTable(
   "tracked_cases",
@@ -85,4 +85,24 @@ export const caseDocuments = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index("case_documents_tracked_case_id_idx").on(table.trackedCaseId)]
+);
+
+// Round 6 — pre-launch marketing email list from the landing page's
+// EmailCaptureForm (src/app/page.tsx, two instances: hero + footer). Plain
+// text, not encrypted like tracked_cases.email — this is a public opt-in
+// newsletter address with no case data attached, and a real DB-level
+// unique constraint (to silently no-op a repeat signup) needs the value
+// comparable at the database, which an app-level AES-256-GCM ciphertext
+// (random IV per row) can't support.
+export const emailSubscribers = pgTable(
+  "email_subscribers",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    email: text("email").notNull(),
+    sourcePage: text("source_page").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [unique("email_subscribers_email_unique").on(table.email)]
 );

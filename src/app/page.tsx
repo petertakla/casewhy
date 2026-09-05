@@ -1,22 +1,4 @@
-function EmailCaptureForm({ ctaLabel }: { ctaLabel: string }) {
-  return (
-    <form className="mt-8 flex w-full max-w-md flex-col gap-3 sm:flex-row">
-      <input
-        type="email"
-        required
-        placeholder="you@example.com"
-        aria-label="Email address"
-        className="flex-1 rounded-lg border border-border-strong bg-surface px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
-      />
-      <button
-        type="submit"
-        className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
-      >
-        {ctaLabel}
-      </button>
-    </form>
-  );
-}
+import { EmailCaptureForm } from "./EmailCaptureForm";
 
 function StatCard({ num, label }: { num: string; label: string }) {
   return (
@@ -65,7 +47,7 @@ export default function LandingPage() {
           update actually means for your timeline.
         </p>
 
-        <EmailCaptureForm ctaLabel="Get notified at launch" />
+        <EmailCaptureForm ctaLabel="Get notified at launch" sourcePage="landing-hero" />
 
         <p className="mt-4 text-xs text-muted">
           No spam. We&apos;ll only email you when CaseWhy is ready to try.
@@ -167,7 +149,7 @@ export default function LandingPage() {
           you&apos;ll be first to know the moment real-case tracking opens up.
         </p>
         <div className="mt-2 flex justify-center">
-          <EmailCaptureForm ctaLabel="Notify me" />
+          <EmailCaptureForm ctaLabel="Notify me" sourcePage="landing-footer" />
         </div>
       </section>
 

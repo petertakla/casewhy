@@ -134,6 +134,10 @@
   }
   form.waitlist button:hover{background:var(--brand-600);}
   .form-note{font-size:0.82rem;color:var(--muted);margin-top:10px;}
+  .hp{position:absolute;width:0;height:0;opacity:0;pointer-events:none;}
+  .form-success{font-size:0.95rem;font-weight:600;color:var(--brand-600);margin:0 auto;max-width:440px;}
+  @media (prefers-color-scheme: dark){ .form-success{color:var(--brand-400);} }
+  .form-error{font-size:0.82rem;color:#c0392b;margin-top:8px;}
 
   section{padding:56px 0;}
   .problem{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
@@ -268,8 +272,9 @@
     <h1>Know what's happening.<br>Know what's next.</h1>
     <p class="sub">CaseWhy checks your case with USCIS every day, explains what changed in plain English — grounded in real USCIS policy, not just a reworded status label — and lets you ask follow-up questions any time, day or night.</p>
 
-    <form class="waitlist" id="join">
-      <input type="email" placeholder="you@email.com" required aria-label="Email address">
+    <form class="waitlist" id="join" data-source="static-hero">
+      <input type="email" name="email" placeholder="you@email.com" required aria-label="Email address">
+      <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
       <button type="submit">Notify me at launch</button>
     </form>
     <p class="form-note">Built and tested. Opening the moment USCIS grants production access.</p>
@@ -364,8 +369,9 @@
   <div class="wrap">
     <h2>Be first to try CaseWhy</h2>
     <p>We're building this in the open — daily case checks, policy-grounded explanations, processing times, and visa bulletin tracking are already working. Join the list and you'll be first to know the moment real-case tracking opens up.</p>
-    <form class="waitlist">
-      <input type="email" placeholder="you@email.com" required aria-label="Email address">
+    <form class="waitlist" data-source="static-footer">
+      <input type="email" name="email" placeholder="you@email.com" required aria-label="Email address">
+      <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
       <button type="submit">Notify me</button>
     </form>
   </div>
@@ -380,6 +386,70 @@
     </div>
   </div>
 </footer>
+
+<script>
+(function () {
+  var API_URL = "https://casewhy-app.vercel.app/api/subscribe";
+
+  document.querySelectorAll("form.waitlist").forEach(function (form) {
+    var emailInput = form.querySelector('input[type="email"]');
+    var honeypot = form.querySelector('input[name="website"]');
+    var button = form.querySelector("button");
+    var source = form.dataset.source || "static-hero";
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var email = emailInput.value.trim();
+      if (!email) return;
+
+      var existingError = form.parentNode.querySelector(".form-error");
+      if (existingError) existingError.remove();
+
+      var originalLabel = button.textContent;
+      button.disabled = true;
+      button.textContent = "Submitting…";
+
+      fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email,
+          sourcePage: source,
+          website: honeypot ? honeypot.value : "",
+        }),
+      })
+        .then(function (res) {
+          return res.json().then(function (data) {
+            return { ok: res.ok && data.ok, error: data.error };
+          });
+        })
+        .then(function (result) {
+          if (result.ok) {
+            var success = document.createElement("p");
+            success.className = "form-success";
+            success.textContent = "You're on the list — we'll email you when CaseWhy is ready.";
+            form.replaceWith(success);
+          } else {
+            button.disabled = false;
+            button.textContent = originalLabel;
+            var err = document.createElement("p");
+            err.className = "form-error";
+            err.textContent = result.error || "Something went wrong. Please try again.";
+            form.insertAdjacentElement("afterend", err);
+          }
+        })
+        .catch(function () {
+          button.disabled = false;
+          button.textContent = originalLabel;
+          var err = document.createElement("p");
+          err.className = "form-error";
+          err.textContent = "Something went wrong. Please try again.";
+          form.insertAdjacentElement("afterend", err);
+        });
+    });
+  });
+})();
+</script>
 
 </body>
 </html>

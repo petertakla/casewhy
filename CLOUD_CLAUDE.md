@@ -64,7 +64,9 @@ Full background:
 
 ## Right now — confirm a checkable UI (do this first, it's quick)
 
-**Resolved Sep 4, 2026 — re-confirming after this section got reverted to its pre-resolution text by a stale save from the cloud session (see note at the bottom of this section).** The `nextjs-app` branch isn't just previewed — the separate `casewhy-app` Vercel project (`.vercel/project.json` → `prj_Zjis1TjZJO8FGqF93t12q169UCN9`) has `nextjs-app` configured as its **Production** branch (`vercel inspect` shows `target: production`), so every push to it deploys straight to a stable production URL, not a throwaway preview link:
+**Correction, Sep 5, 2026 ~4:45am ET — the claim below was wrong, root-caused after it bit us twice.** Every push to `nextjs-app` was landing as a **Preview** deployment, not Production, despite two separate "done, verified in production" claims (this section originally, and again after tonight's CW-31/33/34 push) — both times the fix was a manual `vercel promote ... --yes` (the user ran it; Claude Code is blocked from the non-interactive form by its own safety classifier). Root cause, confirmed directly via the Vercel API (`GET /v9/projects/casewhy-app`): the project's actual Git integration has **`productionBranch: "main"`**, not `nextjs-app` — `main` on this repo is an effectively-unused branch (the real static landing page at casewhy.com is a *separate* Vercel project, "casewhy", not this one). The earlier "vercel inspect shows target: production" evidence was real but misleading — it was almost certainly from an earlier manual `vercel --prod` deploy, which forces `target: production` on that one deployment regardless of the Git branch setting, not from the branch setting actually being correct. **Attempted to fix via the API (`PATCH .../projects/casewhy-app` with `productionBranch` or `link.productionBranch`) — both rejected as invalid fields; the CLI's `vercel git` subcommand only supports connect/disconnect.** This looks like a dashboard-only setting on this API surface. **Still open, needs the user:** Vercel dashboard → casewhy-app project → Settings → Git → Production Branch → change from `main` to `nextjs-app`. Once that's done, every future push should deploy straight to production and the manual-promote step goes away for good — until then, expect to need `vercel promote <preview-url> --yes` after every push, and don't claim something is "live in production" from a push alone without checking `vercel ls casewhy-app` first.
+
+The stable URLs, once a deployment actually is Production:
 
 - **https://casewhy-app.vercel.app** — stable alias, click this one
 - https://casewhy-app-smarticos.vercel.app — same deployment, alternate alias
@@ -130,6 +132,57 @@ A concrete order for the four new items, since "in priority order" above is now 
 **All new/changed files from this pass:** `src/lib/kb/policy-memos.ts`, `src/lib/kb/processing-times.ts`, `src/lib/kb/visa-bulletin.ts`, `src/app/visa-bulletin/page.tsx`, `src/app/processing-times/page.tsx`, `src/app/ask/page.tsx` (all new); `src/lib/ai/explain.ts` (KB wiring), `src/app/dashboard/page.tsx` (policy citations under the explanation), `src/components/AuthHeader.tsx` (nav links) — all `tsc --noEmit` and `npm run lint` clean, verified in-browser via `npm run dev` + Claude in Chrome (dashboard, visa bulletin, processing times, ask-a-question stub, and the landing page correctly *not* showing the new app nav). Not yet pushed/deployed as of this writing — ask the user whether to push before assuming it's live.
 
 Report progress and any real estimates back in this file as usual — re-fetch before editing if the cloud session has touched it since your last read (check the timestamp in the banner at the top).
+
+## Branding decision, Sep 5, 2026 (evening) — logo + tagline finalized
+
+Peter reviewed four logo concepts (built and published by the cloud session as a "CaseWhy Logo Concepts" artifact) and picked one, plus finalized the tagline. This replaces the "tagline not yet finalized" note in the MVP scope doc Section 8 — the cloud session has updated that doc too.
+
+**Decision:** Logo = a rounded-square badge in CaseWhy green (`#1baf7a`) with a white checkmark. Tagline = **"Your USCIS case, explained!"**
+
+**Already done — the cloud session committed these directly, no action needed to get the favicon/app-icon live:**
+
+- `src/app/icon.svg`, `src/app/favicon.ico`, `src/app/apple-icon.png` — Next.js App Router auto-detects these special filenames in `src/app/` and wires up the browser-tab favicon and Apple touch icon automatically, zero code/metadata changes required. Should just appear on the next build.
+- `public/brand/mark.svg`, `public/brand/wordmark-lockup.svg`, `public/brand/icon-512.png`, `public/brand/icon-192.png` — same mark at other sizes plus a full icon+wordmark lockup SVG, for whenever a PWA manifest gets built (512/192 are the two standard manifest icon sizes) or for anything outside the app (docs, social, README). Not wired into any code yet.
+
+**Two small code changes still needed — both straightforward, exact diffs below since I already have the current file contents:**
+
+1. **`tailwind.config.ts`** — the `brand` color scale is still the placeholder blue from scaffolding (`500: "#2a78d6"`, comment literally says "swap once CaseWhy branding is finalized"). It's finalized now — replace the whole `brand` object with:
+
+   ```ts
+   brand: {
+     50: "#ecfdf6",
+     100: "#d0fae7",
+     400: "#34d399",
+     500: "#1baf7a",
+     600: "#148a61",
+     700: "#0f6b4c",
+     800: "#0b5039",
+   },
+   ```
+
+   This is the same green as the new icon (`#1baf7a` at 500), built as an analogous scale to the blue one it replaces. Every existing `bg-brand-500`, `text-brand-600 dark:text-brand-400`, etc. usage (landing page CTA, header active-link underline, sign-in/sign-out links) picks up the new color automatically — no other files need touching for this part.
+
+2. **`src/components/Logo.tsx`** — currently a placeholder gradient "C" square (`bg-gradient-to-br from-brand-400 to-brand-700`) plus plain single-color "CaseWhy" text. Swap for the real mark and a two-tone wordmark ("Case" in the default foreground color, "Why" in brand green — matches the lockup in `public/brand/wordmark-lockup.svg`):
+
+   ```tsx
+   export function Logo({ className = "" }: { className?: string }) {
+     return (
+       <span className={`inline-flex items-center gap-2 font-semibold tracking-tight ${className}`}>
+         <img src="/brand/mark.svg" alt="" className="h-7 w-7 rounded-lg" />
+         <span>
+           Case<span className="text-brand-500">Why</span>
+         </span>
+       </span>
+     );
+   }
+   ```
+
+**Copy changes — judgment calls, left to you, not urgent:**
+
+- `src/app/layout.tsx` `metadata` — current title is `"CaseWhy — Understand your USCIS case"`. Consider weaving the finalized tagline in (e.g. as the `description`, or appending it to `title`) — your call on exact wording, just use the locked tagline text verbatim if you do: "Your USCIS case, explained!"
+- `src/app/page.tsx` landing hero — the current kicker/H1 ("Understand your USCIS case, not just its status.") is a longer marketing sentence, not the short tagline — these can coexist (tagline near/under the logo, longer H1 as the hero headline) rather than one replacing the other. Fold into CW-28 if/when that visual-design pass happens; not blocking anything.
+
+No rush on any of this — it's cosmetic, doesn't block CW-32 or anything else in flight. Do it whenever convenient.
 
 ## Architecture (per the MVP scope doc)
 

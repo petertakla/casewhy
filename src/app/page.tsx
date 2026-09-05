@@ -84,19 +84,27 @@ export default function LandingPage() {
             forums at midnight for someone in your exact situation.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <StatCard num="12M+" label="pending USCIS cases" />
-            <StatCard num="+42%" label="backlog growth, year over year" />
+            <StatCard num="12.1M+" label="pending USCIS cases" />
+            <StatCard num="+42%" label="net backlog growth, year over year" />
             <StatCard num="1" label="status label, zero explanation" />
           </div>
+          <p className="mt-4 text-xs text-muted">
+            Source: USCIS quarterly caseload data, Q2 FY2026 — re-verified Sep 5, 2026, not carried
+            over unchecked.
+          </p>
         </div>
       </section>
 
       <section className="px-6 py-16">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-4xl">
           <h2 className="text-center text-2xl font-bold tracking-tight">
             What CaseWhy does differently
           </h2>
-          <div className="mt-10 grid gap-5 sm:grid-cols-3">
+          <p className="mx-auto mt-3 max-w-xl text-center text-sm text-muted">
+            Plain-language status explanations aren&apos;t rare anymore — several trackers do
+            that now. Here&apos;s what&apos;s actually different about CaseWhy.
+          </p>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <FeatureCard
               step={1}
               title="Track"
@@ -104,13 +112,18 @@ export default function LandingPage() {
             />
             <FeatureCard
               step={2}
-              title="Understand"
-              description="The moment anything changes, we explain what it actually means — the real context behind it, not just a status code."
+              title="Understand, with real sources"
+              description="Explanations grounded in a curated USCIS policy and case-law knowledge base, with the specific policy cited — not a generic rewording of your status text."
             />
             <FeatureCard
               step={3}
+              title="See the full picture"
+              description="Official processing-time estimates and the current visa bulletin for your case type, right alongside your own status — not just a single label."
+            />
+            <FeatureCard
+              step={4}
               title="Act"
-              description="We tell you the general next step people in your situation take — when a case inquiry helps, when it's time to loop in your representative, or when to call an attorney."
+              description="General next-step guidance for your situation, and a clear line to a licensed immigration attorney the moment something is specific to your case."
             />
           </div>
         </div>
@@ -147,12 +160,11 @@ export default function LandingPage() {
       </section>
 
       <section className="px-6 py-16 text-center">
-        <h2 className="text-2xl font-bold tracking-tight">
-          Be first to know when CaseWhy launches
-        </h2>
+        <h2 className="text-2xl font-bold tracking-tight">Be first to try CaseWhy</h2>
         <p className="mt-3 text-muted">
-          We&apos;re building this in the open — join the list and you&apos;ll hear from us the
-          moment it&apos;s ready to try.
+          We&apos;re building this in the open — daily case checks, policy-grounded explanations,
+          processing times, and visa bulletin tracking are already working. Join the list and
+          you&apos;ll be first to know the moment real-case tracking opens up.
         </p>
         <div className="mt-2 flex justify-center">
           <EmailCaptureForm ctaLabel="Notify me" />

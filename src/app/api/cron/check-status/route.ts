@@ -5,12 +5,10 @@
 // most HTTP clients if misconfigured, a mistake that's bitten this pattern
 // before (see the NVDA project's cron-job.org notes).
 
-import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { trackedCases } from "@/lib/db/schema";
-import { encryptField, decryptField } from "@/lib/db/crypto";
-import { getCaseStatus, UscisApiError } from "@/lib/uscis/client";
-import { sendStatusChangeEmail } from "@/lib/email/postmark";
+import { UscisApiError } from "@/lib/uscis/client";
+import { checkTrackedCaseNow } from "@/lib/uscis/check-status";
 
 export async function POST(request: Request) {
   const expected = process.env.CRON_SECRET;
@@ -28,30 +26,9 @@ export async function POST(request: Request) {
 
   for (const row of rows) {
     try {
-      const receiptNumber = decryptField(row.receiptNumber);
-      const email = decryptField(row.email);
-      const previousStatusText = row.lastStatusText ? decryptField(row.lastStatusText) : null;
-
-      const status = await getCaseStatus(receiptNumber);
+      const { notified: wasNotified } = await checkTrackedCaseNow(row);
       checked++;
-
-      if (previousStatusText !== null && previousStatusText !== status.statusText) {
-        await sendStatusChangeEmail({
-          to: email,
-          receiptNumber,
-          statusText: status.statusText,
-          statusDescription: status.statusDescription,
-        });
-        notified++;
-      }
-
-      await db
-        .update(trackedCases)
-        .set({
-          lastStatusText: encryptField(status.statusText),
-          lastCheckedAt: new Date(),
-        })
-        .where(eq(trackedCases.id, row.id));
+      if (wasNotified) notified++;
     } catch (err) {
       const message =
         err instanceof UscisApiError

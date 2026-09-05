@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth/server";
 import { getTrackedCases } from "./actions";
 import { getSubscriptionTier, TIER_LIMITS } from "@/lib/billing/tier";
 import { TrackCaseButton } from "./TrackCaseButton";
+import { CheckNowButton } from "./CheckNowButton";
 import { CaseSwitcher } from "./CaseSwitcher";
 import { DocumentVault } from "./DocumentVault";
 
@@ -149,6 +150,8 @@ function StatusCard({
     signedIn: boolean;
     alreadyTracked: boolean;
     trackedCaseId?: string;
+    lastCheckedAt?: Date | null;
+    canCheckNow: boolean;
     atCap: boolean;
     maxCases: number;
   } | null;
@@ -179,13 +182,22 @@ function StatusCard({
       {tracking && (
         <div className="mt-3">
           {tracking.signedIn ? (
-            <TrackCaseButton
-              receiptNumber={status.receiptNumber}
-              trackedCaseId={tracking.trackedCaseId}
-              alreadyTracked={tracking.alreadyTracked}
-              atCap={tracking.atCap}
-              maxCases={tracking.maxCases}
-            />
+            <>
+              <TrackCaseButton
+                receiptNumber={status.receiptNumber}
+                trackedCaseId={tracking.trackedCaseId}
+                alreadyTracked={tracking.alreadyTracked}
+                atCap={tracking.atCap}
+                maxCases={tracking.maxCases}
+              />
+              {tracking.alreadyTracked && tracking.trackedCaseId && (
+                <CheckNowButton
+                  trackedCaseId={tracking.trackedCaseId}
+                  lastCheckedAt={tracking.lastCheckedAt ?? null}
+                  canCheckNow={tracking.canCheckNow}
+                />
+              )}
+            </>
           ) : (
             <p className="text-xs text-muted">
               <Link href="/auth/sign-in" className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
@@ -241,10 +253,12 @@ export default async function DashboardPage({
 
   let trackedCasesList: Awaited<ReturnType<typeof getTrackedCases>> = [];
   let maxCases = TIER_LIMITS.free.maxCases;
+  let canCheckNow = false;
   if (session?.user) {
     trackedCasesList = await getTrackedCases(session.user.id);
     const tier = await getSubscriptionTier(session.user.id);
     maxCases = TIER_LIMITS[tier].maxCases;
+    canCheckNow = tier === "plus";
   }
 
   // An explicit ?receipt= search always wins (ad-hoc lookup); otherwise fall
@@ -297,6 +311,8 @@ export default async function DashboardPage({
               signedIn: !!session?.user,
               alreadyTracked: trackedCasesList.some((c) => c.receiptNumber === status.receiptNumber),
               trackedCaseId: trackedCasesList.find((c) => c.receiptNumber === status.receiptNumber)?.id,
+              lastCheckedAt: trackedCasesList.find((c) => c.receiptNumber === status.receiptNumber)?.lastCheckedAt,
+              canCheckNow,
               atCap: trackedCasesList.length >= maxCases,
               maxCases,
             }}

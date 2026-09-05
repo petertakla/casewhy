@@ -6,6 +6,7 @@ import { getTrackedCases } from "./actions";
 import { getSubscriptionTier, TIER_LIMITS } from "@/lib/billing/tier";
 import { TrackCaseButton } from "./TrackCaseButton";
 import { CheckNowButton } from "./CheckNowButton";
+import { DownloadReportLink } from "./DownloadReportLink";
 import { CaseSwitcher } from "./CaseSwitcher";
 import { DocumentVault } from "./DocumentVault";
 
@@ -152,6 +153,7 @@ function StatusCard({
     trackedCaseId?: string;
     lastCheckedAt?: Date | null;
     canCheckNow: boolean;
+    canDownloadReport: boolean;
     atCap: boolean;
     maxCases: number;
   } | null;
@@ -191,11 +193,17 @@ function StatusCard({
                 maxCases={tracking.maxCases}
               />
               {tracking.alreadyTracked && tracking.trackedCaseId && (
-                <CheckNowButton
-                  trackedCaseId={tracking.trackedCaseId}
-                  lastCheckedAt={tracking.lastCheckedAt ?? null}
-                  canCheckNow={tracking.canCheckNow}
-                />
+                <>
+                  <CheckNowButton
+                    trackedCaseId={tracking.trackedCaseId}
+                    lastCheckedAt={tracking.lastCheckedAt ?? null}
+                    canCheckNow={tracking.canCheckNow}
+                  />
+                  <DownloadReportLink
+                    receiptNumber={status.receiptNumber}
+                    canDownload={tracking.canDownloadReport}
+                  />
+                </>
               )}
             </>
           ) : (
@@ -313,6 +321,7 @@ export default async function DashboardPage({
               trackedCaseId: trackedCasesList.find((c) => c.receiptNumber === status.receiptNumber)?.id,
               lastCheckedAt: trackedCasesList.find((c) => c.receiptNumber === status.receiptNumber)?.lastCheckedAt,
               canCheckNow,
+              canDownloadReport: canCheckNow,
               atCap: trackedCasesList.length >= maxCases,
               maxCases,
             }}

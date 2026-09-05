@@ -170,12 +170,23 @@ export interface CaseCreateRequest {
   receiptNumbers?: string[];
   representiveRoleToSubjectOfRecord?: RepresentiveRole;
   /**
-   * Typed optional per the docs schema, but the live API 400s without a
-   * value it recognizes as "a valid MyAccount email" (sandbox test, Sep 5,
-   * 2026) — sign up for a USCIS MyAccount at myaccount.uscis.gov to get one
-   * to test with; not yet done as of this writing.
+   * NOT an email address, despite the error message's wording — confirmed
+   * via two real sandbox tests, Sep 5, 2026. It's an enum, `"LEGACY"` or
+   * `"MY_ACCOUNT"`; sending a bare email string gets "Invalid Digital
+   * Delivery Method provided. Must be of [LEGACY, MY_ACCOUNT]". Sending
+   * `"MY_ACCOUNT"` gets back to the *same* "Enter valid MyAccount email"
+   * message — even with a real, freshly-created production MyAccount for
+   * info@casewhy.com in hand, tested the same day. Most likely explanation
+   * (not confirmed): the FOIA *sandbox* endpoint validates the requester's
+   * email against a sandbox-only user pool that doesn't know about real
+   * production MyAccount signups — the two systems probably don't share
+   * user data, for good reason (a sandbox test tool shouldn't touch real
+   * production PII). If so, there's no test account we can create our way
+   * into satisfying this in sandbox; worth asking USCIS support directly
+   * whether a sandbox-specific test MyAccount identity exists, same as how
+   * Case Status has a published test receipt number (EAC9999103403).
    */
-  digitalDelivery?: string;
+  digitalDelivery?: "LEGACY" | "MY_ACCOUNT";
   preferredConsentMethod?: string;
   courtProceedings?: boolean;
   recordsRequested: RecordRequestItem[];

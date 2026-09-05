@@ -6,7 +6,7 @@ import { getTrackedCases } from "./actions";
 import { getSubscriptionTier, TIER_LIMITS } from "@/lib/billing/tier";
 import { TrackCaseButton } from "./TrackCaseButton";
 import { CaseSwitcher } from "./CaseSwitcher";
-import { FileUploadStub } from "./FileUploadStub";
+import { DocumentVault } from "./DocumentVault";
 
 export const dynamic = "force-dynamic";
 
@@ -218,7 +218,7 @@ function StatusCard({
         </div>
       )}
 
-      <FileUploadStub />
+      <DocumentVault trackedCaseId={tracking?.trackedCaseId} />
     </div>
   );
 }

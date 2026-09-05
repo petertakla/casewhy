@@ -56,3 +56,33 @@ export const chatUsage = pgTable(
   },
   (table) => [primaryKey({ columns: [table.userId, table.yearMonth] })]
 );
+
+// CW-38 — supporting-document vault. Tied to a specific tracked case (not
+// just a user), per CW-36's multi-case model: an I-693 or RFE response
+// belongs to one case, not the whole account. userId is denormalized here
+// too (defense-in-depth: lets /api/documents check ownership with a single
+// row read, without also joining tracked_cases on every request).
+export const caseDocuments = pgTable(
+  "case_documents",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    trackedCaseId: text("tracked_case_id")
+      .notNull()
+      .references(() => trackedCases.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull(),
+    // Encrypted (AES-256-GCM, src/lib/db/crypto.ts) — a real filename like
+    // "John_Smith_Passport.pdf" is identifying, same reasoning as
+    // tracked_cases.receiptNumber.
+    fileName: text("file_name").notNull(),
+    contentType: text("content_type").notNull(),
+    sizeBytes: integer("size_bytes").notNull(),
+    // Vercel Blob pathname (not the full URL) — private-store blobs aren't
+    // fetchable by URL alone, so downloads are proxied through
+    // /api/documents/[id] using blob's get(), keyed off this pathname.
+    blobPathname: text("blob_pathname").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("case_documents_tracked_case_id_idx").on(table.trackedCaseId)]
+);

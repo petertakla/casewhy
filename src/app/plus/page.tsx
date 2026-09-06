@@ -3,10 +3,91 @@ import { auth } from "@/lib/auth/server";
 import { getSubscriptionDetails } from "@/lib/billing/tier";
 import { startCheckout, openBillingPortal } from "./actions";
 
-function FeatureRow({ title, free, plus }: { title: string; free: string; plus: string }) {
+// Round 14 — each feature is now a hyperlink to its own fuller explanation
+// (below, under "Plus, in depth") instead of a flat bullet, per the
+// competitor-review revision — this also doubles as SEO landing-page
+// content, the same role /processing-times and /visa-bulletin play.
+interface PlusFeature {
+  id: string;
+  title: string;
+  free: string;
+  plus: string;
+  explanation: string;
+}
+
+const PLUS_FEATURES: PlusFeature[] = [
+  {
+    id: "ai-chat",
+    title: "AI chat about your case",
+    free: "10 / month",
+    plus: "Unlimited",
+    explanation:
+      "Ask a plain-language question about your case status, a policy term, or what a next step might mean, grounded in CaseWhy's curated policy/case-law knowledge base with visible citations — not a generic chatbot guessing. Free accounts get 10 questions a month; Plus removes the limit.",
+  },
+  {
+    id: "tracked-cases",
+    title: "Tracked cases (family)",
+    free: "1",
+    plus: "Up to 5",
+    explanation:
+      "Track up to 5 cases on one account — enough for a real household (a spouse, kids, parents) without needing separate logins or separate subscriptions. Free accounts track 1.",
+  },
+  {
+    id: "on-demand-checks",
+    title: "On-demand status checks",
+    free: "—",
+    plus: "Included",
+    explanation:
+      "Every account gets an automatic daily status check. Plus adds a \"check now\" button for the moment you're actually anxious about a case — no waiting for the next scheduled check.",
+  },
+  {
+    id: "document-vault",
+    title: "Secure document vault",
+    free: "—",
+    plus: "Included",
+    explanation:
+      "Upload and store supporting documents (an I-693, an RFE response, receipts) against a specific tracked case, encrypted and private to your account — handy to have organized in one place if you ever need to hand things off to an attorney.",
+  },
+  {
+    id: "stalled-case-alert",
+    title: "Stalled-case alert",
+    free: "Included",
+    plus: "Included",
+    explanation:
+      "CaseWhy flags a case that's gone unusually quiet relative to a typical timeline. This alert itself is free on every tier — it's the escalation tools that follow it (below) that are part of Plus.",
+  },
+  {
+    id: "representative-lookup",
+    title: "Representative lookup",
+    free: "—",
+    plus: "Included",
+    explanation:
+      "Once a case is flagged as stalled, look up your actual U.S. Senators and House representative by address — real, current officials, not a static list — as a starting point for a congressional inquiry.",
+  },
+  {
+    id: "escalation-letters",
+    title: "Escalation letter drafting",
+    free: "—",
+    plus: "Included",
+    explanation:
+      "Draft one of three real escalation letters — a congressional inquiry, a field-office follow-up, or a formal USCIS Ombudsman case-assistance request — pre-filled with your case's details. Not legal advice; each letter is a starting point you review and send yourself.",
+  },
+  {
+    id: "pdf-report",
+    title: "Attorney-handoff PDF report",
+    free: "—",
+    plus: "Included",
+    explanation:
+      "Generate a one-page PDF summarizing your case's status and plain-language explanation — useful to hand an attorney directly if you ever need one, without re-explaining everything from scratch.",
+  },
+];
+
+function FeatureRow({ id, title, free, plus }: { id: string; title: string; free: string; plus: string }) {
   return (
     <div className="grid grid-cols-[1fr_auto_auto] items-center gap-4 border-b border-border py-4 text-sm last:border-b-0 sm:grid-cols-[1fr_140px_140px]">
-      <span className="font-medium text-foreground/90">{title}</span>
+      <a href={`#${id}`} className="font-medium text-foreground/90 hover:text-brand-600 dark:hover:text-brand-400 hover:underline">
+        {title}
+      </a>
       <span className="text-center text-muted">{free}</span>
       <span className="text-center font-semibold text-brand-600 dark:text-brand-400">{plus}</span>
     </div>
@@ -102,19 +183,26 @@ export default async function PlusPage({
           <span className="text-center">Free</span>
           <span className="text-center text-brand-600 dark:text-brand-400">Plus</span>
         </div>
-        <FeatureRow title="AI chat about your case" free="10 / month" plus="Unlimited" />
-        <FeatureRow title="Tracked cases (family)" free="1" plus="Up to 5" />
-        <FeatureRow title="On-demand status checks" free="—" plus="Included" />
-        <FeatureRow title="Secure document vault" free="—" plus="Included" />
-        <FeatureRow title="Stalled-case alert" free="Included" plus="Included" />
-        <FeatureRow title="Representative lookup" free="—" plus="Included" />
-        <FeatureRow title="Escalation letter drafting" free="—" plus="Included" />
-        <FeatureRow title="Attorney-handoff PDF report" free="—" plus="Included" />
+        {PLUS_FEATURES.map((feature) => (
+          <FeatureRow key={feature.id} id={feature.id} title={feature.title} free={feature.free} plus={feature.plus} />
+        ))}
       </div>
       <p className="mt-2 text-xs text-muted">
         The stalled-case alert itself is always free — only the representative lookup and letter
         drafting that follow it are part of CaseWhy Plus.
       </p>
+
+      <div className="mt-10">
+        <h2 className="text-lg font-semibold">Plus, in depth</h2>
+        <div className="mt-3 divide-y divide-border rounded-2xl border border-border bg-surface px-6">
+          {PLUS_FEATURES.map((feature) => (
+            <div key={feature.id} id={feature.id} className="scroll-mt-20 py-4">
+              <p className="font-semibold">{feature.title}</p>
+              <p className="mt-1.5 text-sm text-muted">{feature.explanation}</p>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <div className="mt-10">
         <h2 className="text-lg font-semibold">Questions</h2>

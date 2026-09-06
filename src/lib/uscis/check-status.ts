@@ -10,9 +10,11 @@ import { trackedCases } from "@/lib/db/schema";
 import { encryptField, decryptField } from "@/lib/db/crypto";
 import { getCaseStatus, type CaseStatus } from "@/lib/uscis/client";
 import { sendStatusChangeEmail } from "@/lib/email/postmark";
+import { getStatusChangeEmailsEnabled } from "@/lib/settings/settings";
 
 export interface TrackedCaseRow {
   id: string;
+  userId: string;
   receiptNumber: string; // encrypted
   email: string; // encrypted
   lastStatusText: string | null; // encrypted
@@ -29,13 +31,15 @@ export async function checkTrackedCaseNow(
   let notified = false;
 
   if (previousStatusText !== null && previousStatusText !== status.statusText) {
-    await sendStatusChangeEmail({
-      to: email,
-      receiptNumber,
-      statusText: status.statusText,
-      statusDescription: status.statusDescription,
-    });
-    notified = true;
+    if (await getStatusChangeEmailsEnabled(row.userId)) {
+      await sendStatusChangeEmail({
+        to: email,
+        receiptNumber,
+        statusText: status.statusText,
+        statusDescription: status.statusDescription,
+      });
+      notified = true;
+    }
   }
 
   const db = getDb();

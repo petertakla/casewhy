@@ -170,3 +170,27 @@ export const escalationLetters = pgTable(
   },
   (table) => [index("escalation_letters_tracked_case_id_idx").on(table.trackedCaseId)]
 );
+
+// Round 14 — Settings page. No row means "notifications on", same
+// no-row-means-default convention as `subscriptions` (free tier). Only
+// one real toggle exists today (status-change emails); add columns here
+// as more notification types are actually built, not speculatively.
+export const userSettings = pgTable("user_settings", {
+  userId: text("user_id").primaryKey(),
+  statusChangeEmailsEnabled: boolean("status_change_emails_enabled").notNull().default(true),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Round 14 — /news page source picker. Stores OPT-OUTS, not opt-ins: a
+// source a user has never touched is enabled by default (per the
+// "default all-on for new accounts" spec), and adding a new entry to
+// NEWS_SOURCES (src/lib/news/sources.ts) needs no backfill here — it's
+// simply absent from every user's disabled set until they uncheck it.
+export const disabledNewsSources = pgTable(
+  "disabled_news_sources",
+  {
+    userId: text("user_id").notNull(),
+    sourceId: text("source_id").notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.sourceId] })]
+);

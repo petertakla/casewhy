@@ -21,8 +21,16 @@ function formatSize(bytes: number): string {
  * /api/documents, backed by a private Vercel Blob store. Documents are tied
  * to one tracked case (trackedCaseId), not just the account — CW-36 made
  * tracking multi-case, so a document has to say which case it belongs to.
+ * Round 12 — gated to CaseWhy Plus (the API enforces this too; this client
+ * gate just avoids showing an upload UI that would 402 on every attempt).
  */
-export function DocumentVault({ trackedCaseId }: { trackedCaseId?: string }) {
+export function DocumentVault({
+  trackedCaseId,
+  canUseVault,
+}: {
+  trackedCaseId?: string;
+  canUseVault: boolean;
+}) {
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -78,6 +86,17 @@ export function DocumentVault({ trackedCaseId }: { trackedCaseId?: string }) {
           Supporting documents
         </p>
         <p className="text-sm text-muted">Track this case to store supporting documents for it.</p>
+      </div>
+    );
+  }
+
+  if (!canUseVault) {
+    return (
+      <div className="mt-6 border-t border-border pt-5">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted">
+          Supporting documents
+        </p>
+        <p className="text-sm text-muted">Upgrade to CaseWhy Plus for a secure document vault.</p>
       </div>
     );
   }

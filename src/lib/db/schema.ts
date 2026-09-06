@@ -106,3 +106,43 @@ export const emailSubscribers = pgTable(
   },
   (table) => [unique("email_subscribers_email_unique").on(table.email)]
 );
+
+// CW-39 — one mailing address per account ("enter it once"), not per case.
+// Encrypted (AES-256-GCM) as a single JSON blob rather than per-field
+// columns — this is genuinely new, more sensitive PII (a real street
+// address), same standard as tracked_cases.receiptNumber. Plus-gated:
+// the representative-lookup and letter-drafting tools are the only
+// things that read this.
+export const mailingAddresses = pgTable("mailing_addresses", {
+  userId: text("user_id").primaryKey(),
+  // Encrypted JSON: {street, city, state, zip}
+  address: text("address").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// CW-39 — records each escalation letter a user has generated, so the
+// dashboard can nudge them toward the next template in the sequence
+// (congressional -> field-office -> Ombudsman) roughly 14 days after the
+// previous one if the case still hasn't moved, per the concept doc's
+// walkthrough. Tied to a tracked case, same reasoning as case_documents.
+export const escalationLetterEnum = pgEnum("escalation_letter_type", [
+  "congressional",
+  "field_office",
+  "ombudsman",
+]);
+
+export const escalationLetters = pgTable(
+  "escalation_letters",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    trackedCaseId: text("tracked_case_id")
+      .notNull()
+      .references(() => trackedCases.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull(),
+    letterType: escalationLetterEnum("letter_type").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("escalation_letters_tracked_case_id_idx").on(table.trackedCaseId)]
+);

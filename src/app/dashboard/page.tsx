@@ -9,6 +9,8 @@ import { CheckNowButton } from "./CheckNowButton";
 import { DownloadReportLink } from "./DownloadReportLink";
 import { CaseSwitcher } from "./CaseSwitcher";
 import { DocumentVault } from "./DocumentVault";
+import { detectStalledCase } from "@/lib/escalation/stall-detector";
+import { EscalationToolkit } from "./EscalationToolkit";
 
 export const dynamic = "force-dynamic";
 
@@ -75,6 +77,42 @@ function SearchForm({ receiptNumber }: { receiptNumber?: string }) {
         Track case
       </button>
     </form>
+  );
+}
+
+/**
+ * CW-39, Part A — free on every tier. Surfaces a real delay honestly
+ * regardless of payment; only the escalation tools that follow are
+ * Plus-gated. See src/lib/escalation/stall-detector.ts for the (honestly
+ * approximate — see its own comment) benchmark this uses.
+ */
+function StalledCaseCard({ daysSinceLastUpdate, milestoneText }: { daysSinceLastUpdate: number; milestoneText: string }) {
+  return (
+    <div className="mt-4 overflow-hidden rounded-xl border border-amber-500/20 bg-amber-500/5">
+      <div className="flex gap-3 border-l-4 border-l-amber-500 p-4">
+        <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
+          <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5">
+            <path
+              d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+              stroke="currentColor"
+              strokeWidth={1.6}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400">
+            This case looks delayed
+          </p>
+          <p className="mt-1.5 text-sm text-foreground/90">
+            It&apos;s been {daysSinceLastUpdate} days since &quot;{milestoneText}&quot; with no further update —
+            longer than typical for this stage. Sign in and upgrade to CaseWhy Plus to find your
+            representative and draft a follow-up letter.
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -154,11 +192,13 @@ function StatusCard({
     lastCheckedAt?: Date | null;
     canCheckNow: boolean;
     canDownloadReport: boolean;
+    canUseVault: boolean;
     atCap: boolean;
     maxCases: number;
   } | null;
 }) {
   const tone = statusTone(status.statusText);
+  const stall = detectStalledCase(status);
 
   return (
     <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
@@ -180,6 +220,10 @@ function StatusCard({
       </div>
 
       <p className="mt-4 text-sm leading-relaxed text-foreground/90">{status.statusDescription}</p>
+
+      {stall.isStalled && stall.milestoneText && (
+        <StalledCaseCard daysSinceLastUpdate={stall.daysSinceLastUpdate} milestoneText={stall.milestoneText} />
+      )}
 
       {tracking && (
         <div className="mt-3">
@@ -238,7 +282,11 @@ function StatusCard({
         </div>
       )}
 
-      <DocumentVault trackedCaseId={tracking?.trackedCaseId} />
+      <DocumentVault trackedCaseId={tracking?.trackedCaseId} canUseVault={tracking?.canUseVault ?? false} />
+
+      {tracking?.trackedCaseId && (
+        <EscalationToolkit trackedCaseId={tracking.trackedCaseId} canUseToolkit={tracking?.canUseVault ?? false} />
+      )}
     </div>
   );
 }
@@ -322,6 +370,7 @@ export default async function DashboardPage({
               lastCheckedAt: trackedCasesList.find((c) => c.receiptNumber === status.receiptNumber)?.lastCheckedAt,
               canCheckNow,
               canDownloadReport: canCheckNow,
+              canUseVault: canCheckNow,
               atCap: trackedCasesList.length >= maxCases,
               maxCases,
             }}

@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth/server";
 import { getDb } from "@/lib/db/client";
 import { caseDocuments, trackedCases } from "@/lib/db/schema";
 import { encryptField, decryptField } from "@/lib/db/crypto";
+import { getSubscriptionTier } from "@/lib/billing/tier";
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_CONTENT_TYPES = new Set(["application/pdf", "image/jpeg", "image/png"]);
@@ -22,6 +23,12 @@ export async function GET(request: NextRequest) {
   const { data: session } = await auth.getSession();
   if (!session?.user) {
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+  }
+  if ((await getSubscriptionTier(session.user.id)) !== "plus") {
+    return NextResponse.json(
+      { error: "The document vault is a CaseWhy Plus feature." },
+      { status: 402 }
+    );
   }
 
   const trackedCaseId = request.nextUrl.searchParams.get("trackedCaseId");
@@ -60,6 +67,12 @@ export async function POST(request: NextRequest) {
   const { data: session } = await auth.getSession();
   if (!session?.user) {
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+  }
+  if ((await getSubscriptionTier(session.user.id)) !== "plus") {
+    return NextResponse.json(
+      { error: "The document vault is a CaseWhy Plus feature." },
+      { status: 402 }
+    );
   }
 
   let form: FormData;

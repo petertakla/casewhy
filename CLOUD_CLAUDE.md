@@ -396,6 +396,8 @@ New direction from Peter: the cloud session now owns running the marketing plan 
 
 **Ask:** start on account-prep assets and the monitor-and-draft tool's read/draft side (X + TikTok + YouTube first, per the API-access findings above — skip Instagram/Facebook until the LLC exists). Don't wire an auto-post capability yet. Report back with real findings the same way CW-33(c) and the Meta/X research above did — if something's blocked or costs more than expected, say so rather than building around it silently.
 
+**Deferred, Sep 6 — Peter's explicit instruction: "defer social media build, hold off till further notice."** Nothing in this round has been built. `SOCIAL_MEDIA_GUARDRAILS.md` is committed and ready for whenever this resumes, but treat round 8 as paused, not in progress — don't pick it back up without Peter (or the cloud session, on his behalf) explicitly saying to resume.
+
 ## Next tasks for Claude Code — round 9, Sep 6 — CW-39 escalation toolkit: real build estimate
 
 **Decided by Peter Sep 6 — see Section 6 of the MVP scope doc for the full record.** This is CW-39, previously scoped-but-not-authorized; it's now authorized as a third addition to the existing CaseWhy Plus tier (unlimited chat + 5-case tracking), at no price change ($9.99/mo covers all three). Ask: a real build estimate, same pattern as CW-37/38/40 — not asking you to build it yet, just size it honestly like those were sized.

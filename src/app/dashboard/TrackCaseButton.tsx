@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { trackCase, untrackCase } from "./actions";
 
 export function TrackCaseButton({
@@ -47,7 +48,11 @@ export function TrackCaseButton({
     return (
       <p className="text-xs text-muted">
         You&apos;re tracking the maximum of {maxCases} case{maxCases === 1 ? "" : "s"} on your
-        plan. Untrack one to add this, or upgrade to CaseWhy Plus for up to 5 cases.
+        plan. Untrack one to add this, or{" "}
+        <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+          upgrade to CaseWhy Plus
+        </Link>{" "}
+        for up to 5 cases.
       </p>
     );
   }

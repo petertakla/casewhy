@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   saveMyMailingAddress,
   getMySavedAddress,
@@ -60,7 +61,10 @@ export function EscalationToolkit({
           Escalation toolkit
         </p>
         <p className="text-sm text-muted">
-          Upgrade to CaseWhy Plus to find your representative and draft a follow-up letter.
+          <Link href="/plus" className="text-brand-600 hover:underline dark:text-brand-400">
+            Upgrade to CaseWhy Plus
+          </Link>{" "}
+          to find your representative and draft a follow-up letter.
         </p>
       </div>
     );

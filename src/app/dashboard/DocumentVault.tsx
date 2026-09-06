@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 
 interface DocumentItem {
   id: string;
@@ -96,7 +97,12 @@ export function DocumentVault({
         <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted">
           Supporting documents
         </p>
-        <p className="text-sm text-muted">Upgrade to CaseWhy Plus for a secure document vault.</p>
+        <p className="text-sm text-muted">
+          <Link href="/plus" className="text-brand-600 hover:underline dark:text-brand-400">
+            Upgrade to CaseWhy Plus
+          </Link>{" "}
+          for a secure document vault.
+        </p>
       </div>
     );
   }

@@ -1,7 +1,7 @@
 // Drizzle schema for CaseWhy's own tables. Neon Auth manages its own
 // `neon_auth` schema (users, sessions) separately — never migrated here.
 
-import { pgTable, pgEnum, text, timestamp, integer, index, primaryKey, unique } from "drizzle-orm/pg-core";
+import { pgTable, pgEnum, text, timestamp, integer, index, primaryKey, unique, boolean } from "drizzle-orm/pg-core";
 
 export const trackedCases = pgTable(
   "tracked_cases",
@@ -34,14 +34,38 @@ export const subscriptionTierEnum = pgEnum("subscription_tier", ["free", "plus"]
 
 // Per-account subscription tier (CW-35/36 packaging — see CLOUD_CLAUDE.md
 // for the confirmed pricing/limits). No row for a user means "free" — the
-// default for literally everyone right now, since no billing exists yet
-// (no LLC, no Stripe, no lawyer-reviewed ToS). A real payment webhook would
-// insert/update this row once those prerequisites exist — see
-// getSubscriptionTier() in src/lib/billing/tier.ts.
+// default until a real Stripe subscription exists.
+//
+// Round 13 — live billing, Stripe test mode. `tier` is now driven by the
+// webhook handler (src/app/api/webhooks/stripe/route.ts), not just a
+// manual/debug script. The Stripe fields mirror Stripe's own subscription
+// object so the webhook can be a thin sync layer rather than reinventing
+// subscription state: `status` uses Stripe's own status strings (active,
+// past_due, canceled, incomplete, etc.) verbatim. Per the decided
+// downgrade behavior, `tier` stays "plus" through `currentPeriodEnd` even
+// after `cancelAtPeriodEnd` is set or a payment fails (`status` becomes
+// past_due) — only `customer.subscription.deleted` (or the period
+// genuinely ending) flips `tier` back to "free". See getSubscriptionTier()
+// in src/lib/billing/tier.ts.
 export const subscriptions = pgTable("subscriptions", {
   userId: text("user_id").primaryKey(),
   tier: subscriptionTierEnum("tier").notNull().default("free"),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  /** Stripe's own subscription status string (active, past_due, canceled, incomplete, unpaid, ...). Null until a subscription exists. */
+  status: text("status"),
+  currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
+  cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Round 13 — dedupes Stripe webhook deliveries (Stripe can and does retry/
+// redeliver events) so a re-sent checkout.session.completed can't
+// double-process. Keyed on Stripe's own event ID.
+export const stripeWebhookEvents = pgTable("stripe_webhook_events", {
+  id: text("id").primaryKey(), // Stripe event ID, e.g. "evt_..."
+  type: text("type").notNull(),
+  processedAt: timestamp("processed_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 // CW-35's chat metering: one row per user per calendar month (UTC),

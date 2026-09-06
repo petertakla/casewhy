@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { checkCaseNow } from "./actions";
 
 function formatCheckedAt(date: Date | null): string {
@@ -36,7 +37,10 @@ export function CheckNowButton({
     return (
       <p className="mt-1.5 text-xs text-muted">
         {formatCheckedAt(checkedAt)} ·{" "}
-        <span className="text-muted">Upgrade to CaseWhy Plus to check on demand</span>
+        <Link href="/plus" className="text-brand-600 hover:underline dark:text-brand-400">
+          Upgrade to CaseWhy Plus
+        </Link>{" "}
+        to check on demand
       </p>
     );
   }

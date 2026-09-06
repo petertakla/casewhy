@@ -107,8 +107,11 @@ function StalledCaseCard({ daysSinceLastUpdate, milestoneText }: { daysSinceLast
           </p>
           <p className="mt-1.5 text-sm text-foreground/90">
             It&apos;s been {daysSinceLastUpdate} days since &quot;{milestoneText}&quot; with no further update —
-            longer than typical for this stage. Sign in and upgrade to CaseWhy Plus to find your
-            representative and draft a follow-up letter.
+            longer than typical for this stage. Sign in and{" "}
+            <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+              upgrade to CaseWhy Plus
+            </Link>{" "}
+            to find your representative and draft a follow-up letter.
           </p>
         </div>
       </div>

@@ -43,6 +43,13 @@
       "when": 1788660458758,
       "tag": "0005_breezy_dust",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788696093086,
+      "tag": "0006_rapid_silver_centurion",
+      "breakpoints": true
     }
   ]
 }

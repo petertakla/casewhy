@@ -3,11 +3,10 @@
 // "CaseWhy Plus," $9.99/mo, unlocking unlimited AI chat and up to 5 tracked
 // cases together (not separate SKUs).
 //
-// IMPORTANT: this is schema/logic only, not live billing. No LLC, no
-// Stripe/payment processor, and no lawyer-reviewed ToS exist yet — this
-// file is the plumbing that a real payment webhook would write to once
-// those prerequisites exist, not a working purchase path. Until then,
-// every account is "free" (no row in `subscriptions` = free).
+// Round 13 — live billing (Stripe test mode). `tier` is now kept in sync by
+// the Stripe webhook handler (src/app/api/webhooks/stripe/route.ts), not
+// just a manual/debug script — see src/lib/db/schema.ts's `subscriptions`
+// table comment for the exact downgrade-timing rule this file relies on.
 
 import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
@@ -34,4 +33,25 @@ export async function getSubscriptionTier(userId: string): Promise<SubscriptionT
     .where(eq(subscriptions.userId, userId))
     .limit(1);
   return row?.tier ?? "free";
+}
+
+export interface SubscriptionDetails {
+  tier: SubscriptionTier;
+  status: string | null;
+  currentPeriodEnd: Date | null;
+  cancelAtPeriodEnd: boolean;
+  hasStripeCustomer: boolean;
+}
+
+/** Fuller subscription state for the /plus page and CTA branching — whether to show "Subscribe," "Manage subscription," or a "canceling on <date>" notice. */
+export async function getSubscriptionDetails(userId: string): Promise<SubscriptionDetails> {
+  const db = getDb();
+  const [row] = await db.select().from(subscriptions).where(eq(subscriptions.userId, userId)).limit(1);
+  return {
+    tier: row?.tier ?? "free",
+    status: row?.status ?? null,
+    currentPeriodEnd: row?.currentPeriodEnd ?? null,
+    cancelAtPeriodEnd: row?.cancelAtPeriodEnd ?? false,
+    hasStripeCustomer: !!row?.stripeCustomerId,
+  };
 }

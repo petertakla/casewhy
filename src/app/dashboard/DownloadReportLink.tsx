@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 /**
  * CW-40 — attorney-handoff PDF report, CaseWhy Plus only (see round-4 in
  * CLOUD_CLAUDE.md for the gating decision: it bundles into the same paid
@@ -15,7 +17,10 @@ export function DownloadReportLink({
   if (!canDownload) {
     return (
       <p className="mt-1.5 text-xs text-muted">
-        Upgrade to CaseWhy Plus for a downloadable attorney-handoff PDF report
+        <Link href="/plus" className="text-brand-600 hover:underline dark:text-brand-400">
+          Upgrade to CaseWhy Plus
+        </Link>{" "}
+        for a downloadable attorney-handoff PDF report
       </p>
     );
   }

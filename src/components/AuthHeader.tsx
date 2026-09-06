@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "/ask", label: "Ask a question" },
   { href: "/processing-times", label: "Processing times" },
   { href: "/visa-bulletin", label: "Visa bulletin" },
+  { href: "/plus", label: "CaseWhy Plus" },
 ];
 
 export function AuthHeader() {

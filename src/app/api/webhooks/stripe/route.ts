@@ -115,6 +115,10 @@ async function findUserIdForCustomer(stripeCustomerId: string): Promise<string |
 async function upsertSubscription(userId: string, stripeCustomerId: string, sub: Stripe.Subscription) {
   const db = getDb();
   const currentPeriodEnd = sub.items.data[0]?.current_period_end;
+  // Live-verified Sep 6 2026: Stripe's hosted Billing Portal "cancel at period
+  // end" flow leaves cancel_at_period_end false and instead sets cancel_at to
+  // the period-end timestamp — cancel_at_period_end alone under-detects it.
+  const cancelAtPeriodEnd = sub.cancel_at_period_end || sub.cancel_at != null;
   await db
     .insert(subscriptions)
     .values({
@@ -124,7 +128,7 @@ async function upsertSubscription(userId: string, stripeCustomerId: string, sub:
       stripeSubscriptionId: sub.id,
       status: sub.status,
       currentPeriodEnd: currentPeriodEnd ? new Date(currentPeriodEnd * 1000) : null,
-      cancelAtPeriodEnd: sub.cancel_at_period_end,
+      cancelAtPeriodEnd,
       updatedAt: new Date(),
     })
     .onConflictDoUpdate({
@@ -135,7 +139,7 @@ async function upsertSubscription(userId: string, stripeCustomerId: string, sub:
         stripeSubscriptionId: sub.id,
         status: sub.status,
         currentPeriodEnd: currentPeriodEnd ? new Date(currentPeriodEnd * 1000) : null,
-        cancelAtPeriodEnd: sub.cancel_at_period_end,
+        cancelAtPeriodEnd,
         updatedAt: new Date(),
       },
     });

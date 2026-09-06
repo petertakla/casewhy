@@ -165,6 +165,14 @@ export default function LandingPage() {
             >
               Privacy Policy
             </a>
+            <a
+              href="https://casewhy.com/terms.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground"
+            >
+              Terms of Service
+            </a>
             <a href="mailto:hello@casewhy.com" className="hover:text-foreground">
               Contact
             </a>

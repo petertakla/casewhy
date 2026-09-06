@@ -7,7 +7,7 @@
 //   npx tsx scripts/set-subscription-tier.ts you@example.com plus
 //   npx tsx scripts/set-subscription-tier.ts you@example.com free
 
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { getDb } from "../src/lib/db/client";
 import { subscriptions } from "../src/lib/db/schema";
 

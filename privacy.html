@@ -101,6 +101,7 @@
     <li><strong>Case information:</strong> the USCIS receipt number(s) you add, and the case status history and updates we retrieve on your behalf through USCIS's official Case Status API.</li>
     <li><strong>Usage information:</strong> basic technical data (such as browser type and pages visited) used to keep the service working and improve it — we do not use invasive tracking or sell this data.</li>
     <li><strong>Pre-launch notify-me email:</strong> if you join the waitlist on this site before CaseWhy is open for signups, we store only the email address you provide, so we can email you once at launch. It isn't linked to any account or case data unless you later sign up yourself.</li>
+    <li><strong>Mailing address (CaseWhy Plus escalation toolkit only):</strong> if you use the representative-lookup or letter-drafting tools, we store the name and mailing address you provide — encrypted at rest with the same standard used for your receipt number — so we can identify your congressional district and pre-fill your own letters. We don't use it for anything else, and it's never shared beyond the U.S. Census Bureau's public geocoding lookup (used only to resolve your district, not stored by them on our behalf).</li>
   </ul>
 
   <h2>2. How We Use Your Information</h2>
@@ -124,6 +125,7 @@
     <li><strong>USCIS's official Case Status API</strong> — to retrieve your case's status using the receipt number you provide.</li>
     <li><strong>An AI service (Claude, by Anthropic)</strong> — to turn raw status text into a plain-language explanation. Only the case status text needed to generate your explanation is sent; we do not send your full account or contact details.</li>
     <li><strong>An email delivery provider</strong> — to send account and status-change notifications.</li>
+    <li><strong>The U.S. Census Bureau's Geocoding Services API</strong> (CaseWhy Plus only) — to resolve a mailing address you provide to a congressional district, if you use the representative-lookup tool.</li>
   </ul>
   <p>Each of these providers is contractually and/or technically limited to using your data only to provide the relevant part of the service.</p>
 

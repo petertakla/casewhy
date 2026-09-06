@@ -4,56 +4,96 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Privacy Policy — CaseWhy</title>
+<link rel="icon" href="/brand/icon-192.png">
+<link rel="icon" href="/brand/icon-512.png" sizes="512x512">
+<link rel="apple-touch-icon" href="/brand/apple-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#1a2233;
-    --ink-soft:#4b5568;
-    --bg:#fbfaf7;
-    --card:#ffffff;
-    --accent:#1f6f5c;
-    --border:#e6e2d8;
-    --warn-bg:#fbf3e6;
-    --warn-border:#e8d3a3;
+    --background:#f7f5f0;
+    --surface:#ffffff;
+    --surface-2:#efece4;
+    --foreground:#1c2024;
+    --muted:#6b7280;
+    --border:#e4e0d6;
+    --border-strong:#d1cbba;
+    --brand-400:#5b9eed;
+    --brand-500:#2a78d6;
+    --brand-600:#1d5fb0;
+    --logo-green:#1baf7a;
+    --glow:42,120,214;
+    --glow-opacity:0.06;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --background:#0a0e17;
+      --surface:#12182a;
+      --surface-2:#1a2238;
+      --foreground:#edf0f5;
+      --muted:#98a1b5;
+      --border:#232c45;
+      --border-strong:#303c5c;
+      --glow:91,158,237;
+      --glow-opacity:0.16;
+    }
   }
   *{box-sizing:border-box;}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;}
-  .wrap{max-width:760px;margin:0 auto;padding:0 24px;}
-  header{padding:22px 0;border-bottom:1px solid var(--border);}
-  .logo{font-weight:700;font-size:1.25rem;letter-spacing:-0.02em;color:var(--ink);text-decoration:none;}
-  .logo span{color:var(--accent);}
-  main{padding:48px 0 80px;}
-  h1{font-size:1.9rem;margin-bottom:6px;}
-  .updated{color:var(--ink-soft);font-size:0.9rem;margin-bottom:32px;}
-  h2{font-size:1.2rem;margin-top:36px;margin-bottom:10px;}
-  p, li{color:var(--ink-soft);font-size:0.98rem;}
-  a{color:var(--accent);}
-  .draft-banner{
-    background:var(--warn-bg);
-    border:1px solid var(--warn-border);
-    border-radius:12px;
-    padding:18px 22px;
-    color:#5c4a24;
-    font-size:0.92rem;
-    margin-bottom:32px;
+  body{
+    margin:0;
+    background:var(--background);
+    color:var(--foreground);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+    background-image:
+      radial-gradient(ellipse 900px 560px at 15% -10%, rgba(var(--glow),var(--glow-opacity)), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(var(--glow), calc(var(--glow-opacity) * 0.7)), transparent 55%);
+    background-repeat:no-repeat;
+    background-attachment:fixed;
   }
-  footer{border-top:1px solid var(--border);padding:24px 0;font-size:0.85rem;color:var(--ink-soft);}
+  a{color:var(--brand-600);}
+  @media (prefers-color-scheme: dark){ a{color:var(--brand-400);} }
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px;}
+  header{position:sticky;top:0;z-index:10;padding:18px 0;border-bottom:1px solid var(--border);background:color-mix(in srgb, var(--surface) 80%, transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+  .logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;}
+  .logo img{height:32px;width:32px;border-radius:8px;flex-shrink:0;}
+  .logo .lockup{display:flex;flex-direction:column;line-height:1.2;}
+  .logo .name{font-weight:700;font-size:1.15rem;letter-spacing:-0.02em;color:var(--foreground);}
+  .logo .name span{color:var(--logo-green);}
+  .logo .tagline{font-size:0.72rem;color:var(--muted);font-weight:500;}
+  main{padding:48px 0 80px;}
+  h1{font-size:1.9rem;margin-bottom:6px;letter-spacing:-0.02em;}
+  .updated{color:var(--muted);font-size:0.9rem;margin-bottom:32px;}
+  h2{font-size:1.2rem;margin-top:36px;margin-bottom:10px;}
+  p, li{color:var(--muted);font-size:0.98rem;}
+  strong{color:var(--foreground);}
+  footer{border-top:1px solid var(--border);padding:32px 0;font-size:0.85rem;color:var(--muted);}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;align-items:center;}
+  footer a{color:var(--muted);text-decoration:none;margin-left:16px;}
+  footer a:hover{color:var(--brand-600);}
+  @media (prefers-color-scheme: dark){ footer a:hover{color:var(--brand-400);} }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="wrap"><a class="logo" href="index.html">Case<span>Why</span></a></div>
+  <div class="wrap">
+    <a class="logo" href="index.html">
+      <img src="/brand/mark.svg" alt="">
+      <span class="lockup">
+        <span class="name">Case<span>Why</span></span>
+        <span class="tagline">Your USCIS case, explained!</span>
+      </span>
+    </a>
+  </div>
 </header>
 
 <main class="wrap">
   <h1>Privacy Policy</h1>
-  <p class="updated">Draft — last edited September 6, 2026</p>
+  <p class="updated">Effective: September 6, 2026</p>
 
-  <div class="draft-banner">
-    <strong>This is a working draft, not a published policy.</strong> It is meant as a starting point for CaseWhy's actual privacy policy and has not been reviewed by an attorney. Do not publish this page live, and do not rely on it as a final legal document, until it has been reviewed by a lawyer familiar with U.S. privacy law and, given the nature of this product, CCPA and similar state privacy statutes.
-  </div>
-
-  <p>CaseWhy ("we," "us," "our") helps people track U.S. Citizenship and Immigration Services (USCIS) case status and understand what changes to their case mean. This policy explains what information we collect, why, and how it's protected.</p>
+  <p>CaseWhy ("we," "us," "our") helps people track U.S. Citizenship and Immigration Services (USCIS) case status and understand what changes to their case mean. This policy explains what information we collect, why, and how it's protected. It works alongside our <a href="terms.html">Terms of Service</a>, which governs your use of CaseWhy more broadly.</p>
 
   <h2>1. Information We Collect</h2>
   <ul>
@@ -87,11 +127,11 @@
   </ul>
   <p>Each of these providers is contractually and/or technically limited to using your data only to provide the relevant part of the service.</p>
 
-  <h2>5. Data Retention & Security</h2>
-  <p>Case and account data is encrypted both at rest and in transit. We retain your data for as long as your account is active. If you delete your account, your case data is permanently deleted within [X days — to be finalized].</p>
+  <h2>5. Data Retention &amp; Security</h2>
+  <p>Case and account data is encrypted both at rest and in transit. We retain your data for as long as your account is active. If you delete your account, your case data is permanently deleted within 30 days.</p>
 
   <h2>6. Your Rights</h2>
-  <p>You can access, correct, or delete your data at any time from your account settings, or by emailing <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>. Depending on your state of residence, you may have additional rights (for example, under the California Consumer Privacy Act) — details to be finalized with legal review.</p>
+  <p>You can access, correct, or delete your data at any time from your account settings, or by emailing <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>. Depending on your state of residence, you may have additional rights under applicable state privacy laws, such as the California Consumer Privacy Act (CCPA) — including the right to know what personal information we hold, request its deletion, and opt out of its sale (we don't sell personal information, so there's nothing to opt out of). Contact us at the email above to exercise any of these rights.</p>
 
   <h2>7. Not Legal Advice</h2>
   <p>CaseWhy is not a law firm, is not affiliated with USCIS or DHS, and does not provide legal advice or representation. Information provided through CaseWhy is general and educational. For advice about your specific case, consult a licensed immigration attorney.</p>
@@ -104,7 +144,14 @@
 </main>
 
 <footer>
-  <div class="wrap">&copy; 2026 CaseWhy. Not affiliated with or endorsed by USCIS or DHS.</div>
+  <div class="wrap">
+    <span>&copy; 2026 CaseWhy. Not affiliated with or endorsed by USCIS or DHS.</span>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="terms.html">Terms of Service</a>
+      <a href="mailto:hello@casewhy.com">Contact</a>
+    </div>
+  </div>
 </footer>
 
 </body>

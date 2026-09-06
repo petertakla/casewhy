@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Service — CaseWhy</title>
+<link rel="icon" href="/brand/icon-192.png">
+<link rel="icon" href="/brand/icon-512.png" sizes="512x512">
+<link rel="apple-touch-icon" href="/brand/apple-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --background:#f7f5f0;
+    --surface:#ffffff;
+    --surface-2:#efece4;
+    --foreground:#1c2024;
+    --muted:#6b7280;
+    --border:#e4e0d6;
+    --border-strong:#d1cbba;
+    --brand-400:#5b9eed;
+    --brand-500:#2a78d6;
+    --brand-600:#1d5fb0;
+    --logo-green:#1baf7a;
+    --glow:42,120,214;
+    --glow-opacity:0.06;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --background:#0a0e17;
+      --surface:#12182a;
+      --surface-2:#1a2238;
+      --foreground:#edf0f5;
+      --muted:#98a1b5;
+      --border:#232c45;
+      --border-strong:#303c5c;
+      --glow:91,158,237;
+      --glow-opacity:0.16;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--background);
+    color:var(--foreground);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+    background-image:
+      radial-gradient(ellipse 900px 560px at 15% -10%, rgba(var(--glow),var(--glow-opacity)), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(var(--glow), calc(var(--glow-opacity) * 0.7)), transparent 55%);
+    background-repeat:no-repeat;
+    background-attachment:fixed;
+  }
+  a{color:var(--brand-600);}
+  @media (prefers-color-scheme: dark){ a{color:var(--brand-400);} }
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px;}
+  header{position:sticky;top:0;z-index:10;padding:18px 0;border-bottom:1px solid var(--border);background:color-mix(in srgb, var(--surface) 80%, transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+  .logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;}
+  .logo img{height:32px;width:32px;border-radius:8px;flex-shrink:0;}
+  .logo .lockup{display:flex;flex-direction:column;line-height:1.2;}
+  .logo .name{font-weight:700;font-size:1.15rem;letter-spacing:-0.02em;color:var(--foreground);}
+  .logo .name span{color:var(--logo-green);}
+  .logo .tagline{font-size:0.72rem;color:var(--muted);font-weight:500;}
+  main{padding:48px 0 80px;}
+  h1{font-size:1.9rem;margin-bottom:6px;letter-spacing:-0.02em;}
+  .updated{color:var(--muted);font-size:0.9rem;margin-bottom:32px;}
+  h2{font-size:1.2rem;margin-top:36px;margin-bottom:10px;}
+  p, li{color:var(--muted);font-size:0.98rem;}
+  strong{color:var(--foreground);}
+  footer{border-top:1px solid var(--border);padding:32px 0;font-size:0.85rem;color:var(--muted);}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;align-items:center;}
+  footer a{color:var(--muted);text-decoration:none;margin-left:16px;}
+  footer a:hover{color:var(--brand-600);}
+  @media (prefers-color-scheme: dark){ footer a:hover{color:var(--brand-400);} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="logo" href="index.html">
+      <img src="/brand/mark.svg" alt="">
+      <span class="lockup">
+        <span class="name">Case<span>Why</span></span>
+        <span class="tagline">Your USCIS case, explained!</span>
+      </span>
+    </a>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Terms of Service</h1>
+  <p class="updated">Effective: September 6, 2026</p>
+
+  <h2>1. Agreement to These Terms</h2>
+  <p>These Terms of Service ("Terms") govern your access to and use of CaseWhy, a web application currently operated as a sole proprietorship based in Florida ("CaseWhy," "we," "us," or "our"; a Florida LLC formation is in progress and these Terms will be updated to name it once filed). By creating an account or using CaseWhy at casewhy.com or casewhy-app.vercel.app (together, the "Service"), you agree to these Terms and to our <a href="privacy.html">Privacy Policy</a>, which is incorporated into these Terms by reference. If you don't agree, don't use the Service.</p>
+
+  <h2>2. What CaseWhy Is</h2>
+  <p>CaseWhy helps you track a pending U.S. Citizenship and Immigration Services (USCIS) case. You provide a receipt number; we check its status against USCIS's own Case Status API and USCIS's FOIA API, and use an AI layer to translate that status into a plain-language explanation and general next steps, grounded in a curated set of public USCIS policy memos, processing-time data, and case-law history. Depending on your plan, the Service may also offer AI chat about your case, tracking for multiple cases (e.g., family members'), document storage, and an escalation toolkit that helps you look up your congressional representative and draft your own inquiry letters when a case appears delayed.</p>
+  <p><strong>CaseWhy is not affiliated with, endorsed by, or operated by USCIS, the Department of Homeland Security, or any other government agency.</strong> We display information sourced from public government systems; we do not control that data and cannot guarantee its accuracy, completeness, or timeliness.</p>
+
+  <h2>3. Not Legal Advice — Read This Before Relying on Anything CaseWhy Tells You</h2>
+  <p><strong>CaseWhy is not a law firm, does not provide legal advice, and using the Service does not create an attorney-client relationship of any kind.</strong> Everything the Service tells you — explanations of your case status, answers from the AI chat feature, processing-time estimates, visa bulletin information, and any drafting assistance in the escalation toolkit — is general, informational content drawn from public USCIS materials. It describes what a status or process generally means; it is never a conclusion about what you, specifically, should do about your case.</p>
+  <p>Decisions about your individual case — including anything that depends on your specific facts, history, or strategy — require a licensed immigration attorney. When the Service's guidance touches on something that could depend on your individual circumstances, it will say so and point you toward consulting one. You should not rely on the Service as a substitute for legal counsel, and we are not responsible for decisions you make based on information from the Service instead of consulting an attorney.</p>
+  <p>If you use the escalation toolkit's letter or request drafting features (for a congressional inquiry, a field-office follow-up, or a USCIS Ombudsman Case Assistance request), the Service organizes and formats content you provide — it does not generate case-specific legal claims on your behalf, and it does not send anything for you. You are solely responsible for reviewing, finalizing, and sending anything you draft using the Service, and for the accuracy of what you send.</p>
+
+  <h2>4. Eligibility and Accounts</h2>
+  <p>You must be at least 18 years old to create a CaseWhy account. You may track cases belonging to family members (e.g., a spouse or child) in addition to your own, up to your plan's case limit, but you represent that you are authorized to do so — for example, because it's your own case, your minor child's case, or a case you have that person's permission to track on their behalf. You're responsible for the accuracy of the information you enter and for keeping your account credentials (including access to the email address used for sign-in) secure. Notify us promptly at <a href="mailto:hello@casewhy.com">hello@casewhy.com</a> if you believe your account has been accessed without authorization.</p>
+  <p>One account per person. Accounts are for your own and your family's personal use, not for resale, sharing with unrelated third parties, or commercial redistribution of case data.</p>
+
+  <h2>5. Subscription Plans and Billing</h2>
+  <p>CaseWhy offers a free tier and a paid subscription tier ("CaseWhy Plus"). <strong>Right now, CaseWhy Plus is not yet available for purchase</strong> — no payment processor is connected and no charges are being collected. The terms below describe how billing will work once it goes live, so that this document doesn't need to be rewritten from scratch at that point; they are not yet operative.</p>
+  <p>When CaseWhy Plus becomes available: it will be billed monthly in advance at the price shown at checkout (currently planned at $9.99/month), auto-renewing until you cancel. You can cancel anytime from your account settings; cancellation stops future billing but doesn't refund the current billing period unless required by law. We may change subscription pricing or features with advance notice by email; continued use after a price change takes effect means you accept the new price. Free-tier limits (such as the number of AI chat questions per month or the number of cases you can track) may change as the Service develops.</p>
+
+  <h2>6. Acceptable Use</h2>
+  <p>You agree not to: use the Service for any unlawful purpose; attempt to scrape, reverse-engineer, or systematically extract data from the Service; interfere with or disrupt the Service's operation or security; misrepresent your identity or your authority to track a case; use the Service to harass, deceive, or impersonate a USCIS official, congressional office, or any other person or entity; or use the escalation toolkit's outputs to make false statements to a government office. We may suspend or terminate accounts that violate this section.</p>
+
+  <h2>7. Your Content</h2>
+  <p>You retain ownership of the information and documents you upload or enter into CaseWhy (case details, uploaded notices or RFE letters, mailing address, letter drafts, and similar). You grant us a limited license to store, process, and display that content back to you as needed to operate the Service — including running it through our AI provider to generate explanations, chat responses, and drafting assistance. We don't sell your content or share it with third parties beyond what's described in our Privacy Policy and what's needed to operate the Service (e.g., our hosting, database, email delivery, and AI infrastructure providers).</p>
+
+  <h2>8. Third-Party Data and Services</h2>
+  <p>The Service relies on data and infrastructure from third parties we don't control, including USCIS's Case Status and FOIA APIs, the U.S. Census Bureau's Geocoding API (for the representative-lookup feature), a hand-maintained table of congressional representatives, Postmark (email delivery), Neon (database hosting), and Vercel (application hosting). We work to keep this data accurate and current, but we don't guarantee it — government processing times, policy positions, and elected officials change, sometimes without advance notice. If you rely on time-sensitive information from the Service (a processing-time estimate, a representative's current contact details, a visa bulletin date), verify it against the original government or official source before acting on it.</p>
+
+  <h2>9. Intellectual Property</h2>
+  <p>CaseWhy and its logo, design, and underlying software are owned by us and protected by applicable intellectual property laws. We grant you a limited, non-exclusive, non-transferable license to use the Service for its intended personal purpose, subject to these Terms. You may not copy, modify, distribute, sell, or lease any part of the Service or its software.</p>
+
+  <h2>10. Disclaimers</h2>
+  <p><strong>The Service is provided "as is" and "as available," without warranties of any kind, express or implied</strong>, including implied warranties of merchantability, fitness for a particular purpose, and non-infringement. We do not warrant that the Service will be uninterrupted, error-free, or that any status information, processing-time estimate, explanation, or drafted document will be accurate, complete, or achieve any particular outcome for your case. You use the Service, and any information or document you draft using it, at your own risk.</p>
+
+  <h2>11. Limitation of Liability</h2>
+  <p>To the fullest extent permitted by law, CaseWhy and its owner will not be liable for any indirect, incidental, special, consequential, or punitive damages, or for any loss of data, opportunity, or goodwill, arising from your use of the Service — including delays, errors, or omissions in case status information, AI-generated explanations or chat responses, or escalation-toolkit drafts. To the extent any liability isn't excluded, our total liability for any claim relating to the Service is limited to the greater of $50 or the amount you paid us in the 12 months before the claim arose.</p>
+
+  <h2>12. Indemnification</h2>
+  <p>You agree to indemnify and hold us harmless from any claim, loss, or expense (including reasonable attorneys' fees) arising from your misuse of the Service, your violation of these Terms, or content you submit or send using the Service.</p>
+
+  <h2>13. Termination</h2>
+  <p>You may stop using the Service and delete your account at any time. We may suspend or terminate your access if you violate these Terms, if required by law, or if we discontinue the Service, with notice where reasonably practicable. Sections that by their nature should survive termination (including Sections 3, 7, 10, 11, 12, and 14) will survive.</p>
+
+  <h2>14. Governing Law and Disputes</h2>
+  <p>These Terms are governed by the laws of the State of Florida, without regard to conflict-of-law principles. Any dispute arising from these Terms or the Service will be brought in the state or federal courts located in Florida, and you consent to that jurisdiction.</p>
+
+  <h2>15. Changes to These Terms</h2>
+  <p>We may update these Terms from time to time. We'll post the updated version at this URL with a new "Last updated" date, and for material changes we'll also notify you by email. Continued use of the Service after changes take effect means you accept the updated Terms.</p>
+
+  <h2>16. Miscellaneous</h2>
+  <p>If any provision of these Terms is found unenforceable, the remaining provisions stay in effect. Our failure to enforce a provision isn't a waiver of it. You may not assign your rights under these Terms without our consent; we may assign ours in connection with a merger, acquisition, or sale of assets. These Terms, together with the <a href="privacy.html">Privacy Policy</a>, are the entire agreement between you and CaseWhy regarding the Service.</p>
+
+  <h2>17. Contact</h2>
+  <p>Questions about these Terms: <a href="mailto:terms@casewhy.com">terms@casewhy.com</a>. Privacy-specific requests: <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>.</p>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>&copy; 2026 CaseWhy. Not affiliated with or endorsed by USCIS or DHS.</span>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="mailto:hello@casewhy.com">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

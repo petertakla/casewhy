@@ -48,3 +48,49 @@ export function bulletinDateLabel(value: string): string {
   if (value === "U") return "Unavailable";
   return value;
 }
+
+// Round 20, item 6 — month-over-month "movement" badge (forward/retrogressed/
+// no change), computed from real data CaseWhy already tracks, never invented.
+//
+// PREVIOUS_MONTH is deliberately absent right now: a real August 2026 Final
+// Action Dates snapshot to diff against couldn't be sourced this session —
+// travel.state.gov's Cloudflare bot-protection hard-blocked the live page
+// (unlike CW-34's original capture, which passed the challenge fine; this
+// time it returned a flat "Sorry, you have been blocked", not just a JS
+// challenge), and the Wayback Machine's own crawls of the same August URL
+// were confirmed to have hit the identical block (all 15 archived snapshots
+// between Jul 17-Aug 23, 2026 recorded as HTTP 403, not real content).
+// Rather than fabricate a comparison month, this ships the computation logic
+// below plus the UI, inactive until a real previous month exists — which
+// happens naturally at the next monthly refresh: keep this September data as
+// PREVIOUS_MONTH when adding October's, and movement badges go live for real.
+export const VISA_BULLETIN_PREVIOUS_MONTH: {
+  month: string;
+  family: BulletinRow[];
+  employment: BulletinRow[];
+} | null = null;
+
+/** Parses a Final Action Date value into a comparable number ("C" sorts highest/most current, "U" lowest). */
+function comparableDateValue(value: string): number | null {
+  if (value === "C") return Infinity;
+  if (value === "U") return -Infinity;
+  const match = /^(\d{2})([A-Z]{3})(\d{2})$/.exec(value);
+  if (!match) return null;
+  const [, day, monStr, yr] = match;
+  const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+  const month = months.indexOf(monStr);
+  if (month === -1) return null;
+  return Date.UTC(2000 + Number(yr), month, Number(day));
+}
+
+export type BulletinMovement = "forward" | "retrogressed" | "unchanged";
+
+/** Null when either value is missing/unparseable, or there's no previous-month data to compare against yet. */
+export function computeMovement(current?: string, previous?: string): BulletinMovement | null {
+  if (!current || !previous) return null;
+  const c = comparableDateValue(current);
+  const p = comparableDateValue(previous);
+  if (c === null || p === null) return null;
+  if (c === p) return "unchanged";
+  return c > p ? "forward" : "retrogressed";
+}

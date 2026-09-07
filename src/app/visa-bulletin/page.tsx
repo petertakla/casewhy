@@ -3,11 +3,27 @@ import {
   EMPLOYMENT_FINAL_ACTION,
   VISA_BULLETIN_MONTH,
   VISA_BULLETIN_SOURCE_URL,
+  VISA_BULLETIN_PREVIOUS_MONTH,
   bulletinDateLabel,
+  computeMovement,
   type BulletinRow,
+  type BulletinMovement,
 } from "@/lib/kb/visa-bulletin";
 
-function BulletinTable({ rows }: { rows: BulletinRow[] }) {
+function MovementBadge({ movement }: { movement: BulletinMovement | null }) {
+  if (!movement) return null;
+  if (movement === "forward") {
+    return <span className="ml-1.5 inline-block rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400" title="Moved forward since last month">▲</span>;
+  }
+  if (movement === "retrogressed") {
+    return <span className="ml-1.5 inline-block rounded-full bg-red-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-red-600 dark:text-red-400" title="Retrogressed since last month">▼</span>;
+  }
+  return <span className="ml-1.5 inline-block rounded-full bg-border px-1.5 py-0.5 text-[10px] font-semibold text-muted" title="No change since last month">—</span>;
+}
+
+function BulletinTable({ rows, previousRows }: { rows: BulletinRow[]; previousRows?: BulletinRow[] }) {
+  const previousFor = (category: string) => previousRows?.find((r) => r.category === category);
+
   return (
     <div className="overflow-x-auto rounded-xl border border-border">
       <table className="w-full text-left text-sm">
@@ -22,19 +38,37 @@ function BulletinTable({ rows }: { rows: BulletinRow[] }) {
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => (
-            <tr key={row.category} className="border-b border-border last:border-0">
-              <td className="px-4 py-3">
-                <span className="font-semibold">{row.category}</span>
-                <span className="ml-2 text-muted">{row.label}</span>
-              </td>
-              <td className="px-4 py-3 font-mono">{bulletinDateLabel(row.allOther)}</td>
-              <td className="px-4 py-3 font-mono">{row.china ? bulletinDateLabel(row.china) : "—"}</td>
-              <td className="px-4 py-3 font-mono">{row.india ? bulletinDateLabel(row.india) : "—"}</td>
-              <td className="px-4 py-3 font-mono">{row.mexico ? bulletinDateLabel(row.mexico) : "—"}</td>
-              <td className="px-4 py-3 font-mono">{row.philippines ? bulletinDateLabel(row.philippines) : "—"}</td>
-            </tr>
-          ))}
+          {rows.map((row) => {
+            const prev = previousFor(row.category);
+            return (
+              <tr key={row.category} className="border-b border-border last:border-0">
+                <td className="px-4 py-3">
+                  <span className="font-semibold">{row.category}</span>
+                  <span className="ml-2 text-muted">{row.label}</span>
+                </td>
+                <td className="px-4 py-3 font-mono">
+                  {bulletinDateLabel(row.allOther)}
+                  <MovementBadge movement={computeMovement(row.allOther, prev?.allOther)} />
+                </td>
+                <td className="px-4 py-3 font-mono">
+                  {row.china ? bulletinDateLabel(row.china) : "—"}
+                  <MovementBadge movement={computeMovement(row.china, prev?.china)} />
+                </td>
+                <td className="px-4 py-3 font-mono">
+                  {row.india ? bulletinDateLabel(row.india) : "—"}
+                  <MovementBadge movement={computeMovement(row.india, prev?.india)} />
+                </td>
+                <td className="px-4 py-3 font-mono">
+                  {row.mexico ? bulletinDateLabel(row.mexico) : "—"}
+                  <MovementBadge movement={computeMovement(row.mexico, prev?.mexico)} />
+                </td>
+                <td className="px-4 py-3 font-mono">
+                  {row.philippines ? bulletinDateLabel(row.philippines) : "—"}
+                  <MovementBadge movement={computeMovement(row.philippines, prev?.philippines)} />
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -65,12 +99,19 @@ export default function VisaBulletinPage() {
       <h2 className="mb-3 text-sm font-semibold uppercase tracking-widest text-muted">
         Family-sponsored preferences
       </h2>
-      <BulletinTable rows={FAMILY_FINAL_ACTION} />
+      <BulletinTable rows={FAMILY_FINAL_ACTION} previousRows={VISA_BULLETIN_PREVIOUS_MONTH?.family} />
 
       <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-widest text-muted">
         Employment-based preferences
       </h2>
-      <BulletinTable rows={EMPLOYMENT_FINAL_ACTION} />
+      <BulletinTable rows={EMPLOYMENT_FINAL_ACTION} previousRows={VISA_BULLETIN_PREVIOUS_MONTH?.employment} />
+
+      {!VISA_BULLETIN_PREVIOUS_MONTH && (
+        <p className="mt-4 text-xs text-muted">
+          Month-over-month movement badges will start appearing once next month&apos;s bulletin is
+          added alongside this one.
+        </p>
+      )}
 
       <p className="mt-8 text-xs text-muted">
         &quot;Current&quot; means visas are available to all qualified applicants in that category

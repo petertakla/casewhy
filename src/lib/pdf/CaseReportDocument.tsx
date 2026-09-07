@@ -69,6 +69,12 @@ export function CaseReportDocument({
           <Text style={styles.label}>Receipt number</Text>
           <Text style={styles.value}>{status.receiptNumber}</Text>
         </View>
+        {status.submittedDate && (
+          <View style={styles.row}>
+            <Text style={styles.label}>Filed / receipt date</Text>
+            <Text style={styles.value}>{status.submittedDate}</Text>
+          </View>
+        )}
         {status.modifiedDate && (
           <View style={styles.row}>
             <Text style={styles.label}>Last updated by USCIS</Text>

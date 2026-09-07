@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { suggestedQuestions } from "@/lib/ai/suggested-questions";
 
 interface RelatedPolicy {
   id: string;
@@ -21,7 +22,16 @@ interface UsageStatus {
   limitReached: boolean;
 }
 
-export function CaseChat({ receiptNumber }: { receiptNumber: string }) {
+export function CaseChat({
+  receiptNumber,
+  statusText,
+  formType,
+}: {
+  receiptNumber: string;
+  /** Case's current status/form type, for the contextual suggested-question pills below. */
+  statusText?: string;
+  formType?: string;
+}) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
@@ -33,8 +43,10 @@ export function CaseChat({ receiptNumber }: { receiptNumber: string }) {
   // doesn't look like it's the reason for an unrelated answer.
   const [relatedPolicies, setRelatedPolicies] = useState<RelatedPolicy[]>([]);
 
-  async function send() {
-    const text = input.trim();
+  const pills = statusText && formType ? suggestedQuestions(statusText, formType) : [];
+
+  async function send(override?: string) {
+    const text = (override ?? input).trim();
     if (!text || pending || limitReached) return;
 
     const nextMessages: Message[] = [...messages, { role: "user", content: text }];
@@ -124,6 +136,21 @@ export function CaseChat({ receiptNumber }: { receiptNumber: string }) {
       </div>
 
       <div className="border-t border-border p-4">
+        {pills.length > 0 && !limitReached && (
+          <div className="mb-3 flex flex-wrap gap-2">
+            {pills.map((q) => (
+              <button
+                key={q}
+                type="button"
+                disabled={pending}
+                onClick={() => send(q)}
+                className="rounded-full border border-border-strong bg-surface-2 px-3 py-1.5 text-xs text-foreground/90 transition-colors hover:border-brand-500 hover:text-brand-600 disabled:opacity-60 dark:hover:text-brand-400"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+        )}
         <form
           onSubmit={(e) => {
             e.preventDefault();

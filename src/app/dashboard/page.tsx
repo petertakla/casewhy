@@ -11,6 +11,9 @@ import { CaseSwitcher } from "./CaseSwitcher";
 import { DocumentVault } from "./DocumentVault";
 import { detectStalledCase } from "@/lib/escalation/stall-detector";
 import { EscalationToolkit } from "./EscalationToolkit";
+import { ReceiptNumberInput } from "./ReceiptNumberInput";
+import { CaseTypeTimelineHint } from "./CaseTypeTimelineHint";
+import { linkifyExplanation } from "@/lib/kb/linkify";
 
 export const dynamic = "force-dynamic";
 
@@ -48,35 +51,18 @@ function statusTone(statusText: string): { dot: string; text: string; bg: string
 
 function SearchForm({ receiptNumber }: { receiptNumber?: string }) {
   return (
-    <form action="/dashboard" method="get" className="flex flex-col gap-3 sm:flex-row">
-      <div className="relative flex-1">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+    <div>
+      <form action="/dashboard" method="get" className="flex flex-col gap-3 sm:flex-row">
+        <ReceiptNumberInput defaultValue={receiptNumber} />
+        <button
+          type="submit"
+          className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
         >
-          <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth={1.8} />
-          <path d="m21 21-4.3-4.3" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
-        </svg>
-        <input
-          type="text"
-          name="receipt"
-          required
-          defaultValue={receiptNumber}
-          placeholder="e.g. EAC9999103403"
-          autoCapitalize="characters"
-          autoComplete="off"
-          aria-label="USCIS receipt number"
-          className="w-full rounded-lg border border-border-strong bg-surface pl-10 pr-4 py-2.5 font-mono text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
-        />
-      </div>
-      <button
-        type="submit"
-        className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
-      >
-        Track case
-      </button>
-    </form>
+          Track case
+        </button>
+      </form>
+      <CaseTypeTimelineHint />
+    </div>
   );
 }
 
@@ -138,7 +124,9 @@ function ExplanationBox({ explanation }: { explanation: CaseExplanation }) {
           <p className="text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
             What this means
           </p>
-          <p className="mt-1.5 text-sm text-foreground/90">{explanation.explanation}</p>
+          <p className="mt-1.5 text-sm text-foreground/90">
+            {linkifyExplanation(explanation.explanation, explanation.relatedPolicies)}
+          </p>
           {explanation.nextSteps.length > 0 && (
             <ul className="mt-3 space-y-1.5 text-sm text-foreground/90">
               {explanation.nextSteps.map((step, i) => (
@@ -222,6 +210,8 @@ function StatusCard({
         )}
       </div>
 
+      {explanation && <ExplanationBox explanation={explanation} />}
+
       <p className="mt-4 text-sm leading-relaxed text-foreground/90">{status.statusDescription}</p>
 
       {stall.isStalled && stall.milestoneText && (
@@ -264,8 +254,6 @@ function StatusCard({
           )}
         </div>
       )}
-
-      {explanation && <ExplanationBox explanation={explanation} />}
 
       {status.history.length > 0 && (
         <div className="mt-6 border-t border-border pt-5">

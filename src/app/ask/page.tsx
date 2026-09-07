@@ -103,7 +103,12 @@ export default async function AskPage({
           <p className="mb-4 font-mono text-xs uppercase tracking-widest text-muted">
             {formType} · {statusText}
           </p>
-          <CaseChat key={receiptNumber} receiptNumber={receiptNumber} />
+          <CaseChat
+            key={receiptNumber}
+            receiptNumber={receiptNumber}
+            statusText={statusText ?? undefined}
+            formType={formType ?? undefined}
+          />
         </>
       )}
     </main>

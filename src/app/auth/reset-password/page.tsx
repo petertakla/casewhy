@@ -44,13 +44,18 @@ function ResetPasswordForm() {
     }
 
     setStatus("loading");
-    const { error } = await authClient.resetPassword({ newPassword: password, token });
-    if (error) {
+    try {
+      const { error } = await authClient.resetPassword({ newPassword: password, token });
+      if (error) {
+        setStatus("error");
+        setErrorMessage(error.message || "This reset link is invalid or has expired. Request a new one.");
+        return;
+      }
+      setStatus("done");
+    } catch {
       setStatus("error");
-      setErrorMessage(error.message || "This reset link is invalid or has expired. Request a new one.");
-      return;
+      setErrorMessage("Something went wrong. Request a new reset link and try again.");
     }
-    setStatus("done");
   }
 
   return (

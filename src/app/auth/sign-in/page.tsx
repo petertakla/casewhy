@@ -45,13 +45,18 @@ function MagicLinkForm({ onBack }: { onBack: () => void }) {
     setStatus("sending");
     setErrorMessage(null);
 
-    const { error } = await authClient.signIn.magicLink({ email, callbackURL: "/dashboard" });
-    if (error) {
+    try {
+      const { error } = await authClient.signIn.magicLink({ email, callbackURL: "/dashboard" });
+      if (error) {
+        setStatus("error");
+        setErrorMessage(error.message || "Something went wrong sending the link. Please try again.");
+        return;
+      }
+      setStatus("sent");
+    } catch {
       setStatus("error");
-      setErrorMessage(error.message || "Something went wrong sending the link. Please try again.");
-      return;
+      setErrorMessage("Something went wrong sending the link. Please try again.");
     }
-    setStatus("sent");
   }
 
   if (status === "sent") {
@@ -117,13 +122,18 @@ function PasswordSignInForm({ onUseMagicLink }: { onUseMagicLink: () => void }) 
     setStatus("loading");
     setErrorMessage(null);
 
-    const { error } = await authClient.signIn.email({ email, password });
-    if (error) {
+    try {
+      const { error } = await authClient.signIn.email({ email, password });
+      if (error) {
+        setStatus("error");
+        setErrorMessage(error.message || "Incorrect email or password.");
+        return;
+      }
+      router.push("/dashboard");
+    } catch {
       setStatus("error");
-      setErrorMessage(error.message || "Incorrect email or password.");
-      return;
+      setErrorMessage("Something went wrong signing in. Please try again.");
     }
-    router.push("/dashboard");
   }
 
   return (

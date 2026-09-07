@@ -19,13 +19,18 @@ export default function ForgotPasswordPage() {
     // works correctly on both app.casewhy.com and any preview deployment
     // already added to that allowlist.
     const redirectTo = `${window.location.origin}/auth/reset-password`;
-    const { error } = await authClient.requestPasswordReset({ email, redirectTo });
-    if (error) {
+    try {
+      const { error } = await authClient.requestPasswordReset({ email, redirectTo });
+      if (error) {
+        setStatus("error");
+        setErrorMessage(error.message || "Something went wrong. Please try again.");
+        return;
+      }
+      setStatus("sent");
+    } catch {
       setStatus("error");
-      setErrorMessage(error.message || "Something went wrong. Please try again.");
-      return;
+      setErrorMessage("Something went wrong. Please try again.");
     }
-    setStatus("sent");
   }
 
   return (

@@ -29,13 +29,18 @@ export default function SignUpPage() {
     }
 
     setStatus("loading");
-    const { error } = await authClient.signUp.email({ email, password, name: "" });
-    if (error) {
+    try {
+      const { error } = await authClient.signUp.email({ email, password, name: "" });
+      if (error) {
+        setStatus("error");
+        setErrorMessage(error.message || "Something went wrong creating your account.");
+        return;
+      }
+      router.push("/dashboard");
+    } catch {
       setStatus("error");
-      setErrorMessage(error.message || "Something went wrong creating your account.");
-      return;
+      setErrorMessage("Something went wrong creating your account. Please try again.");
     }
-    router.push("/dashboard");
   }
 
   return (

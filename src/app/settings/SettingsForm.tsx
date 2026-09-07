@@ -34,15 +34,15 @@ function ToggleRow({
 export function SettingsForm({
   initialStatusChangeEmailsEnabled,
   newsSources,
-  initialDisabledSourceIds,
+  initialEnabledSourceIds,
 }: {
   initialStatusChangeEmailsEnabled: boolean;
   newsSources: NewsSource[];
-  initialDisabledSourceIds: string[];
+  initialEnabledSourceIds: string[];
 }) {
   const [isPending, startTransition] = useTransition();
   const [statusChangeEmails, setStatusChangeEmails] = useState(initialStatusChangeEmailsEnabled);
-  const [disabledSourceIds, setDisabledSourceIds] = useState(new Set(initialDisabledSourceIds));
+  const [enabledSourceIds, setEnabledSourceIds] = useState(new Set(initialEnabledSourceIds));
 
   return (
     <div className="space-y-8">
@@ -75,12 +75,12 @@ export function SettingsForm({
             <ToggleRow
               key={source.id}
               label={source.name}
-              checked={!disabledSourceIds.has(source.id)}
+              checked={enabledSourceIds.has(source.id)}
               onChange={(checked) => {
-                setDisabledSourceIds((prev) => {
+                setEnabledSourceIds((prev) => {
                   const next = new Set(prev);
-                  if (checked) next.delete(source.id);
-                  else next.add(source.id);
+                  if (checked) next.add(source.id);
+                  else next.delete(source.id);
                   return next;
                 });
                 startTransition(async () => {

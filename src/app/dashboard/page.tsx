@@ -238,6 +238,7 @@ function StatusCard({
                 alreadyTracked={tracking.alreadyTracked}
                 atCap={tracking.atCap}
                 maxCases={tracking.maxCases}
+                plusMaxCases={TIER_LIMITS.plus.maxCases}
               />
               {tracking.alreadyTracked && tracking.trackedCaseId && (
                 <>

@@ -181,16 +181,22 @@ export const userSettings = pgTable("user_settings", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-// Round 14 — /news page source picker. Stores OPT-OUTS, not opt-ins: a
-// source a user has never touched is enabled by default (per the
-// "default all-on for new accounts" spec), and adding a new entry to
-// NEWS_SOURCES (src/lib/news/sources.ts) needs no backfill here — it's
-// simply absent from every user's disabled set until they uncheck it.
-export const disabledNewsSources = pgTable(
-  "disabled_news_sources",
+// Round 14, revised round 17 — /news page source picker. Stores only
+// DEVIATIONS from each source's own `defaultOn` (src/lib/news/sources.ts),
+// not a full on/off row per source: a user who's never touched a given
+// checkbox has no row for it, and its effective state is just that
+// source's `defaultOn` — so adding a new NEWS_SOURCES entry needs no
+// backfill here regardless of whether it defaults on or off. Round 17
+// changed this from a pure opt-out set (every source defaulted on) to a
+// per-source default, which needed an explicit `enabled` column here to
+// represent "explicitly turned on despite defaulting off" as well as
+// "explicitly turned off despite defaulting on."
+export const newsSourcePreferences = pgTable(
+  "news_source_preferences",
   {
     userId: text("user_id").notNull(),
     sourceId: text("source_id").notNull(),
+    enabled: boolean("enabled").notNull(),
   },
   (table) => [primaryKey({ columns: [table.userId, table.sourceId] })]
 );

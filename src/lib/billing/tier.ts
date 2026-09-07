@@ -1,12 +1,15 @@
 // CW-35/36 packaging — confirmed by Peter (see CLOUD_CLAUDE.md "Pricing/
 // packaging decision" for the full reasoning): one bundled paid tier,
-// "CaseWhy Plus," $9.99/mo, unlocking unlimited AI chat and up to 5 tracked
+// "CaseWhy Plus," $9.99/mo, unlocking unlimited AI chat and up to 10 tracked
 // cases together (not separate SKUs).
 //
 // Round 13 — live billing (Stripe test mode). `tier` is now kept in sync by
 // the Stripe webhook handler (src/app/api/webhooks/stripe/route.ts), not
 // just a manual/debug script — see src/lib/db/schema.ts's `subscriptions`
 // table comment for the exact downgrade-timing rule this file relies on.
+//
+// Round 17 — case cap raised 5 -> 10 (Peter's direct call, supersedes the
+// round-14/CW-36 decision to hold at 5 over reselling-risk concerns).
 
 import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
@@ -22,7 +25,7 @@ export interface TierLimits {
 
 export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
   free: { maxCases: 1, chatQuestionsPerMonth: 10 },
-  plus: { maxCases: 5, chatQuestionsPerMonth: null },
+  plus: { maxCases: 10, chatQuestionsPerMonth: null },
 };
 
 export async function getSubscriptionTier(userId: string): Promise<SubscriptionTier> {

@@ -92,15 +92,14 @@ async function fetchFederalRegisterSource(source: NewsSource): Promise<NewsItem[
 
 /**
  * Fetches every enabled source and returns a merged, newest-first list.
- * `enabledSourceIds === null` means "no preferences row yet" — every
- * source is enabled by default (see disabledNewsSources's opt-out design).
+ * `enabledSourceIds` is the already-resolved effective set for this viewer
+ * (each source's own `defaultOn` unless overridden — see
+ * getEnabledNewsSourceIds in src/lib/settings/settings.ts).
  */
 export async function fetchNews(
-  enabledSourceIds: Set<string> | null
+  enabledSourceIds: Set<string>
 ): Promise<{ items: NewsItem[]; failedSources: string[] }> {
-  const sources = enabledSourceIds
-    ? NEWS_SOURCES.filter((source) => enabledSourceIds.has(source.id))
-    : NEWS_SOURCES;
+  const sources = NEWS_SOURCES.filter((source) => enabledSourceIds.has(source.id));
 
   const failedSources: string[] = [];
   const settled = await Promise.allSettled(

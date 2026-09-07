@@ -57,6 +57,20 @@
       "when": 1788727456947,
       "tag": "0007_lethal_hairball",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788787793982,
+      "tag": "0008_violet_pete_wisdom",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1788787803536,
+      "tag": "0009_dusty_midnight",
+      "breakpoints": true
     }
   ]
 }

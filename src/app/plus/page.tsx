@@ -22,15 +22,15 @@ const PLUS_FEATURES: PlusFeature[] = [
     free: "10 / month",
     plus: "Unlimited",
     explanation:
-      "Ask a plain-language question about your case status, a policy term, or what a next step might mean, grounded in CaseWhy's curated policy/case-law knowledge base with visible citations — not a generic chatbot guessing. Free accounts get 10 questions a month; Plus removes the limit.",
+      "Your status just changed to \"Request for Evidence\" and you don't know what that means, whether your timeline just reset, or what USCIS actually wants — that's exactly what the chat is for. Ask in plain English and get an answer grounded in CaseWhy's own curated policy and case-law knowledge base, with visible citations you can check yourself, instead of a generic chatbot guessing from general training data. On the free tier, 10 questions a month sounds like a lot until the week your case actually changes — that's usually when you have five follow-up questions in a single evening, and by Thursday you're locked out until next month. Plus removes the limit entirely, so you can ask a question the moment you're anxious about one, not ration them.",
   },
   {
     id: "tracked-cases",
     title: "Tracked cases (family)",
     free: "1",
-    plus: "Up to 5",
+    plus: "Up to 10",
     explanation:
-      "Track up to 5 cases on one account — enough for a real household (a spouse, kids, parents) without needing separate logins or separate subscriptions. Free accounts track 1.",
+      "A free account tracks exactly one case — fine if it's just you, but most immigration cases aren't solo: a spouse's I-485 alongside your own, kids' derivative cases, or parents you're helping through an N-400 you understand better than they do. Plus lets one account track up to 10 cases at once, so the whole household lives under a single login instead of everyone creating separate accounts (and separate $9.99/mo subscriptions) just to see their own status. Each case gets its own full CaseWhy experience — its own status history, its own AI explanations, its own document vault — switched between with a single click, not re-entered from scratch every time.",
   },
   {
     id: "on-demand-checks",
@@ -38,7 +38,7 @@ const PLUS_FEATURES: PlusFeature[] = [
     free: "—",
     plus: "Included",
     explanation:
-      "Every account gets an automatic daily status check. Plus adds a \"check now\" button for the moment you're actually anxious about a case — no waiting for the next scheduled check.",
+      "Every account, free or Plus, gets an automatic status check once a day. Most days that's plenty — but the day your case might actually have moved isn't most days. Plus adds a real \"Check now\" button right on the dashboard for exactly that moment: you heard something changed, or it's just been quiet too long and you want to know right now instead of waiting for tomorrow's scheduled check. It calls USCIS directly, the same way the daily check does, just on your schedule instead of a fixed one.",
   },
   {
     id: "document-vault",
@@ -46,7 +46,7 @@ const PLUS_FEATURES: PlusFeature[] = [
     free: "—",
     plus: "Included",
     explanation:
-      "Upload and store supporting documents (an I-693, an RFE response, receipts) against a specific tracked case, encrypted and private to your account — handy to have organized in one place if you ever need to hand things off to an attorney.",
+      "An RFE lands with a deadline and a list of documents USCIS wants — pay stubs, a new I-693, a marriage certificate, whatever it is. The vault is where you put them as you gather them, attached to that specific case, encrypted, and private to your account (backed by Vercel's private Blob storage, not a shared folder). It's most useful in the exact moment things get stressful: instead of a downloads folder full of scans you'll never find again, everything relevant to one case lives in one place — genuinely handy if you ever need to hand a case off to an attorney and don't want to re-gather everything from scratch.",
   },
   {
     id: "stalled-case-alert",
@@ -54,7 +54,7 @@ const PLUS_FEATURES: PlusFeature[] = [
     free: "Included",
     plus: "Included",
     explanation:
-      "CaseWhy flags a case that's gone unusually quiet relative to a typical timeline. This alert itself is free on every tier — it's the escalation tools that follow it (below) that are part of Plus.",
+      "CaseWhy flags a case that's gone unusually quiet relative to a real benchmark — not a guess, but how long cases like yours typically take before the next real step. This alert itself is free on every tier, by design: knowing something might be stuck shouldn't be behind a paywall. It's the two escalation tools that follow a stall alert — representative lookup and letter drafting, both below — that are part of Plus, since acting on a stall (versus just being told about one) is where the real value is.",
   },
   {
     id: "representative-lookup",
@@ -62,7 +62,7 @@ const PLUS_FEATURES: PlusFeature[] = [
     free: "—",
     plus: "Included",
     explanation:
-      "Once a case is flagged as stalled, look up your actual U.S. Senators and House representative by address — real, current officials, not a static list — as a starting point for a congressional inquiry.",
+      "Once a case is flagged as stalled, a lot of people's first instinct is \"can my member of Congress help with this?\" — and most don't actually know who that is, or have an outdated name from years ago. Enter your address and CaseWhy looks up your real, current U.S. Senators and House representative — pulled from live government data, not a static list that goes stale after every election — as a genuine starting point for a congressional inquiry, one of the more effective real-world ways to get a stuck case looked at.",
   },
   {
     id: "escalation-letters",
@@ -70,7 +70,7 @@ const PLUS_FEATURES: PlusFeature[] = [
     free: "—",
     plus: "Included",
     explanation:
-      "Draft one of three real escalation letters — a congressional inquiry, a field-office follow-up, or a formal USCIS Ombudsman case-assistance request — pre-filled with your case's details. Not legal advice; each letter is a starting point you review and send yourself.",
+      "Knowing who to contact is one problem; knowing what to actually write is another. Plus can draft one of three real letters — a congressional inquiry to the representative you just looked up, a follow-up to your specific field office, or a formal USCIS Ombudsman case-assistance request — pre-filled with your case's real details so you're not staring at a blank page. This is deliberately not legal advice: every draft is adversarially tested to refuse fabricating claims or overstating your situation, and it's a starting point you review, edit, and send yourself, not something CaseWhy sends on your behalf.",
   },
   {
     id: "pdf-report",
@@ -78,7 +78,7 @@ const PLUS_FEATURES: PlusFeature[] = [
     free: "—",
     plus: "Included",
     explanation:
-      "Generate a one-page PDF summarizing your case's status and plain-language explanation — useful to hand an attorney directly if you ever need one, without re-explaining everything from scratch.",
+      "If a case reaches the point where you actually need an attorney, the first meeting usually starts with you re-explaining everything from the beginning while they take notes. This generates a real one-page PDF instead — your case's current status and CaseWhy's own plain-language explanation of it, ready to hand over or attach to an email — so that first conversation starts from \"here's where things stand\" instead of starting from zero.",
   },
 ];
 

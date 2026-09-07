@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth/server";
-import { getStatusChangeEmailsEnabled, getDisabledNewsSourceIds } from "@/lib/settings/settings";
+import { getStatusChangeEmailsEnabled, getEnabledNewsSourceIds } from "@/lib/settings/settings";
 import { NEWS_SOURCES } from "@/lib/news/sources";
 import { RESOURCE_LINKS } from "@/lib/resources/links";
 import { SettingsForm } from "./SettingsForm";
@@ -11,9 +11,9 @@ export default async function SettingsPage() {
     redirect("/auth/sign-in");
   }
 
-  const [statusChangeEmailsEnabled, disabledSourceIds] = await Promise.all([
+  const [statusChangeEmailsEnabled, enabledSourceIds] = await Promise.all([
     getStatusChangeEmailsEnabled(session.user.id),
-    getDisabledNewsSourceIds(session.user.id),
+    getEnabledNewsSourceIds(session.user.id),
   ]);
 
   return (
@@ -24,7 +24,7 @@ export default async function SettingsPage() {
       <SettingsForm
         initialStatusChangeEmailsEnabled={statusChangeEmailsEnabled}
         newsSources={NEWS_SOURCES}
-        initialDisabledSourceIds={[...disabledSourceIds]}
+        initialEnabledSourceIds={[...enabledSourceIds]}
       />
 
       <section className="mt-8">

@@ -10,6 +10,7 @@ export function TrackCaseButton({
   alreadyTracked,
   atCap,
   maxCases,
+  plusMaxCases,
 }: {
   receiptNumber: string;
   /** Present when alreadyTracked — the row id, needed to untrack. */
@@ -17,6 +18,8 @@ export function TrackCaseButton({
   alreadyTracked: boolean;
   atCap: boolean;
   maxCases: number;
+  /** CaseWhy Plus's own cap — shown in the free-tier "upgrade" message. */
+  plusMaxCases: number;
 }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +55,7 @@ export function TrackCaseButton({
         <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
           upgrade to CaseWhy Plus
         </Link>{" "}
-        for up to 5 cases.
+        for up to {plusMaxCases} cases.
       </p>
     );
   }

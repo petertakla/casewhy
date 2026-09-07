@@ -72,8 +72,9 @@
   .logo .name{font-weight:700;font-size:1.15rem;letter-spacing:-0.02em;color:var(--foreground);}
   .logo .name span{color:var(--logo-green);}
   .logo .tagline{font-size:0.72rem;color:var(--muted);font-weight:500;}
-  nav a{margin-left:24px;font-size:0.92rem;color:var(--muted);text-decoration:none;}
-  nav a:hover{color:var(--foreground);}
+  .nav-group{display:flex;align-items:center;}
+  nav a, .signin-link{margin-left:24px;font-size:0.92rem;color:var(--muted);text-decoration:none;white-space:nowrap;}
+  nav a:hover, .signin-link:hover{color:var(--foreground);}
 
   .hero{padding:72px 0 48px;text-align:center;}
   .eyebrow{
@@ -258,12 +259,14 @@
         <span class="tagline">Your USCIS case, explained!</span>
       </span>
     </a>
-    <nav>
-      <a href="#how-it-works">How it works</a>
-      <a href="#trust">Privacy</a>
-      <a href="#join">Join the waitlist</a>
-      <a href="https://app.casewhy.com/auth/sign-in">Sign in</a>
-    </nav>
+    <div class="nav-group">
+      <nav>
+        <a href="#how-it-works">How it works</a>
+        <a href="#trust">Privacy</a>
+        <a href="#join">Join the waitlist</a>
+      </nav>
+      <a class="signin-link" href="https://app.casewhy.com/auth/sign-in">Sign in</a>
+    </div>
   </div>
 </header>
 

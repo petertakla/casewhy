@@ -154,7 +154,7 @@ export function CaseChat({
                   setUsedPills((prev) => new Set(prev).add(q));
                   send(q);
                 }}
-                className="rounded-full border border-border-strong bg-surface-2 px-3 py-1.5 text-xs text-foreground/90 transition-colors hover:border-brand-500 hover:text-brand-600 disabled:opacity-60 dark:hover:text-brand-400"
+                className="rounded-full border border-border-strong bg-surface-2 px-3 py-1.5 text-xs font-medium text-brand-600 transition-colors hover:border-brand-500 disabled:opacity-60 dark:text-brand-400"
               >
                 {q}
               </button>

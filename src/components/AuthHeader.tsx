@@ -8,10 +8,10 @@ import { Logo } from "./Logo";
 const NAV_LINKS = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/ask", label: "Ask a question" },
+  { href: "/plus", label: "CaseWhy Plus" },
   { href: "/processing-times", label: "Processing times" },
   { href: "/visa-bulletin", label: "Visa bulletin" },
   { href: "/news", label: "News" },
-  { href: "/plus", label: "CaseWhy Plus" },
   { href: "/settings", label: "Settings" },
 ];
 

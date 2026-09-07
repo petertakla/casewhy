@@ -43,7 +43,14 @@ export function CaseChat({
   // doesn't look like it's the reason for an unrelated answer.
   const [relatedPolicies, setRelatedPolicies] = useState<RelatedPolicy[]>([]);
 
-  const pills = statusText && formType ? suggestedQuestions(statusText, formType) : [];
+  // Round 21 follow-up — Peter reported the same pill sitting there after
+  // being asked. Pills now come from an ordered pool (suggestedQuestions no
+  // longer caps it); once a pill is used it drops out of the visible window
+  // and the next unused one from the pool slides in, so there's always a
+  // fresh suggestion rather than the same one repeating.
+  const pool = statusText && formType ? suggestedQuestions(statusText, formType) : [];
+  const [usedPills, setUsedPills] = useState<Set<string>>(new Set());
+  const pills = pool.filter((q) => !usedPills.has(q)).slice(0, 3);
 
   async function send(override?: string) {
     const text = (override ?? input).trim();
@@ -143,7 +150,10 @@ export function CaseChat({
                 key={q}
                 type="button"
                 disabled={pending}
-                onClick={() => send(q)}
+                onClick={() => {
+                  setUsedPills((prev) => new Set(prev).add(q));
+                  send(q);
+                }}
                 className="rounded-full border border-border-strong bg-surface-2 px-3 py-1.5 text-xs text-foreground/90 transition-colors hover:border-brand-500 hover:text-brand-600 disabled:opacity-60 dark:hover:text-brand-400"
               >
                 {q}

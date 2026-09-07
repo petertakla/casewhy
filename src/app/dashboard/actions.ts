@@ -9,11 +9,14 @@ import { encryptField, decryptField } from "@/lib/db/crypto";
 import { getSubscriptionTier, TIER_LIMITS } from "@/lib/billing/tier";
 import { UscisApiError } from "@/lib/uscis/client";
 import { checkTrackedCaseNow } from "@/lib/uscis/check-status";
+import { CASE_TYPES } from "@/lib/kb/case-type-timeline";
 
 export interface TrackedCase {
   id: string;
   receiptNumber: string;
   lastCheckedAt: Date | null;
+  /** One of CASE_TYPES' ids, or null for a case tracked before round 21. */
+  caseType: string | null;
 }
 
 export async function getTrackedCases(userId: string): Promise<TrackedCase[]> {
@@ -23,6 +26,7 @@ export async function getTrackedCases(userId: string): Promise<TrackedCase[]> {
       id: trackedCases.id,
       receiptNumber: trackedCases.receiptNumber,
       lastCheckedAt: trackedCases.lastCheckedAt,
+      caseType: trackedCases.caseType,
     })
     .from(trackedCases)
     .where(eq(trackedCases.userId, userId))
@@ -35,6 +39,7 @@ export async function getTrackedCases(userId: string): Promise<TrackedCase[]> {
         id: row.id,
         receiptNumber: decryptField(row.receiptNumber),
         lastCheckedAt: row.lastCheckedAt,
+        caseType: row.caseType,
       });
     } catch {
       // Malformed/undecryptable row (e.g. pre-encryption test data) — skip
@@ -91,10 +96,17 @@ export async function checkCaseNow(trackedCaseId: string): Promise<{ statusText:
  * no longer replaces an existing one; call untrackCase() first if the cap
  * is already reached.
  */
-export async function trackCase(receiptNumber: string): Promise<void> {
+export async function trackCase(receiptNumber: string, caseType: string): Promise<void> {
   const { data: session } = await auth.getSession();
   if (!session?.user) {
     throw new Error("Sign in to track a case.");
+  }
+
+  // Round 21 — required going forward, "other" included, so every new
+  // tracked case has a real value to key explanation/chat/guardrail logic
+  // off. Validated server-side, never trusted from the client alone.
+  if (!CASE_TYPES.some((c) => c.id === caseType)) {
+    throw new Error("Select a valid case type.");
   }
 
   const existing = await getTrackedCases(session.user.id);
@@ -117,6 +129,7 @@ export async function trackCase(receiptNumber: string): Promise<void> {
     userId: session.user.id,
     receiptNumber: encryptField(receiptNumber),
     email: encryptField(session.user.email),
+    caseType,
   });
 
   revalidatePath("/dashboard");

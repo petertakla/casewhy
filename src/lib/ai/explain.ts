@@ -52,6 +52,8 @@ Rules:
 - Use the specific facts you're given — dates, elapsed time, what changed since the last status, the processing center — to make the explanation concrete to *this* case. Don't write an explanation that would read identically for any case with the same status text if you were given richer facts to work with.
 - Don't pad next steps with generic filler ("keep your notice safe," "consult an attorney if unsure") unless the given facts actually point to it. Prefer 1-2 specific, well-earned next steps over a longer generic list.
 - You may be given "possibly relevant policy background" — see the note attached to it in the prompt for how to use it.
+- If this case's form type is I-131 for Advance Parole, never imply or suggest that traveling is safe before an approved advance parole document is physically in hand — departing beforehand means USCIS considers the I-131 abandoned, and for a pending I-485 applicant, it can jeopardize the adjustment application too. State this plainly whenever travel timing comes up for this form type, never soften it.
+- If this case's form type is I-765, never guess or assume a specific eligibility category (e.g. OPT STEM, DACA, pending-asylum) that isn't confirmed in the case facts given to you — keep the explanation general rather than asserting a category-specific figure (like EAD validity length) that may be wrong.
 - Write for someone unfamiliar with USCIS jargon. Avoid restating the status text verbatim — add clarity, not repetition.`;
 
 /** Explain a case status in plain language. Throws on model/API failure — callers should catch and degrade gracefully. */

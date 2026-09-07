@@ -12,7 +12,6 @@ import { DocumentVault } from "./DocumentVault";
 import { detectStalledCase } from "@/lib/escalation/stall-detector";
 import { EscalationToolkit } from "./EscalationToolkit";
 import { ReceiptNumberInput } from "./ReceiptNumberInput";
-import { CaseTypeTimelineHint } from "./CaseTypeTimelineHint";
 import { linkifyExplanation } from "@/lib/kb/linkify";
 
 export const dynamic = "force-dynamic";
@@ -51,18 +50,15 @@ function statusTone(statusText: string): { dot: string; text: string; bg: string
 
 function SearchForm({ receiptNumber }: { receiptNumber?: string }) {
   return (
-    <div>
-      <form action="/dashboard" method="get" className="flex flex-col gap-3 sm:flex-row">
-        <ReceiptNumberInput defaultValue={receiptNumber} />
-        <button
-          type="submit"
-          className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
-        >
-          Track case
-        </button>
-      </form>
-      <CaseTypeTimelineHint />
-    </div>
+    <form action="/dashboard" method="get" className="flex flex-col gap-3 sm:flex-row">
+      <ReceiptNumberInput defaultValue={receiptNumber} />
+      <button
+        type="submit"
+        className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+      >
+        Track case
+      </button>
+    </form>
   );
 }
 

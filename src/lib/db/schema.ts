@@ -25,6 +25,12 @@ export const trackedCases = pgTable(
     // until the first cron run after tracking.
     lastStatusText: text("last_status_text"),
     lastCheckedAt: timestamp("last_checked_at", { withTimezone: true }),
+    // Round 21 — one of CASE_TYPES' ids (src/lib/kb/case-type-timeline.ts),
+    // e.g. "n400", "i131", "other". Not encrypted — a form type alone isn't
+    // identifying, unlike receiptNumber/email. Nullable only because rows
+    // tracked before round 21 don't have one; the app requires a real
+    // selection (including "other") for every new case going forward.
+    caseType: text("case_type"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index("tracked_cases_user_id_idx").on(table.userId)]

@@ -28,7 +28,12 @@ export interface PolicyMemo {
   title: string;
   memoNumber?: string;
   datePublished: string; // ISO date the policy was issued/announced
-  /** Case-status text/description/history substrings (lowercase) that make this entry plausibly relevant. */
+  /**
+   * Case-status text/description/history substrings (lowercase) that make
+   * this entry plausibly relevant. An empty array means "always relevant
+   * whenever formTypes matches" (round 21 — used for form-specific reference
+   * entries like I-131's, which apply regardless of status wording).
+   */
   statusKeywords: string[];
   /** Form types this applies to, or "*" for broadly applicable. */
   formTypes: string[] | "*";
@@ -95,9 +100,68 @@ export const POLICY_MEMOS: PolicyMemo[] = [
     sourceTitle: "USCIS Notice to Appear Policy Memorandum history (archived)",
     sourceUrl: "https://www.uscis.gov/archive/notice-to-appear-policy-memorandum",
   },
+  // Round 21 — form-specific reference entries for the 4 newly-supported
+  // case types. Each always applies to its own formType (statusKeywords: []
+  // — see textMatches()) rather than being conditional on status wording,
+  // since these are background facts about the form itself, not about a
+  // particular status update.
+  {
+    id: "i90-green-card-renewal",
+    title: "I-90 Green Card Renewal/Replacement — What Changes and What Doesn't",
+    datePublished: "2026-01-01",
+    formTypes: ["I-90"],
+    statusKeywords: [],
+    summary:
+      "An I-90 renews an expiring/expired card, replaces a lost/stolen/damaged one, or updates a card after a name or other change. USCIS recommends filing up to 6 months before expiration. As of this writing, USCIS extends an expired card's validity by 36 months (up from a prior 24-month extension) for I-9/employment-verification purposes when the expired card is presented together with the I-90 filing receipt notice.",
+    currentStatus:
+      "An I-90 is a renewal, not a re-adjudication of permanent-resident eligibility — status doesn't change while pending, assuming the person remains an LPR in good standing. It is not the right form for someone with an actual abandonment-of-residence concern (e.g., extended time outside the U.S.) — that's a different, more serious question than a routine renewal, and should go to an attorney.",
+    sourceTitle: "USCIS: Extension of Green Card Validity to 36 Months for Renewals",
+    sourceUrl:
+      "https://www.uscis.gov/newsroom/alerts/uscis-extends-green-card-validity-extension-to-36-months-for-green-card-renewals",
+  },
+  {
+    id: "i131-travel-document-abandonment",
+    title: "I-131 Travel Documents — the Advance Parole Abandonment Risk",
+    datePublished: "2026-01-01",
+    formTypes: ["I-131"],
+    statusKeywords: [],
+    summary:
+      "I-131 covers three distinct purposes: Advance Parole (for pending I-485 applicants or certain other categories needing permission to travel and return), a Re-entry Permit (for LPRs planning a trip of a year or more), and a Refugee Travel Document (for refugees/asylees) — these should never be conflated with each other.",
+    currentStatus:
+      "The single highest-stakes fact, from USCIS's own I-131 page: filing to request an advance parole document and departing the U.S. without that document valid for the entire trip means USCIS considers the I-131 abandoned — and for a pending I-485 applicant specifically, an unauthorized departure risks the underlying adjustment application too, not just the travel document. Any explanation touching a pending advance-parole case must carry this caveat explicitly, never softened, and must never suggest travel is safe before an advance parole document is approved and physically in hand.",
+    sourceTitle: "USCIS: I-131, Application for Travel Document",
+    sourceUrl: "https://www.uscis.gov/i-131",
+  },
+  {
+    id: "n600-certificate-of-citizenship",
+    title: "N-600 Certificate of Citizenship — Acquisition vs. Derivation",
+    datePublished: "2026-01-01",
+    formTypes: ["N-600"],
+    statusKeywords: [],
+    summary:
+      "N-600 covers two distinct pathways: acquisition (was a U.S. citizen automatically at birth abroad through a citizen parent — no age limit to request proof) and derivation (became a citizen automatically as a minor under the Child Citizenship Act of 2000, generally requiring the child to have been under 18, an LPR, and in the legal and physical custody of a U.S.-citizen parent at the time that parent naturalized).",
+    currentStatus:
+      "N-600 doesn't confer citizenship — someone who qualifies is already a citizen by operation of law; the form only requests the government's proof document. It is not the right form for an LPR intending to naturalize (that's N-400), someone born in the U.S. (a birth certificate suffices), or someone already naturalized as an adult (a Certificate of Naturalization, not N-600). Processing time varies widely by service center.",
+    sourceTitle: "USCIS: N-600, Application for Certificate of Citizenship",
+    sourceUrl: "https://www.uscis.gov/n-600",
+  },
+  {
+    id: "i765-employment-authorization",
+    title: "I-765 Employment Authorization — the Eligibility Category Matters",
+    datePublished: "2026-01-01",
+    formTypes: ["I-765"],
+    statusKeywords: [],
+    summary:
+      "The underlying eligibility category — a code like (c)(9) pending adjustment, (c)(8) pending asylum, (a)(5) granted asylee, (c)(33) DACA, (c)(3)(B)/(c)(3)(C) F-1 OPT/STEM, (a)(3)/(a)(4) paroled refugee/refugee, etc. — matters more than \"I-765\" as a label, since it reflects why someone can work, tied to a different underlying status/application per category. Status vocabulary (received, biometrics, approved, card produced) is generic across categories, but what an approval means, and how long the resulting EAD is valid, depends on the category.",
+    currentStatus:
+      "Never guess or assume a specific eligibility category from the form alone — if the underlying basis isn't known from the case's own facts, keep any explanation general rather than asserting a category that may be wrong.",
+    sourceTitle: "USCIS: Employment Authorization Document",
+    sourceUrl: "https://www.uscis.gov/employment-authorization",
+  },
 ];
 
 function textMatches(memo: PolicyMemo, haystack: string): boolean {
+  if (memo.statusKeywords.length === 0) return true;
   return memo.statusKeywords.some((kw) => haystack.includes(kw));
 }
 
@@ -123,11 +187,19 @@ export interface CaseFactsForMatching {
 export function findRelevantPolicyContext(facts: CaseFactsForMatching): PolicyMemo[] {
   const haystack = `${facts.statusText} ${facts.statusDescription} ${facts.historyText}`.toLowerCase();
 
-  return POLICY_MEMOS.filter((memo) => {
+  const matches = POLICY_MEMOS.filter((memo) => {
     if (!formTypeMatches(memo, facts.formType)) return false;
     if (memo.effectiveFrom) {
       return Boolean(facts.submittedDate && facts.submittedDate >= memo.effectiveFrom);
     }
     return textMatches(memo, haystack);
-  }).slice(0, 2);
+  });
+
+  // Form-specific entries (formTypes narrowed to this exact form, e.g. the
+  // I-131 abandonment-risk entry) rank ahead of broadly-applicable "*"
+  // entries, so a form-specific match can't get crowded out of the top-2 cap
+  // by a coincidentally-matched general one.
+  matches.sort((a, b) => Number(a.formTypes === "*") - Number(b.formTypes === "*"));
+
+  return matches.slice(0, 2);
 }

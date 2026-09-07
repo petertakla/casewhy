@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { trackCase, untrackCase } from "./actions";
+import { CASE_TYPES } from "@/lib/kb/case-type-timeline";
 
 export function TrackCaseButton({
   receiptNumber,
@@ -23,6 +24,8 @@ export function TrackCaseButton({
 }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [caseType, setCaseType] = useState("");
+  const selected = CASE_TYPES.find((c) => c.id === caseType);
 
   if (alreadyTracked && trackedCaseId) {
     return (
@@ -62,18 +65,39 @@ export function TrackCaseButton({
 
   return (
     <div>
+      <label className="block text-xs font-medium text-muted" htmlFor="track-case-type">
+        What kind of case is this?
+      </label>
+      <select
+        id="track-case-type"
+        value={caseType}
+        onChange={(e) => setCaseType(e.target.value)}
+        required
+        className="mt-1 w-full max-w-xs rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
+      >
+        <option value="">Select a case type…</option>
+        {CASE_TYPES.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.label}
+          </option>
+        ))}
+      </select>
+      <p className="mt-1 text-xs text-muted">
+        Enter your form type for a more detailed, form-specific AI response.
+      </p>
+      {selected && <p className="mt-1.5 max-w-xl text-xs leading-relaxed text-muted">{selected.timelineBlurb}</p>}
       <button
         type="button"
-        disabled={isPending}
+        disabled={isPending || !caseType}
         onClick={() => startTransition(async () => {
           setError(null);
           try {
-            await trackCase(receiptNumber);
+            await trackCase(receiptNumber, caseType);
           } catch (err) {
             setError(err instanceof Error ? err.message : "Something went wrong.");
           }
         })}
-        className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline disabled:opacity-60"
+        className="mt-2 text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline disabled:cursor-not-allowed disabled:opacity-40"
       >
         {isPending ? "Saving…" : "Track this case"}
       </button>

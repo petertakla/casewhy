@@ -553,6 +553,18 @@ Peter shared a screenshot review of a real competitor, **Case Tracker for USCIS 
 - **Verified thoroughly:** full `tsc`/lint clean, production `next build` succeeds, dev-server click-through for every new interactive piece (news-source checkboxes, notification toggle, `/plus` anchor links) with real DB-state checks after each toggle — then a second pass live on `casewhy-app.vercel.app` post-deploy (`/news` renders real, current, deduped stories; `/settings` correctly redirects a signed-out visitor to sign-in). Committed `99cf083`, pushed to `nextjs-app`, auto-deployed to production.
 - **Not done, out of scope per the concept doc's own framing:** the case-cap and 3-month-discount items needed no code (see items 1/2 above) — nothing to do there.
 
+**Addendum, Sep 6 (cloud session) — expand `NEWS_SOURCES` from 6 to 10.** Peter asked for the fuller shortlist that should have been researched the first time. Four more sources were fetched and confirmed live during this research (same standard as the original six — a real fetch, not just a search hit); add these to `src/lib/news/sources.ts` alongside the existing six:
+- **The Insightful Immigration Blog (Cyrus D. Mehta)** — `https://blog.cyrusmehta.com/feed`. Confirmed live (Sep 5, 2026 post on a Maryland court blocking a birthright-citizenship rule). Widely cited legal analysis of court decisions and regulatory changes.
+- **Murthy Law Firm Blog** — `https://www.murthy.com/feed/`. Confirmed live. One of the most established immigration law firm blogs; strong on process changes and FAQs that often apply system-wide, not just to employment cases.
+- **WR Immigration (Wolfsdorf Rosenthal) Blog** — `https://www.wolfsdorf.com/feed/`. Confirmed live (Sep 2-3, 2026 posts, including a monthly "Global Immigration Recap" digest).
+- **Greenberg Traurig — Inside Business Immigration** — `https://www.gtlaw-insidebusinessimmigration.com/feed/`. Confirmed live (Sep 3, 2026 post specifically analyzing that month's Visa Bulletin — nice complement to CW-34).
+
+Two candidates were checked and deliberately left out, worth knowing so they aren't re-added later without realizing why: `fwd.us/feed/` 404s (dead), and the National Immigration Forum's feed (`immigrationforum.org/feed/`, redirects to `forumtogether.org/feed/`) returned mostly stale/placeholder items (last real post December 2024). Center for Immigration Studies (`cis.org/blog/feed`) is a real, live feed but was left off on purpose — it's a restrictionist advocacy think tank, and a single-issue advocacy blog (from either direction) would tilt an otherwise-neutral news page rather than inform it.
+
+**One more in reserve, not part of the 10:** RedBus2US (`https://redbus2us.com/feed/`, confirmed live) — strong on H-1B/F-1 community news, but overlaps heavily with Murthy/Wolfsdorf's employment-based coverage already on the list. Worth adding as an 11th (or swapping in) later if user feedback says the shortlist skews too litigation/policy-heavy.
+
+Since `disabled_news_sources` already defaults new sources to on (per the schema note above — "no row = every source on"), adding these four needs no migration and no backfill, exactly as the config was designed to allow. Re-verify all four URLs at build time regardless (a blog's feed can move) rather than trusting this list blindly, same discipline as the original six.
+
 ## Architecture (per the MVP scope doc)
 
 - Frontend: Next.js, mobile-responsive, ~~installable as a PWA~~ (not a native app for v1) — **done Sep 5 ~6:50am ET**, see "Next tasks for Claude Code" item 2 above

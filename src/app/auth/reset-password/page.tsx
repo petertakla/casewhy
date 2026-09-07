@@ -47,7 +47,7 @@ function ResetPasswordForm() {
     const { error } = await authClient.resetPassword({ newPassword: password, token });
     if (error) {
       setStatus("error");
-      setErrorMessage(error.message ?? "This reset link is invalid or has expired. Request a new one.");
+      setErrorMessage(error.message || "This reset link is invalid or has expired. Request a new one.");
       return;
     }
     setStatus("done");

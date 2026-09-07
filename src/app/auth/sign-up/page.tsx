@@ -32,7 +32,7 @@ export default function SignUpPage() {
     const { error } = await authClient.signUp.email({ email, password, name: "" });
     if (error) {
       setStatus("error");
-      setErrorMessage(error.message ?? "Something went wrong creating your account.");
+      setErrorMessage(error.message || "Something went wrong creating your account.");
       return;
     }
     router.push("/dashboard");

@@ -22,7 +22,7 @@ export default function ForgotPasswordPage() {
     const { error } = await authClient.requestPasswordReset({ email, redirectTo });
     if (error) {
       setStatus("error");
-      setErrorMessage(error.message ?? "Something went wrong. Please try again.");
+      setErrorMessage(error.message || "Something went wrong. Please try again.");
       return;
     }
     setStatus("sent");

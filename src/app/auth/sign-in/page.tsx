@@ -48,7 +48,7 @@ function MagicLinkForm({ onBack }: { onBack: () => void }) {
     const { error } = await authClient.signIn.magicLink({ email, callbackURL: "/dashboard" });
     if (error) {
       setStatus("error");
-      setErrorMessage(error.message ?? "Something went wrong sending the link. Please try again.");
+      setErrorMessage(error.message || "Something went wrong sending the link. Please try again.");
       return;
     }
     setStatus("sent");
@@ -120,7 +120,7 @@ function PasswordSignInForm({ onUseMagicLink }: { onUseMagicLink: () => void }) 
     const { error } = await authClient.signIn.email({ email, password });
     if (error) {
       setStatus("error");
-      setErrorMessage(error.message ?? "Incorrect email or password.");
+      setErrorMessage(error.message || "Incorrect email or password.");
       return;
     }
     router.push("/dashboard");

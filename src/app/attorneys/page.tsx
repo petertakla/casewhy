@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ATTORNEY_DIRECTORY, ATTORNEY_DIRECTORY_DISCLAIMER } from "@/lib/attorneys/directory";
 
 export default function AttorneysPage() {
@@ -48,6 +49,14 @@ export default function AttorneysPage() {
           ))}
         </div>
       )}
+
+      <p className="mt-8 text-sm text-muted">
+        Licensed immigration attorney?{" "}
+        <Link href="/attorneys/join" className="text-brand-600 hover:underline dark:text-brand-400">
+          Apply to be listed
+        </Link>
+        .
+      </p>
     </main>
   );
 }

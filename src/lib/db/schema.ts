@@ -256,3 +256,23 @@ export const representativeApplications = pgTable("representative_applications",
   contactPhone: text("contact_phone"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// Round 28 — self-enroll applications for the attorney directory
+// (src/lib/attorneys/directory.ts). Submissions land here, not in the
+// public directory file itself — same reasoning as representativeApplications
+// above: nothing here is ever auto-published, Peter manually vets each one
+// (confirms active bar admission/good standing) before adding a one-line
+// entry to the directory file. Not encrypted, same reasoning as above.
+export const attorneyApplications = pgTable("attorney_applications", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+  firm: text("firm").notNull(),
+  statesLicensed: text("states_licensed").notNull(),
+  barNumber: text("bar_number").notNull(),
+  practiceAreas: text("practice_areas").notNull(),
+  contactEmail: text("contact_email").notNull(),
+  contactPhone: text("contact_phone"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

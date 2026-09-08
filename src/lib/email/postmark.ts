@@ -5,8 +5,8 @@
 
 const FROM_ADDRESS = "info@casewhy.com";
 // No dedicated admin-alert address exists yet anywhere in the app — per
-// round 29's spec, notifications about new directory applications go here
-// until one does.
+// round 28/29's spec, notifications about new directory applications go
+// here until one does.
 const ADMIN_NOTIFICATION_ADDRESS = "info@casewhy.com";
 
 export async function sendStatusChangeEmail({
@@ -47,6 +47,63 @@ export async function sendStatusChangeEmail({
         statusDescription,
         "",
         "Sign in to CaseWhy to see the full details.",
+      ].join("\n"),
+      MessageStream: "outbound",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
+  }
+}
+
+// Round 28 — notifies Peter of a new attorney application
+// (src/app/attorneys/join). No admin dashboard exists yet at this volume —
+// email is enough, same call round 29's representative applications made.
+export async function sendAttorneyApplicationNotification({
+  name,
+  firm,
+  statesLicensed,
+  barNumber,
+  practiceAreas,
+  contactEmail,
+  contactPhone,
+}: {
+  name: string;
+  firm: string;
+  statesLicensed: string;
+  barNumber: string;
+  practiceAreas: string;
+  contactEmail: string;
+  contactPhone?: string;
+}): Promise<void> {
+  const token = process.env.POSTMARK_API_TOKEN;
+  if (!token) {
+    console.warn(
+      `[postmark] POSTMARK_API_TOKEN not set — skipping attorney-application notification for ${name}`
+    );
+    return;
+  }
+
+  const res = await fetch("https://api.postmarkapp.com/email", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Postmark-Server-Token": token,
+    },
+    body: JSON.stringify({
+      From: FROM_ADDRESS,
+      To: ADMIN_NOTIFICATION_ADDRESS,
+      Subject: `New attorney application: ${name}`,
+      TextBody: [
+        `Name: ${name}`,
+        `Firm: ${firm}`,
+        `States licensed: ${statesLicensed}`,
+        `Bar number: ${barNumber}`,
+        `Practice areas: ${practiceAreas}`,
+        `Contact email: ${contactEmail}`,
+        `Contact phone: ${contactPhone || "(not provided)"}`,
       ].join("\n"),
       MessageStream: "outbound",
     }),

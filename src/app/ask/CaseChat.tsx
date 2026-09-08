@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { suggestedQuestions } from "@/lib/ai/suggested-questions";
+import { linkifyExplanation } from "@/lib/kb/linkify";
 
 interface RelatedPolicy {
   id: string;
@@ -135,7 +136,16 @@ export function CaseChat({
                   : "bg-surface-2 text-foreground/90"
               }`}
             >
-              <p className="whitespace-pre-wrap">{m.content}</p>
+              {/* New task, same day as round 29/30 — assistant replies get the
+                  same always-on TERM_LINKS pass (src/lib/kb/term-links.ts) the
+                  dashboard explanation already uses, so a guardrail's own
+                  "consult an attorney" redirect becomes a real /get-help
+                  link. No per-case relatedPolicies here (chat only tracks the
+                  latest response's, not per-message), so [] — TERM_LINKS
+                  still fires regardless. User's own text is never linkified. */}
+              <p className="whitespace-pre-wrap">
+                {m.role === "assistant" ? linkifyExplanation(m.content, []) : m.content}
+              </p>
             </div>
           </div>
         ))}

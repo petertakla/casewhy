@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { href: "/processing-times", label: "Processing times" },
   { href: "/visa-bulletin", label: "Visa bulletin" },
   { href: "/news", label: "News" },
+  { href: "/get-help", label: "Get Help" },
   { href: "/settings", label: "Settings" },
 ];
 

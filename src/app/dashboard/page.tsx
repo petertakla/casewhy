@@ -93,7 +93,11 @@ function StalledCaseCard({ daysSinceLastUpdate, milestoneText }: { daysSinceLast
             <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
               upgrade to CaseWhy Plus
             </Link>{" "}
-            to find your representative and draft a follow-up letter.
+            to find your representative and draft a follow-up letter, or{" "}
+            <Link href="/get-help" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+              get help from a licensed professional
+            </Link>{" "}
+            now.
           </p>
         </div>
       </div>
@@ -128,7 +132,13 @@ function ExplanationBox({ explanation }: { explanation: CaseExplanation }) {
               {explanation.nextSteps.map((step, i) => (
                 <li key={i} className="flex gap-2">
                   <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-muted" />
-                  <span>{step}</span>
+                  {/* New task, same day as round 29/30 — next-step bullets weren't
+                      going through linkifyExplanation at all, so a step ending in
+                      "...consult a licensed immigration attorney" rendered as
+                      inert text even after the TERM_LINKS "attorney" entry was
+                      added. Real gap, found by testing live rather than assumed
+                      fixed by the term-links change alone. */}
+                  <span>{linkifyExplanation(step, explanation.relatedPolicies)}</span>
                 </li>
               ))}
             </ul>

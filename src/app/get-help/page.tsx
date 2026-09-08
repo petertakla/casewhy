@@ -1,14 +1,20 @@
 import Link from "next/link";
 
-// Round 29 — ties the (currently two) separate "talk to a professional"
-// directories together so they're discoverable as one coherent feature
-// instead of a scavenger hunt across unlinked pages. Each entity type stays
-// its own fully separate system (own table/page/flow, per
-// partner-marketing-domain-concept.md) — this page is just the shared front
-// door. More categories (legal aid orgs, university DSOs, community orgs,
-// employers) get their own card here as each ships its own round; none of
-// those are built yet, so none are listed yet.
-const CATEGORIES = [
+// Round 29 — ties the separate "talk to a professional" directories
+// together so they're discoverable as one coherent feature instead of a
+// scavenger hunt across unlinked pages. Each entity type stays its own
+// fully separate system (own table/page/flow, per
+// partner-marketing-domain-concept.md) — this page is just the shared
+// front door.
+//
+// New-task, same day — surfaced everywhere it belongs (nav on both sites,
+// dashboard/chat/escalation-toolkit) and given its own slot for every
+// entity type in the six-part backlog, live or not: legal aid orgs,
+// university DSOs, community orgs, and employers all show as "Coming
+// soon" placeholders now rather than waiting to be added card-by-card as
+// each ships — same "informational listing, not an endorsement" framing
+// as /attorneys applies to the page as a whole, stated once at the top.
+const LIVE_CATEGORIES = [
   {
     href: "/attorneys",
     label: "Attorneys",
@@ -23,6 +29,25 @@ const CATEGORIES = [
   },
 ];
 
+const COMING_SOON_CATEGORIES = [
+  {
+    label: "Legal aid & nonprofit organizations",
+    description: "Immigration help for those who can't afford a private attorney.",
+  },
+  {
+    label: "University international student offices",
+    description: "Your school's DSO, for F-1 student status questions.",
+  },
+  {
+    label: "Community & cultural organizations",
+    description: "Local and cultural organizations that support immigrants.",
+  },
+  {
+    label: "For employers",
+    description: "Sponsoring or supporting employees through the immigration process.",
+  },
+];
+
 export default function GetHelpPage() {
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
@@ -31,8 +56,14 @@ export default function GetHelpPage() {
         CaseWhy gives you plain-language information, not legal advice. When your situation needs
         a licensed professional&apos;s judgment, here&apos;s where to find one.
       </p>
+      <p className="mt-2 text-xs text-muted">
+        This page is an informational list, not an endorsement or a referral service. CaseWhy
+        doesn&apos;t vouch for outcomes, and being listed here doesn&apos;t mean any listing is
+        right for your specific situation.
+      </p>
+
       <div className="mt-8 space-y-4">
-        {CATEGORIES.map((category) => (
+        {LIVE_CATEGORIES.map((category) => (
           <Link
             key={category.href}
             href={category.href}
@@ -41,6 +72,21 @@ export default function GetHelpPage() {
             <p className="font-semibold text-foreground">{category.label}</p>
             <p className="mt-1 text-sm text-muted">{category.description}</p>
           </Link>
+        ))}
+
+        {COMING_SOON_CATEGORIES.map((category) => (
+          <div
+            key={category.label}
+            className="rounded-xl border border-dashed border-border-strong p-5"
+          >
+            <div className="flex items-baseline justify-between gap-2">
+              <p className="font-semibold text-muted">{category.label}</p>
+              <span className="shrink-0 rounded-full bg-surface-2 px-2 py-0.5 text-xs font-medium text-muted">
+                Coming soon
+              </span>
+            </div>
+            <p className="mt-1 text-sm text-muted">{category.description}</p>
+          </div>
         ))}
       </div>
     </main>

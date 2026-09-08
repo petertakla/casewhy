@@ -176,6 +176,9 @@ export default function LandingPage() {
             <a href="mailto:hello@casewhy.com" className="hover:text-foreground">
               Contact
             </a>
+            <a href="/get-help" className="hover:text-foreground">
+              Get Help
+            </a>
           </div>
         </div>
       </footer>

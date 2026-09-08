@@ -27,6 +27,24 @@ export function TrackCaseButton({
   const [caseType, setCaseType] = useState("");
   const selected = CASE_TYPES.find((c) => c.id === caseType);
 
+  // Round 22 — the list grew past a flat dropdown (9 real types + "Other"),
+  // grouped into optgroups. Grouping is derived here, in array order, rather
+  // than duplicated as a separate data structure.
+  const groupedOptions: { group: string; options: typeof CASE_TYPES }[] = [];
+  const ungrouped: typeof CASE_TYPES = [];
+  for (const option of CASE_TYPES) {
+    if (!option.group) {
+      ungrouped.push(option);
+      continue;
+    }
+    let bucket = groupedOptions.find((g) => g.group === option.group);
+    if (!bucket) {
+      bucket = { group: option.group, options: [] };
+      groupedOptions.push(bucket);
+    }
+    bucket.options.push(option);
+  }
+
   if (alreadyTracked && trackedCaseId) {
     return (
       <div className="flex items-center gap-3">
@@ -76,7 +94,16 @@ export function TrackCaseButton({
         className="mt-1 w-full max-w-xs rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
       >
         <option value="">Select a case type…</option>
-        {CASE_TYPES.map((c) => (
+        {groupedOptions.map((g) => (
+          <optgroup key={g.group} label={g.group}>
+            {g.options.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.label}
+              </option>
+            ))}
+          </optgroup>
+        ))}
+        {ungrouped.map((c) => (
           <option key={c.id} value={c.id}>
             {c.label}
           </option>

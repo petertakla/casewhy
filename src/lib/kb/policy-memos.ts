@@ -158,6 +158,36 @@ export const POLICY_MEMOS: PolicyMemo[] = [
     sourceTitle: "USCIS: Employment Authorization Document",
     sourceUrl: "https://www.uscis.gov/employment-authorization",
   },
+  // Round 22 — I-129 (a genuinely new user population: nonimmigrant/temporary
+  // workers, not the green-card/citizenship track) and I-751 (deferred from
+  // round 21, the natural next step for the family-based population CaseWhy
+  // already serves).
+  {
+    id: "i129-h1b-portability",
+    title: "I-129 Nonimmigrant Worker Petitions — H-1B Portability and Its Limits",
+    datePublished: "2026-01-01",
+    formTypes: ["I-129"],
+    statusKeywords: [],
+    summary:
+      "I-129 covers many distinct nonimmigrant worker classifications — H-1B, L-1, O-1, TN, E-1/E-2, R-1, P-1, and others — which behave differently under the hood; never assume which classification a case is without it being independently confirmed. For H-1B specifically, AC21 portability means someone can generally start working for a new employer as soon as a new or transfer I-129 petition is properly filed and receipted, not upon approval — provided they're maintaining valid H-1B status (or within the 60-day post-employment grace period), the new employer has a certified Labor Condition Application and is paying prevailing wage, and there's no history of unauthorized work.",
+    currentStatus:
+      "If the new petition is later denied, work authorization under it ends immediately — this is a real, high-stakes fact that should never be softened or left implied when portability comes up.",
+    sourceTitle: "H-1B Transfer and Portability Under AC21",
+    sourceUrl: "https://www.lighthousehq.com/blog/h1b-transfer",
+  },
+  {
+    id: "i751-removing-conditions-deadline",
+    title: "I-751 — the 90-Day Filing Window and What Happens If You Miss It",
+    datePublished: "2026-01-01",
+    formTypes: ["I-751"],
+    statusKeywords: [],
+    summary:
+      "A joint I-751 petition must generally be filed within the 90 days immediately before the 2-year conditional permanent resident card's expiration date. Waiver categories exist for filing without the other spouse and without that 90-day window restriction: divorce, death of the spouse, abuse during the marriage, or extreme hardship.",
+    currentStatus:
+      "Missing the 90-day window is a real, serious consequence, not a soft deadline: conditional resident status automatically terminates, and USCIS can initiate removal (deportation) proceedings. Late filing is only possible with a written good-cause explanation, and approval isn't guaranteed — state this plainly, never softened, whenever a case is approaching that window. The fraud-suspicion/interview branch and the abuse-waiver branch both carry real emotional and legal stakes — keep any guidance procedural and general (how the waiver process generally works), never an assessment of a specific person's own eligibility or likelihood of success.",
+    sourceTitle: "I-751, Petition to Remove Conditions on Residence",
+    sourceUrl: "https://duevisa.com/blog/i751-removal-of-conditions",
+  },
 ];
 
 function textMatches(memo: PolicyMemo, haystack: string): boolean {

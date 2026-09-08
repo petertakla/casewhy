@@ -125,8 +125,8 @@ export function EscalationToolkit({
       </p>
       <p className="mb-3 text-xs text-muted">
         If this feels like it needs more than a letter,{" "}
-        <Link href="/attorneys" className="text-brand-600 hover:underline dark:text-brand-400">
-          find an immigration attorney
+        <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+          get help from a licensed professional
         </Link>
         .
       </p>

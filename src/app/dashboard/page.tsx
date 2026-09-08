@@ -157,9 +157,9 @@ function ExplanationBox({ explanation }: { explanation: CaseExplanation }) {
           )}
           <p className="mt-3 text-xs text-muted">
             General information, not legal advice. For guidance specific to your case, talk to a
-            licensed immigration attorney —{" "}
-            <Link href="/attorneys" className="text-brand-600 hover:underline dark:text-brand-400">
-              find one here
+            licensed professional —{" "}
+            <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+              get help finding one
             </Link>
             .
           </p>

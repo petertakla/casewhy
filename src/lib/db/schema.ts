@@ -234,3 +234,25 @@ export const pushSubscriptions = pgTable(
     unique("push_subscriptions_endpoint_unique").on(table.endpoint),
   ]
 );
+
+// Round 29 — self-enroll applications for the accredited-representatives
+// directory (src/lib/representatives/directory.ts). Submissions land here,
+// not in the public directory file itself — same split round 27/28
+// established for attorneys: nothing here is ever auto-published, Peter
+// manually vets each one (confirms the DOJ/BIA accreditation is real and
+// current) before adding a one-line entry to the directory file. Not
+// encrypted — this is business contact info an applicant is voluntarily
+// submitting to be listed publicly if approved, not private case data.
+export const representativeApplications = pgTable("representative_applications", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+  organization: text("organization").notNull(),
+  accreditationDetails: text("accreditation_details").notNull(),
+  statesServed: text("states_served").notNull(),
+  practiceFocus: text("practice_focus").notNull(),
+  contactEmail: text("contact_email").notNull(),
+  contactPhone: text("contact_phone"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

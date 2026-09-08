@@ -4,6 +4,10 @@
 // exists.
 
 const FROM_ADDRESS = "info@casewhy.com";
+// No dedicated admin-alert address exists yet anywhere in the app — per
+// round 29's spec, notifications about new directory applications go here
+// until one does.
+const ADMIN_NOTIFICATION_ADDRESS = "info@casewhy.com";
 
 export async function sendStatusChangeEmail({
   to,
@@ -43,6 +47,64 @@ export async function sendStatusChangeEmail({
         statusDescription,
         "",
         "Sign in to CaseWhy to see the full details.",
+      ].join("\n"),
+      MessageStream: "outbound",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
+  }
+}
+
+// Round 29 — notifies Peter of a new accredited-representative application
+// (src/app/representatives/join). No admin dashboard exists yet at this
+// volume, per the same "email is enough" call made for round 28's attorney
+// applications — this is just the one that got built first.
+export async function sendRepresentativeApplicationNotification({
+  name,
+  organization,
+  accreditationDetails,
+  statesServed,
+  practiceFocus,
+  contactEmail,
+  contactPhone,
+}: {
+  name: string;
+  organization: string;
+  accreditationDetails: string;
+  statesServed: string;
+  practiceFocus: string;
+  contactEmail: string;
+  contactPhone?: string;
+}): Promise<void> {
+  const token = process.env.POSTMARK_API_TOKEN;
+  if (!token) {
+    console.warn(
+      `[postmark] POSTMARK_API_TOKEN not set — skipping representative-application notification for ${name}`
+    );
+    return;
+  }
+
+  const res = await fetch("https://api.postmarkapp.com/email", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Postmark-Server-Token": token,
+    },
+    body: JSON.stringify({
+      From: FROM_ADDRESS,
+      To: ADMIN_NOTIFICATION_ADDRESS,
+      Subject: `New accredited representative application: ${name}`,
+      TextBody: [
+        `Name: ${name}`,
+        `Organization: ${organization}`,
+        `Accreditation details: ${accreditationDetails}`,
+        `States/regions served: ${statesServed}`,
+        `Practice focus: ${practiceFocus}`,
+        `Contact email: ${contactEmail}`,
+        `Contact phone: ${contactPhone || "(not provided)"}`,
       ].join("\n"),
       MessageStream: "outbound",
     }),

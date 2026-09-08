@@ -235,15 +235,17 @@ export const pushSubscriptions = pgTable(
   ]
 );
 
-// Round 29 — self-enroll applications for the accredited-representatives
-// directory (src/lib/representatives/directory.ts). Submissions land here,
-// not in the public directory file itself — same split round 27/28
-// established for attorneys: nothing here is ever auto-published, Peter
-// manually vets each one (confirms the DOJ/BIA accreditation is real and
-// current) before adding a one-line entry to the directory file. Not
-// encrypted — this is business contact info an applicant is voluntarily
-// submitting to be listed publicly if approved, not private case data.
-export const representativeApplications = pgTable("representative_applications", {
+// Round 29 (renamed from representative_applications same day, to match
+// the /accredited-representatives route and the rest of this file's naming)
+// — self-enroll applications for the accredited-representatives directory.
+// Submissions land here, not in accreditedRepresentativeDirectory below —
+// same split round 27/28 established for attorneys: nothing here is ever
+// auto-published, Peter manually vets each one (confirms the DOJ/BIA
+// accreditation is real and current) before it's promoted to the public
+// directory table. Not encrypted — this is business contact info an
+// applicant is voluntarily submitting to be listed publicly if approved,
+// not private case data.
+export const accreditedRepresentativeApplications = pgTable("accredited_representative_applications", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
@@ -256,6 +258,52 @@ export const representativeApplications = pgTable("representative_applications",
   contactPhone: text("contact_phone"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// New table, same day — the actual public, approved accredited-representative
+// listings. Unlike the attorney directory (still a hand-edited static array,
+// since it's empty pending real self-enrolled attorneys), this one is a real
+// DB table because it's machine-seeded from DOJ's own public roster at real
+// volume (see scripts/seed-accredited-representatives.ts) — a static array
+// isn't practical to maintain by hand at this size, and the roster itself
+// needs periodic re-seeding (DOJ refreshes it roughly weekly), which a table
+// supports far better than hand-editing source code. One row per accredited
+// representative (not per organization) — an org can have several reps, each
+// gets their own permalink at /accredited-representatives/[slug]. Not
+// encrypted — this is DOJ's own already-public data.
+export const accreditedRepresentativeDirectory = pgTable(
+  "accredited_representative_directory",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    slug: text("slug").notNull(),
+    representativeName: text("representative_name").notNull(),
+    dhsOnly: boolean("dhs_only").notNull(),
+    accreditationExpiration: text("accreditation_expiration"),
+    accreditationPendingRenewal: boolean("accreditation_pending_renewal").notNull().default(false),
+    organizationName: text("organization_name").notNull(),
+    organizationStatus: text("organization_status").notNull(),
+    organizationRecognitionExpiration: text("organization_recognition_expiration"),
+    organizationRecognitionPendingRenewal: boolean("organization_recognition_pending_renewal")
+      .notNull()
+      .default(false),
+    officeType: text("office_type"),
+    streetAddress: text("street_address"),
+    cityStateZip: text("city_state_zip"),
+    phone: text("phone"),
+    state: text("state").notNull(),
+    // e.g. "DOJ EOIR Recognized Organizations and Accredited Representatives
+    // Roster, current as of 08/30/26" — shown on every seeded entry per the
+    // seed task's own trust requirement (same instinct as CW-31's KB citing
+    // sources directly, not folding them silently into prose).
+    sourceCitation: text("source_citation").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique("accredited_representative_directory_slug_unique").on(table.slug),
+    index("accredited_representative_directory_state_idx").on(table.state),
+  ]
+);
 
 // Round 28 — self-enroll applications for the attorney directory
 // (src/lib/attorneys/directory.ts). Submissions land here, not in the

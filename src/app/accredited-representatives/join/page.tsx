@@ -10,6 +10,9 @@ export default function RepresentativeJoinPage() {
         not an endorsement: every application is reviewed against the DOJ&apos;s own
         Recognition &amp; Accreditation roster before anyone is added.
       </p>
+      <p className="mt-2 text-xs text-muted">
+        Free to join, always — no fee to be listed.
+      </p>
       <div className="mt-8">
         <ApplicationForm />
       </div>

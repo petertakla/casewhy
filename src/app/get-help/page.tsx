@@ -22,7 +22,7 @@ const LIVE_CATEGORIES = [
       "Licensed immigration attorneys who can represent you and give advice specific to your case.",
   },
   {
-    href: "/representatives",
+    href: "/accredited-representatives",
     label: "Accredited representatives",
     description:
       "DOJ-accredited, non-lawyer representatives — often at nonprofits — authorized to practice immigration law.",
@@ -60,6 +60,10 @@ export default function GetHelpPage() {
         This page is an informational list, not an endorsement or a referral service. CaseWhy
         doesn&apos;t vouch for outcomes, and being listed here doesn&apos;t mean any listing is
         right for your specific situation.
+      </p>
+      <p className="mt-2 text-xs text-muted">
+        Every resource here is free to use, always — no fees, no ads, no hidden cost. Same as the
+        rest of CaseWhy: we don&apos;t sell your data or run ads either.
       </p>
 
       <div className="mt-8 space-y-4">

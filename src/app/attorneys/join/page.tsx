@@ -9,6 +9,9 @@ export default function AttorneyJoinPage() {
         every application is reviewed against your state bar&apos;s public lookup tool before
         anyone is added.
       </p>
+      <p className="mt-2 text-xs text-muted">
+        Free to join, always — no fee to be a founding partner.
+      </p>
       <div className="mt-8">
         <ApplicationForm />
       </div>

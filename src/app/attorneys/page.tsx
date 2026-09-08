@@ -9,7 +9,10 @@ export default function AttorneysPage() {
         A hand-curated list of immigration attorneys, for anything CaseWhy tells you needs a
         licensed professional&apos;s judgment rather than general information.
       </p>
-      <p className="mb-8 text-xs text-muted">{ATTORNEY_DIRECTORY_DISCLAIMER}</p>
+      <p className="mb-2 text-xs text-muted">{ATTORNEY_DIRECTORY_DISCLAIMER}</p>
+      <p className="mb-8 text-xs text-muted">
+        Free to browse, always — no fees, no ads, no sign-in required.
+      </p>
 
       {ATTORNEY_DIRECTORY.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border-strong p-8 text-center">
@@ -30,22 +33,18 @@ export default function AttorneysPage() {
       ) : (
         <div className="space-y-4">
           {ATTORNEY_DIRECTORY.map((attorney) => (
-            <div key={attorney.id} className="rounded-xl border border-border bg-surface p-5">
+            <Link
+              key={attorney.id}
+              href={`/attorneys/${attorney.id}`}
+              className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
+            >
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <p className="font-semibold">{attorney.name}</p>
+                <p className="font-semibold text-foreground">{attorney.name}</p>
                 <p className="text-xs text-muted">{attorney.statesLicensed.join(", ")}</p>
               </div>
               <p className="text-sm text-muted">{attorney.firm}</p>
               <p className="mt-2 text-xs text-muted">{attorney.practiceFocus.join(" · ")}</p>
-              <a
-                href={attorney.contactMethod.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 inline-block text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
-              >
-                {attorney.contactMethod.label}
-              </a>
-            </div>
+            </Link>
           ))}
         </div>
       )}
@@ -54,8 +53,8 @@ export default function AttorneysPage() {
         Licensed immigration attorney?{" "}
         <Link href="/attorneys/join" className="text-brand-600 hover:underline dark:text-brand-400">
           Apply to be listed
-        </Link>
-        .
+        </Link>{" "}
+        — free, no cost to join.
       </p>
     </main>
   );

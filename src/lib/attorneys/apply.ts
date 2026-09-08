@@ -1,7 +1,7 @@
 // Round 28 — shared application-submission logic for the attorney
 // self-enroll form (/attorneys/join), used by the "use server" wrapper in
 // src/app/attorneys/join/actions.ts. Mirrors
-// src/lib/representatives/apply.ts's shape exactly (which itself mirrors
+// src/lib/accredited-representatives/apply.ts's shape exactly (which itself mirrors
 // src/lib/marketing/subscribe.ts): zod validation, a CSS-hidden honeypot,
 // insert-and-report-success-either-way so a bot can't learn its submission
 // was rejected.
@@ -58,7 +58,7 @@ export async function submitAttorneyApplication(input: {
     contactPhone: parsed.data.contactPhone || null,
   });
 
-  // Best-effort — see src/lib/representatives/apply.ts for the same
+  // Best-effort — see src/lib/accredited-representatives/apply.ts for the same
   // reasoning: a Postmark hiccup shouldn't fail a submission that already
   // landed in the DB.
   try {

@@ -1,6 +1,6 @@
 // Round 29 — shared application-submission logic for the accredited-
-// representatives self-enroll form (/representatives/join), used by the
-// "use server" wrapper in src/app/representatives/join/actions.ts. Mirrors
+// representatives self-enroll form (/accredited-representatives/join), used by the
+// "use server" wrapper in src/app/accredited-representatives/join/actions.ts. Mirrors
 // src/lib/marketing/subscribe.ts's shape: zod validation, a CSS-hidden
 // honeypot (not type="hidden", which a form-filling bot would recognize and
 // skip), insert-and-report-success-either-way so a bot can't learn its
@@ -8,7 +8,7 @@
 
 import { z } from "zod";
 import { getDb } from "@/lib/db/client";
-import { representativeApplications } from "@/lib/db/schema";
+import { accreditedRepresentativeApplications } from "@/lib/db/schema";
 import { sendRepresentativeApplicationNotification } from "@/lib/email/postmark";
 
 const ApplicationInput = z.object({
@@ -52,7 +52,7 @@ export async function submitRepresentativeApplication(input: {
   }
 
   const db = getDb();
-  await db.insert(representativeApplications).values({
+  await db.insert(accreditedRepresentativeApplications).values({
     name: parsed.data.name,
     organization: parsed.data.organization,
     accreditationDetails: parsed.data.accreditationDetails,

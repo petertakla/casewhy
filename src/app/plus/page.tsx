@@ -191,6 +191,13 @@ export default async function PlusPage({
         The stalled-case alert itself is always free — only the representative lookup and letter
         drafting that follow it are part of CaseWhy Plus.
       </p>
+      <p className="mt-1 text-xs text-muted">
+        <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+          Get Help
+        </Link>{" "}
+        — finding an attorney or accredited representative — is free on every tier too, not a
+        Plus perk.
+      </p>
 
       <div className="mt-10">
         <h2 className="text-lg font-semibold">Plus, in depth</h2>

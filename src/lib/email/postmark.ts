@@ -115,7 +115,7 @@ export async function sendAttorneyApplicationNotification({
 }
 
 // Round 29 — notifies Peter of a new accredited-representative application
-// (src/app/representatives/join). No admin dashboard exists yet at this
+// (src/app/accredited-representatives/join). No admin dashboard exists yet at this
 // volume, per the same "email is enough" call made for round 28's attorney
 // applications — this is just the one that got built first.
 export async function sendRepresentativeApplicationNotification({

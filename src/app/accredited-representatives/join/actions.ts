@@ -1,6 +1,6 @@
 "use server";
 
-import { submitRepresentativeApplication as submitImpl, type ApplyResult } from "@/lib/representatives/apply";
+import { submitRepresentativeApplication as submitImpl, type ApplyResult } from "@/lib/accredited-representatives/apply";
 
 export type { ApplyResult };
 

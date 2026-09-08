@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { suggestedQuestions } from "@/lib/ai/suggested-questions";
 
 interface RelatedPolicy {
@@ -192,7 +193,11 @@ export function CaseChat({
         )}
         <p className="mt-3 text-xs text-muted">
           General information, not legal advice. For guidance specific to your case, talk to a
-          licensed immigration attorney.
+          licensed immigration attorney —{" "}
+          <Link href="/attorneys" className="text-brand-600 hover:underline dark:text-brand-400">
+            find one here
+          </Link>
+          .
         </p>
       </div>
     </div>

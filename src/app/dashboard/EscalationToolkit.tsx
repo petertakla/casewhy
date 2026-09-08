@@ -120,8 +120,15 @@ export function EscalationToolkit({
 
   return (
     <div className="mt-6 border-t border-border pt-5">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted">
+      <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted">
         Escalation toolkit
+      </p>
+      <p className="mb-3 text-xs text-muted">
+        If this feels like it needs more than a letter,{" "}
+        <Link href="/attorneys" className="text-brand-600 hover:underline dark:text-brand-400">
+          find an immigration attorney
+        </Link>
+        .
       </p>
 
       {hasAddress === null && <p className="text-xs text-muted">Loading…</p>}

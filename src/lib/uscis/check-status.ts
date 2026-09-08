@@ -11,6 +11,7 @@ import { encryptField, decryptField } from "@/lib/db/crypto";
 import { getCaseStatus, type CaseStatus } from "@/lib/uscis/client";
 import { sendStatusChangeEmail } from "@/lib/email/postmark";
 import { getStatusChangeEmailsEnabled } from "@/lib/settings/settings";
+import { sendPushToUser } from "@/lib/push/send";
 
 export interface TrackedCaseRow {
   id: string;
@@ -40,6 +41,16 @@ export async function checkTrackedCaseNow(
       });
       notified = true;
     }
+    // Round 26 — same first-check gate as the email above (previousStatusText
+    // !== null), for the same reason: don't notify on the very first check
+    // after tracking, only on a real change. A user with zero subscribed
+    // devices just gets an empty Promise.all — no separate "is push on" flag
+    // to check first.
+    await sendPushToUser(row.userId, {
+      title: `${status.formType} — ${status.statusText}`,
+      body: status.statusDescription,
+      url: `/dashboard?receipt=${encodeURIComponent(receiptNumber)}`,
+    });
   }
 
   const db = getDb();

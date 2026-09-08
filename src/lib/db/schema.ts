@@ -206,3 +206,31 @@ export const newsSourcePreferences = pgTable(
   },
   (table) => [primaryKey({ columns: [table.userId, table.sourceId] })]
 );
+
+// Round 26 — Web Push subscriptions. One row per subscribed browser/device,
+// not per user — a user can have several (phone, laptop, etc.), and each
+// needs its own endpoint/keys to actually receive a push. No separate
+// "push enabled" boolean anywhere: whether push is "on" for a given browser
+// is just whether a row exists for that browser's own endpoint, checked
+// client-side via pushManager.getSubscription() (the server has no way to
+// know which endpoint belongs to "the current browser" ahead of time, the
+// way it does for the single per-user email toggle above). Not encrypted —
+// an endpoint/key pair is a delivery credential, not identifying case data,
+// same reasoning as not encrypting Stripe IDs elsewhere in this schema.
+export const pushSubscriptions = pgTable(
+  "push_subscriptions",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id").notNull(),
+    endpoint: text("endpoint").notNull(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("push_subscriptions_user_id_idx").on(table.userId),
+    unique("push_subscriptions_endpoint_unique").on(table.endpoint),
+  ]
+);

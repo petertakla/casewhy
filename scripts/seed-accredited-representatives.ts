@@ -71,7 +71,6 @@ async function main() {
   const db = getDb();
 
   let inserted = 0;
-  let updated = 0;
   const usedSlugs = new Set<string>();
 
   for (const r of records) {

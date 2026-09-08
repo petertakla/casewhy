@@ -54,7 +54,20 @@ export function AuthHeader() {
             <span className="hidden sm:inline text-muted">{session.user.email}</span>
             <button
               type="button"
-              onClick={() => authClient.signOut().then(() => router.refresh())}
+              onClick={() =>
+                authClient.signOut().then(() => {
+                  // Explicit redirect, not just router.refresh() — refresh()
+                  // alone re-fetches the *current* route's server data, which
+                  // leaves the user sitting on a protected page (e.g.
+                  // /dashboard) that may not gracefully handle a suddenly-
+                  // missing session. Redirecting to "/" first guarantees a
+                  // sane landing spot regardless of what page sign-out was
+                  // clicked from; refresh() after ensures a fresh fetch even
+                  // if already on "/".
+                  router.push("/");
+                  router.refresh();
+                })
+              }
               className="font-semibold text-brand-600 dark:text-brand-400 hover:underline"
             >
               Sign out

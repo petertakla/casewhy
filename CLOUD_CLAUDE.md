@@ -36,9 +36,16 @@ Three new pieces of work, ready to pick up (after round 26, or in parallel if co
 
 Full background/reasoning for all of the above lives in `partner-marketing-domain-concept.md` (updated same day — also re-synced into this repo, since the copy here was a few edits stale) and `attorney-email-campaign-concept.md` (also re-synced).
 
-**Two small corrections, Sep 8 (cloud session), same day — if `get-help-hub-and-nav-task.md`/`partner-marketing-domain-concept.md` were already fetched before this, re-fetch before finishing the nav work (both files re-synced into this repo just now):**
+**Two small corrections, Sep 8 (cloud session), same day — landed after round 31 had already shipped, so they never made it live. Superseded by the consolidated follow-up below — work from that instead of applying these separately.**
 1. In the signed-in app nav (`AuthHeader.tsx`), "Get Help" goes **immediately after "CaseWhy Plus"** in the nav order — not just "somewhere alongside" the other items.
 2. **Signed-out visitors on `app.casewhy.com` need "Get Help" in the top nav too**, not only the landing-page footer (item 3 in the task doc). This is additive — the footer link stays — but whatever renders as the header in the signed-out state (may or may not be the same component as the signed-in nav — check rather than assume) needs its own "Get Help" entry.
+
+**Follow-up, Sep 8 (cloud session), later — checked round 29/31's own done-notes against what was actually specified and found three real gaps, now consolidated into `round29-followup-seed-and-messaging-gaps.md` (new file, this repo):**
+1. **Round 29's directory shipped empty.** Its done-note says it "ships empty, same pattern as `attorneys/directory.ts`" — that's the attorney pattern (correct there), but accredited representatives were specifically supposed to be seeded from DOJ EOIR's own public roster (`round29-accredited-reps-build-and-seed-task.md`, already in this repo) since DOJ itself is the vetting authority. That seed step doesn't appear to have run.
+2. **The "free, always" messaging was never added** — no occurrence anywhere in `/get-help`, `/attorneys`, `/representatives`. This spec landed after round 31 shipped, so it's not a regression, just unfinished.
+3. **The two nav corrections directly above never landed either**, same reason (post-round-31 timing).
+
+See `round29-followup-seed-and-messaging-gaps.md` for the full consolidated task — work from that rather than piecing together the items above.
 
 ## What this is
 
@@ -1082,6 +1089,17 @@ Per `round29-accredited-reps-build-and-seed-task.md` and the cross-cutting requi
 4. Pushed both commits to `origin/nextjs-app` and confirmed the Vercel deploy went live at `app.casewhy.com`.
 
 **Note for the cloud session:** the "Get Help directory work" section above still frames all three tasks (DNS, hub, round 29) as "ready to pick up" — round 29's rename/permalinks/seed slice is now fully done per this section; please fold that into the next status re-sync rather than re-issuing the task.
+
+---
+
+## Round 33, Sep 8 — round 29 follow-up: nav placement, DONE (Claude Code)
+
+While round 32 was being pushed, the cloud session wrote a new task doc directly to this repo's disk (`round29-followup-seed-and-messaging-gaps.md`) flagging 3 gaps against round 29/31's done-notes. **Gaps 1 (empty directory) and 2 (missing "free" messaging) were stale by the time they landed** — round 32, done minutes earlier in this same session, already fixed both (seeded 98 real DOJ records, added the free-tier copy) under the newer `/accredited-representatives` naming the doc's own author hadn't seen yet. **Gap 3 (nav placement) was real and still open:**
+
+1. `AuthHeader.tsx`'s `NAV_LINKS` reordered so "Get Help" sits immediately after "CaseWhy Plus" (was 6th, after News; now 4th).
+2. Signed-out visitors on `app.casewhy.com`'s landing page (`/`) had **no header nav at all** — `AuthHeader`'s nav only renders when `pathname` matches an app route, and the signed-out branch only ever showed "Sign in." Added a "Get Help" link next to "Sign in" in that branch, gated to `!onAppPage` so it doesn't duplicate the nav's own "Get Help" link on pages that already show the full nav.
+
+`tsc`/lint clean, production build succeeds. **Honest verification gap, same reason as round 32:** no browser-automation tool available this session (Claude in Chrome extension not connected), and this specific fix is client-rendered (gated on `authClient.useSession()`'s pending/session state) — a plain `curl` against a dev server can't observe it the way it could for round 32's server-rendered pages (confirmed this directly: curling `/` showed only the static footer's "Get Help," not the header's, since the header needs real browser JS to resolve session state before painting). The change was verified by reading the logic directly instead: `onAppPage` is computed the same way for both nav branches, the new link only appears in the signed-out block, and the JSX/build compiles clean. **A person (or a future session with browser tools) should click through the signed-out landing page once to visually confirm** the header shows "Get Help | Sign in" and that no app page shows it twice. Also committed the cloud session's newly-synced concept docs (`attorney-email-campaign-concept.md`, `casewhyhub-dns-setup-task.md`, `get-help-hub-and-nav-task.md`, `partner-marketing-domain-concept.md`, `round29-accredited-reps-build-and-seed-task.md`, `round29-followup-seed-and-messaging-gaps.md`) that had been written to disk but never git-tracked, matching this repo's usual pattern of tracking these handoff docs.
 
 ---
 

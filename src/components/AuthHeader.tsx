@@ -9,10 +9,10 @@ const NAV_LINKS = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/ask", label: "Ask a question" },
   { href: "/plus", label: "CaseWhy Plus" },
+  { href: "/get-help", label: "Get Help" },
   { href: "/processing-times", label: "Processing times" },
   { href: "/visa-bulletin", label: "Visa bulletin" },
   { href: "/news", label: "News" },
-  { href: "/get-help", label: "Get Help" },
   { href: "/settings", label: "Settings" },
 ];
 
@@ -75,12 +75,19 @@ export function AuthHeader() {
             </button>
           </div>
         ) : (
-          <Link
-            href="/auth/sign-in"
-            className="font-semibold text-brand-600 dark:text-brand-400 hover:underline"
-          >
-            Sign in
-          </Link>
+          <div className="flex items-center gap-4">
+            {!onAppPage && (
+              <Link href="/get-help" className="text-muted hover:text-foreground">
+                Get Help
+              </Link>
+            )}
+            <Link
+              href="/auth/sign-in"
+              className="font-semibold text-brand-600 dark:text-brand-400 hover:underline"
+            >
+              Sign in
+            </Link>
+          </div>
         )}
       </div>
     </header>

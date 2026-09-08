@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ATTORNEY_DIRECTORY, ATTORNEY_DIRECTORY_DISCLAIMER } from "@/lib/attorneys/directory";
+import { StateFilter } from "@/components/StateFilter";
 
 export default function AttorneysPage() {
   return (
@@ -31,22 +32,27 @@ export default function AttorneysPage() {
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {ATTORNEY_DIRECTORY.map((attorney) => (
-            <Link
-              key={attorney.id}
-              href={`/attorneys/${attorney.id}`}
-              className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
-            >
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <p className="font-semibold text-foreground">{attorney.name}</p>
-                <p className="text-xs text-muted">{attorney.statesLicensed.join(", ")}</p>
-              </div>
-              <p className="text-sm text-muted">{attorney.firm}</p>
-              <p className="mt-2 text-xs text-muted">{attorney.practiceFocus.join(" · ")}</p>
-            </Link>
-          ))}
-        </div>
+        <StateFilter
+          emptyMessage="No attorneys match."
+          items={ATTORNEY_DIRECTORY.map((attorney) => ({
+            key: attorney.id,
+            states: attorney.statesLicensed,
+            searchText: `${attorney.name} ${attorney.firm} ${attorney.practiceFocus.join(" ")}`,
+            node: (
+              <Link
+                href={`/attorneys/${attorney.id}`}
+                className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="font-semibold text-foreground">{attorney.name}</p>
+                  <p className="text-xs text-muted">{attorney.statesLicensed.join(", ")}</p>
+                </div>
+                <p className="text-sm text-muted">{attorney.firm}</p>
+                <p className="mt-2 text-xs text-muted">{attorney.practiceFocus.join(" · ")}</p>
+              </Link>
+            ),
+          }))}
+        />
       )}
 
       <p className="mt-8 text-sm text-muted">

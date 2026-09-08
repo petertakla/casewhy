@@ -3,6 +3,7 @@ import {
   getAccreditedRepresentativeDirectory,
   ACCREDITED_REPRESENTATIVE_DIRECTORY_DISCLAIMER,
 } from "@/lib/accredited-representatives/directory";
+import { StateFilter } from "@/components/StateFilter";
 
 // Unlike /attorneys (a static in-source array), this reads a real DB table
 // that gets re-seeded periodically and grows via approved applications —
@@ -19,7 +20,7 @@ export default async function AccreditedRepresentativesPage() {
       <p className="mb-2 mt-2 text-muted">
         DOJ-accredited representatives — non-lawyers authorized to practice immigration law,
         typically at nonprofit organizations. Sourced from DOJ&apos;s own public roster,
-        Florida-first.
+        nationwide.
       </p>
       <p className="mb-2 text-xs text-muted">{ACCREDITED_REPRESENTATIVE_DIRECTORY_DISCLAIMER}</p>
       <p className="mb-8 text-xs text-muted">
@@ -43,25 +44,30 @@ export default async function AccreditedRepresentativesPage() {
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {directory.map((rep) => (
-            <Link
-              key={rep.id}
-              href={`/accredited-representatives/${rep.slug}`}
-              className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
-            >
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <p className="font-semibold text-foreground">{rep.representativeName}</p>
-                <p className="text-xs text-muted">{rep.state}</p>
-              </div>
-              <p className="text-sm text-muted">{rep.organizationName}</p>
-              <p className="mt-1 text-xs text-muted">
-                {rep.dhsOnly ? "DHS only" : "Full accreditation"}
-                {rep.accreditationPendingRenewal ? " · renewal pending" : ""}
-              </p>
-            </Link>
-          ))}
-        </div>
+        <StateFilter
+          emptyMessage="No accredited representatives match."
+          items={directory.map((rep) => ({
+            key: rep.id,
+            states: [rep.state],
+            searchText: `${rep.representativeName} ${rep.organizationName} ${rep.cityStateZip ?? ""} ${rep.streetAddress ?? ""}`,
+            node: (
+              <Link
+                href={`/accredited-representatives/${rep.slug}`}
+                className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="font-semibold text-foreground">{rep.representativeName}</p>
+                  <p className="text-xs text-muted">{rep.state}</p>
+                </div>
+                <p className="text-sm text-muted">{rep.organizationName}</p>
+                <p className="mt-1 text-xs text-muted">
+                  {rep.dhsOnly ? "DHS only" : "Full accreditation"}
+                  {rep.accreditationPendingRenewal ? " · renewal pending" : ""}
+                </p>
+              </Link>
+            ),
+          }))}
+        />
       )}
 
       <p className="mt-8 text-sm text-muted">

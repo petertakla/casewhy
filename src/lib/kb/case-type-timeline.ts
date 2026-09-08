@@ -28,6 +28,18 @@
 // I-589 and I-821D remain deliberately deferred to round 23, which requires
 // Peter's personal review before shipping, given their materially higher
 // stakes — see CLOUD_CLAUDE.md round 23.
+//
+// Round 23 — adds I-589 (asylum) and I-821D (DACA), the two highest-stakes
+// case types added so far. Built per Peter's explicit "go all-in, but err
+// on the side of safety" direction (Sep 8) after checking how competitors
+// handle them (Lawfully supports both directly; VisaWatch supports
+// neither). Facts re-verified fresh at build time given how fast both
+// move — see the KB entries in policy-memos.ts for full sourcing and the
+// hard-rule guardrails in explain.ts/chat.ts, which are deliberately
+// stricter here than any other form type: decline and redirect to an
+// attorney on anything close to the line, rather than a careful hedge.
+// This round is not "done" until Peter has personally reviewed the real
+// KB content and guardrail-test transcripts — see CLOUD_CLAUDE.md round 23.
 
 import {
   findProcessingTime,
@@ -45,7 +57,7 @@ export interface CaseTypeOption {
    * the UI. "other" (undefined) renders as a plain trailing option, not
    * inside any group — see TrackCaseButton.tsx.
    */
-  group?: "Citizenship & status" | "Family-based" | "Employment-based" | "Travel & green card";
+  group?: "Citizenship & status" | "Family-based" | "Employment-based" | "Travel & green card" | "Asylum & humanitarian";
 }
 
 const n400Note = FIELD_OFFICE_ONLY_FORMS.find((f) => f.formType === "N-400")!.note;
@@ -128,6 +140,20 @@ export const CASE_TYPES: CaseTypeOption[] = [
       ? `I-90s are currently taking around ${i90.percentile80Months} months for 80% of cases (${i90.office}, as of ${PROCESSING_TIMES_AS_OF}). USCIS recommends filing up to 6 months before your card expires. Your filing receipt notice extends your expired card's validity for employment/I-9 purposes — this doesn't change your actual permanent-resident status, which doesn't change while an I-90 is pending.`
       : "See the Processing Times page for what CaseWhy has on file for I-90.",
     group: "Travel & green card",
+  },
+  {
+    id: "i589",
+    label: "Asylum (I-589)",
+    timelineBlurb:
+      "No fixed national timeline figure sourced yet for I-589 — see the Processing Times page for what CaseWhy has on file. Must generally file within one year of arrival, with real exceptions for changed or extraordinary circumstances — never something to assess without an attorney. Affirmative asylum (filed with USCIS) and defensive asylum (raised in immigration court, under EOIR, not USCIS) are different processes — if you're not sure which applies to you, ask an attorney rather than assume. As of September 2026, the wait for an initial work permit (EAD) is roughly 150 days after filing (approximate, not exact) — a DHS rule proposed in February 2026 would extend this to 365 days, but it remains proposed, not finalized, as of this writing.",
+    group: "Asylum & humanitarian",
+  },
+  {
+    id: "i821d",
+    label: "DACA (I-821D)",
+    timelineBlurb:
+      "As of this writing, USCIS is processing DACA renewals only — it is not accepting or processing new initial applications, so a first-time DACA case genuinely isn't possible right now. DACA's legal status is still being litigated: a federal appeals court found its work-authorization component may be unlawful, and the case has been sent back to a district court for a decision that, as of this writing, hasn't been issued — the outcome and timing are genuinely unresolved, not something CaseWhy can predict.",
+    group: "Asylum & humanitarian",
   },
   {
     id: "other",

@@ -47,6 +47,31 @@ Full background/reasoning for all of the above lives in `partner-marketing-domai
 
 See `round29-followup-seed-and-messaging-gaps.md` for the full consolidated task — work from that rather than piecing together the items above.
 
+**Status correction, Sep 8 (cloud session), later still — the above is all resolved, checked directly against rounds 32/33 rather than assumed.** All three gaps in the follow-up doc are done: round 32 (Claude Code) seeded 98 real DOJ records into `/accredited-representatives` (renamed from `/representatives`) and added the "free, always" copy; round 33 (Claude Code) fixed both nav placements (after "CaseWhy Plus" in the signed-in nav; added to the signed-out landing-page header too). No further action needed on this thread — leaving the sections above unedited per this file's own "don't rewrite past sections" convention, this note is the correction.
+
+## Round 34, Sep 8 (cloud session) — legal aid / nonprofit orgs, next entity type, authorized
+
+Peter's decision, Sep 8: greenlit legal aid/nonprofit immigration organizations (entity type 3 of the six-entity plan) as the next round, explicitly "built+seeded the same way as round 29" — meaning built+seeded correctly the *first* time, learning from round 29's original gap (fixed later, in round 32, but shouldn't have needed a second pass). DSOs, community orgs, and employers (types 4-6) remain unauthorized.
+
+Full task doc: `round34-legal-aid-orgs-build-and-seed-task.md` (new file, this repo, mirrored from the Ideas project) — relayed in full here too, since this file is the durable source of truth:
+
+> Same entity-type template as attorneys/accredited-representatives: `legal_aid_directory` + `legal_aid_applications` tables, `/legal-aid` public page (with the same "informational listing" disclaimer and "free to use, always" statement already required elsewhere), `/legal-aid/join` self-enroll page ("free to join" statement), individual `/legal-aid/<slug-or-id>` permalinks for every entry, admin notification on submission. Wire the `/get-help` hub's legal-aid card to link here instead of "Coming soon."
+>
+> **Seed it in the same round, not a follow-up:** source is the recognized-organizations side of the same DOJ EOIR roster round 29/32 already used (`https://www.justice.gov/eoir/page/file/942301/download`) — pull the *organization* rows this time, not the individual-representative rows. Parse with real code (`pdfplumber`/`pypdf` or equivalent, matching round 32's actual approach — see `scripts/seed-accredited-representatives.ts` and its data file for the pattern to follow), Florida-first, skip anything reading as lapsed, cite source + pull date on the page. This explicitly reuses round 32's already-working parse/seed pipeline rather than re-deriving one from scratch.
+
+## Not part of round 34
+
+DSOs, community orgs, employers — no workable baseline data source identified yet for any of them, still unauthorized.
+
+## Round 35, Sep 8 (cloud session) — real bug found live + a scope expansion, both from Peter directly
+
+Two items, independent of round 34, found by Peter testing the live app himself:
+
+1. **Bug: signed-out visitors see the full app nav, not the minimal "Get Help | Sign in" round 33 was supposed to ship.** This directly contradicts round 33's own done-note, which flagged its verification as a logic-read only (no browser tool available that session) and asked for a real click-through to confirm — this is that confirmation, and it found a real problem. Needs investigation into `AuthHeader.tsx`'s `onAppPage` branching, not a re-guess.
+2. **Scope expansion: accredited representatives should cover all 50 states + DC, not just Florida**, with a state-selector dropdown on `/accredited-representatives` (default: all states, no forced Florida-first filter). Re-run round 32's existing DOJ-parse pipeline (`scripts/seed-accredited-representatives.ts`) without the Florida-only filter, same parsing discipline as before (real code, not a summarized fetch), plus a `state` column and permalink-collision check now that the same org-name pattern could repeat across states.
+
+Full task doc: `round35-nav-bug-and-nationwide-reps-task.md` (new file, this repo, mirrored from the Ideas project) — see that file for the complete spec on both items.
+
 ## What this is
 
 CaseWhy is an AI-explained USCIS case-status tracking web app. Existing trackers (Lawfully, US Case Tracker, VisaWatch) poll USCIS and show status. CaseWhy's differentiator: turn a status change or policy shift into a plain-language explanation and a concrete next action, instead of just a timestamp. **Updated Sep 5, 2026 (later that day):** the free/paid split described here is under active revision — see the new section below, "Scope expansion from Peter, Sep 5." The "ask a question" AI chat is no longer v2 — it's initial-rollout scope now, alongside a knowledge base, processing-time data, and visa bulletin tracking. Secondary revenue: attorney-referral warm handoff (still stretch).
@@ -1103,6 +1128,23 @@ While round 32 was being pushed, the cloud session wrote a new task doc directly
 
 ---
 
+## Round 35 Part 1, Sep 8 — signed-out nav bug, DONE (Claude Code); Part 2 (nationwide reps) and Round 34 (legal aid orgs) not started
+
+Peter's live-testing found round 33's nav fix didn't actually work: a signed-out visitor on `/plus` saw the **full** signed-in nav (Dashboard, Ask a question, Processing times, Visa bulletin, News, Settings), not just "Get Help | Sign in" — reproduced and screenshotted before touching any code, confirming the report exactly as filed.
+
+**Root cause: `onAppPage` was computed from the URL path, not session state.** Several pages that appear in `NAV_LINKS` — `/plus`, `/news`, `/processing-times`, `/visa-bulletin` — are public pages a signed-out visitor can land on directly (confirmed by reading `plus/page.tsx`: it calls `auth.getSession()` but renders a signed-out variant rather than redirecting). Landing on any of those set `onAppPage = true`, which put a signed-out visitor into the "show the full nav" branch regardless of whether they were authenticated. Round 33's fix only addressed the one path (`/`) where `onAppPage` happened to already be `false` — it never touched the actual bug, which is that nav visibility was keyed off the wrong signal.
+
+**Fix:** replaced `onAppPage` with `isSignedIn = !isPending && !!session?.user`. The full `NAV_LINKS` bar now renders only when actually signed in, on any page; the signed-out branch always shows "Get Help | Sign in," unconditionally (no more `!onAppPage` gate needed, since the full nav can no longer co-render with it). `tsc`/lint clean, production build succeeds.
+
+**Verified with a real browser this time** (Claude in Chrome was connected this session, unlike rounds 32/33) — not just a logic read:
+1. Reproduced the bug live pre-fix: screenshotted `app.casewhy.com/plus` signed out, confirmed the full nav bar rendering above "Sign in."
+2. Deployed the fix, then re-checked the same page signed out: header now shows only "Get Help | Sign in."
+3. Also checked `/` and `/news` signed out — same minimal header both places.
+
+**Round 35 Part 2 (nationwide accredited-representatives expansion + state dropdown) and Round 34 (legal aid orgs, build + seed in one pass) are both authorized but not started this session** — Part 1 was the live-bug fix and took priority per the task doc's own sequencing instruction ("fix Part 1 first, it's a real bug on live traffic").
+
+---
+
 ## Architecture (per the MVP scope doc)
 
 - Frontend: Next.js, mobile-responsive, ~~installable as a PWA~~ (not a native app for v1) — **done Sep 5 ~6:50am ET**, see "Next tasks for Claude Code" item 2 above
@@ -1220,3 +1262,7 @@ While round 32 was being pushed, the cloud session wrote a new task doc directly
 49. **Round 29 — DONE Sep 8:** BIA-accredited representatives, first of the in-app "Get Help" expansion. New `src/lib/representatives/directory.ts` (ships empty, mirrors round 27's attorney directory), a new `/representatives` page falling back to DOJ EOIR's real recognition-and-accreditation roster (URL verified live before shipping), a new `/representatives/join` self-enroll form + `representative_applications` table (separate from attorneys, own email notification to Peter), and a new `/get-help` hub linking Attorneys + Accredited representatives — the 3 existing "talk to an attorney" moments now point here instead of straight to `/attorneys`. `tsc`/lint clean, build succeeds, verified live twice (dev + production) with a real submission landing in the DB and a real Postmark send confirmed `Sent` in its own log both times. Rest of the six-entity backlog (legal aid orgs next, then DSOs/community orgs, employers last) stays unauthorized pending its own go-ahead. See round 29 above for full detail.
 50. **Round 30 — DONE Sep 8:** `casewhyhub.com` DNS setup, from a task doc relayed via chat rather than written to this file directly. Confirmed the Cloudflare zone is active (auto-created by the registration) with zero records; added a proxied placeholder A + CNAME and a Redirect Rule sending both `casewhyhub.com` and `www.casewhyhub.com` to `https://www.casewhy.com` via a 302 (not 301, since this is an explicit placeholder, not the real destination). SPF/DKIM/DMARC deliberately untouched, confirmed via `dig`. See round 30 above for full detail.
 51. **Round 31 — DONE Sep 8:** "Get Help" hub built out (4 new "Coming soon" placeholder cards alongside the 2 already-live ones — **the task doc's assumption that round 29 hadn't started was stale**, flagged rather than silently followed) and surfaced everywhere: `casewhy.com` nav + footer, `app.casewhy.com` landing footer, signed-in app nav, free-tier stalled-case card. Also fixed a real gap live-testing turned up: AI-generated "next steps" bullets and chat replies weren't going through the term-linking pipeline at all, so the new `attorney` → `/get-help` term link never actually rendered there until wired in. `tsc`/lint clean, both Vercel projects deployed and verified live. See round 31 above for full detail.
+52. **Round 32 — DONE Sep 8:** finished a prior session's uncommitted "round 29 rework" — renamed `/representatives` → `/accredited-representatives`, added individual permalinks for both live entity types, converted the directory to a real DB table, applied the migration to production, and seeded 98 real DOJ-sourced records (`pdfplumber`-parsed, Florida-first, cross-checked). Added the "free, always" copy to `/attorneys`, `/accredited-representatives`, both `/join` pages, and `/plus`. See round 32 above for full detail.
+53. **Round 33 — DONE Sep 8:** the two nav-placement gaps from round 29's follow-up — "Get Help" moved to immediately after "CaseWhy Plus" in the signed-in nav (was 6th, now 4th), and added to the signed-out landing page's header (previously showed only "Sign in," no nav at all). See round 33 above for full detail.
+54. **Round 34 — authorized Sep 8, not started.** Legal aid/nonprofit immigration organizations (entity type 3), built + seeded the same round using round 32's already-working DOJ-parse pipeline as the template. See "Round 34" above and `round34-legal-aid-orgs-build-and-seed-task.md` for the full spec. DSOs, community orgs, employers (types 4-6) remain unauthorized.
+55. **Round 35 Part 1 — DONE Sep 8 (Claude Code).** Signed-out visitors saw the full app nav on public pages that overlap `NAV_LINKS` (`/plus`, `/news`, `/processing-times`, `/visa-bulletin`) — round 33's fix never actually addressed this since it gated nav visibility on path, not session. Fixed by keying nav visibility off real session state (`isSignedIn`) instead; verified live with a real browser (reproduced pre-fix, confirmed fixed post-deploy). **Round 35 Part 2 (nationwide accredited-representatives + state dropdown) and Round 34 (legal aid orgs, build+seed) both authorized, not started.** See "Round 35 Part 1" above for full detail, and `round35-nav-bug-and-nationwide-reps-task.md` / `round34-legal-aid-orgs-build-and-seed-task.md` for the remaining specs.

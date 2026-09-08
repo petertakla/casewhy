@@ -20,7 +20,11 @@ export function AuthHeader() {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
   const pathname = usePathname();
-  const onAppPage = NAV_LINKS.some((link) => pathname.startsWith(link.href));
+  // Gated on session, not path — several public marketing pages (e.g. /plus,
+  // /news) are also NAV_LINKS entries, and a signed-out visitor landing on
+  // one of those must never see the signed-in-only links (Dashboard,
+  // Settings, etc.), regardless of which page they're on.
+  const isSignedIn = !isPending && !!session?.user;
 
   return (
     <header className="sticky top-0 z-10 border-b border-border bg-surface/80 backdrop-blur-md">
@@ -29,7 +33,7 @@ export function AuthHeader() {
           <Logo />
         </Link>
 
-        {onAppPage && (
+        {isSignedIn && (
           <nav className="order-3 flex w-full gap-x-5 gap-y-1 overflow-x-auto text-sm sm:order-none sm:w-auto">
             {NAV_LINKS.map((link) => {
               const active = pathname.startsWith(link.href);
@@ -76,11 +80,9 @@ export function AuthHeader() {
           </div>
         ) : (
           <div className="flex items-center gap-4">
-            {!onAppPage && (
-              <Link href="/get-help" className="text-muted hover:text-foreground">
-                Get Help
-              </Link>
-            )}
+            <Link href="/get-help" className="text-muted hover:text-foreground">
+              Get Help
+            </Link>
             <Link
               href="/auth/sign-in"
               className="font-semibold text-brand-600 dark:text-brand-400 hover:underline"

@@ -1,14 +1,23 @@
 import Link from "next/link";
-import { ATTORNEY_DIRECTORY, ATTORNEY_DIRECTORY_DISCLAIMER } from "@/lib/attorneys/directory";
+import { getAttorneyDirectory, ATTORNEY_DIRECTORY_DISCLAIMER } from "@/lib/attorneys/directory";
 import { StateFilter } from "@/components/StateFilter";
 
-export default function AttorneysPage() {
+// Round 40 — now reads a real DB table (machine-seeded from state-bar
+// board-certification records) rather than the static array round 27
+// shipped. Same reasoning as /accredited-representatives and /legal-aid:
+// force dynamic rendering so a re-seed shows up without a redeploy.
+export const dynamic = "force-dynamic";
+
+export default async function AttorneysPage() {
+  const directory = await getAttorneyDirectory();
+
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
       <h1 className="text-2xl font-bold tracking-tight">Find an attorney</h1>
       <p className="mb-2 mt-2 text-muted">
-        A hand-curated list of immigration attorneys, for anything CaseWhy tells you needs a
-        licensed professional&apos;s judgment rather than general information.
+        Immigration attorneys — board-certified specialists sourced from official state bar
+        records, plus self-enrolled listings — for anything CaseWhy tells you needs a licensed
+        professional&apos;s judgment rather than general information.
       </p>
       <p className="mb-2 rounded-lg border border-border-strong bg-surface-2 p-3 text-sm text-foreground/90">
         {ATTORNEY_DIRECTORY_DISCLAIMER}
@@ -17,7 +26,7 @@ export default function AttorneysPage() {
         Free to browse, always — no fees, no ads, no sign-in required.
       </p>
 
-      {ATTORNEY_DIRECTORY.length === 0 ? (
+      {directory.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border-strong p-8 text-center">
           <p className="text-sm text-muted">
             We&apos;re still building this list out — check back soon. In the meantime, the American
@@ -36,20 +45,20 @@ export default function AttorneysPage() {
       ) : (
         <StateFilter
           emptyMessage="No attorneys match."
-          items={ATTORNEY_DIRECTORY.map((attorney) => ({
+          items={directory.map((attorney) => ({
             key: attorney.id,
             states: attorney.statesLicensed,
-            searchText: `${attorney.name} ${attorney.firm} ${attorney.practiceFocus.join(" ")}`,
+            searchText: `${attorney.name} ${attorney.firm ?? ""} ${attorney.practiceFocus.join(" ")} ${attorney.cityStateZip ?? ""}`,
             node: (
               <Link
-                href={`/attorneys/${attorney.id}`}
+                href={`/attorneys/${attorney.slug}`}
                 className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <p className="font-semibold text-foreground">{attorney.name}</p>
                   <p className="text-xs text-muted">{attorney.statesLicensed.join(", ")}</p>
                 </div>
-                <p className="text-sm text-muted">{attorney.firm}</p>
+                {attorney.firm && <p className="text-sm text-muted">{attorney.firm}</p>}
                 <p className="mt-2 text-xs text-muted">{attorney.practiceFocus.join(" · ")}</p>
               </Link>
             ),

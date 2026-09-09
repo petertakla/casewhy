@@ -19,6 +19,8 @@ const ApplicationInput = z.object({
   practiceAreas: z.string().trim().min(1, "Enter your practice areas.").max(300),
   contactEmail: z.string().trim().toLowerCase().email("Enter a valid email address."),
   contactPhone: z.string().trim().max(30).optional().or(z.literal("")),
+  // Round 40 — optional; the applicant obviously knows their own site.
+  websiteUrl: z.string().trim().max(300).optional().or(z.literal("")),
   // Honeypot — see src/lib/marketing/subscribe.ts for the same pattern.
   website: z.string().max(0).optional().or(z.literal("")),
 });
@@ -36,6 +38,7 @@ export async function submitAttorneyApplication(input: {
   practiceAreas: string;
   contactEmail: string;
   contactPhone?: string;
+  websiteUrl?: string;
   website?: string;
 }): Promise<ApplyResult> {
   const parsed = ApplicationInput.safeParse(input);
@@ -56,6 +59,7 @@ export async function submitAttorneyApplication(input: {
     practiceAreas: parsed.data.practiceAreas,
     contactEmail: parsed.data.contactEmail,
     contactPhone: parsed.data.contactPhone || null,
+    websiteUrl: parsed.data.websiteUrl || null,
   });
 
   // Best-effort — see src/lib/accredited-representatives/apply.ts for the same
@@ -70,6 +74,7 @@ export async function submitAttorneyApplication(input: {
       practiceAreas: parsed.data.practiceAreas,
       contactEmail: parsed.data.contactEmail,
       contactPhone: parsed.data.contactPhone,
+      websiteUrl: parsed.data.websiteUrl,
     });
   } catch (err) {
     console.error("Failed to send attorney-application notification email", err);

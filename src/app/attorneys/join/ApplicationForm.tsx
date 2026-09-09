@@ -29,6 +29,7 @@ export function ApplicationForm() {
   const [practiceAreas, setPracticeAreas] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
   const [website, setWebsite] = useState(""); // honeypot
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
@@ -46,6 +47,7 @@ export function ApplicationForm() {
         practiceAreas,
         contactEmail,
         contactPhone,
+        websiteUrl,
         website,
       });
       if (result.ok) {
@@ -132,6 +134,15 @@ export function ApplicationForm() {
           value={contactPhone}
           onChange={(e) => setContactPhone(e.target.value)}
           className={inputClass}
+        />
+      </Field>
+      <Field label="Website (optional)">
+        <input
+          type="url"
+          value={websiteUrl}
+          onChange={(e) => setWebsiteUrl(e.target.value)}
+          className={inputClass}
+          placeholder="https://"
         />
       </Field>
       {/* Honeypot — hidden from real visitors via CSS, not a type="hidden"

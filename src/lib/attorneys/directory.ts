@@ -1,43 +1,69 @@
-// Round 27, Phase 1 — a hand-curated, unpaid, editorial directory of
-// immigration attorneys. Same "small, easy to edit" pattern as
-// src/lib/news/sources.ts and src/lib/congress/representatives.ts.
+// Round 27, Phase 1 — began as a hand-curated, unpaid, editorial directory
+// (a static, deliberately-empty array). Round 40 converts this to a real DB
+// table, machine-seeded from official state-bar board-certification records
+// (Florida, Texas, North Carolina — see scripts/seed-attorneys.ts) — the
+// same reasoning that already let accredited representatives and legal aid
+// orgs be machine-seeded rather than hand-curated: board certification by a
+// state-created regulatory body is the vetting mechanism, not something
+// Claude Code has to independently confirm. Self-enrollment
+// (/attorneys/join, attorneyApplications) remains the path for every
+// attorney outside these three states' certified lists, and for any
+// board-certified attorney who'd rather list a different contact method
+// than what the state bar publishes.
 //
-// Deliberately Phase 1 only: nobody pays to be listed, no per-referral fee,
-// no application/admin-approval flow. This is what keeps it outside the
-// fee-splitting rules (ABA Model Rule 5.4(a)/7.2(b)) and — pending a real
-// confirmation, not an assumption — likely outside Florida Bar Rule 4-7.22's
-// "qualifying provider" regulation too, which targets for-profit referral
-// arrangements. Phase 2 (flat-fee paid listings) is NOT authorized and
-// stays gated on the attorney review already deferred from round 13 — see
-// attorney-referral-directory-concept.md and CLOUD_CLAUDE.md round 27.
-//
-// Ships empty on purpose. Real attorneys are Peter's own business-
-// development track (warm intro from his own N-400 attorney, AILA's
-// Florida chapter, direct solo/small-firm outreach) — not something
-// Claude Code sources. Adding a real entry is a one-line edit to the array
-// below, no code change needed elsewhere.
-//
-// VETTING REQUIREMENT — non-negotiable, before adding any real entry:
-// confirm active bar admission and good standing via that state's public
-// attorney-lookup tool (e.g. The Florida Bar's own "Find a Lawyer" search
-// for a Florida-licensed attorney). Listing a lapsed or sanctioned attorney
-// would be a real trust problem, not just a data error.
+// Still Phase 1 only in the ways that matter for round 27's original legal
+// reasoning: nobody pays to be listed, no per-referral fee, no endorsement
+// implied — round 39's disclaimer wording says so explicitly on the page.
+
+import { getDb } from "@/lib/db/client";
+import { attorneyDirectory } from "@/lib/db/schema";
+import { eq, asc } from "drizzle-orm";
 
 export interface AttorneyEntry {
   id: string;
+  slug: string;
   name: string;
-  firm: string;
-  /** State postal codes, e.g. ["FL"]. An attorney can be licensed in more than one state. */
+  firm: string | null;
+  /** State postal codes, e.g. ["FL"]. Parsed from the comma-joined DB column. */
   statesLicensed: string[];
-  /** e.g. "Asylum", "Family-based", "Employment-based", "Naturalization" — free text, not an enum, since coverage will grow with CaseWhy's own case-type list. */
+  /** Free text, comma-joined in the DB — e.g. "Board Certified - Immigration and Nationality Law". */
   practiceFocus: string[];
-  contactMethod: {
-    label: string;
-    url: string;
+  websiteUrl: string | null;
+  phone: string | null;
+  email: string | null;
+  streetAddress: string | null;
+  cityStateZip: string | null;
+  sourceCitation: string | null;
+}
+
+function toEntry(row: typeof attorneyDirectory.$inferSelect): AttorneyEntry {
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    firm: row.firm,
+    statesLicensed: row.statesLicensed.split(",").map((s) => s.trim()).filter(Boolean),
+    practiceFocus: row.practiceFocus.split(",").map((s) => s.trim()).filter(Boolean),
+    websiteUrl: row.websiteUrl,
+    phone: row.phone,
+    email: row.email,
+    streetAddress: row.streetAddress,
+    cityStateZip: row.cityStateZip,
+    sourceCitation: row.sourceCitation,
   };
 }
 
-export const ATTORNEY_DIRECTORY: AttorneyEntry[] = [];
+export async function getAttorneyDirectory(): Promise<AttorneyEntry[]> {
+  const db = getDb();
+  const rows = await db.select().from(attorneyDirectory).orderBy(asc(attorneyDirectory.name));
+  return rows.map(toEntry);
+}
+
+export async function getAttorneyBySlug(slug: string): Promise<AttorneyEntry | null> {
+  const db = getDb();
+  const rows = await db.select().from(attorneyDirectory).where(eq(attorneyDirectory.slug, slug)).limit(1);
+  return rows[0] ? toEntry(rows[0]) : null;
+}
 
 // Round 39 — exact wording, per Peter's direct instruction: a real
 // mitigation against the open Florida Bar Rule 4-7.22 "qualifying provider"

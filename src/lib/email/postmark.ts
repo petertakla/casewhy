@@ -68,6 +68,7 @@ export async function sendAttorneyApplicationNotification({
   practiceAreas,
   contactEmail,
   contactPhone,
+  websiteUrl,
 }: {
   name: string;
   firm: string;
@@ -76,6 +77,7 @@ export async function sendAttorneyApplicationNotification({
   practiceAreas: string;
   contactEmail: string;
   contactPhone?: string;
+  websiteUrl?: string;
 }): Promise<void> {
   const token = process.env.POSTMARK_API_TOKEN;
   if (!token) {
@@ -104,6 +106,7 @@ export async function sendAttorneyApplicationNotification({
         `Practice areas: ${practiceAreas}`,
         `Contact email: ${contactEmail}`,
         `Contact phone: ${contactPhone || "(not provided)"}`,
+        `Website: ${websiteUrl || "(not provided)"}`,
       ].join("\n"),
       MessageStream: "outbound",
     }),

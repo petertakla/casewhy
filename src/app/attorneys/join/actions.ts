@@ -15,6 +15,7 @@ export async function submitAttorneyApplication(input: {
   practiceAreas: string;
   contactEmail: string;
   contactPhone?: string;
+  websiteUrl?: string;
   website?: string;
 }): Promise<ApplyResult> {
   return submitImpl(input);

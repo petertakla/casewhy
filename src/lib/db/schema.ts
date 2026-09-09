@@ -322,6 +322,10 @@ export const attorneyApplications = pgTable("attorney_applications", {
   practiceAreas: text("practice_areas").notNull(),
   contactEmail: text("contact_email").notNull(),
   contactPhone: text("contact_phone"),
+  // Round 40 — an attorney submitting their own listing obviously knows
+  // their own site; added so self-enroll approvals can carry a website the
+  // same way machine-seeded (board-certified) entries do.
+  websiteUrl: text("website_url"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -390,4 +394,48 @@ export const legalAidDirectory = pgTable(
     unique("legal_aid_directory_slug_unique").on(table.slug),
     index("legal_aid_directory_state_idx").on(table.state),
   ]
+);
+
+// Round 40 — attorney directory converted from a static, hand-edited,
+// deliberately-empty array (round 27) to a real DB table, machine-seeded
+// from official state-bar board-certification records (Florida, Texas,
+// North Carolina — the only three states with a formal immigration-law
+// specialty certification found in research; see
+// attorney-directory-self-sourcing-research-sep9.md). Board certification
+// by a state-created regulatory body is the vetting mechanism here, the
+// same reasoning that already let accredited representatives and legal aid
+// orgs be machine-seeded rather than hand-curated. Self-enrollment
+// (attorney_applications, unchanged) remains the path for every attorney
+// outside these three states' certified lists.
+//
+// statesLicensed/practiceFocus are comma-joined text, not a Postgres array
+// column (this schema hasn't used array columns before; kept consistent
+// with the free-text convention already used in attorneyApplications
+// rather than introducing a new column type for one table). Parsed back
+// into an array in src/lib/attorneys/directory.ts for <StateFilter>.
+// websiteUrl is nullable — round 40's own research found none of the three
+// source directories reliably publish one; populated where the source
+// actually provided it (confirmed present for Texas, absent for Florida/NC),
+// never guessed or backfilled from a second source.
+export const attorneyDirectory = pgTable(
+  "attorney_directory",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    firm: text("firm"),
+    statesLicensed: text("states_licensed").notNull(),
+    barNumber: text("bar_number"),
+    practiceFocus: text("practice_focus").notNull(),
+    websiteUrl: text("website_url"),
+    phone: text("phone"),
+    email: text("email"),
+    streetAddress: text("street_address"),
+    cityStateZip: text("city_state_zip"),
+    sourceCitation: text("source_citation"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [unique("attorney_directory_slug_unique").on(table.slug)]
 );

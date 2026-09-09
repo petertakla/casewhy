@@ -1,19 +1,18 @@
 import { notFound } from "next/navigation";
-import { ATTORNEY_DIRECTORY } from "@/lib/attorneys/directory";
+import { getAttorneyBySlug } from "@/lib/attorneys/directory";
 import { BackLink } from "@/components/BackLink";
 
-// New task, same day as round 29/30/31 — every directory entry across all
-// entity types gets its own permalink (decided Sep 8, applies uniformly).
-// The attorney directory is still empty pending real self-enrolled
-// attorneys (round 27), so this route currently only 404s, but it's built
-// now rather than left as a follow-up once real entries land.
+// Round 40 — now reads a real DB table by slug rather than the static
+// array's id field. Directory param name kept as [id] (unchanged route)
+// even though the lookup is by slug now, to avoid touching every existing
+// link into this route for a rename that carries no user-facing benefit.
 export default async function AttorneyDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const attorney = ATTORNEY_DIRECTORY.find((a) => a.id === id);
+  const attorney = await getAttorneyBySlug(id);
   if (!attorney) notFound();
 
   return (
@@ -21,7 +20,7 @@ export default async function AttorneyDetailPage({
       <BackLink href="/attorneys" label="All attorneys" />
 
       <h1 className="mt-4 text-2xl font-bold tracking-tight">{attorney.name}</h1>
-      <p className="mt-1 text-muted">{attorney.firm}</p>
+      {attorney.firm && <p className="mt-1 text-muted">{attorney.firm}</p>}
 
       <div className="mt-6 space-y-4 rounded-xl border border-border bg-surface p-5 text-sm">
         <div>
@@ -32,18 +31,36 @@ export default async function AttorneyDetailPage({
           <p className="text-xs font-semibold uppercase tracking-widest text-muted">Practice focus</p>
           <p className="mt-1">{attorney.practiceFocus.join(", ")}</p>
         </div>
+        {(attorney.streetAddress || attorney.cityStateZip) && (
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">Office</p>
+            <p className="mt-1">
+              {attorney.streetAddress && <>{attorney.streetAddress}<br /></>}
+              {attorney.cityStateZip}
+            </p>
+          </div>
+        )}
+        {attorney.phone && (
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">Phone</p>
+            <p className="mt-1">{attorney.phone}</p>
+          </div>
+        )}
       </div>
 
-      <a
-        href={attorney.contactMethod.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-6 inline-block text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
-      >
-        {attorney.contactMethod.label}
-      </a>
+      {attorney.websiteUrl && (
+        <a
+          href={attorney.websiteUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 inline-block text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
+        >
+          Visit website
+        </a>
+      )}
 
-      <p className="mt-6 text-xs text-muted">
+      {attorney.sourceCitation && <p className="mt-6 text-xs text-muted">{attorney.sourceCitation}</p>}
+      <p className="mt-2 text-xs text-muted">
         This is an informational listing, not an endorsement or a referral service. Always confirm
         current bar standing yourself before hiring anyone.
       </p>

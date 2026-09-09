@@ -9,6 +9,7 @@ import {
   type BulletinRow,
   type BulletinMovement,
 } from "@/lib/kb/visa-bulletin";
+import { ShareButton } from "@/components/ShareButton";
 
 function MovementBadge({ movement }: { movement: BulletinMovement | null }) {
   if (!movement) return null;
@@ -95,6 +96,14 @@ export default function VisaBulletinPage() {
           view the official Department of State bulletin
         </a>
       </p>
+
+      <div className="mb-8">
+        <ShareButton
+          url="https://app.casewhy.com/visa-bulletin"
+          title="CaseWhy — Visa bulletin"
+          text="Track visa bulletin movement for free with CaseWhy."
+        />
+      </div>
 
       <h2 className="mb-3 text-sm font-semibold uppercase tracking-widest text-muted">
         Family-sponsored preferences

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth/server";
 import { getSubscriptionDetails } from "@/lib/billing/tier";
 import { startCheckout, openBillingPortal } from "./actions";
+import { ShareButton } from "@/components/ShareButton";
 
 // Round 14 — each feature is now a hyperlink to its own fuller explanation
 // (below, under "Plus, in depth") instead of a flat bullet, per the
@@ -134,6 +135,14 @@ export default async function PlusPage({
         <span className="font-mono text-xl font-bold text-foreground">$9.99</span> / month, billed
         monthly, cancel anytime.
       </p>
+
+      <div className="mt-4">
+        <ShareButton
+          url="https://app.casewhy.com/plus"
+          title="CaseWhy Plus"
+          text="Track your whole family's USCIS cases with unlimited AI chat about what's happening — CaseWhy Plus."
+        />
+      </div>
 
       {isPlus && details?.cancelAtPeriodEnd && details.currentPeriodEnd && (
         <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm text-amber-700 dark:text-amber-400">

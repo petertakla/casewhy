@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getDsoBySlug } from "@/lib/dso/directory";
 import { BackLink } from "@/components/BackLink";
 import { ReportListingLink } from "@/components/ReportListingLink";
+import { ShareButton } from "@/components/ShareButton";
 
 export default async function DsoDetailPage({
   params,
@@ -78,7 +79,12 @@ export default async function DsoDetailPage({
         current details directly with the school before relying on anyone.
       </p>
 
-      <div className="mt-6">
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <ShareButton
+          url={`https://app.casewhy.com/dso/${school.slug}`}
+          title={school.schoolName}
+          text={`Found this on CaseWhy — ${school.schoolName}'s international student office listing — thought you should see it.`}
+        />
         <ReportListingLink entityType="dso" entityId={school.id} entityName={school.schoolName} />
       </div>
     </main>

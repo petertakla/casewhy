@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getAttorneyBySlug } from "@/lib/attorneys/directory";
 import { BackLink } from "@/components/BackLink";
 import { ReportListingLink } from "@/components/ReportListingLink";
+import { ShareButton } from "@/components/ShareButton";
 
 // Round 40 — now reads a real DB table by slug rather than the static
 // array's id field. Directory param name kept as [id] (unchanged route)
@@ -66,7 +67,12 @@ export default async function AttorneyDetailPage({
         current bar standing yourself before hiring anyone.
       </p>
 
-      <div className="mt-6">
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <ShareButton
+          url={`https://app.casewhy.com/attorneys/${attorney.slug}`}
+          title={attorney.name}
+          text={`Found this on CaseWhy — ${attorney.name}, a free immigration attorney directory listing — thought you should see it.`}
+        />
         <ReportListingLink entityType="attorney" entityId={attorney.id} entityName={attorney.name} />
       </div>
     </main>

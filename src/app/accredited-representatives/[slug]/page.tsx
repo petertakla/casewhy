@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getAccreditedRepresentativeBySlug } from "@/lib/accredited-representatives/directory";
 import { BackLink } from "@/components/BackLink";
 import { ReportListingLink } from "@/components/ReportListingLink";
+import { ShareButton } from "@/components/ShareButton";
 
 export default async function AccreditedRepresentativeDetailPage({
   params,
@@ -79,7 +80,12 @@ export default async function AccreditedRepresentativeDetailPage({
         .
       </p>
 
-      <div className="mt-6">
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <ShareButton
+          url={`https://app.casewhy.com/accredited-representatives/${rep.slug}`}
+          title={rep.representativeName}
+          text={`Found this on CaseWhy — ${rep.representativeName} at ${rep.organizationName}, a free DOJ-accredited representative directory listing — thought you should see it.`}
+        />
         <ReportListingLink
           entityType="accredited_representative"
           entityId={rep.id}

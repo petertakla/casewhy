@@ -1,4 +1,5 @@
 import { EmailCaptureForm } from "./EmailCaptureForm";
+import { ShareButton } from "@/components/ShareButton";
 
 function StatCard({ num, label }: { num: string; label: string }) {
   return (
@@ -180,6 +181,12 @@ export default function LandingPage() {
               Get Help
             </a>
           </div>
+          <ShareButton
+            url="https://casewhy.com"
+            title="CaseWhy"
+            text="Track your USCIS case, understand what's actually happening, and find real help — free, no ads, ever."
+            label="Share CaseWhy"
+          />
         </div>
       </footer>
     </main>

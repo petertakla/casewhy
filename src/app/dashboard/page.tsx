@@ -13,6 +13,7 @@ import { detectStalledCase } from "@/lib/escalation/stall-detector";
 import { EscalationToolkit } from "./EscalationToolkit";
 import { ReceiptNumberInput } from "./ReceiptNumberInput";
 import { linkifyExplanation } from "@/lib/kb/linkify";
+import { PositiveShareNudge } from "./PositiveShareNudge";
 
 export const dynamic = "force-dynamic";
 
@@ -33,10 +34,18 @@ function friendlyErrorMessage(err: UscisApiError): string {
   return "USCIS's case status service is temporarily unavailable. Please try again shortly.";
 }
 
+/** True for the same "good news" statuses statusTone() colors emerald —
+ * shared so the round-44 share nudge fires on exactly the same signal as
+ * the status pill, not a second, possibly-drifting definition of "positive". */
+function isPositiveStatus(statusText: string): boolean {
+  const s = statusText.toLowerCase();
+  return s.includes("approved") || s.includes("card was delivered") || s.includes("naturalization oath");
+}
+
 /** Semantic color for a status pill, matched loosely against USCIS's own wording. */
 function statusTone(statusText: string): { dot: string; text: string; bg: string } {
   const s = statusText.toLowerCase();
-  if (s.includes("approved") || s.includes("card was delivered") || s.includes("naturalization oath")) {
+  if (isPositiveStatus(statusText)) {
     return { dot: "bg-emerald-500", text: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10" };
   }
   if (s.includes("denied") || s.includes("rejected") || s.includes("terminated")) {
@@ -227,6 +236,8 @@ function StatusCard({
       {stall.isStalled && stall.milestoneText && (
         <StalledCaseCard daysSinceLastUpdate={stall.daysSinceLastUpdate} milestoneText={stall.milestoneText} />
       )}
+
+      {!stall.isStalled && isPositiveStatus(status.statusText) && <PositiveShareNudge />}
 
       {tracking && (
         <div className="mt-3">

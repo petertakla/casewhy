@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getLegalAidBySlug } from "@/lib/legal-aid/directory";
 import { BackLink } from "@/components/BackLink";
 import { ReportListingLink } from "@/components/ReportListingLink";
+import { ShareButton } from "@/components/ShareButton";
 
 export default async function LegalAidDetailPage({
   params,
@@ -77,7 +78,12 @@ export default async function LegalAidDetailPage({
         .
       </p>
 
-      <div className="mt-6">
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <ShareButton
+          url={`https://app.casewhy.com/legal-aid/${org.slug}`}
+          title={org.organizationName}
+          text={`Found this on CaseWhy — ${org.organizationName}, a free/low-cost legal aid resource — thought you should see it.`}
+        />
         <ReportListingLink
           entityType="legal_aid"
           entityId={org.id}

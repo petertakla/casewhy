@@ -7,6 +7,7 @@ import {
   OFFICE_LOCATOR_URL,
   ASC_LOCATOR_URL,
 } from "@/lib/kb/processing-times";
+import { ShareButton } from "@/components/ShareButton";
 
 export default function ProcessingTimesPage() {
   return (
@@ -26,6 +27,14 @@ export default function ProcessingTimesPage() {
           check the official tool for your exact form and office
         </a>
       </p>
+
+      <div className="mb-8">
+        <ShareButton
+          url="https://app.casewhy.com/processing-times"
+          title="CaseWhy — Processing times"
+          text="See USCIS processing-time estimates for real case types, for free, with CaseWhy."
+        />
+      </div>
 
       <div className="space-y-4">
         {PROCESSING_TIMES.map((entry) => (

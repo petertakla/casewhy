@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth/server";
 import { getEnabledNewsSourceIds } from "@/lib/settings/settings";
 import { fetchNews } from "@/lib/news/fetch-news";
+import { ShareButton } from "@/components/ShareButton";
 
 function formatDate(date: Date | null): string {
   if (!date) return "";
@@ -29,6 +30,14 @@ export default async function NewsPage() {
           </>
         )}
       </p>
+
+      <div className="mb-8">
+        <ShareButton
+          url="https://app.casewhy.com/news"
+          title="CaseWhy — Immigration news"
+          text="Curated USCIS and immigration-law news, for free, with CaseWhy."
+        />
+      </div>
 
       {items.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border-strong p-6 text-center text-sm text-muted">

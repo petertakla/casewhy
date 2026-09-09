@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getCommunityOrgBySlug } from "@/lib/community-orgs/directory";
 import { BackLink } from "@/components/BackLink";
 import { ReportListingLink } from "@/components/ReportListingLink";
+import { ShareButton } from "@/components/ShareButton";
 
 export default async function CommunityOrgDetailPage({
   params,
@@ -56,7 +57,12 @@ export default async function CommunityOrgDetailPage({
         current details directly with the organization before relying on anyone.
       </p>
 
-      <div className="mt-6">
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <ShareButton
+          url={`https://app.casewhy.com/community-orgs/${org.slug}`}
+          title={org.organizationName}
+          text={`Found this on CaseWhy — ${org.organizationName}, a free community/cultural organization resource — thought you should see it.`}
+        />
         <ReportListingLink
           entityType="community_org"
           entityId={org.id}

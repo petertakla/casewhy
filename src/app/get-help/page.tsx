@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ShareButton } from "@/components/ShareButton";
 
 // Round 29 — ties the separate "talk to a professional" directories
 // together so they're discoverable as one coherent feature instead of a
@@ -70,6 +71,14 @@ export default function GetHelpPage() {
         Every resource here is free to use, always — no fees, no ads, no hidden cost. Same as the
         rest of CaseWhy: we don&apos;t sell your data or run ads either.
       </p>
+
+      <div className="mt-4">
+        <ShareButton
+          url="https://app.casewhy.com/get-help"
+          title="CaseWhy — Get Help"
+          text="Free help finding an immigration attorney, accredited representative, legal aid, and more — all in one place, no fees, no ads."
+        />
+      </div>
 
       <div className="mt-8 space-y-4">
         {LIVE_CATEGORIES.map((category) => (

@@ -9,6 +9,49 @@ const FROM_ADDRESS = "info@casewhy.com";
 // here until one does.
 const ADMIN_NOTIFICATION_ADDRESS = "info@casewhy.com";
 
+// Round 46 — notifies Peter that a Plus account crossed the 10-case
+// auto-approved band and needs a one-click review. Fires once per
+// threshold-crossing (see src/app/dashboard/actions.ts), not once per case.
+export async function sendCaseReviewRequestNotification({
+  userEmail,
+  approveUrl,
+}: {
+  userEmail: string;
+  approveUrl: string;
+}): Promise<void> {
+  const token = process.env.POSTMARK_API_TOKEN;
+  if (!token) {
+    console.warn(
+      `[postmark] POSTMARK_API_TOKEN not set — skipping case-review-request notification for ${userEmail}`
+    );
+    return;
+  }
+
+  const res = await fetch("https://api.postmarkapp.com/email", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Postmark-Server-Token": token,
+    },
+    body: JSON.stringify({
+      From: FROM_ADDRESS,
+      To: ADMIN_NOTIFICATION_ADDRESS,
+      Subject: `Case-tracking review needed: ${userEmail}`,
+      TextBody: [
+        `${userEmail} is tracking more than 10 cases on CaseWhy Plus and needs a quick review.`,
+        "",
+        `Approve (raises this account to 25 cases, activates everything pending): ${approveUrl}`,
+      ].join("\n"),
+      MessageStream: "outbound",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
+  }
+}
+
 export async function sendStatusChangeEmail({
   to,
   receiptNumber,

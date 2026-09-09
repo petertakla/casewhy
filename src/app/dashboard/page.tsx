@@ -3,7 +3,7 @@ import { getCaseStatus, UscisApiError, type CaseStatus } from "@/lib/uscis/clien
 import { explainCaseStatus, type CaseExplanation } from "@/lib/ai/explain";
 import { auth } from "@/lib/auth/server";
 import { getTrackedCases } from "./actions";
-import { getSubscriptionTier, TIER_LIMITS } from "@/lib/billing/tier";
+import { getSubscriptionDetails, TIER_LIMITS, PLUS_HARD_CEILING_MAX_CASES } from "@/lib/billing/tier";
 import { TrackCaseButton } from "./TrackCaseButton";
 import { CheckNowButton } from "./CheckNowButton";
 import { DownloadReportLink } from "./DownloadReportLink";
@@ -205,6 +205,13 @@ function StatusCard({
     canUseVault: boolean;
     atCap: boolean;
     maxCases: number;
+    /** Round 46 — true when adding another case will land as pending_review
+     * rather than active (Plus, past the 10-case auto-approved band). */
+    willQueueForReview: boolean;
+    /** Round 46 — true when atCap is Plus's 25-case hard ceiling rather
+     * than a flat-tier cap — changes TrackCaseButton's message to "contact
+     * us" instead of "upgrade to Plus." */
+    isPlusHardCeiling: boolean;
   } | null;
 }) {
   const tone = statusTone(status.statusText);
@@ -250,6 +257,8 @@ function StatusCard({
                 atCap={tracking.atCap}
                 maxCases={tracking.maxCases}
                 plusMaxCases={TIER_LIMITS.plus.maxCases}
+                willQueueForReview={tracking.willQueueForReview}
+                isPlusHardCeiling={tracking.isPlusHardCeiling}
               />
               {tracking.alreadyTracked && tracking.trackedCaseId && (
                 <>
@@ -312,6 +321,26 @@ function ErrorCard({ message }: { message: string }) {
   );
 }
 
+/**
+ * Round 46 — shown instead of a live status lookup for a case pending
+ * review past Plus's 10-case auto-approved band. Deliberately never calls
+ * getCaseStatus() for a pending case — that's the whole point of the gate,
+ * not just the cron job's own polling.
+ */
+function PendingReviewCard({ receiptNumber }: { receiptNumber: string }) {
+  return (
+    <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6">
+      <p className="font-mono text-xs uppercase tracking-widest text-muted">{receiptNumber}</p>
+      <p className="mt-2 text-sm font-semibold text-amber-600 dark:text-amber-400">Pending review</p>
+      <p className="mt-1.5 text-sm text-foreground/90">
+        You&apos;re tracking more than 10 cases, so this one needs a quick check before CaseWhy
+        starts polling it — we&apos;ll email you within 1 business day. Your other active cases
+        keep updating normally in the meantime.
+      </p>
+    </div>
+  );
+}
+
 export default async function DashboardPage({
   searchParams,
 }: {
@@ -323,23 +352,31 @@ export default async function DashboardPage({
   let trackedCasesList: Awaited<ReturnType<typeof getTrackedCases>> = [];
   let maxCases = TIER_LIMITS.free.maxCases;
   let canCheckNow = false;
+  let isPlus = false;
+  let effectiveMaxCases = TIER_LIMITS.plus.maxCases;
   if (session?.user) {
     trackedCasesList = await getTrackedCases(session.user.id);
-    const tier = await getSubscriptionTier(session.user.id);
-    maxCases = TIER_LIMITS[tier].maxCases;
-    canCheckNow = tier === "plus";
+    const details = await getSubscriptionDetails(session.user.id);
+    isPlus = details.tier === "plus";
+    maxCases = TIER_LIMITS[details.tier].maxCases;
+    effectiveMaxCases = details.effectiveMaxCases;
+    canCheckNow = isPlus;
   }
 
   // An explicit ?receipt= search always wins (ad-hoc lookup); otherwise fall
   // back to the signed-in user's first tracked case, if any (CW-36: could
   // be one of several — see CaseSwitcher below for picking a different one).
   const receiptNumber = receipt?.trim() || trackedCasesList[0]?.receiptNumber || undefined;
+  const trackedMatch = trackedCasesList.find((c) => c.receiptNumber === receiptNumber);
+  const isPendingReview = trackedMatch?.status === "pending_review";
 
   let status: CaseStatus | null = null;
   let explanation: CaseExplanation | null = null;
   let errorMessage: string | null = null;
 
-  if (receiptNumber) {
+  // Round 46 — never fetch a live status for a case pending review; that's
+  // the actual gate, not just the cron job's own polling.
+  if (receiptNumber && !isPendingReview) {
     try {
       status = await getCaseStatus(receiptNumber);
       try {
@@ -353,6 +390,18 @@ export default async function DashboardPage({
         : "Something went wrong looking up your case. Please try again.";
     }
   }
+
+  // Round 46 — Plus is gated-unlimited: fully blocked only at the 25-case
+  // hard ceiling, not at the 10-case auto-approved band (that band queues
+  // for review instead, see willQueueForReview below). Free tier keeps its
+  // original flat-cap behavior.
+  const atCap = isPlus
+    ? trackedCasesList.length >= PLUS_HARD_CEILING_MAX_CASES
+    : trackedCasesList.length >= maxCases;
+  const willQueueForReview =
+    isPlus &&
+    trackedCasesList.length >= effectiveMaxCases &&
+    trackedCasesList.length < PLUS_HARD_CEILING_MAX_CASES;
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
@@ -372,6 +421,7 @@ export default async function DashboardPage({
       )}
 
       <div className="mt-6">
+        {isPendingReview && receiptNumber && <PendingReviewCard receiptNumber={receiptNumber} />}
         {status && (
           <StatusCard
             status={status}
@@ -384,13 +434,15 @@ export default async function DashboardPage({
               canCheckNow,
               canDownloadReport: canCheckNow,
               canUseVault: canCheckNow,
-              atCap: trackedCasesList.length >= maxCases,
-              maxCases,
+              atCap,
+              maxCases: isPlus && atCap ? PLUS_HARD_CEILING_MAX_CASES : maxCases,
+              willQueueForReview,
+              isPlusHardCeiling: isPlus && atCap,
             }}
           />
         )}
         {errorMessage && <ErrorCard message={errorMessage} />}
-        {!status && !errorMessage && !receiptNumber && (
+        {!status && !isPendingReview && !errorMessage && !receiptNumber && (
           <div className="rounded-2xl border border-dashed border-border-strong p-8 text-center">
             <p className="text-sm text-muted">
               No case tracked yet — enter a receipt number above to get started.

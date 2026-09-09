@@ -61,25 +61,31 @@ export default async function AskPage({
   }
 
   // An explicit ?receipt= naming one of this user's own tracked cases wins
-  // (CW-36: could have several); otherwise default to the first.
+  // (CW-36: could have several); otherwise default to the first active one
+  // (round 46: never default to a pending-review case — same reasoning as
+  // the dashboard, chat needs a real status to ground itself in).
   const requested = receipt?.trim();
+  const activeCases = trackedCasesList.filter((c) => c.status === "active");
   const receiptNumber =
     requested && trackedCasesList.some((c) => c.receiptNumber === requested)
       ? requested
-      : trackedCasesList[0].receiptNumber;
+      : (activeCases[0] ?? trackedCasesList[0]).receiptNumber;
+  const isPendingReview = trackedCasesList.find((c) => c.receiptNumber === receiptNumber)?.status === "pending_review";
 
   let statusText: string | null = null;
   let formType: string | null = null;
   let errorMessage: string | null = null;
-  try {
-    const status = await getCaseStatus(receiptNumber);
-    statusText = status.statusText;
-    formType = status.formType;
-  } catch (err) {
-    errorMessage =
-      err instanceof UscisApiError
-        ? "Couldn't reach USCIS's case status service right now. Please try again shortly."
-        : "Something went wrong looking up your case.";
+  if (!isPendingReview) {
+    try {
+      const status = await getCaseStatus(receiptNumber);
+      statusText = status.statusText;
+      formType = status.formType;
+    } catch (err) {
+      errorMessage =
+        err instanceof UscisApiError
+          ? "Couldn't reach USCIS's case status service right now. Please try again shortly."
+          : "Something went wrong looking up your case.";
+    }
   }
 
   return (
@@ -94,7 +100,15 @@ export default async function AskPage({
         <CaseSwitcher cases={trackedCasesList} activeReceiptNumber={receiptNumber} basePath="/ask" />
       )}
 
-      {errorMessage ? (
+      {isPendingReview ? (
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6">
+          <p className="text-sm text-amber-600 dark:text-amber-400">
+            This case is pending review (you&apos;re tracking more than 10 cases) — chat opens up
+            once it&apos;s approved. Pick a different case above, or check back after you hear from
+            us.
+          </p>
+        </div>
+      ) : errorMessage ? (
         <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6">
           <p className="text-sm text-red-600 dark:text-red-400">{errorMessage}</p>
         </div>

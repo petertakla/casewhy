@@ -6,10 +6,12 @@ import { auth } from "@/lib/auth/server";
 import { getDb } from "@/lib/db/client";
 import { trackedCases } from "@/lib/db/schema";
 import { encryptField, decryptField } from "@/lib/db/crypto";
-import { getSubscriptionTier, TIER_LIMITS } from "@/lib/billing/tier";
+import { getSubscriptionTier, getSubscriptionDetails, TIER_LIMITS, PLUS_HARD_CEILING_MAX_CASES } from "@/lib/billing/tier";
 import { UscisApiError } from "@/lib/uscis/client";
 import { checkTrackedCaseNow } from "@/lib/uscis/check-status";
 import { CASE_TYPES } from "@/lib/kb/case-type-timeline";
+import { subscriptions } from "@/lib/db/schema";
+import { sendCaseReviewRequestNotification } from "@/lib/email/postmark";
 
 export interface TrackedCase {
   id: string;
@@ -17,6 +19,10 @@ export interface TrackedCase {
   lastCheckedAt: Date | null;
   /** One of CASE_TYPES' ids, or null for a case tracked before round 21. */
   caseType: string | null;
+  /** Round 46 — "pending_review" cases are never polled and never counted
+   * toward AI/chat quota until an admin approves the account past Plus's
+   * 10-case auto-approved band. Always "active" on free-tier accounts. */
+  status: "active" | "pending_review";
 }
 
 export async function getTrackedCases(userId: string): Promise<TrackedCase[]> {
@@ -27,6 +33,7 @@ export async function getTrackedCases(userId: string): Promise<TrackedCase[]> {
       receiptNumber: trackedCases.receiptNumber,
       lastCheckedAt: trackedCases.lastCheckedAt,
       caseType: trackedCases.caseType,
+      status: trackedCases.status,
     })
     .from(trackedCases)
     .where(eq(trackedCases.userId, userId))
@@ -40,6 +47,7 @@ export async function getTrackedCases(userId: string): Promise<TrackedCase[]> {
         receiptNumber: decryptField(row.receiptNumber),
         lastCheckedAt: row.lastCheckedAt,
         caseType: row.caseType,
+        status: row.status === "pending_review" ? "pending_review" : "active",
       });
     } catch {
       // Malformed/undecryptable row (e.g. pre-encryption test data) — skip
@@ -72,6 +80,9 @@ export async function checkCaseNow(trackedCaseId: string): Promise<{ statusText:
     .where(and(eq(trackedCases.id, trackedCaseId), eq(trackedCases.userId, session.user.id)));
   if (!row) {
     throw new Error("Case not found.");
+  }
+  if (row.status === "pending_review") {
+    throw new Error("This case is pending review and can't be checked yet.");
   }
 
   let result;
@@ -115,6 +126,54 @@ export async function trackCase(receiptNumber: string, caseType: string): Promis
   }
 
   const tier = await getSubscriptionTier(session.user.id);
+  const db = getDb();
+
+  // Round 46 — Plus is gated-unlimited (three bands), not a flat cap; free
+  // tier keeps its own simple cap, no review bands at all.
+  if (tier === "plus") {
+    const details = await getSubscriptionDetails(session.user.id);
+    const totalCount = existing.length; // active + pending_review together
+    if (totalCount >= PLUS_HARD_CEILING_MAX_CASES) {
+      throw new Error(
+        `You're tracking the maximum of ${PLUS_HARD_CEILING_MAX_CASES} cases CaseWhy Plus supports. Need to track more? Contact us at hello@casewhy.com.`
+      );
+    }
+
+    const willBePending = totalCount >= details.effectiveMaxCases;
+    const pendingAlreadyExists = existing.some((c) => c.status === "pending_review");
+
+    await db.insert(trackedCases).values({
+      userId: session.user.id,
+      receiptNumber: encryptField(receiptNumber),
+      email: encryptField(session.user.email),
+      caseType,
+      status: willBePending ? "pending_review" : "active",
+    });
+
+    // Notify once per threshold-crossing, not once per case — only when
+    // this insert is the *first* pending_review row since the last
+    // approval (i.e. no pending case existed yet before this one).
+    if (willBePending && !pendingAlreadyExists) {
+      const token = crypto.randomUUID();
+      await db
+        .update(subscriptions)
+        .set({ pendingApprovalToken: token })
+        .where(eq(subscriptions.userId, session.user.id));
+      try {
+        await sendCaseReviewRequestNotification({
+          userEmail: session.user.email,
+          approveUrl: `https://app.casewhy.com/api/admin/approve-cases?token=${token}`,
+        });
+      } catch (err) {
+        console.error("Failed to send case-review-request notification email", err);
+      }
+    }
+
+    revalidatePath("/dashboard");
+    revalidatePath("/ask");
+    return;
+  }
+
   const maxCases = TIER_LIMITS[tier].maxCases;
   if (existing.length >= maxCases) {
     // A plain Error, not a custom class — "use server" files may only
@@ -124,7 +183,6 @@ export async function trackCase(receiptNumber: string, caseType: string): Promis
     );
   }
 
-  const db = getDb();
   await db.insert(trackedCases).values({
     userId: session.user.id,
     receiptNumber: encryptField(receiptNumber),

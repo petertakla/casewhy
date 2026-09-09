@@ -31,6 +31,11 @@ export const trackedCases = pgTable(
     // tracked before round 21 don't have one; the app requires a real
     // selection (including "other") for every new case going forward.
     caseType: text("case_type"),
+    // Round 46 — "active" is polled by the cron job and counted toward
+    // AI/chat quota; "pending_review" is neither, until an admin approves
+    // the account past CaseWhy Plus's 10-case auto-approved band. Free-tier
+    // rows are always "active" — the review-band system is Plus-only.
+    status: text("status").notNull().default("active"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index("tracked_cases_user_id_idx").on(table.userId)]
@@ -62,6 +67,20 @@ export const subscriptions = pgTable("subscriptions", {
   status: text("status"),
   currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
   cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
+  // Round 46 — Plus's case-tracking cap, gated-unlimited: null means "use
+  // TIER_LIMITS.plus.maxCases" (10, the auto-approved band); set to 25 once
+  // an admin approves a threshold-crossing request. Never set for free-tier
+  // accounts — that tier has its own flat cap with no review bands.
+  effectiveMaxCases: integer("effective_max_cases"),
+  // Set when an 11th+ case first lands as pending_review (the "threshold
+  // crossing" moment), so the admin-notification email only fires once per
+  // crossing rather than once per pending case. A single-use, unguessable
+  // token embedded in the one-click approve link — not literally Neon
+  // Auth's own magic-link mechanism (that's scoped to authenticating a
+  // specific user's sign-in session, not administering an unrelated batch
+  // approval action), but the same "long random token, no new auth system"
+  // pattern. Cleared on use.
+  pendingApprovalToken: text("pending_approval_token"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

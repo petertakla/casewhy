@@ -12,6 +12,8 @@ export function TrackCaseButton({
   atCap,
   maxCases,
   plusMaxCases,
+  willQueueForReview = false,
+  isPlusHardCeiling = false,
 }: {
   receiptNumber: string;
   /** Present when alreadyTracked — the row id, needed to untrack. */
@@ -21,6 +23,13 @@ export function TrackCaseButton({
   maxCases: number;
   /** CaseWhy Plus's own cap — shown in the free-tier "upgrade" message. */
   plusMaxCases: number;
+  /** Round 46 — true when adding another case will land as pending_review
+   * (Plus, past the 10-case auto-approved band) rather than active. */
+  willQueueForReview?: boolean;
+  /** Round 46 — true when atCap is Plus's 25-case hard ceiling rather than
+   * a flat-tier cap — swaps the message to "contact us" instead of
+   * "upgrade to Plus," since the account is already on Plus. */
+  isPlusHardCeiling?: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -65,6 +74,19 @@ export function TrackCaseButton({
           {isPending ? "Removing…" : "Stop tracking"}
         </button>
       </div>
+    );
+  }
+
+  if (atCap && isPlusHardCeiling) {
+    return (
+      <p className="text-xs text-muted">
+        You&apos;re tracking the maximum of {maxCases} cases CaseWhy Plus supports. Need to track
+        more?{" "}
+        <a href="mailto:hello@casewhy.com" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+          Contact us
+        </a>
+        .
+      </p>
     );
   }
 
@@ -113,6 +135,13 @@ export function TrackCaseButton({
         Enter your form type for a more detailed, form-specific AI response.
       </p>
       {selected && <p className="mt-1.5 max-w-xl text-xs leading-relaxed text-muted">{selected.timelineBlurb}</p>}
+      {willQueueForReview && (
+        <p className="mt-1.5 max-w-xl text-xs leading-relaxed text-amber-600 dark:text-amber-400">
+          Tracking more than 10 cases needs a quick check — we&apos;ll email you within 1 business
+          day. This one will show as &quot;Pending review&quot; until then; your existing cases
+          keep updating normally.
+        </p>
+      )}
       <button
         type="button"
         disabled={isPending || !caseType}

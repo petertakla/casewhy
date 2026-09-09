@@ -5,6 +5,7 @@
 // most HTTP clients if misconfigured, a mistake that's bitten this pattern
 // before (see the NVDA project's cron-job.org notes).
 
+import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { trackedCases } from "@/lib/db/schema";
 import { UscisApiError } from "@/lib/uscis/client";
@@ -18,7 +19,10 @@ export async function POST(request: Request) {
   }
 
   const db = getDb();
-  const rows = await db.select().from(trackedCases);
+  // Round 46 — "pending_review" cases (Plus accounts past the 10-case
+  // auto-approved band, awaiting a one-click admin approval) never touch
+  // the shared USCIS quota until approved.
+  const rows = await db.select().from(trackedCases).where(eq(trackedCases.status, "active"));
 
   let checked = 0;
   let notified = 0;

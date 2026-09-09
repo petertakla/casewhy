@@ -39,5 +39,9 @@ export interface AttorneyEntry {
 
 export const ATTORNEY_DIRECTORY: AttorneyEntry[] = [];
 
+// Round 39 — exact wording, per Peter's direct instruction: a real
+// mitigation against the open Florida Bar Rule 4-7.22 "qualifying provider"
+// question in attorney-referral-directory-concept.md, not just phrasing
+// preference. Do not paraphrase this sentence.
 export const ATTORNEY_DIRECTORY_DISCLAIMER =
-  "This is an informational list, not an endorsement or a referral service. CaseWhy does not vouch for outcomes, and being listed here doesn't mean an attorney is right for your specific situation. Always confirm an attorney's current bar standing yourself before hiring anyone.";
+  "This directory is for informational purposes only. It does not constitute a lawyer referral service, and listing does not imply an endorsement or recommendation by this platform. Always confirm an attorney's current bar standing yourself before hiring anyone.";

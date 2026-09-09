@@ -62,5 +62,7 @@ export async function getAccreditedRepresentativeBySlug(
   return rows[0] ?? null;
 }
 
+// Round 39 — adapted wording per Peter's direct instruction, same standard
+// applied across all six entity types. Do not paraphrase this sentence.
 export const ACCREDITED_REPRESENTATIVE_DIRECTORY_DISCLAIMER =
-  "This is an informational list, not an endorsement or a referral service. CaseWhy does not vouch for outcomes, and being listed here doesn't mean a representative is right for your specific situation. Always confirm a representative's current DOJ accreditation yourself before relying on anyone.";
+  "This directory is for informational purposes only. It does not constitute a referral service, and listing does not imply an endorsement or recommendation by this platform. Always confirm a representative's current DOJ accreditation yourself before relying on anyone.";

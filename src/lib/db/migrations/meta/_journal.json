@@ -106,6 +106,13 @@
       "when": 1788892441539,
       "tag": "0014_worthless_hydra",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1788914023642,
+      "tag": "0015_outstanding_sentinel",
+      "breakpoints": true
     }
   ]
 }

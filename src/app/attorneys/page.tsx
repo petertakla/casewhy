@@ -10,7 +10,9 @@ export default function AttorneysPage() {
         A hand-curated list of immigration attorneys, for anything CaseWhy tells you needs a
         licensed professional&apos;s judgment rather than general information.
       </p>
-      <p className="mb-2 text-xs text-muted">{ATTORNEY_DIRECTORY_DISCLAIMER}</p>
+      <p className="mb-2 rounded-lg border border-border-strong bg-surface-2 p-3 text-sm text-foreground/90">
+        {ATTORNEY_DIRECTORY_DISCLAIMER}
+      </p>
       <p className="mb-8 text-xs text-muted">
         Free to browse, always — no fees, no ads, no sign-in required.
       </p>

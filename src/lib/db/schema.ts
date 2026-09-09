@@ -324,3 +324,70 @@ export const attorneyApplications = pgTable("attorney_applications", {
   contactPhone: text("contact_phone"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// Round 34 — self-enroll applications for the legal-aid/nonprofit directory
+// (entity type 3 of the six-entity "Get Help" system). Same split as every
+// other entity type: nothing here is ever auto-published, Peter manually
+// vets each one before adding it to legalAidDirectory below. Not encrypted,
+// same reasoning as the other applications tables.
+export const legalAidApplications = pgTable("legal_aid_applications", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  organizationName: text("organization_name").notNull(),
+  orgType: text("org_type").notNull(),
+  contactPerson: text("contact_person").notNull(),
+  statesServed: text("states_served").notNull(),
+  populationServed: text("population_served").notNull(),
+  servicesOffered: text("services_offered").notNull(),
+  contactEmail: text("contact_email").notNull(),
+  contactPhone: text("contact_phone"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Round 34 — the public, approved legal-aid/nonprofit org listings.
+// Machine-seeded from the same DOJ EOIR roster as accreditedRepresentative-
+// Directory (round 29/32/35), pulling the *organization* rows rather than
+// individual representatives — DOJ recognition of the organization itself is
+// the vetting mechanism, same reasoning that let accredited representatives
+// be machine-seeded rather than hand-curated like the attorney directory.
+// One row per organization (its Principal Office, or first-listed office if
+// no address is explicitly marked "Principal Office" — same simplification
+// already disclosed for accredited representatives: a multi-office org's
+// other locations aren't separately represented). orgType/contactPerson/
+// populationServed/servicesOffered are nullable because DOJ's roster has no
+// such fields at all — they're always null from this seed, present only so
+// a future manual-curation pass (or an approved self-enroll application)
+// can fill them in without a schema change. Not encrypted — DOJ's own
+// already-public data, same as accreditedRepresentativeDirectory.
+export const legalAidDirectory = pgTable(
+  "legal_aid_directory",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    slug: text("slug").notNull(),
+    organizationName: text("organization_name").notNull(),
+    orgType: text("org_type"),
+    contactPerson: text("contact_person"),
+    populationServed: text("population_served"),
+    servicesOffered: text("services_offered"),
+    organizationStatus: text("organization_status").notNull(),
+    organizationRecognizedDate: text("organization_recognized_date"),
+    organizationRecognitionExpiration: text("organization_recognition_expiration"),
+    organizationRecognitionPendingRenewal: boolean("organization_recognition_pending_renewal")
+      .notNull()
+      .default(false),
+    officeType: text("office_type"),
+    streetAddress: text("street_address"),
+    cityStateZip: text("city_state_zip"),
+    phone: text("phone"),
+    state: text("state").notNull(),
+    sourceCitation: text("source_citation").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique("legal_aid_directory_slug_unique").on(table.slug),
+    index("legal_aid_directory_state_idx").on(table.state),
+  ]
+);

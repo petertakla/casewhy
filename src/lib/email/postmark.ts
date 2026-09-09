@@ -171,3 +171,60 @@ export async function sendRepresentativeApplicationNotification({
     throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
   }
 }
+
+export async function sendLegalAidApplicationNotification({
+  organizationName,
+  orgType,
+  contactPerson,
+  statesServed,
+  populationServed,
+  servicesOffered,
+  contactEmail,
+  contactPhone,
+}: {
+  organizationName: string;
+  orgType: string;
+  contactPerson: string;
+  statesServed: string;
+  populationServed: string;
+  servicesOffered: string;
+  contactEmail: string;
+  contactPhone?: string;
+}): Promise<void> {
+  const token = process.env.POSTMARK_API_TOKEN;
+  if (!token) {
+    console.warn(
+      `[postmark] POSTMARK_API_TOKEN not set — skipping legal-aid-application notification for ${organizationName}`
+    );
+    return;
+  }
+
+  const res = await fetch("https://api.postmarkapp.com/email", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Postmark-Server-Token": token,
+    },
+    body: JSON.stringify({
+      From: FROM_ADDRESS,
+      To: ADMIN_NOTIFICATION_ADDRESS,
+      Subject: `New legal aid organization application: ${organizationName}`,
+      TextBody: [
+        `Organization: ${organizationName}`,
+        `Org type: ${orgType}`,
+        `Contact person: ${contactPerson}`,
+        `States/regions served: ${statesServed}`,
+        `Population served: ${populationServed}`,
+        `Services offered: ${servicesOffered}`,
+        `Contact email: ${contactEmail}`,
+        `Contact phone: ${contactPhone || "(not provided)"}`,
+      ].join("\n"),
+      MessageStream: "outbound",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
+  }
+}

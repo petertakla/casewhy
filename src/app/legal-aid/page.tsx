@@ -1,29 +1,25 @@
 import Link from "next/link";
-import {
-  getAccreditedRepresentativeDirectory,
-  ACCREDITED_REPRESENTATIVE_DIRECTORY_DISCLAIMER,
-} from "@/lib/accredited-representatives/directory";
+import { getLegalAidDirectory, LEGAL_AID_DIRECTORY_DISCLAIMER } from "@/lib/legal-aid/directory";
 import { StateFilter } from "@/components/StateFilter";
 
 // Unlike /attorneys (a static in-source array), this reads a real DB table
-// that gets re-seeded periodically and grows via approved applications —
-// without forcing dynamic rendering, Next.js would prerender this once at
-// build time and freeze the list until the next deploy.
+// that gets re-seeded periodically — without forcing dynamic rendering,
+// Next.js would prerender this once at build time and freeze the list until
+// the next deploy. Same reasoning as /accredited-representatives.
 export const dynamic = "force-dynamic";
 
-export default async function AccreditedRepresentativesPage() {
-  const directory = await getAccreditedRepresentativeDirectory();
+export default async function LegalAidPage() {
+  const directory = await getLegalAidDirectory();
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-      <h1 className="text-2xl font-bold tracking-tight">Find an accredited representative</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Find a legal aid organization</h1>
       <p className="mb-2 mt-2 text-muted">
-        DOJ-accredited representatives — non-lawyers authorized to practice immigration law,
-        typically at nonprofit organizations. Sourced from DOJ&apos;s own public roster,
-        nationwide.
+        Nonprofit organizations recognized by the DOJ to provide immigration legal help, often at
+        low or no cost. Sourced from DOJ&apos;s own public roster, nationwide.
       </p>
       <p className="mb-2 rounded-lg border border-border-strong bg-surface-2 p-3 text-sm text-foreground/90">
-        {ACCREDITED_REPRESENTATIVE_DIRECTORY_DISCLAIMER}
+        {LEGAL_AID_DIRECTORY_DISCLAIMER}
       </p>
       <p className="mb-8 text-xs text-muted">
         Free to browse, always — no fees, no ads, no sign-in required.
@@ -47,25 +43,21 @@ export default async function AccreditedRepresentativesPage() {
         </div>
       ) : (
         <StateFilter
-          emptyMessage="No accredited representatives match."
-          items={directory.map((rep) => ({
-            key: rep.id,
-            states: [rep.state],
-            searchText: `${rep.representativeName} ${rep.organizationName} ${rep.cityStateZip ?? ""} ${rep.streetAddress ?? ""}`,
+          emptyMessage="No legal aid organizations match."
+          items={directory.map((org) => ({
+            key: org.id,
+            states: [org.state],
+            searchText: `${org.organizationName} ${org.cityStateZip ?? ""} ${org.streetAddress ?? ""}`,
             node: (
               <Link
-                href={`/accredited-representatives/${rep.slug}`}
+                href={`/legal-aid/${org.slug}`}
                 className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="font-semibold text-foreground">{rep.representativeName}</p>
-                  <p className="text-xs text-muted">{rep.state}</p>
+                  <p className="font-semibold text-foreground">{org.organizationName}</p>
+                  <p className="text-xs text-muted">{org.state}</p>
                 </div>
-                <p className="text-sm text-muted">{rep.organizationName}</p>
-                <p className="mt-1 text-xs text-muted">
-                  {rep.dhsOnly ? "DHS only" : "Full accreditation"}
-                  {rep.accreditationPendingRenewal ? " · renewal pending" : ""}
-                </p>
+                {org.cityStateZip && <p className="text-sm text-muted">{org.cityStateZip}</p>}
               </Link>
             ),
           }))}
@@ -73,8 +65,8 @@ export default async function AccreditedRepresentativesPage() {
       )}
 
       <p className="mt-8 text-sm text-muted">
-        Represent a nonprofit with DOJ-accredited staff?{" "}
-        <Link href="/accredited-representatives/join" className="text-brand-600 hover:underline dark:text-brand-400">
+        Run a nonprofit providing immigration legal help?{" "}
+        <Link href="/legal-aid/join" className="text-brand-600 hover:underline dark:text-brand-400">
           Apply to be listed
         </Link>{" "}
         — free, no cost to join.

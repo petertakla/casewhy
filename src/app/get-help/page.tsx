@@ -9,11 +9,11 @@ import Link from "next/link";
 //
 // New-task, same day — surfaced everywhere it belongs (nav on both sites,
 // dashboard/chat/escalation-toolkit) and given its own slot for every
-// entity type in the six-part backlog, live or not: legal aid orgs,
-// university DSOs, community orgs, and employers all show as "Coming
-// soon" placeholders now rather than waiting to be added card-by-card as
-// each ships — same "informational listing, not an endorsement" framing
-// as /attorneys applies to the page as a whole, stated once at the top.
+// entity type in the six-part backlog, live or not, rather than waiting to
+// be added card-by-card as each ships — same "informational listing, not an
+// endorsement" framing as /attorneys applies to the page as a whole, stated
+// once at the top. Round 34 moved legal aid orgs from "Coming soon" to
+// live; university DSOs, community orgs, and employers remain placeholders.
 const LIVE_CATEGORIES = [
   {
     href: "/attorneys",
@@ -27,13 +27,14 @@ const LIVE_CATEGORIES = [
     description:
       "DOJ-accredited, non-lawyer representatives — often at nonprofits — authorized to practice immigration law.",
   },
-];
-
-const COMING_SOON_CATEGORIES = [
   {
+    href: "/legal-aid",
     label: "Legal aid & nonprofit organizations",
     description: "Immigration help for those who can't afford a private attorney.",
   },
+];
+
+const COMING_SOON_CATEGORIES = [
   {
     label: "University international student offices",
     description: "Your school's DSO, for F-1 student status questions.",

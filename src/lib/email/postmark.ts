@@ -225,6 +225,125 @@ export async function sendListingReportNotification({
   }
 }
 
+// Round 43 — notifies Peter of a new DSO application (src/app/dso/join).
+// Same "email is enough for now, no admin dashboard" call as every other
+// application-notification function.
+export async function sendDsoApplicationNotification({
+  schoolName,
+  campusName,
+  contactName,
+  contactEmail,
+  contactPhone,
+  websiteUrl,
+  notes,
+}: {
+  schoolName: string;
+  campusName?: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone?: string;
+  websiteUrl?: string;
+  notes?: string;
+}): Promise<void> {
+  const token = process.env.POSTMARK_API_TOKEN;
+  if (!token) {
+    console.warn(
+      `[postmark] POSTMARK_API_TOKEN not set — skipping DSO-application notification for ${schoolName}`
+    );
+    return;
+  }
+
+  const res = await fetch("https://api.postmarkapp.com/email", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Postmark-Server-Token": token,
+    },
+    body: JSON.stringify({
+      From: FROM_ADDRESS,
+      To: ADMIN_NOTIFICATION_ADDRESS,
+      Subject: `New DSO application: ${schoolName}`,
+      TextBody: [
+        `School: ${schoolName}`,
+        `Campus: ${campusName || "(not provided)"}`,
+        `Contact name: ${contactName}`,
+        `Contact email: ${contactEmail}`,
+        `Contact phone: ${contactPhone || "(not provided)"}`,
+        `Website: ${websiteUrl || "(not provided)"}`,
+        `Notes: ${notes || "(none)"}`,
+      ].join("\n"),
+      MessageStream: "outbound",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
+  }
+}
+
+// Round 43 — notifies Peter of a new community/cultural org application
+// (src/app/community-orgs/join). Mirrors sendLegalAidApplicationNotification.
+export async function sendCommunityOrgApplicationNotification({
+  organizationName,
+  orgType,
+  contactPerson,
+  statesServed,
+  populationServed,
+  servicesOffered,
+  contactEmail,
+  contactPhone,
+  websiteUrl,
+}: {
+  organizationName: string;
+  orgType: string;
+  contactPerson: string;
+  statesServed: string;
+  populationServed: string;
+  servicesOffered: string;
+  contactEmail: string;
+  contactPhone?: string;
+  websiteUrl?: string;
+}): Promise<void> {
+  const token = process.env.POSTMARK_API_TOKEN;
+  if (!token) {
+    console.warn(
+      `[postmark] POSTMARK_API_TOKEN not set — skipping community-org-application notification for ${organizationName}`
+    );
+    return;
+  }
+
+  const res = await fetch("https://api.postmarkapp.com/email", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Postmark-Server-Token": token,
+    },
+    body: JSON.stringify({
+      From: FROM_ADDRESS,
+      To: ADMIN_NOTIFICATION_ADDRESS,
+      Subject: `New community/cultural org application: ${organizationName}`,
+      TextBody: [
+        `Organization: ${organizationName}`,
+        `Org type: ${orgType}`,
+        `Contact person: ${contactPerson}`,
+        `States/regions served: ${statesServed}`,
+        `Population served: ${populationServed}`,
+        `Services offered: ${servicesOffered}`,
+        `Contact email: ${contactEmail}`,
+        `Contact phone: ${contactPhone || "(not provided)"}`,
+        `Website: ${websiteUrl || "(not provided)"}`,
+      ].join("\n"),
+      MessageStream: "outbound",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
+  }
+}
+
 export async function sendLegalAidApplicationNotification({
   organizationName,
   orgType,

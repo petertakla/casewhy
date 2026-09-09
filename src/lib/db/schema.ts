@@ -440,6 +440,118 @@ export const attorneyDirectory = pgTable(
   (table) => [unique("attorney_directory_slug_unique").on(table.slug)]
 );
 
+// Round 43 — self-enroll applications for the DSO (university international
+// student office) directory, entity type 4 of the six-entity "Get Help"
+// system. Same split as every other entity type: nothing here is ever
+// auto-published. Since DHS's own school-search data has no DSO contact
+// info at all (round 43's own research — no bulk source anywhere has it,
+// it's a staff role with no federal registry), this application form is
+// also how an existing machine-seeded school row gets a real named contact
+// filled in later, not just how a brand-new school gets added.
+export const dsoApplications = pgTable("dso_applications", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  schoolName: text("school_name").notNull(),
+  campusName: text("campus_name"),
+  contactName: text("contact_name").notNull(),
+  contactEmail: text("contact_email").notNull(),
+  contactPhone: text("contact_phone"),
+  websiteUrl: text("website_url"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Round 43 — the public DSO directory. Machine-seeded from DHS's own
+// "Study in the States" School Search (studyinthestates.dhs.gov), SEVP
+// certification itself is the vetting mechanism (a federally-certified
+// school, same category of official record as every other entity type's
+// source). Scoped to Education Type = Higher Education only, not all
+// 13,839 SEVP-certified institutions nationwide (which includes K-12
+// private schools, flight schools, language institutes) — a deliberate,
+// documented narrowing since "university international student offices"
+// is this entity type's own stated framing, not general SEVP coverage.
+// No websiteUrl field populated from the source (DHS's data has none) —
+// left null rather than guessed/constructed, same discipline as round 40's
+// attorney websiteUrl; dsoApplications above is the path to a real one.
+export const dsoDirectory = pgTable(
+  "dso_directory",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    slug: text("slug").notNull(),
+    schoolName: text("school_name").notNull(),
+    campusName: text("campus_name"),
+    isMainCampus: boolean("is_main_campus").notNull().default(false),
+    f1Certified: boolean("f1_certified").notNull().default(false),
+    m1Certified: boolean("m1_certified").notNull().default(false),
+    streetAddress: text("street_address"),
+    cityStateZip: text("city_state_zip"),
+    state: text("state").notNull(),
+    phone: text("phone"),
+    websiteUrl: text("website_url"),
+    dataSource: text("data_source").notNull().default("dhs_study_in_the_states"),
+    sourceCitation: text("source_citation").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique("dso_directory_slug_unique").on(table.slug),
+    index("dso_directory_state_idx").on(table.state),
+  ]
+);
+
+// Round 43 — self-enroll applications for the community/cultural
+// organization directory, entity type 5. Same shape as legalAidApplications.
+export const communityOrgApplications = pgTable("community_org_applications", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  organizationName: text("organization_name").notNull(),
+  orgType: text("org_type").notNull(),
+  contactPerson: text("contact_person").notNull(),
+  statesServed: text("states_served").notNull(),
+  populationServed: text("population_served").notNull(),
+  servicesOffered: text("services_offered").notNull(),
+  contactEmail: text("contact_email").notNull(),
+  contactPhone: text("contact_phone"),
+  websiteUrl: text("website_url"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Round 43 — the public community/cultural organization directory.
+// Machine-seeded from USCIS's own Citizenship and Integration Grant
+// Program (CIGP) recipient records (FY22-24) — a real federal grant award
+// is the vetting mechanism, same category of official record as every
+// other entity type's source. Explicitly partial coverage (grant winners
+// only, not all community/cultural organizations) — sourceCitation states
+// this plainly on every row, same honesty standard as attorneys' 3-state
+// board-certification list. No street address in the source (only
+// city/state) and no website field — left null rather than guessed,
+// communityOrgApplications above is the path to a real one.
+export const communityOrgDirectory = pgTable(
+  "community_org_directory",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    slug: text("slug").notNull(),
+    organizationName: text("organization_name").notNull(),
+    cityStateZip: text("city_state_zip"),
+    state: text("state").notNull(),
+    description: text("description"),
+    fiscalYearsAwarded: text("fiscal_years_awarded").notNull(),
+    websiteUrl: text("website_url"),
+    dataSource: text("data_source").notNull().default("uscis_cigp"),
+    sourceCitation: text("source_citation").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique("community_org_directory_slug_unique").on(table.slug),
+    index("community_org_directory_state_idx").on(table.state),
+  ]
+);
+
 // Round 41 — "report incorrect information" on every live Get Help listing
 // (attorneys, accredited representatives, legal aid; future entity types
 // per partner-marketing-domain-concept.md's standing template). A report

@@ -13,7 +13,9 @@ import Link from "next/link";
 // be added card-by-card as each ships — same "informational listing, not an
 // endorsement" framing as /attorneys applies to the page as a whole, stated
 // once at the top. Round 34 moved legal aid orgs from "Coming soon" to
-// live; university DSOs, community orgs, and employers remain placeholders.
+// live; round 43 did the same for DSOs and community orgs. Only employers
+// (entity type 6, gated on a team-accounts product decision) remains a
+// placeholder.
 const LIVE_CATEGORIES = [
   {
     href: "/attorneys",
@@ -32,17 +34,19 @@ const LIVE_CATEGORIES = [
     label: "Legal aid & nonprofit organizations",
     description: "Immigration help for those who can't afford a private attorney.",
   },
-];
-
-const COMING_SOON_CATEGORIES = [
   {
+    href: "/dso",
     label: "University international student offices",
-    description: "Your school's DSO, for F-1 student status questions.",
+    description: "Find your school's international student office, for F-1/M-1 status questions.",
   },
   {
+    href: "/community-orgs",
     label: "Community & cultural organizations",
     description: "Local and cultural organizations that support immigrants.",
   },
+];
+
+const COMING_SOON_CATEGORIES = [
   {
     label: "For employers",
     description: "Sponsoring or supporting employees through the immigration process.",

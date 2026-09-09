@@ -15,7 +15,13 @@ import { getDb } from "@/lib/db/client";
 import { listingReports } from "@/lib/db/schema";
 import { sendListingReportNotification } from "@/lib/email/postmark";
 
-export const REPORTABLE_ENTITY_TYPES = ["attorney", "accredited_representative", "legal_aid"] as const;
+export const REPORTABLE_ENTITY_TYPES = [
+  "attorney",
+  "accredited_representative",
+  "legal_aid",
+  "dso",
+  "community_org",
+] as const;
 export type ReportableEntityType = (typeof REPORTABLE_ENTITY_TYPES)[number];
 
 const ReportInput = z.object({

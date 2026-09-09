@@ -1,6 +1,6 @@
-# New task for Claude Code — round 51: two real bugs — share text wording, Gemini link has no context
+# New task for Claude Code — round 51: two real bugs — share text wording, and swap Gemini for ChatGPT on the "ask an AI" link
 
-**Status: authorized now, Sep 9.** Peter checked both round 44/49's share function and round 48's verification links live and found real problems with each. Two independent fixes, same round since both are small.
+**Status: authorized now, Sep 9 — revised same day (Gemini → ChatGPT).** Peter checked both round 44/49's share function and round 48's verification links live and found real problems with each. Two independent fixes, same round since both are small.
 
 ## Bug 1 — share text: round 49 changed more than the order, or never shipped correctly
 
@@ -14,16 +14,21 @@ This keeps Peter's own wording and structure (his direct instruction), just corr
 
 **Scope, same as round 49:** only touches wherever this exact three-entity list appears as the share pitch. Does not touch the per-listing permalink share text (a single named resource, not a list) or the hero headline/subheadline copy itself.
 
-## Bug 2 — Gemini link opens with no context (genuinely not fixable as a URL parameter — recommending a real fix)
+## Bug 2 — swap Gemini for ChatGPT: confirmed working prefill/auto-send URL, unlike Gemini
 
-Peter's report: the Gemini link opens but with no context — this matches round 48's own honest note that it shipped a plain `https://gemini.google.com/app` link with no query, because the deep-link/prefill format couldn't be safely confirmed at the time (an ad-injecting extension interfered with testing).
+Peter's report: the Gemini link opens but with no context — this matches round 48's own honest note that it shipped a plain `https://gemini.google.com/app` link with no query, because the deep-link/prefill format couldn't be safely confirmed at the time.
 
-**Checked directly this round: it's not a testing artifact — Gemini's consumer web app has no supported URL parameter for prefilling a prompt at all**, confirmed via a live Sep 2026 discussion thread of people asking Google for exactly this (`q=`/`prompt=` support) with no official mechanism existing. The handful of workarounds that exist require the *visitor* to have a specific browser extension installed — not something CaseWhy can rely on for a random visitor, so this isn't a "guess the right parameter" problem, there just isn't one to guess.
+**Confirmed this round: Gemini's consumer web app genuinely has no supported URL parameter for prefilling a prompt** — there's no format to find, so no workaround was worth building on top of it.
 
-**Recommended real fix — copy-to-clipboard + open, so the visitor actually gets the context:** clicking "Ask Gemini about [Name]" should (a) copy the constructed query text to the clipboard — reuse the same `navigator.clipboard.writeText()` pattern already in `ShareButton.tsx`'s copy-link button — (b) open `https://gemini.google.com/app` in a new tab as before, and (c) show a brief one-time tooltip/toast near the link, e.g. "Query copied — paste it into Gemini," so the visitor knows to paste rather than staring at a blank chat. This is the honest version of "give the visitor context" given the real constraint, not a workaround that silently fails.
+**Instead, swap the link from Gemini to ChatGPT — `chatgpt.com` has a real, confirmed, working equivalent.** `https://chatgpt.com/?q=<encoded query>` opens a new chat and **automatically submits the query as a message on page load, no click or paste needed** — confirmed via a third-party security research write-up describing this exact behavior (real enough to be documented as a prompt-injection consideration, i.e. genuinely functioning, not a rumor). This delivers on the original ask (one click → the AI is already answering about this specific name) in a way Gemini structurally cannot.
 
-If clipboard write fails (permissions, unsupported browser — same real-world case `ShareButton.tsx` already handles gracefully), fall back to just opening the plain link as today, no broken tooltip.
+**In `VerificationLinks.tsx` (or wherever this link lives):**
+- Change the label from "Ask Gemini about {name}" to **"Ask ChatGPT about {name}"**.
+- Build the href the same way the Google link's query is already built (same `context ? "name" context : "name"` pattern) — `https://chatgpt.com/?q=${encodeURIComponent(query)}`.
+- Keep the same labeling philosophy round 48 established: this is a general-info assistant, not a verification tool, and should never be framed as confirming or checking anything — only the Google link carries that framing.
+- Drop the clipboard-copy/tooltip idea entirely — it's not needed once the URL parameter itself carries the context.
+- **Verify live, don't assume:** confirm the `?q=` behavior actually works as described for a signed-out visitor (not just someone already logged into ChatGPT) — the source describing this didn't confirm the signed-out case. If a signed-out visitor hits a sign-up wall instead of an auto-answered chat, report that back plainly rather than shipping it anyway; the fallback in that case is the same plain-link-no-query approach round 48 used for Gemini, just pointed at ChatGPT instead.
 
 ## Verify live
 
-Bug 1: confirm the corrected text renders on the real homepage hero share action on `casewhy.com` (both the native share-sheet path if testable and the fallback dropdown), and on the Next.js app side if the same three-entity list appears there too. Confirm no other placement was touched. Bug 2: confirm on a real permalink page that clicking "Ask Gemini about [Name]" actually copies the constructed query (check the real clipboard content, not just that the function ran) and opens Gemini in a new tab, and that the fallback (plain open, no tooltip) works when clipboard access is denied. `tsc`/lint clean, production build succeeds on both branches. Report back and fold into `CLOUD_CLAUDE.md`'s standing status — including confirming round 49's actual prior state (shipped-but-wrong vs. never shipped) so the record is accurate.
+Bug 1: confirm the corrected text renders on the real homepage hero share action on `casewhy.com` (both the native share-sheet path if testable and the fallback dropdown), and on the Next.js app side if the same three-entity list appears there too. Confirm no other placement was touched. Bug 2: confirm on a real permalink page that clicking "Ask ChatGPT about [Name]" opens ChatGPT with the query already submitted and answered — test as a signed-out visitor specifically, not just a logged-in one. `tsc`/lint clean, production build succeeds on both branches. Report back and fold into `CLOUD_CLAUDE.md`'s standing status — including confirming round 49's actual prior state (shipped-but-wrong vs. never shipped) so the record is accurate.

@@ -3,6 +3,7 @@ import { getAttorneyBySlug } from "@/lib/attorneys/directory";
 import { BackLink } from "@/components/BackLink";
 import { ReportListingLink } from "@/components/ReportListingLink";
 import { ShareButton } from "@/components/ShareButton";
+import { VerificationLinks } from "@/components/VerificationLinks";
 
 // Round 40 — now reads a real DB table by slug rather than the static
 // array's id field. Directory param name kept as [id] (unchanged route)
@@ -67,7 +68,14 @@ export default async function AttorneyDetailPage({
         current bar standing yourself before hiring anyone.
       </p>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
+      <div className="mt-6">
+        <VerificationLinks
+          name={attorney.name}
+          context={[attorney.firm, attorney.cityStateZip, "immigration attorney"].filter(Boolean).join(" ")}
+        />
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-3">
         <ShareButton
           url={`https://app.casewhy.com/attorneys/${attorney.slug}`}
           title={attorney.name}

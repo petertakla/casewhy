@@ -3,6 +3,7 @@ import { getCommunityOrgBySlug } from "@/lib/community-orgs/directory";
 import { BackLink } from "@/components/BackLink";
 import { ReportListingLink } from "@/components/ReportListingLink";
 import { ShareButton } from "@/components/ShareButton";
+import { VerificationLinks } from "@/components/VerificationLinks";
 
 export default async function CommunityOrgDetailPage({
   params,
@@ -57,7 +58,11 @@ export default async function CommunityOrgDetailPage({
         current details directly with the organization before relying on anyone.
       </p>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
+      <div className="mt-6">
+        <VerificationLinks name={org.organizationName} context={org.cityStateZip ?? undefined} />
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-3">
         <ShareButton
           url={`https://app.casewhy.com/community-orgs/${org.slug}`}
           title={org.organizationName}

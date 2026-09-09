@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 // Round 48 — one shared "do your own research on this listing" line, on
 // every Get Help entity-type detail/permalink page (never the list pages,
 // per the task's explicit instruction). Reused across attorneys, accredited
@@ -13,19 +17,33 @@
 // this person actually licensed, is this org still operating), so it's
 // labeled as asking a question, never as checking or confirming anything.
 //
-// Gemini's prefill URL format could NOT be confirmed live in this session
-// — an ad-injecting browser extension overlay blocked the real Gemini UI
-// during testing, and that testing would have had to happen on a real,
-// signed-in personal Google account rather than a disposable one, which
-// wasn't a safe way to verify a URL format either. Per the task's own
-// explicit fallback instruction, this ships a plain (non-prefilled) link
-// to https://gemini.google.com/app rather than guessing at a query
-// parameter that might silently fail. Revisit if a reliable format is
-// confirmed later.
+// Round 51 — Gemini's consumer web app has no supported URL parameter for
+// prefilling a prompt at all (confirmed directly this round, not just a
+// testing artifact of round 48's ad-overlay interference), so there's no
+// query-string format to discover. Real fix: copy the constructed query to
+// the clipboard before opening Gemini, same clipboard pattern already used
+// by ShareButton.tsx's copy-link button, with a brief toast so the visitor
+// knows to paste rather than facing a blank chat. Falls back to a plain
+// open with no toast if clipboard access fails.
 
 export function VerificationLinks({ name, context }: { name: string; context?: string }) {
+  const [copied, setCopied] = useState(false);
   const query = context ? `"${name}" ${context}` : `"${name}"`;
   const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+
+  async function handleGeminiClick() {
+    // Open synchronously, on the click itself, so popup blockers don't
+    // treat the async clipboard call below as breaking the user gesture.
+    window.open("https://gemini.google.com/app", "_blank", "noopener,noreferrer");
+    try {
+      await navigator.clipboard.writeText(query);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 4000);
+    } catch {
+      // Clipboard API unavailable/denied — Gemini still opened above, no
+      // broken tooltip.
+    }
+  }
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
@@ -37,14 +55,16 @@ export function VerificationLinks({ name, context }: { name: string; context?: s
       >
         Search {name} on Google
       </a>
-      <a
-        href="https://gemini.google.com/app"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-brand-600 hover:underline dark:text-brand-400"
-      >
-        Ask Gemini about {name}
-      </a>
+      <span className="relative inline-flex items-center gap-2">
+        <button
+          type="button"
+          onClick={handleGeminiClick}
+          className="text-brand-600 hover:underline dark:text-brand-400"
+        >
+          Ask Gemini about {name}
+        </button>
+        {copied && <span className="text-muted">Query copied — paste it into Gemini</span>}
+      </span>
     </div>
   );
 }

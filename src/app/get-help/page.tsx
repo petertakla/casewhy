@@ -76,7 +76,7 @@ export default function GetHelpPage() {
         <ShareButton
           url="https://app.casewhy.com/get-help"
           title="CaseWhy — Get Help"
-          text="Free help finding an immigration attorney, accredited representative, legal aid, and more — all in one place, no fees, no ads."
+          text="Free legal aid, accredited representatives, attorneys, and more — all in one place. No fees. No ads."
         />
       </div>
 

@@ -206,6 +206,16 @@
   .founder-note p{color:var(--muted);margin:0 0 14px;}
   .founder-note .sign{color:var(--foreground);font-weight:600;font-style:normal;}
 
+  .share-widget{position:relative;display:inline-block;}
+  .share-widget .share-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border-strong);background:var(--surface);color:var(--foreground);border-radius:8px;padding:8px 14px;font-size:0.9rem;font-weight:500;cursor:pointer;font-family:inherit;}
+  .share-widget .share-btn:hover{background:var(--surface-2);}
+  .share-widget .share-menu{display:none;position:absolute;left:0;top:calc(100% + 8px);z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px;box-shadow:0 8px 24px rgba(0,0,0,0.25);gap:4px;align-items:center;white-space:nowrap;}
+  .share-widget.open .share-menu{display:flex;}
+  .share-widget .share-menu a,.share-widget .share-menu button{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;color:var(--muted);background:none;border:none;cursor:pointer;}
+  .share-widget .share-menu a:hover,.share-widget .share-menu button:hover{background:var(--surface-2);color:var(--foreground);}
+  .share-widget .share-menu svg{width:16px;height:16px;}
+  .share-widget .copied-label{font-size:0.78rem;color:var(--muted);padding-left:4px;}
+
   .get-help h2{text-align:center;font-size:1.6rem;margin-bottom:8px;}
   .get-help .section-note{text-align:center;color:var(--muted);max-width:620px;margin:0 auto 12px;}
   .get-help .free-line{text-align:center;color:var(--brand-600);font-weight:600;font-size:0.92rem;margin:0 0 40px;}
@@ -326,6 +336,8 @@
     <span class="eyebrow">Coming soon — built and tested, waiting on final USCIS approval</span>
     <h1>Know what's happening.<br>Know what to do next.</h1>
     <p class="sub">CaseWhy checks your case with USCIS every day and explains what changed in plain English — grounded in real USCIS policy, not a reworded status label. When that's not enough, we connect you to real help: free legal aid, accredited representatives, and attorneys — all free, no ads, ever.</p>
+
+    <div class="share-widget" style="margin-bottom:48px;" data-url="https://casewhy.com" data-title="CaseWhy" data-label="Share" data-text="Track your USCIS case, understand what's actually happening, and find real help — free, no ads, ever."></div>
 
     <form class="waitlist" id="join" data-source="static-hero">
       <input type="email" name="email" placeholder="you@email.com" required aria-label="Email address">
@@ -478,6 +490,7 @@
       <a href="mailto:hello@casewhy.com">Contact</a>
       <a href="https://app.casewhy.com/get-help">Get Help</a>
     </div>
+    <div class="share-widget" data-url="https://casewhy.com" data-title="CaseWhy" data-label="Share CaseWhy" data-text="Track your USCIS case, understand what's actually happening, and find real help — free, no ads, ever."></div>
   </div>
 </footer>
 
@@ -540,6 +553,106 @@
           err.textContent = "Something went wrong. Please try again.";
           form.insertAdjacentElement("afterend", err);
         });
+    });
+  });
+})();
+
+// Round 44 — shared social-sharing widget, mirrors the React <ShareButton>
+// used across app.casewhy.com: navigator.share() where supported (mobile),
+// falling back to direct X/Facebook/LinkedIn/WhatsApp/email share-intent
+// links plus a copy-link button on desktop. Every instance on this page
+// passes fully generic pitch text — there's no account/case data on this
+// static marketing site to leak in the first place, but the same no-PII
+// discipline as the app-side component still applies.
+(function () {
+  var ICONS = {
+    x: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23.3 22h-7.1l-5.5-7.2L4.3 22H1.2l8.1-9.3L1 2h7.3l5 6.6L18.9 2zm-1.2 18h1.9L7.4 4h-2l12.3 16z"/></svg>',
+    facebook: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg>',
+    linkedin: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.4 20.4h-3.5v-5.5c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9v5.6H9.5V9h3.4v1.6h.1c.5-.9 1.6-1.8 3.3-1.8 3.5 0 4.1 2.3 4.1 5.3v6.3zM5.7 7.4a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM7.5 20.4H4V9h3.5v11.4z"/></svg>',
+    whatsapp: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8 1-.2.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.2.2-.3.2-.5.1-.2 0-.4 0-.5 0-.1-.6-1.5-.8-2-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.2-.9.9-.9 2.2s1 2.6 1.1 2.7c.1.2 2 3 4.7 4.2.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>',
+    email: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+    link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.5.4l2-2a5 5 0 0 0-7-7l-1.2 1.1"/><path d="M14 11a5 5 0 0 0-7.5-.4l-2 2a5 5 0 0 0 7 7l1.1-1.1"/></svg>',
+    shareIcon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-3.9M8.6 13.5l6.8 3.9"/></svg>'
+  };
+
+  function withRef(url) {
+    try {
+      var u = new URL(url);
+      u.searchParams.set("ref", "share");
+      return u.toString();
+    } catch (e) {
+      return url;
+    }
+  }
+
+  document.querySelectorAll(".share-widget").forEach(function (widget) {
+    var url = withRef(widget.dataset.url);
+    var title = widget.dataset.title || "CaseWhy";
+    var text = widget.dataset.text || "";
+    var label = widget.dataset.label || "Share";
+
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "share-btn";
+    btn.innerHTML = ICONS.shareIcon + "<span>" + label + "</span>";
+    widget.appendChild(btn);
+
+    var menu = document.createElement("div");
+    menu.className = "share-menu";
+
+    var links = [
+      { key: "x", label: "Share on X", href: "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text) + "&url=" + encodeURIComponent(url) },
+      { key: "facebook", label: "Share on Facebook", href: "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url) },
+      { key: "linkedin", label: "Share on LinkedIn", href: "https://www.linkedin.com/sharing/share-offsite/?url=" + encodeURIComponent(url) },
+      { key: "whatsapp", label: "Share on WhatsApp", href: "https://wa.me/?text=" + encodeURIComponent(text + " " + url) },
+      { key: "email", label: "Share by email", href: "mailto:?subject=" + encodeURIComponent(title) + "&body=" + encodeURIComponent(text + "\n\n" + url) }
+    ];
+
+    links.forEach(function (l) {
+      var a = document.createElement("a");
+      a.href = l.href;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.setAttribute("aria-label", l.label);
+      a.title = l.label;
+      a.innerHTML = ICONS[l.key];
+      menu.appendChild(a);
+    });
+
+    var copyBtn = document.createElement("button");
+    copyBtn.type = "button";
+    copyBtn.setAttribute("aria-label", "Copy link");
+    copyBtn.title = "Copy link";
+    copyBtn.innerHTML = ICONS.link;
+    menu.appendChild(copyBtn);
+
+    var copiedLabel = document.createElement("span");
+    copiedLabel.className = "copied-label";
+    copiedLabel.style.display = "none";
+    copiedLabel.textContent = "Copied!";
+    menu.appendChild(copiedLabel);
+
+    widget.appendChild(menu);
+
+    copyBtn.addEventListener("click", function () {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(function () {
+          copiedLabel.style.display = "inline";
+          setTimeout(function () { copiedLabel.style.display = "none"; }, 2000);
+        }).catch(function () {});
+      }
+    });
+
+    btn.addEventListener("click", function () {
+      if (navigator.share) {
+        navigator.share({ title: title, text: text, url: url }).catch(function () {});
+        return;
+      }
+      widget.classList.toggle("open");
+    });
+
+    document.addEventListener("click", function (e) {
+      if (!widget.contains(e.target)) widget.classList.remove("open");
     });
   });
 })();

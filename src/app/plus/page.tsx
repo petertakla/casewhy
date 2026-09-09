@@ -28,10 +28,10 @@ const PLUS_FEATURES: PlusFeature[] = [
   {
     id: "tracked-cases",
     title: "Tracked cases (family)",
-    free: "1",
+    free: "3",
     plus: "Unlimited",
     explanation:
-      "A free account tracks exactly one case — fine if it's just you, but most immigration cases aren't solo: a spouse's I-485 alongside your own, kids' derivative cases, or parents you're helping through an N-400 you understand better than they do. Plus is unlimited case tracking for your family — no fixed cap — so the whole household lives under a single login instead of everyone creating separate accounts (and separate $9.99/mo subscriptions) just to see their own status. Each case gets its own full CaseWhy experience — its own status history, its own AI explanations, its own document vault — switched between with a single click, not re-entered from scratch every time. Tracking more than 10 cases at once is uncommon enough that we ask for a quick, one-time check before it kicks in — most households never see this step, and it's a review, not a denial.",
+      "A free account tracks up to 3 cases — fine for most people, but bigger or more complex households need more: a spouse's I-485 alongside your own, kids' derivative cases, or parents you're helping through an N-400 you understand better than they do. Plus is unlimited case tracking for your family — no fixed cap — so the whole household lives under a single login instead of everyone creating separate accounts (and separate $9.99/mo subscriptions) just to see their own status. Each case gets its own full CaseWhy experience — its own status history, its own AI explanations, its own document vault — switched between with a single click, not re-entered from scratch every time. Tracking more than 10 cases at once is uncommon enough that we ask for a quick, one-time check before it kicks in — most households never see this step, and it's a review, not a denial.",
   },
   {
     id: "on-demand-checks",

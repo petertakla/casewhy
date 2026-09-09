@@ -13,6 +13,10 @@
 // round-14/CW-36 decision to hold at 5 over reselling-risk concerns).
 // TIER_LIMITS.plus.maxCases (10) is now the auto-approved band's ceiling,
 // not a hard cap — see PLUS_HARD_CEILING_MAX_CASES.
+//
+// Round 47 — free-tier cap raised 1 -> 3 (Peter's direct call, matching
+// VisaWatch's free tier per the Sep 9 pricing recheck — the one place
+// CaseWhy was measurably more restrictive than a named competitor).
 
 import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
@@ -27,7 +31,7 @@ export interface TierLimits {
 }
 
 export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
-  free: { maxCases: 1, chatQuestionsPerMonth: 10 },
+  free: { maxCases: 3, chatQuestionsPerMonth: 10 },
   plus: { maxCases: 10, chatQuestionsPerMonth: null },
 };
 

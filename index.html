@@ -206,6 +206,55 @@
   .founder-note p{color:var(--muted);margin:0 0 14px;}
   .founder-note .sign{color:var(--foreground);font-weight:600;font-style:normal;}
 
+  .get-help h2{text-align:center;font-size:1.6rem;margin-bottom:8px;}
+  .get-help .section-note{text-align:center;color:var(--muted);max-width:620px;margin:0 auto 12px;}
+  .get-help .free-line{text-align:center;color:var(--brand-600);font-weight:600;font-size:0.92rem;margin:0 0 40px;}
+  @media (prefers-color-scheme: dark){ .get-help .free-line{color:var(--brand-400);} }
+  .get-help-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+  }
+  .get-help-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px 20px;
+    text-decoration:none;
+    display:block;
+    color:inherit;
+    transition:border-color 0.15s ease;
+  }
+  a.get-help-card:hover{border-color:var(--border-strong);}
+  .get-help-card.soon{border-style:dashed;}
+  .get-help-card .row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+  .get-help-card h3{margin:0;font-size:1rem;}
+  .get-help-card p{margin:0;color:var(--muted);font-size:0.88rem;}
+  .badge{
+    flex-shrink:0;
+    font-size:0.68rem;
+    font-weight:700;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    padding:3px 8px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .badge.live{background:var(--brand-50);color:var(--brand-600);}
+  @media (prefers-color-scheme: dark){ .badge.live{background:rgba(91,158,237,0.15);color:var(--brand-400);} }
+  .badge.soon{background:var(--surface-2);color:var(--muted);}
+  .get-help-cta-row{text-align:center;margin-top:36px;}
+  .get-help-cta-row a.button{
+    display:inline-block;
+    padding:14px 26px;
+    border-radius:8px;
+    background:var(--brand-500);
+    color:#fff;
+    font-weight:600;
+    text-decoration:none;
+  }
+  .get-help-cta-row a.button:hover{background:var(--brand-600);}
+
   .trust{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
   .trust .wrap{max-width:760px;}
   .trust h2{text-align:center;font-size:1.6rem;margin-bottom:28px;}
@@ -244,6 +293,7 @@
   @media (max-width:760px){
     .feature-grid{grid-template-columns:1fr;}
     .feature.wide{grid-column:span 1;}
+    .get-help-grid{grid-template-columns:1fr;}
     nav{display:none;}
   }
 </style>
@@ -333,6 +383,43 @@
         <h3>CaseWhy Plus, coming at launch</h3>
         <p>Track up to 10 cases for your whole family, unlimited questions, on-demand checks, a secure document vault, an escalation toolkit for stalled cases (representative lookup plus congressional, field-office, and USCIS Ombudsman letter templates), and an attorney-ready case report you can bring to a consultation.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="get-help" id="get-help">
+  <div class="wrap">
+    <h2>More than a tracker — real help, free</h2>
+    <p class="section-note">Other case trackers stop at a status update. CaseWhy connects you to real help — attorneys, accredited representatives, and free legal aid — built into the app.</p>
+    <p class="free-line">Free to use, always — no fees, no ads, ever.</p>
+    <div class="get-help-grid">
+      <a class="get-help-card live" href="https://app.casewhy.com/attorneys">
+        <div class="row"><h3>Attorneys</h3><span class="badge live">Live</span></div>
+        <p>Board-certified immigration attorneys, sourced from official state bar records — free to browse, free to be listed.</p>
+      </a>
+      <a class="get-help-card live" href="https://app.casewhy.com/accredited-representatives">
+        <div class="row"><h3>Accredited representatives</h3><span class="badge live">Live, nationwide</span></div>
+        <p>DOJ-accredited representatives in all 50 states, sourced directly from official government records.</p>
+      </a>
+      <a class="get-help-card live" href="https://app.casewhy.com/legal-aid">
+        <div class="row"><h3>Legal aid &amp; nonprofit organizations</h3><span class="badge live">Live, nationwide</span></div>
+        <p>Free and low-cost legal help for those who need it most, sourced from official nonprofit records.</p>
+      </a>
+      <div class="get-help-card soon">
+        <div class="row"><h3>University international student offices</h3><span class="badge soon">Coming soon</span></div>
+        <p>Find your school's DSO for F-1/OPT support.</p>
+      </div>
+      <div class="get-help-card soon">
+        <div class="row"><h3>Community &amp; cultural organizations</h3><span class="badge soon">Coming soon</span></div>
+        <p>Local, trusted organizations that understand your community.</p>
+      </div>
+      <div class="get-help-card soon">
+        <div class="row"><h3>For employers</h3><span class="badge soon">Coming soon</span></div>
+        <p>Sponsoring or relocating employees? We can help.</p>
+      </div>
+    </div>
+    <div class="get-help-cta-row">
+      <a class="button" href="https://app.casewhy.com/get-help">Explore Get Help →</a>
     </div>
   </div>
 </section>

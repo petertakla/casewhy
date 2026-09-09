@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getLegalAidDirectory, LEGAL_AID_DIRECTORY_DISCLAIMER } from "@/lib/legal-aid/directory";
 import { StateFilter } from "@/components/StateFilter";
+import { ReportListingLink } from "@/components/ReportListingLink";
 
 // Unlike /attorneys (a static in-source array), this reads a real DB table
 // that gets re-seeded periodically — without forcing dynamic rendering,
@@ -49,16 +50,22 @@ export default async function LegalAidPage() {
             states: [org.state],
             searchText: `${org.organizationName} ${org.cityStateZip ?? ""} ${org.streetAddress ?? ""}`,
             node: (
-              <Link
-                href={`/legal-aid/${org.slug}`}
-                className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
-              >
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="font-semibold text-foreground">{org.organizationName}</p>
-                  <p className="text-xs text-muted">{org.state}</p>
+              <div className="rounded-xl border border-border bg-surface transition-colors hover:border-border-strong">
+                <Link href={`/legal-aid/${org.slug}`} className="block p-5">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <p className="font-semibold text-foreground">{org.organizationName}</p>
+                    <p className="text-xs text-muted">{org.state}</p>
+                  </div>
+                  {org.cityStateZip && <p className="text-sm text-muted">{org.cityStateZip}</p>}
+                </Link>
+                <div className="border-t border-border px-5 py-2">
+                  <ReportListingLink
+                    entityType="legal_aid"
+                    entityId={org.id}
+                    entityName={org.organizationName}
+                  />
                 </div>
-                {org.cityStateZip && <p className="text-sm text-muted">{org.cityStateZip}</p>}
-              </Link>
+              </div>
             ),
           }))}
         />

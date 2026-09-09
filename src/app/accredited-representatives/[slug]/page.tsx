@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getAccreditedRepresentativeBySlug } from "@/lib/accredited-representatives/directory";
 import { BackLink } from "@/components/BackLink";
+import { ReportListingLink } from "@/components/ReportListingLink";
 
 export default async function AccreditedRepresentativeDetailPage({
   params,
@@ -77,6 +78,14 @@ export default async function AccreditedRepresentativeDetailPage({
         </a>
         .
       </p>
+
+      <div className="mt-6">
+        <ReportListingLink
+          entityType="accredited_representative"
+          entityId={rep.id}
+          entityName={rep.representativeName}
+        />
+      </div>
     </main>
   );
 }

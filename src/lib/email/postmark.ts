@@ -175,6 +175,56 @@ export async function sendRepresentativeApplicationNotification({
   }
 }
 
+// Round 41 — notifies Peter of a new "report incorrect information"
+// submission on any live Get Help listing. Same "email is enough for now,
+// no admin dashboard" call already made for join applications; the report
+// itself always lands in `listing_reports` regardless of whether this send
+// succeeds.
+export async function sendListingReportNotification({
+  entityType,
+  entityName,
+  reportText,
+  reporterEmail,
+}: {
+  entityType: string;
+  entityName: string;
+  reportText: string;
+  reporterEmail?: string;
+}): Promise<void> {
+  const token = process.env.POSTMARK_API_TOKEN;
+  if (!token) {
+    console.warn(
+      `[postmark] POSTMARK_API_TOKEN not set — skipping listing-report notification for ${entityName}`
+    );
+    return;
+  }
+
+  const res = await fetch("https://api.postmarkapp.com/email", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Postmark-Server-Token": token,
+    },
+    body: JSON.stringify({
+      From: FROM_ADDRESS,
+      To: ADMIN_NOTIFICATION_ADDRESS,
+      Subject: `Listing report: ${entityName}`,
+      TextBody: [
+        `Entity type: ${entityType}`,
+        `Listing: ${entityName}`,
+        `Report: ${reportText}`,
+        `Reporter email: ${reporterEmail || "(not provided)"}`,
+      ].join("\n"),
+      MessageStream: "outbound",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
+  }
+}
+
 export async function sendLegalAidApplicationNotification({
   organizationName,
   orgType,

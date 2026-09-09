@@ -439,3 +439,27 @@ export const attorneyDirectory = pgTable(
   },
   (table) => [unique("attorney_directory_slug_unique").on(table.slug)]
 );
+
+// Round 41 — "report incorrect information" on every live Get Help listing
+// (attorneys, accredited representatives, legal aid; future entity types
+// per partner-marketing-domain-concept.md's standing template). A report
+// queue, not an auto-edit/auto-removal — nothing here ever changes a live
+// listing on its own, same "manual review before anything public changes"
+// principle already used for join-form applications. entityName is a
+// denormalized snapshot taken at report time (not a live join) so a report
+// stays readable even if the listing it's about is later edited or removed.
+// entityType is plain text, not a pgEnum, so a new entity type can start
+// filing reports without a migration — validated against a known set in
+// src/lib/reports/report.ts instead.
+export const listingReports = pgTable("listing_reports", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  entityType: text("entity_type").notNull(),
+  entityId: text("entity_id").notNull(),
+  entityName: text("entity_name").notNull(),
+  reportText: text("report_text").notNull(),
+  reporterEmail: text("reporter_email"),
+  status: text("status").notNull().default("new"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

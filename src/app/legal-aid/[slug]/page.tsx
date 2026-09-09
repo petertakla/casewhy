@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getLegalAidBySlug } from "@/lib/legal-aid/directory";
 import { BackLink } from "@/components/BackLink";
+import { ReportListingLink } from "@/components/ReportListingLink";
 
 export default async function LegalAidDetailPage({
   params,
@@ -75,6 +76,14 @@ export default async function LegalAidDetailPage({
         </a>
         .
       </p>
+
+      <div className="mt-6">
+        <ReportListingLink
+          entityType="legal_aid"
+          entityId={org.id}
+          entityName={org.organizationName}
+        />
+      </div>
     </main>
   );
 }

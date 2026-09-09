@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getAttorneyDirectory, ATTORNEY_DIRECTORY_DISCLAIMER } from "@/lib/attorneys/directory";
 import { StateFilter } from "@/components/StateFilter";
+import { ReportListingLink } from "@/components/ReportListingLink";
 
 // Round 40 — now reads a real DB table (machine-seeded from state-bar
 // board-certification records) rather than the static array round 27
@@ -50,17 +51,23 @@ export default async function AttorneysPage() {
             states: attorney.statesLicensed,
             searchText: `${attorney.name} ${attorney.firm ?? ""} ${attorney.practiceFocus.join(" ")} ${attorney.cityStateZip ?? ""}`,
             node: (
-              <Link
-                href={`/attorneys/${attorney.slug}`}
-                className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
-              >
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="font-semibold text-foreground">{attorney.name}</p>
-                  <p className="text-xs text-muted">{attorney.statesLicensed.join(", ")}</p>
+              <div className="rounded-xl border border-border bg-surface transition-colors hover:border-border-strong">
+                <Link href={`/attorneys/${attorney.slug}`} className="block p-5">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <p className="font-semibold text-foreground">{attorney.name}</p>
+                    <p className="text-xs text-muted">{attorney.statesLicensed.join(", ")}</p>
+                  </div>
+                  {attorney.firm && <p className="text-sm text-muted">{attorney.firm}</p>}
+                  <p className="mt-2 text-xs text-muted">{attorney.practiceFocus.join(" · ")}</p>
+                </Link>
+                <div className="border-t border-border px-5 py-2">
+                  <ReportListingLink
+                    entityType="attorney"
+                    entityId={attorney.id}
+                    entityName={attorney.name}
+                  />
                 </div>
-                {attorney.firm && <p className="text-sm text-muted">{attorney.firm}</p>}
-                <p className="mt-2 text-xs text-muted">{attorney.practiceFocus.join(" · ")}</p>
-              </Link>
+              </div>
             ),
           }))}
         />

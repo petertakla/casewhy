@@ -4,6 +4,7 @@ import {
   ACCREDITED_REPRESENTATIVE_DIRECTORY_DISCLAIMER,
 } from "@/lib/accredited-representatives/directory";
 import { StateFilter } from "@/components/StateFilter";
+import { ReportListingLink } from "@/components/ReportListingLink";
 
 // Unlike /attorneys (a static in-source array), this reads a real DB table
 // that gets re-seeded periodically and grows via approved applications —
@@ -53,20 +54,26 @@ export default async function AccreditedRepresentativesPage() {
             states: [rep.state],
             searchText: `${rep.representativeName} ${rep.organizationName} ${rep.cityStateZip ?? ""} ${rep.streetAddress ?? ""}`,
             node: (
-              <Link
-                href={`/accredited-representatives/${rep.slug}`}
-                className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
-              >
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="font-semibold text-foreground">{rep.representativeName}</p>
-                  <p className="text-xs text-muted">{rep.state}</p>
+              <div className="rounded-xl border border-border bg-surface transition-colors hover:border-border-strong">
+                <Link href={`/accredited-representatives/${rep.slug}`} className="block p-5">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <p className="font-semibold text-foreground">{rep.representativeName}</p>
+                    <p className="text-xs text-muted">{rep.state}</p>
+                  </div>
+                  <p className="text-sm text-muted">{rep.organizationName}</p>
+                  <p className="mt-1 text-xs text-muted">
+                    {rep.dhsOnly ? "DHS only" : "Full accreditation"}
+                    {rep.accreditationPendingRenewal ? " · renewal pending" : ""}
+                  </p>
+                </Link>
+                <div className="border-t border-border px-5 py-2">
+                  <ReportListingLink
+                    entityType="accredited_representative"
+                    entityId={rep.id}
+                    entityName={rep.representativeName}
+                  />
                 </div>
-                <p className="text-sm text-muted">{rep.organizationName}</p>
-                <p className="mt-1 text-xs text-muted">
-                  {rep.dhsOnly ? "DHS only" : "Full accreditation"}
-                  {rep.accreditationPendingRenewal ? " · renewal pending" : ""}
-                </p>
-              </Link>
+              </div>
             ),
           }))}
         />

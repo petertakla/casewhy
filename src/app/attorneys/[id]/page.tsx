@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getAttorneyBySlug } from "@/lib/attorneys/directory";
 import { BackLink } from "@/components/BackLink";
+import { ReportListingLink } from "@/components/ReportListingLink";
 
 // Round 40 — now reads a real DB table by slug rather than the static
 // array's id field. Directory param name kept as [id] (unchanged route)
@@ -64,6 +65,10 @@ export default async function AttorneyDetailPage({
         This is an informational listing, not an endorsement or a referral service. Always confirm
         current bar standing yourself before hiring anyone.
       </p>
+
+      <div className="mt-6">
+        <ReportListingLink entityType="attorney" entityId={attorney.id} entityName={attorney.name} />
+      </div>
     </main>
   );
 }

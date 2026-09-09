@@ -3,7 +3,13 @@
 import { useEffect, useState, useTransition } from "react";
 import { updateStatusChangeEmails, updateNewsSource } from "./actions";
 import type { NewsSource } from "@/lib/news/sources";
-import { urlBase64ToUint8Array, isIosNotInstalled, isPushSupported } from "@/lib/push/client";
+import {
+  urlBase64ToUint8Array,
+  isIosNotInstalled,
+  isPushSupported,
+  detectBrowser,
+  NOTIFICATION_BLOCKED_HELP,
+} from "@/lib/push/client";
 
 function ToggleRow({
   label,
@@ -46,6 +52,9 @@ function PushNotificationsRow() {
   >("checking");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [blockedHelp, setBlockedHelp] = useState<
+    (typeof NOTIFICATION_BLOCKED_HELP)[keyof typeof NOTIFICATION_BLOCKED_HELP] | null
+  >(null);
 
   useEffect(() => {
     if (!isPushSupported()) {
@@ -58,6 +67,7 @@ function PushNotificationsRow() {
     }
     if (Notification.permission === "denied") {
       setStatus("denied");
+      setBlockedHelp(NOTIFICATION_BLOCKED_HELP[detectBrowser()]);
       return;
     }
     navigator.serviceWorker.ready
@@ -73,6 +83,7 @@ function PushNotificationsRow() {
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
         setStatus("denied");
+        setBlockedHelp(NOTIFICATION_BLOCKED_HELP[detectBrowser()]);
         return;
       }
       const registration = await navigator.serviceWorker.ready;
@@ -155,10 +166,30 @@ function PushNotificationsRow() {
         />
       </label>
       {status === "denied" && (
-        <p className="mt-1 text-xs text-red-500">
-          Notifications are blocked for this site in your browser settings. Allow notifications
-          for casewhy.com to turn this on.
-        </p>
+        <div className="mt-1">
+          <p className="text-xs text-red-500">
+            Notifications are blocked for this site in your browser settings. Allow notifications
+            for casewhy.com to turn this on.
+          </p>
+          {blockedHelp && (
+            <p className="mt-1 text-xs text-muted">
+              {blockedHelp.instructions}
+              {blockedHelp.helpUrl && (
+                <>
+                  {" "}
+                  <a
+                    href={blockedHelp.helpUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                  >
+                    Learn more
+                  </a>
+                </>
+              )}
+            </p>
+          )}
+        </div>
       )}
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
     </div>

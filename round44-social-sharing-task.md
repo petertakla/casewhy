@@ -1,0 +1,34 @@
+# New task for Claude Code — round 44: social sharing links, placed strategically across CaseWhy
+
+**Status: authorized now.** Peter's direct ask: add social media sharing to CaseWhy pages so users can share the app/its resources with friends and family — word-of-mouth is the whole organic marketing plan (`immigration-case-companion-mvp-scope.md` Section 7), and right now there's no actual mechanism for a user to pass anything along beyond copying a URL by hand.
+
+## The one rule that matters more than placement: never let a share leak anything private
+
+CaseWhy encrypts receipt numbers at rest and has never put case-specific data in a shareable link. **Every share button built in this round must default to generic, non-personal share text and a generic URL** — the app name, a one-line pitch, and a link to `casewhy.com` (or the specific public page being shared, e.g. a Get Help permalink or a news article). **Never auto-populate share text with a receipt number, a case status, a status-change date, or anything else tied to one user's specific case** — even the "your case moved" dashboard moment (see placement 4 below) shares the *idea* ("I found a tool that actually explains USCIS delays"), not the user's own case detail. If a placement's natural share text would need to reference the user's specific situation to make sense, rewrite it generic instead of scoping it down — don't ship a "mostly generic, one field pulled from the account" version.
+
+## Mechanism — one shared component, reused everywhere
+
+Build a single `<ShareButton>` (or `<SharePanel>`) component, reused at every placement below rather than one-off implementations per page:
+
+- **Mobile / any browser that supports it**: use the native Web Share API (`navigator.share()`) first — it's the best UX where available (iOS Safari, Android Chrome, most mobile browsers) since it hands off to the OS's own share sheet (Messages, WhatsApp, Mail, etc.) rather than CaseWhy reinventing a channel list.
+- **Fallback (desktop browsers without `navigator.share`, or as an explicit "more options" expansion)**: a small set of direct share links — X/Twitter, Facebook, LinkedIn, WhatsApp (web link format, works well on desktop too for immigrant-community outreach specifically), and a plain "copy link" button (clipboard API, with a real "Copied!" confirmation state, not just a silent action). Email/mailto as a sixth option, since a personal email is a very natural way to pass this along to a family member.
+- Each placement passes the component its own `{url, title, text}` — but per the rule above, `text` is always the generic pitch line for that page type (see suggested copy per placement below), never anything account-specific.
+- Confirm no analytics/tracking parameter gets appended to shared URLs that would leak who shared it in a way that violates the existing privacy posture — a simple UTM-style `?ref=share` for basic reach measurement is fine (doesn't identify the sharer or the recipient), but nothing tied to an account ID or receipt number.
+
+## Placement — where this actually goes, and why each one earns its spot
+
+1. **`casewhy.com`'s marketing homepage** (static `main` branch) — a share button near the top (hero area or right after the intro), generic pitch: *"Track your USCIS case, understand what's actually happening, and find real help — free, no ads, ever."* This is the core "tell a friend who's also going through the process" moment — the single highest-value placement, since most people going through an immigration case know others who are too.
+2. **The Get Help hub (`/get-help`) and every entity-type page/permalink** (`/attorneys/<id>`, `/accredited-representatives/<slug>`, `/legal-aid/<id>`, and DSOs/community-orgs once round 43 ships) — this is arguably the *best* placement in the whole app: someone browsing a legal aid org or an accredited representative listing is very likely doing it on behalf of a friend or family member, not just themselves. Share text here should reference the specific resource, not just the app: *"Found this on CaseWhy — [Org Name], a free/low-cost immigration resource — thought you should see it."* (Still no case data — this is fine because it's about the *listing*, a public, non-personal record, not the sharing user's own case.)
+3. **The founder story, once posted** (`founder-story-drafts.md` — LinkedIn/X content, not yet posted) and any future blog/press content — standard share buttons on any long-form content page, generic "read this" framing.
+4. **The dashboard, on a genuinely positive status-change moment only** (e.g., approval, oath ceremony scheduled) — a soft, dismissible "Know someone else waiting on a case? Tell them about CaseWhy" prompt with a share button, generic app-pitch text only (per the no-leak rule above — this is triggered by the user's own good news, but the share content itself never states what that news was). Do **not** add this prompt on negative/neutral status changes or on the stalled-case escalation flow — that's not the moment to ask someone to share an app, it reads as tone-deaf.
+5. **`/plus`, `/processing-times`, `/visa-bulletin`, `/news`** — standard content-page share buttons, generic page-appropriate text (e.g. the visa bulletin page shares as *"Track visa bulletin movement for free with CaseWhy"*).
+6. **`app.casewhy.com`'s footer and `casewhy.com`'s footer** — a persistent, low-friction "Share CaseWhy" link/icon row alongside the existing Privacy/Terms/Get Help footer links, always available even on pages that don't have a dedicated share button.
+
+## What this round does NOT include
+
+- No new backend tracking table, referral-code system, or "invite and get X" incentive mechanic — this is plain sharing, not a referral program. (A referral-rewards program is a real, separate, bigger idea — flag it back if worth scoping later, don't build it as part of this.)
+- No requirement to build official CaseWhy social media accounts/handles to share *to* — sharing to X/Facebook/LinkedIn/WhatsApp works via their standard public share-intent URLs regardless of whether CaseWhy itself has an account on each platform.
+
+## Verify live
+
+`tsc`/lint clean, production build succeeds. Confirm `navigator.share()` path works on a real mobile browser (or at minimum, confirmed via devtools' mobile emulation plus checking MDN's current support matrix if a real device isn't available) and that the desktop fallback renders correctly and each fallback link actually opens the right share-intent URL with the right pre-filled text. Confirm — this is the part that actually matters — that no share text or URL anywhere in the six placements contains a receipt number, case status, or any other account-specific data; spot-check placement 4 specifically since it's the one closest to a real account event. Report back and fold into `CLOUD_CLAUDE.md`'s standing status per the usual handoff pattern.

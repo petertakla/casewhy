@@ -93,6 +93,51 @@ export const stripeWebhookEvents = pgTable("stripe_webhook_events", {
   processedAt: timestamp("processed_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+// Round 50 — table-driven CaseWhy Plus pricing. `plan_prices` holds each
+// plan's base price; `pricing_rules` holds date-ranged discounts on top of
+// it, so a future price change is a data change (via
+// scripts/set-pricing-rule.ts) rather than a code deploy. Checkout computes
+// the effective price at session-creation time via inline Stripe
+// `price_data` (see src/lib/billing/pricing.ts) — no per-price-point Stripe
+// Price objects to manage. A base-price change only affects new
+// signups — existing Stripe Subscription objects keep charging whatever
+// they were created with (Peter's explicit decision, no migration path).
+export const planIdEnum = pgEnum("plan_id", ["plus_monthly", "plus_quarterly", "plus_annual"]);
+export const billingIntervalEnum = pgEnum("billing_interval", ["month", "year"]);
+export const pricingAdjustmentTypeEnum = pgEnum("pricing_adjustment_type", ["fixed_amount", "percent"]);
+
+export const planPrices = pgTable("plan_prices", {
+  planId: planIdEnum("plan_id").primaryKey(),
+  basePriceCents: integer("base_price_cents").notNull(),
+  billingInterval: billingIntervalEnum("billing_interval").notNull(),
+  // 1 for monthly/annual, 3 for quarterly (Stripe's recurring interval is
+  // interval + interval_count, not a native "quarter" unit).
+  intervalCount: integer("interval_count").notNull(),
+});
+
+export const pricingRules = pgTable(
+  "pricing_rules",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    planId: planIdEnum("plan_id").notNull(),
+    adjustmentType: pricingAdjustmentTypeEnum("adjustment_type").notNull(),
+    // Interpreted per adjustmentType: cents to subtract for "fixed_amount",
+    // basis points off (1000 = 10%) for "percent" — both plain integers to
+    // avoid float rounding error, same convention Stripe itself uses for
+    // amounts.
+    adjustmentValue: integer("adjustment_value").notNull(),
+    effectiveStart: timestamp("effective_start", { withTimezone: true }).notNull(),
+    // Null = open-ended (no end date).
+    effectiveEnd: timestamp("effective_end", { withTimezone: true }),
+    label: text("label").notNull(),
+    active: boolean("active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("pricing_rules_plan_id_idx").on(table.planId)]
+);
+
 // CW-35's chat metering: one row per user per calendar month (UTC),
 // incremented once per successful chat reply. See
 // src/lib/billing/chat-usage.ts.

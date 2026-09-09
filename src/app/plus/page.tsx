@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth/server";
 import { getSubscriptionDetails } from "@/lib/billing/tier";
+import { getAllEffectivePrices, type EffectivePrice, type PlanId } from "@/lib/billing/pricing";
 import { startCheckout, openBillingPortal } from "./actions";
 import { ShareButton } from "@/components/ShareButton";
 
@@ -95,6 +96,59 @@ function FeatureRow({ id, title, free, plus }: { id: string; title: string; free
   );
 }
 
+const PLAN_PERIOD_LABEL: Record<PlanId, string> = {
+  plus_monthly: "/ month",
+  plus_quarterly: "/ 3 months",
+  plus_annual: "/ year",
+};
+
+const PLAN_MONTHS: Record<PlanId, number> = {
+  plus_monthly: 1,
+  plus_quarterly: 3,
+  plus_annual: 12,
+};
+
+function formatDollars(cents: number): string {
+  return (cents / 100).toFixed(2);
+}
+
+function PlanCard({
+  planId,
+  price,
+  canSubscribe,
+}: {
+  planId: PlanId;
+  price: EffectivePrice;
+  canSubscribe: boolean;
+}) {
+  const perMonth = price.priceCents / PLAN_MONTHS[planId];
+  return (
+    <div className="flex flex-col rounded-xl border border-border bg-surface p-5">
+      <p className="text-sm font-semibold text-muted">
+        {planId === "plus_monthly" ? "Monthly" : planId === "plus_quarterly" ? "Quarterly" : "Annual"}
+      </p>
+      <p className="mt-1">
+        <span className="font-mono text-2xl font-bold text-foreground">${formatDollars(price.priceCents)}</span>{" "}
+        <span className="text-sm text-muted">{PLAN_PERIOD_LABEL[planId]}</span>
+      </p>
+      <p className="mt-1 text-xs text-muted">${formatDollars(perMonth)} / month equivalent</p>
+      {price.appliedRuleLabel && (
+        <p className="mt-1 text-xs font-medium text-brand-600 dark:text-brand-400">{price.appliedRuleLabel}</p>
+      )}
+      {canSubscribe && (
+        <form action={startCheckout.bind(null, planId)} className="mt-4">
+          <button
+            type="submit"
+            className="w-full rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600"
+          >
+            Subscribe
+          </button>
+        </form>
+      )}
+    </div>
+  );
+}
+
 function FaqItem({ q, a }: { q: string; a: string }) {
   return (
     <div className="border-b border-border py-4 last:border-b-0">
@@ -113,6 +167,7 @@ export default async function PlusPage({
   const { data: session } = await auth.getSession();
   const details = session?.user ? await getSubscriptionDetails(session.user.id) : null;
   const isPlus = details?.tier === "plus";
+  const prices = await getAllEffectivePrices();
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
@@ -131,11 +186,6 @@ export default async function PlusPage({
       <p className="mb-2 mt-2 text-lg text-muted">
         Everything CaseWhy does, without the limits — for you and your whole family.
       </p>
-      <p className="text-sm text-muted">
-        <span className="font-mono text-xl font-bold text-foreground">$9.99</span> / month, billed
-        monthly, cancel anytime.
-      </p>
-
       <div className="mt-4">
         <ShareButton
           url="https://app.casewhy.com/plus"
@@ -157,15 +207,8 @@ export default async function PlusPage({
         </div>
       )}
 
-      <div className="mt-6">
-        {!session?.user ? (
-          <Link
-            href="/auth/sign-in"
-            className="inline-block rounded-lg bg-brand-500 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-600"
-          >
-            Sign in to subscribe
-          </Link>
-        ) : isPlus ? (
+      {isPlus ? (
+        <div className="mt-6">
           <form action={openBillingPortal}>
             <button
               type="submit"
@@ -174,17 +217,30 @@ export default async function PlusPage({
               Manage subscription
             </button>
           </form>
-        ) : (
-          <form action={startCheckout}>
-            <button
-              type="submit"
-              className="rounded-lg bg-brand-500 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-600"
-            >
-              Subscribe to CaseWhy Plus
-            </button>
-          </form>
-        )}
-      </div>
+        </div>
+      ) : (
+        <>
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <PlanCard planId="plus_monthly" price={prices.plus_monthly} canSubscribe={!!session?.user} />
+            <PlanCard planId="plus_quarterly" price={prices.plus_quarterly} canSubscribe={!!session?.user} />
+            <PlanCard planId="plus_annual" price={prices.plus_annual} canSubscribe={!!session?.user} />
+          </div>
+          {!session?.user && (
+            <div className="mt-4">
+              <Link
+                href="/auth/sign-in"
+                className="inline-block rounded-lg bg-brand-500 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-600"
+              >
+                Sign in to subscribe
+              </Link>
+            </div>
+          )}
+          <p className="mt-4 text-xs text-muted">
+            No refunds, no proration — cancel anytime and you&apos;ll keep access through the end of
+            your current billing period.
+          </p>
+        </>
+      )}
 
       <div className="mt-10 rounded-2xl border border-border bg-surface p-6">
         <div className="grid grid-cols-[1fr_auto_auto] gap-4 border-b border-border-strong pb-3 text-xs font-semibold uppercase tracking-widest text-muted sm:grid-cols-[1fr_140px_140px]">

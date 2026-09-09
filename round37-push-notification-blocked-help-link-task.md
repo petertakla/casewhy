@@ -1,0 +1,14 @@
+# New task for Claude Code — round 37: add a help link when push notifications are browser-blocked
+
+**Status: authorized now.** Peter tried enabling push notifications (round 26 feature, Settings toggle) and got: *"Notifications are blocked for this site in your browser settings. Allow notifications for casewhy.com to turn this on."* Round 26's own done-note already anticipated this exact "denied" state in the settings toggle UI, but the message alone leaves the user stuck — there's no way for JavaScript to reopen a browser's notification-permission prompt once the user has denied or blocked it, so the fix is guiding them to the right settings screen, not retrying the permission request.
+
+## What to add
+
+Next to (or directly below) that existing "Notifications are blocked..." message in the push-notification settings toggle, add a link or short instructions to get there. Since there's no single URL that works across all browsers, and browser sniffing is inherently a little fragile, do this in whatever order is simplest to get right and honest about its limits:
+
+1. **If a reliable browser detection already exists in the codebase (check first, don't add a second one)** — or a lightweight one is trivial to add — show browser-specific instructions: Chrome/Edge (`chrome://settings/content/notifications` or the padlock/site-info icon in the address bar → Site settings → Notifications), Firefox (padlock icon → Connection secure → More information → Permissions, or `about:preferences#privacy`), Safari (Safari menu → Settings → Websites → Notifications). Note `chrome://` and similar internal URLs can't be linked to directly and opened via `window.location` from a web page in every browser — verify this actually works before shipping it as a clickable link, and fall back to plain written instructions plus the icon/menu path if a direct link isn't reliable.
+2. **If detection feels too fragile to get right confidently this round**, ship the simpler version instead: a short, generic instruction ("Notifications are blocked for this site — look for a lock or site-info icon in your browser's address bar, click it, and allow notifications for casewhy.com") plus a "Learn more" link to a general help resource on managing site notification permissions (verify a real URL, don't guess one). Either version is fine — the requirement is that the user isn't left with a dead-end message and no next step, not a specific implementation.
+
+## Verify live
+
+Confirm the message change is visible in the actual blocked-notifications state (the same state Peter hit — notifications previously denied at the browser level, not just never asked). `tsc`/lint clean, production build succeeds, deployed and confirmed live. Report back and fold into `CLOUD_CLAUDE.md`'s standing status per the usual handoff pattern (round 26's original section is the natural place to note this follow-up).

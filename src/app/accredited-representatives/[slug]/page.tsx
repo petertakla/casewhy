@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAccreditedRepresentativeBySlug } from "@/lib/accredited-representatives/directory";
+import { BackLink } from "@/components/BackLink";
 
 export default async function AccreditedRepresentativeDetailPage({
   params,
@@ -13,9 +13,7 @@ export default async function AccreditedRepresentativeDetailPage({
 
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-10">
-      <Link href="/accredited-representatives" className="text-sm text-brand-600 hover:underline dark:text-brand-400">
-        ← All accredited representatives
-      </Link>
+      <BackLink href="/accredited-representatives" label="All accredited representatives" />
 
       <h1 className="mt-4 text-2xl font-bold tracking-tight">{rep.representativeName}</h1>
       <p className="mt-1 text-muted">{rep.organizationName}</p>

@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ATTORNEY_DIRECTORY } from "@/lib/attorneys/directory";
+import { BackLink } from "@/components/BackLink";
 
 // New task, same day as round 29/30/31 — every directory entry across all
 // entity types gets its own permalink (decided Sep 8, applies uniformly).
@@ -18,9 +18,7 @@ export default async function AttorneyDetailPage({
 
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-10">
-      <Link href="/attorneys" className="text-sm text-brand-600 hover:underline dark:text-brand-400">
-        ← All attorneys
-      </Link>
+      <BackLink href="/attorneys" label="All attorneys" />
 
       <h1 className="mt-4 text-2xl font-bold tracking-tight">{attorney.name}</h1>
       <p className="mt-1 text-muted">{attorney.firm}</p>

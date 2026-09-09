@@ -17,8 +17,19 @@
 // functions can't cross the server/client boundary as props. Each caller
 // builds its own entity-specific markup server-side and passes it down as
 // `node`; this component only ever handles plain, serializable data.
+//
+// The selected state and search text are reflected in the URL's own query
+// string (?state=&q=) rather than kept only in local component state —
+// round 36's real bug: a permalink page's "back to all" link hard-linked to
+// the bare list URL, silently dropping whatever filter the user had applied
+// before clicking into an entry. Syncing to the URL means the list page's
+// own address reflects the current filter, so a real browser back
+// navigation (see BackLink.tsx) lands on that same filtered view instead of
+// resetting to the unfiltered list — and, as a side benefit, a filtered view
+// is now linkable/bookmarkable on its own.
 
 import { useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 // All 50 states + DC. Some entity types will have zero current entries for
 // a given state (a real data gap, not a bug) — still listed, disabled, so
@@ -52,8 +63,20 @@ export function StateFilter({
   searchPlaceholder = "Search by name, organization, or city",
   emptyMessage = "No entries match.",
 }: StateFilterProps) {
-  const [selectedState, setSelectedState] = useState("");
-  const [search, setSearch] = useState("");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [selectedState, setSelectedState] = useState(() => searchParams.get("state") ?? "");
+  const [search, setSearch] = useState(() => searchParams.get("q") ?? "");
+
+  function updateUrl(nextState: string, nextSearch: string) {
+    const params = new URLSearchParams();
+    if (nextState) params.set("state", nextState);
+    if (nextSearch) params.set("q", nextSearch);
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }
 
   const counts = useMemo(() => {
     const c = new Map<string, number>();
@@ -83,7 +106,10 @@ export function StateFilter({
         <select
           id="state-filter-select"
           value={selectedState}
-          onChange={(e) => setSelectedState(e.target.value)}
+          onChange={(e) => {
+            setSelectedState(e.target.value);
+            updateUrl(e.target.value, search);
+          }}
           className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-foreground"
         >
           <option value="">All states ({items.length})</option>
@@ -96,7 +122,10 @@ export function StateFilter({
         <input
           type="text"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            updateUrl(selectedState, e.target.value);
+          }}
           placeholder={searchPlaceholder}
           className="min-w-[220px] flex-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-foreground placeholder:text-muted"
         />

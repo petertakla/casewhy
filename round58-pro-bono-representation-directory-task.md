@@ -1,0 +1,46 @@
+# New task for Claude Code — round 58: build a 7th Get Help entity type — pro bono immigration-court representation
+
+**Status: authorized now, Sep 10.** Peter surfaced two EOIR pages (`justice.gov/eoir/find-legal-representation` and `justice.gov/eoir/list-pro-bono-legal-service-providers`) and asked whether CaseWhy could use them. Researched directly (cloud session, not guessed): the "Find Legal Representation" hub's main directory (Recognition & Accreditation roster) is **already** `/legal-aid` and `/accredited-representatives`'s exact source — nothing new there. But the **separate** "List of Pro Bono Legal Service Providers" is a genuinely different, currently-unused dataset, and Peter explicitly chose to build it as its own new Get Help category rather than merge it into `/legal-aid` (see "Why a new category, not a merge" below).
+
+## What this data actually is — checked directly, not assumed
+
+Source: `https://www.justice.gov/eoir/file/probonofulllist/download` (PDF), linked from `https://www.justice.gov/eoir/list-pro-bono-legal-service-providers`. Published quarterly (Jan/Apr/Jul/Oct) by EOIR's Office of Policy. Organized **by immigration court location** (e.g. "Florida — Miami Immigration Court," "Arizona — Phoenix Immigration Court"), not by state directly — the state has to be derived from which court section an entry sits under. Confirmed real sample entries (verbatim, from a live fetch):
+
+- `Florence Immigrant and Refugee Rights Project* P.O. Box 32670 Phoenix, AZ 85064 Tel: (602) 307-1008 firrp@firrp.org www.firrp.org • Children cases only • No walk-ins • Please call to make an appointment` (Arizona — Phoenix Immigration Court)
+- `Americans for Immigrant Justice* 6355 NW 36 Street, Suite 309 Miami, FL 33166 Tel: (786) 454-8554 info@aijustice.org www.aijustice.org` (Florida — Miami Immigration Court)
+- `Church World Service* Miami Office: 1924 NW 84 Avenue Doral, FL 33126 Tel: (305) 774-6770 • Walk-ins or appointments • Languages: Spanish, Haitian Creole` (Florida — Miami Immigration Court)
+- `ABA Commission on Immigration Detention Information Hotline** 1050 Connecticut Avenue, NW, Unit 400 Washington, DC 20036 • Pro se case assistance for detained respondents only` (National service)
+
+Per-entry fields, confirmed present across the sample: organization name, address, phone, email/website, and (inconsistently) languages offered, case-type restrictions (e.g. "children cases only"), and intake policy (walk-in vs. appointment-only). Some entries are themselves **referral services**, not direct providers — flag these distinctly, don't treat them identically to a direct-service org. Confirm the exact PDF layout and asterisk/footnote meanings (`*`, `**`) directly against the live document before parsing — the samples above suggest at least two distinct footnote markers with different meanings, don't guess at what they mean.
+
+## Why a new category, not a merge into `/legal-aid` — Peter's explicit call
+
+Asked directly and confirmed: this becomes its own Get Help entity type (the 7th, alongside attorneys, accredited representatives, legal aid orgs, DSOs, community orgs, and the still-unbuilt employers placeholder), not additional rows in `/legal-aid`. Reasoning that led here, for context on the build:
+
+- **Different vetting story.** `/legal-aid`'s DOJ recognition is a real federal vetting mechanism. EOIR's own page for this list states explicitly: *"EOIR does not endorse any of these organizations, referral services, or attorneys... EOIR does not participate in, nor is it responsible for, the representation decisions or performance..."* — a meaningfully weaker guarantee than DOJ recognition. Keeping it as a separate category lets the page's own disclaimer say this plainly instead of blurring two different vetting strengths into one list.
+- **Different data shape.** Immigration-court jurisdiction, languages, walk-in policy, and case-type limits aren't fields `legalAidDirectory` has (or needs for its DOJ-recognition data) — a real schema mismatch, not just "more rows."
+- **Different practical need.** This list is specifically about representation *in immigration court proceedings* (removal defense) — a more specific, often higher-stakes need than `/legal-aid`'s general "help with my case" framing.
+
+## A real usage restriction — confirmed fine to proceed, but the wording matters for the disclaimer
+
+The EOIR page states verbatim: *"The List is not to be used by organizations or attorneys for the purpose of solicitation for paid legal services."* Flagged to Peter directly before building (a prior round, 34, deliberately avoided this exact list for this exact reason) — Peter confirmed CaseWhy's free-to-browse, free-to-join, no-fees-either-side model doesn't constitute solicitation and gave the explicit go-ahead. Given that, this restriction doesn't block the build, but **it does need to shape the page's own disclaimer** — quote EOIR's own non-endorsement language (above) directly in the new entity type's disclaimer text, same pattern as the exact-wording disclaimers already used elsewhere (round 39's Florida Bar language, `LEGAL_AID_DIRECTORY_DISCLAIMER`). Don't paraphrase EOIR's disclaimer — quote it.
+
+## Build
+
+- New DB table (e.g. `proBonoRepresentationDirectory`) — fields: `organizationName`, `slug`, `streetAddress`, `cityStateZip`, `state` (derived from the court section), `immigrationCourt` (the court name/city it's listed under — some orgs may appear under multiple courts; decide how to handle that once you see the real parsed data, don't guess now), `phone`, `email`, `website`, `languages` (nullable), `caseTypeLimits` (nullable, e.g. "Children cases only"), `intakePolicy` (nullable, e.g. "No walk-ins — call for appointment"), `isReferralService` (boolean), `sourceCitation`. Mirror the existing seed-script pattern (`scripts/seed-legal-aid-orgs.ts` is the closest analog) — a full delete-and-reseed script, not an incremental one, same reasoning as every other machine-seeded directory here.
+- New page, e.g. `/pro-bono-representation` (pick the clearest route name — check it doesn't collide with anything) — same shell as the other five live entity types: `<StateFilter>`, `<BackLink>` on the detail page, `<ReportListingLink>`, `<VerificationLinks>` (round 48's Google/ChatGPT links), social sharing (round 44's `<ShareButton>`). A permalink page per org, same as every other entity type.
+- Get Help hub (`/get-help`) gets a 7th card. Check how the grid/layout currently handles 6 cards (5 live + employers placeholder) and confirm it reflows cleanly at 7 — don't assume it does.
+- Nav and any other place the 6 entity types are enumerated (footer, static site's Get Help section) need the 7th added — grep for wherever the entity-type list is hardcoded rather than trusting memory of where it appears, same discipline as every prior copy-sweep round.
+- Self-enroll: decide whether this category gets a `/pro-bono-representation/join` application flow like the others (probably yes, for consistency) — if built, route new applications the same way as the others (lands in the DB as `pending` or similar, Postmark notification), and see round 59 (disciplined-practitioners screening) for whether new applications here should also get screened.
+
+## Dedup — a real, expected overlap with existing directories
+
+Several sample entries (Americans for Immigrant Justice, Church World Service) are large, well-known immigration legal-aid nonprofits that plausibly also appear in `/legal-aid`'s existing 865 DOJ-recognized orgs, or even `/accredited-representatives`. This is expected, not a parsing bug. Don't silently merge or dedupe them away — these are two different vetting/service facts about the same real-world organization (DOJ-recognized *and* pledges 50+ hrs/yr of court-specific pro bono representation). Run a real name-similarity pass after seeding both directories; where a strong match is found, it's fine to leave both listings live as-is (they're genuinely different information), but worth a note in your completion report on how much overlap actually exists — that's a real, useful data point for whether a future cross-link between the two listings is worth building, not something to guess at now.
+
+## What must not change
+
+Don't touch `/legal-aid`, `/accredited-representatives`, or any other existing entity type's data or schema. Don't build the employers placeholder (entity type 6) as part of this — that's still a separate, unbuilt slot.
+
+## Verify live
+
+Confirm the real PDF parses correctly (spot-check several states, not just Florida/Arizona from the samples above), the new page renders with state filter/search working, a permalink page for a real seeded org works with `<BackLink>`, `<ReportListingLink>`, `<VerificationLinks>`, and share all present, the Get Help hub's 7th card renders correctly at both desktop and mobile widths, the EOIR non-endorsement disclaimer is quoted verbatim (not paraphrased) on the new page, and — if a join flow is built — a real test application lands correctly with a confirmed Postmark send. `tsc`/lint clean, production build succeeds. Report back with the real total count seeded and the real dedup-overlap finding, and fold into `CLOUD_CLAUDE.md`'s standing status.

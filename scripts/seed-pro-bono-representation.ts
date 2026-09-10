@@ -1,9 +1,9 @@
 // Round 58 — seeds the pro bono immigration-court representation directory
 // (entity type 7) from EOIR's own quarterly "List of Pro Bono Legal Service
 // Providers" PDF (justice.gov/eoir/file/probonofulllist/download,
-// "Updated July 2026" per the document's own header). Parsed with a
-// column-aware Python/pdfplumber script (not checked into this repo —
-// throwaway, per this project's usual PDF-pipeline pattern) since the
+// "Updated July 2026" per the document's own header). Parsed with
+// scripts/parse-pro-bono-representation-pdf.py, a column-aware Python/
+// pdfplumber script — checked into this repo for reproducibility, since the
 // source is a genuinely two-column, gap-flowing layout where naive text
 // extraction interleaves adjacent organizations. Verified against several
 // of the source's own sample entries during parsing — see CLOUD_CLAUDE.md

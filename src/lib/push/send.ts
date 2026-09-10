@@ -1,14 +1,29 @@
 // Round 26 — server-side push send via web-push, wired into the same
 // notify path checkTrackedCaseNow() already uses for the Postmark email.
+//
+// Round 57 — setVapidDetails() used to run at module load time, which
+// meant merely *importing* this file (e.g. through check-status.ts's
+// import chain, pulled in by /api/chat and the dashboard's checkCaseNow
+// action) threw if VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY weren't set,
+// regardless of whether push was ever actually used — this is exactly what
+// broke GitHub Actions CI (no VAPID secrets configured there) and would
+// have broken any other environment missing just these two vars for the
+// same reason, unrelated to what it was actually trying to do. Lazy-init
+// instead: only required when a push send is genuinely attempted.
 
 import webpush from "web-push";
 import { getPushSubscriptionsForUser, deletePushSubscriptionByEndpoint, type StoredPushSubscription } from "./subscriptions";
 
-webpush.setVapidDetails(
-  "mailto:hello@casewhy.com",
-  process.env.VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
+let vapidConfigured = false;
+function ensureVapidConfigured(): void {
+  if (vapidConfigured) return;
+  webpush.setVapidDetails(
+    "mailto:hello@casewhy.com",
+    process.env.VAPID_PUBLIC_KEY!,
+    process.env.VAPID_PRIVATE_KEY!
+  );
+  vapidConfigured = true;
+}
 
 export interface CaseStatusPushPayload {
   title: string;
@@ -25,6 +40,7 @@ export interface CaseStatusPushPayload {
  * webhook/notification integration.
  */
 export async function sendPushToUser(userId: string, payload: CaseStatusPushPayload): Promise<void> {
+  ensureVapidConfigured();
   const subs = await getPushSubscriptionsForUser(userId);
   await Promise.all(subs.map((sub) => sendToOneSubscription(sub, payload)));
 }

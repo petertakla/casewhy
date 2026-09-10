@@ -59,12 +59,20 @@ export default async function NewsPage() {
                 </p>
                 <p className="mt-1.5 font-semibold text-foreground">{item.title}</p>
               </a>
-              <Link
-                href={`/news/${newsItemId(item)}`}
-                className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
-              >
-                Ask CaseWhy about this →
-              </Link>
+              <div className="mt-2 flex items-center justify-between text-xs font-medium">
+                <Link
+                  href={`/ask?link=${encodeURIComponent(`/news/${newsItemId(item)}`)}&ask=applies`}
+                  className="text-brand-600 hover:underline dark:text-brand-400"
+                >
+                  Does it apply to me?
+                </Link>
+                <Link
+                  href={`/ask?link=${encodeURIComponent(`/news/${newsItemId(item)}`)}&ask=explains`}
+                  className="text-brand-600 hover:underline dark:text-brand-400"
+                >
+                  How it applies to me?
+                </Link>
+              </div>
             </div>
           ))}
         </div>

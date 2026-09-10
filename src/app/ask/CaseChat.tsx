@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { suggestedQuestions } from "@/lib/ai/suggested-questions";
 import { linkifyExplanation } from "@/lib/kb/linkify";
@@ -24,15 +24,41 @@ interface UsageStatus {
   limitReached: boolean;
 }
 
+// Round 66 — the two quick-ask questions. The button label is the short,
+// consistent wording Peter specced; the message actually sent to the model
+// is deliberately fuller and differently-shaped for each, so the two
+// answers come back genuinely distinct (a relevance check vs. a concrete
+// effect-on-the-case explanation) rather than near-identical rewordings of
+// the same question.
+const QUICK_ASK = {
+  applies: {
+    label: "Does it apply to me?",
+    message:
+      "Does this specific policy or news item actually apply to my case? Answer yes, no, or uncertain based on my case's actual form type, status, and dates, and explain your reasoning — don't get into what it would mean for my case yet, just whether it applies.",
+  },
+  explains: {
+    label: "How it applies to me?",
+    message:
+      "Assuming this does apply to my case, explain concretely how it affects my case specifically — what it changes about my expected next steps or timeline, not just whether it's relevant.",
+  },
+} as const;
+
+export type QuickAskKind = keyof typeof QUICK_ASK;
+
 export function CaseChat({
   receiptNumber,
   statusText,
   formType,
+  initialLinkedUrl,
+  initialAutoAsk,
 }: {
   receiptNumber: string;
   /** Case's current status/form type, for the contextual suggested-question pills below. */
   statusText?: string;
   formType?: string;
+  /** Round 66 — a policy/news path arriving via `/ask?link=...`, auto-attached and auto-asked on first load. */
+  initialLinkedUrl?: string;
+  initialAutoAsk?: QuickAskKind;
 }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -60,9 +86,17 @@ export function CaseChat({
   const [linkInput, setLinkInput] = useState("");
   const [linkedUrl, setLinkedUrl] = useState<string | null>(null);
 
-  async function send(override?: string) {
+  async function send(override?: string, linkedUrlOverride?: string) {
     const text = (override ?? input).trim();
     if (!text || pending || limitReached) return;
+
+    // Round 66 — an explicit override always wins over state. attachAndAsk()
+    // calls setLinkedUrl() and send() in the same synchronous handler; state
+    // updates aren't guaranteed to have landed by the time send() reads
+    // linkedUrl, which would silently send the very first quick-ask question
+    // without the link attached. Passing the value straight through sidesteps
+    // the race entirely.
+    const effectiveLinkedUrl = linkedUrlOverride ?? linkedUrl;
 
     const nextMessages: Message[] = [...messages, { role: "user", content: text }];
     setMessages(nextMessages);
@@ -77,7 +111,7 @@ export function CaseChat({
         body: JSON.stringify({
           receiptNumber,
           messages: nextMessages,
-          ...(linkedUrl ? { linkedUrl } : {}),
+          ...(effectiveLinkedUrl ? { linkedUrl: effectiveLinkedUrl } : {}),
         }),
       });
       const data = await res.json();
@@ -110,6 +144,30 @@ export function CaseChat({
     }
   }
 
+  // Round 66 — one shared path for every way a quick-ask question gets
+  // triggered (the relatedPolicies links here, the attach-box's fixed pills,
+  // and the auto-fire effect below), instead of duplicating attach-then-send
+  // three times.
+  function attachAndAsk(url: string, question: string) {
+    setLinkedUrl(url);
+    send(question, url);
+  }
+
+  // Auto-fires once on a genuinely fresh load (an empty chat) when arriving
+  // via `/ask?link=...&ask=...` from `/news` or the dashboard. Guarded with a
+  // ref, not just the messages.length check, since this sends a real
+  // question against the user's cap — React's dev-mode double-invoke must
+  // never fire it twice.
+  const autoFiredRef = useRef(false);
+  useEffect(() => {
+    if (autoFiredRef.current) return;
+    if (initialLinkedUrl && initialAutoAsk && messages.length === 0) {
+      autoFiredRef.current = true;
+      attachAndAsk(initialLinkedUrl, QUICK_ASK[initialAutoAsk].message);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialLinkedUrl, initialAutoAsk]);
+
   return (
     <div className="rounded-2xl border border-border bg-surface">
       {relatedPolicies.length > 0 && (
@@ -119,19 +177,36 @@ export function CaseChat({
           </p>
           <ul className="mt-1.5 space-y-1 text-xs">
             {relatedPolicies.map((p) => (
-              <li key={p.id}>
-                <a
-                  href={p.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-brand-600 dark:text-brand-400 hover:underline"
-                >
-                  {p.title}
-                </a>
-                <span className="text-muted"> — {p.sourceTitle}</span>{" "}
-                <Link href={`/policy/${p.id}`} className="text-muted underline decoration-dotted hover:text-foreground">
-                  Ask CaseWhy about this →
-                </Link>
+              <li key={p.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                <span>
+                  <a
+                    href={p.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand-600 dark:text-brand-400 hover:underline"
+                  >
+                    {p.title}
+                  </a>
+                  <span className="text-muted"> — {p.sourceTitle}</span>
+                </span>
+                <span className="flex shrink-0 gap-3">
+                  <button
+                    type="button"
+                    disabled={pending || limitReached}
+                    onClick={() => attachAndAsk(`/policy/${p.id}`, QUICK_ASK.applies.message)}
+                    className="text-muted underline decoration-dotted hover:text-foreground disabled:opacity-60"
+                  >
+                    {QUICK_ASK.applies.label}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={pending || limitReached}
+                    onClick={() => attachAndAsk(`/policy/${p.id}`, QUICK_ASK.explains.message)}
+                    className="text-muted underline decoration-dotted hover:text-foreground disabled:opacity-60"
+                  >
+                    {QUICK_ASK.explains.label}
+                  </button>
+                </span>
               </li>
             ))}
           </ul>
@@ -252,18 +327,18 @@ export function CaseChat({
                 <button
                   type="button"
                   disabled={pending}
-                  onClick={() => send("Does this apply to my case?")}
+                  onClick={() => send(QUICK_ASK.applies.message)}
                   className="rounded-full border border-border-strong bg-surface-2 px-3 py-1.5 text-xs font-medium text-brand-600 transition-colors hover:border-brand-500 disabled:opacity-60 dark:text-brand-400"
                 >
-                  Does this apply to my case?
+                  {QUICK_ASK.applies.label}
                 </button>
                 <button
                   type="button"
                   disabled={pending}
-                  onClick={() => send("What does this mean for my case?")}
+                  onClick={() => send(QUICK_ASK.explains.message)}
                   className="rounded-full border border-border-strong bg-surface-2 px-3 py-1.5 text-xs font-medium text-brand-600 transition-colors hover:border-brand-500 disabled:opacity-60 dark:text-brand-400"
                 >
-                  What does this mean for my case?
+                  {QUICK_ASK.explains.label}
                 </button>
               </div>
             )}

@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth/server";
 import { getTrackedCases } from "@/app/dashboard/actions";
 import { CaseSwitcher } from "@/app/dashboard/CaseSwitcher";
 import { getCaseStatus, UscisApiError } from "@/lib/uscis/client";
-import { CaseChat } from "./CaseChat";
+import { CaseChat, type QuickAskKind } from "./CaseChat";
 
 export const dynamic = "force-dynamic";
 
@@ -15,12 +15,23 @@ function EmptyState({ children }: { children: React.ReactNode }) {
   );
 }
 
+function parseAutoAsk(value: string | undefined): QuickAskKind | undefined {
+  return value === "applies" || value === "explains" ? value : undefined;
+}
+
 export default async function AskPage({
   searchParams,
 }: {
-  searchParams: Promise<{ receipt?: string }>;
+  searchParams: Promise<{ receipt?: string; link?: string; ask?: string }>;
 }) {
-  const { receipt } = await searchParams;
+  const { receipt, link, ask } = await searchParams;
+  // Round 66 — a quick-ask link only auto-fires when both parts of the pair
+  // are present and well-formed; a bare `?link=` with no `?ask=` (or vice
+  // versa) is treated as if neither were there rather than guessed at.
+  const initialLinkedUrl = link?.trim() || undefined;
+  const initialAutoAsk = parseAutoAsk(ask);
+  const autoAskProps =
+    initialLinkedUrl && initialAutoAsk ? { initialLinkedUrl, initialAutoAsk } : {};
   const { data: session } = await auth.getSession();
 
   if (!session?.user) {
@@ -122,6 +133,7 @@ export default async function AskPage({
             receiptNumber={receiptNumber}
             statusText={statusText ?? undefined}
             formType={formType ?? undefined}
+            {...autoAskProps}
           />
         </>
       )}

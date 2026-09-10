@@ -114,7 +114,20 @@ function StalledCaseCard({ daysSinceLastUpdate, milestoneText }: { daysSinceLast
   );
 }
 
-function ExplanationBox({ explanation }: { explanation: CaseExplanation }) {
+function ExplanationBox({
+  explanation,
+  receiptNumber,
+  alreadyTracked,
+}: {
+  explanation: CaseExplanation;
+  receiptNumber: string;
+  /** Round 66 — quick-ask links only render for a case the signed-in user
+   * has actually tracked. `/ask`'s existing logic silently falls back to a
+   * different tracked case for an unrecognized `?receipt=`, so an ad-hoc,
+   * not-yet-tracked lookup would otherwise get misrouted to the wrong case
+   * instead of the one this citation is actually about. */
+  alreadyTracked: boolean;
+}) {
   return (
     <div className="mt-5 overflow-hidden rounded-xl border border-brand-500/20 bg-surface-2">
       <div className="flex gap-3 border-l-4 border-l-brand-500 p-4">
@@ -159,19 +172,34 @@ function ExplanationBox({ explanation }: { explanation: CaseExplanation }) {
               </p>
               <ul className="mt-1.5 space-y-1 text-xs">
                 {explanation.relatedPolicies.map((p) => (
-                  <li key={p.id}>
-                    <a
-                      href={p.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-brand-600 dark:text-brand-400 hover:underline"
-                    >
-                      {p.title}
-                    </a>
-                    <span className="text-muted"> — {p.sourceTitle}</span>{" "}
-                    <Link href={`/policy/${p.id}`} className="text-muted underline decoration-dotted hover:text-foreground">
-                      Ask CaseWhy about this →
-                    </Link>
+                  <li key={p.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                    <span>
+                      <a
+                        href={p.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-brand-600 dark:text-brand-400 hover:underline"
+                      >
+                        {p.title}
+                      </a>
+                      <span className="text-muted"> — {p.sourceTitle}</span>
+                    </span>
+                    {alreadyTracked && (
+                      <span className="flex shrink-0 gap-3 text-muted">
+                        <Link
+                          href={`/ask?link=${encodeURIComponent(`/policy/${p.id}`)}&ask=applies&receipt=${receiptNumber}`}
+                          className="underline decoration-dotted hover:text-foreground"
+                        >
+                          Does it apply to me?
+                        </Link>
+                        <Link
+                          href={`/ask?link=${encodeURIComponent(`/policy/${p.id}`)}&ask=explains&receipt=${receiptNumber}`}
+                          className="underline decoration-dotted hover:text-foreground"
+                        >
+                          How it applies to me?
+                        </Link>
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -239,7 +267,13 @@ function StatusCard({
         )}
       </div>
 
-      {explanation && <ExplanationBox explanation={explanation} />}
+      {explanation && (
+        <ExplanationBox
+          explanation={explanation}
+          receiptNumber={status.receiptNumber}
+          alreadyTracked={tracking?.alreadyTracked ?? false}
+        />
+      )}
 
       <p className="mt-4 text-sm leading-relaxed text-foreground/90">{status.statusDescription}</p>
 

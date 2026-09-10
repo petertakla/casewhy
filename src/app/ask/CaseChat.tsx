@@ -154,6 +154,18 @@ export function CaseChat({
       </div>
 
       <div className="border-t border-border p-4">
+        {limitReached && (
+          <div className="mb-3 rounded-lg border border-brand-500/30 bg-brand-500/5 p-3 text-sm">
+            <p className="font-medium text-foreground">You&apos;ve used all 10 free questions this month.</p>
+            <p className="mt-1 text-muted">
+              Get unlimited questions with{" "}
+              <Link href="/plus#ai-chat" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
+                CaseWhy Plus
+              </Link>{" "}
+              — every answer still grounded in real USCIS policy, with citations.
+            </p>
+          </div>
+        )}
         {pills.length > 0 && !limitReached && (
           <div className="mb-3 flex flex-wrap gap-2">
             {pills.map((q) => (

@@ -184,7 +184,8 @@ export default async function PlusPage({
 
       <h1 className="text-3xl font-bold tracking-tight">CaseWhy Plus</h1>
       <p className="mb-2 mt-2 text-lg text-muted">
-        Everything CaseWhy does, without the limits — for you and your whole family.
+        Unlimited, cited AI chat about your case — plus the escalation toolkit for when it
+        stalls. For you and your whole family.
       </p>
       <div className="mt-4">
         <ShareButton
@@ -239,6 +240,40 @@ export default async function PlusPage({
             No refunds, no proration — cancel anytime and you&apos;ll keep access through the end of
             your current billing period.
           </p>
+
+          <div className="mt-8 grid grid-cols-1 gap-4 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6 sm:grid-cols-2">
+            <div>
+              <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
+                Unlimited questions, actually grounded
+              </p>
+              <p className="mt-1.5 text-sm text-muted">
+                Ask as many questions as you need, the moment your case changes. Every answer
+                cites CaseWhy&apos;s own USCIS policy knowledge base — not a generic chatbot
+                guessing.
+              </p>
+              <a
+                href="#ai-chat"
+                className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
+              >
+                See how it works →
+              </a>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
+                A real escalation toolkit
+              </p>
+              <p className="mt-1.5 text-sm text-muted">
+                When a case stalls, find your real congressional representative and draft a real
+                escalation letter — pre-filled with your case&apos;s details, not a blank page.
+              </p>
+              <a
+                href="#escalation-letters"
+                className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
+              >
+                See how it works →
+              </a>
+            </div>
+          </div>
         </>
       )}
 

@@ -106,7 +106,7 @@ export default function LandingPage() {
             <FeatureCard
               step={4}
               title="Act"
-              description="General next-step guidance for your situation, and a clear line to a licensed immigration attorney the moment something is specific to your case."
+              description="General next-step guidance for your situation — including a free AI chat for general questions, no sign-up needed — and a clear line to a licensed immigration attorney the moment something is specific to your case."
             />
           </div>
         </div>

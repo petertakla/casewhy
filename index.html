@@ -253,7 +253,7 @@
   .badge.live{background:var(--brand-50);color:var(--brand-600);}
   @media (prefers-color-scheme: dark){ .badge.live{background:rgba(91,158,237,0.15);color:var(--brand-400);} }
   .badge.soon{background:var(--surface-2);color:var(--muted);}
-  .get-help-cta-row{text-align:center;margin-top:36px;}
+  .get-help-cta-row{text-align:center;margin-top:36px;display:flex;flex-wrap:wrap;justify-content:center;gap:14px;}
   .get-help-cta-row a.button{
     display:inline-block;
     padding:14px 26px;
@@ -264,6 +264,13 @@
     text-decoration:none;
   }
   .get-help-cta-row a.button:hover{background:var(--brand-600);}
+  .get-help-cta-row a.button.secondary{
+    background:transparent;
+    color:var(--brand-600);
+    border:1px solid var(--border-strong);
+  }
+  @media (prefers-color-scheme: dark){ .get-help-cta-row a.button.secondary{color:var(--brand-400);} }
+  .get-help-cta-row a.button.secondary:hover{background:var(--surface-2);}
 
   .trust{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
   .trust .wrap{max-width:760px;}
@@ -404,6 +411,7 @@
     <h2>More than a tracker — real help, free</h2>
     <p class="section-note">Other case trackers stop at a status update. CaseWhy connects you to real help — attorneys, accredited representatives, and free legal aid — built into the app.</p>
     <p class="free-line">Free to use, always — no fees, no ads, ever.</p>
+    <p class="section-note">Not sure which one you need? Answer two quick questions and we'll point you to the right option — or just ask CaseWhy's AI directly, free, no sign-up required.</p>
     <div class="get-help-grid">
       <a class="get-help-card live" href="https://app.casewhy.com/attorneys">
         <div class="row"><h3>Attorneys</h3><span class="badge live">Live</span></div>
@@ -436,6 +444,7 @@
     </div>
     <div class="get-help-cta-row">
       <a class="button" href="https://app.casewhy.com/get-help">Explore Get Help →</a>
+      <a class="button secondary" href="https://app.casewhy.com/get-help/ask">Ask a free question →</a>
     </div>
   </div>
 </section>

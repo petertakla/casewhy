@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { ShareButton } from "@/components/ShareButton";
+import { ENTITY_TYPES } from "@/lib/get-help/entity-types";
+import { GetHelpChooser } from "./GetHelpChooser";
 
 // Round 29 — ties the separate "talk to a professional" directories
 // together so they're discoverable as one coherent feature instead of a
@@ -18,47 +20,12 @@ import { ShareButton } from "@/components/ShareButton";
 // a 7th entity type (pro bono immigration-court representation), not part
 // of the original six-part backlog. Only employers (entity type 6, gated
 // on a team-accounts product decision) remains a placeholder.
-const LIVE_CATEGORIES = [
-  {
-    href: "/attorneys",
-    label: "Attorneys",
-    description:
-      "Licensed immigration attorneys who can represent you and give advice specific to your case.",
-  },
-  {
-    href: "/accredited-representatives",
-    label: "Accredited representatives",
-    description:
-      "DOJ-accredited, non-lawyer representatives — often at nonprofits — authorized to practice immigration law.",
-  },
-  {
-    href: "/legal-aid",
-    label: "Legal aid & nonprofit organizations",
-    description: "Immigration help for those who can't afford a private attorney.",
-  },
-  {
-    href: "/pro-bono-representation",
-    label: "Pro bono immigration-court representation",
-    description: "Free representation in immigration court proceedings, organized by court.",
-  },
-  {
-    href: "/dso",
-    label: "University international student offices",
-    description: "Find your school's international student office, for F-1/M-1 status questions.",
-  },
-  {
-    href: "/community-orgs",
-    label: "Community & cultural organizations",
-    description: "Local and cultural organizations that support immigrants.",
-  },
-];
-
-const COMING_SOON_CATEGORIES = [
-  {
-    label: "For employers",
-    description: "Sponsoring or supporting employees through the immigration process.",
-  },
-];
+//
+// Round 60 — the category list itself now lives in
+// src/lib/get-help/entity-types.ts (this page and the new chooser both read
+// from it), and each live category shows a `whenToUse` trigger sentence
+// alongside its description — answers "which one applies to me" directly,
+// which the page never said anywhere before.
 
 export default function GetHelpPage() {
   return (
@@ -86,32 +53,38 @@ export default function GetHelpPage() {
         />
       </div>
 
-      <div className="mt-8 space-y-4">
-        {LIVE_CATEGORIES.map((category) => (
-          <Link
-            key={category.href}
-            href={category.href}
-            className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
-          >
-            <p className="font-semibold text-foreground">{category.label}</p>
-            <p className="mt-1 text-sm text-muted">{category.description}</p>
-          </Link>
-        ))}
+      <div className="mt-8">
+        <GetHelpChooser />
+      </div>
 
-        {COMING_SOON_CATEGORIES.map((category) => (
-          <div
-            key={category.label}
-            className="rounded-xl border border-dashed border-border-strong p-5"
-          >
-            <div className="flex items-baseline justify-between gap-2">
-              <p className="font-semibold text-muted">{category.label}</p>
-              <span className="shrink-0 rounded-full bg-surface-2 px-2 py-0.5 text-xs font-medium text-muted">
-                Coming soon
-              </span>
+      <div id="full-list" className="mt-8 scroll-mt-20 space-y-4">
+        {ENTITY_TYPES.map((category) =>
+          category.status === "live" && category.href ? (
+            <Link
+              key={category.id}
+              href={category.href}
+              className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
+            >
+              <p className="font-semibold text-foreground">{category.label}</p>
+              <p className="mt-1 text-sm text-muted">{category.description}</p>
+              {category.whenToUse && (
+                <p className="mt-2 text-sm text-brand-600 dark:text-brand-400">
+                  Use this when: {category.whenToUse}
+                </p>
+              )}
+            </Link>
+          ) : (
+            <div key={category.id} className="rounded-xl border border-dashed border-border-strong p-5">
+              <div className="flex items-baseline justify-between gap-2">
+                <p className="font-semibold text-muted">{category.label}</p>
+                <span className="shrink-0 rounded-full bg-surface-2 px-2 py-0.5 text-xs font-medium text-muted">
+                  Coming soon
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-muted">{category.description}</p>
             </div>
-            <p className="mt-1 text-sm text-muted">{category.description}</p>
-          </div>
-        ))}
+          )
+        )}
       </div>
     </main>
   );

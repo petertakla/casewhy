@@ -1,0 +1,28 @@
+# New task for Claude Code — round 52: beef up "Unlimited AI questions" as a headline CaseWhy Plus differentiator
+
+**Status: authorized now, Sep 9.** Peter's ask: the unlimited AI chat on Plus (already built, CW-35 — free tier is metered at 10 questions/month, Plus has no limit) is real value nobody else in this space offers, and it's currently buried as the first row of a feature-comparison table on `/plus` rather than pitched as a headline reason to subscribe. Same instinct as round 46's "market case tracking as unlimited" — elevate the framing, not the underlying limit (which is already unlimited and needs no change).
+
+## Where this lives today, checked directly in `src/app/plus/page.tsx`
+
+The `ai-chat` row already has strong explanatory copy ("so you can ask a question the moment you're anxious about one, not ration them") — that paragraph doesn't need a rewrite. What's missing is prominence: right now it's presented exactly like the other seven feature rows (document vault, PDF report, etc.), with no visual or positional signal that this is one of the two or three reasons Plus is worth $9.99 in the first place. The page's own subheadline is generic ("Everything CaseWhy does, without the limits — for you and your whole family.") and doesn't name it at all.
+
+## The changes
+
+1. **Add a short, visually distinct callout above the feature-comparison table** (between the pricing cards and the table, or directly under the `<h1>`/subheadline) naming unlimited AI chat as a headline reason to subscribe — pair it with the escalation toolkit, per the Sep 9 pricing recheck's own recommendation to lead marketing with "the things nobody else has at any price: the escalation toolkit and the grounded AI chat" rather than case-count limits. Something in the spirit of: **"Ask as many questions as you need. Every answer is grounded in CaseWhy's own USCIS policy knowledge base, with citations — not a generic chatbot guessing."** Exact wording is yours to refine, but it needs to say "unlimited" plainly and needs to say *why* that AI chat is different from asking any general-purpose AI (the grounding/citations, which is the actual differentiator — "unlimited" on its own is just a quantity claim, competitors could copy that word without the substance behind it).
+2. **Update the page's subheadline** to name this explicitly instead of the generic "without the limits" — work unlimited AI chat into it directly (or replace it with something that leads with the two headline features rather than a generic tagline).
+3. **The free-tier chat-limit moment is the highest-intent upsell moment on the whole product — use it.** Find `CaseChat.tsx`'s existing "X of 10 free questions left this month" / cap-reached upgrade message (built in CW-35) and strengthen the copy specifically at the point the cap is hit: this is the exact moment a real user is mid-anxiety about their case and just got cut off. The message should name "unlimited questions with CaseWhy Plus" plainly, not a generic "upgrade to Plus" — and link straight to `/plus`, ideally anchored to the `#ai-chat` section built by round 14's existing anchor-link pattern so they land on the exact explanation, not the top of the page.
+4. **Check the static marketing site (`casewhy.com`, `main` branch) for any Plus teaser or feature-callout that mentions chat/questions** — if one exists and doesn't already say "unlimited," bring it in line; if none exists, that's fine, no new section needs to be invented there as part of this round.
+
+## What NOT to change
+
+- The underlying limit itself (free: 10/month, Plus: unlimited) — already correct, not part of this ask.
+- The homepage hero headline/subheadline (`casewhy.com`) — round 45 made a deliberate call to lead with Get Help there; this round is scoped to `/plus` and the in-app upgrade moment, not reopening that decision.
+- The feature-comparison table's structure/other rows — only the `ai-chat` row's surrounding page context changes, not the table mechanics.
+
+## One thing worth flagging, not building
+
+Unlimited AI chat is a different cost shape than round 46's unlimited case tracking: case tracking mostly consumes a *shared external* USCIS quota (which round 46 already protects with its gate), while every chat question is a real, metered AI Gateway cost that scales directly with how much a Plus subscriber actually asks — there's no shared-quota backstop here. At today's per-message cost (the Sep 9 pricing recheck estimated roughly $0.10–$1.80/month per active subscriber depending on usage) this isn't a real risk yet, and Peter's standing call on numbers like this is to revisit with real usage data post-launch rather than pre-building a safeguard for a problem that doesn't exist yet — so this round ships with no new rate-limit or abuse gate. Just flagging it here so it's a conscious choice, not an oversight, the same way round 46 flagged the equivalent risk for case tracking before deciding how to handle it.
+
+## Verify live
+
+Confirm the new callout and updated subheadline render on `/plus` in both light/dark mode; confirm the free-tier chat cap message (test with a real disposable free-tier account that actually uses all 10 questions) shows the strengthened copy and links correctly to `/plus#ai-chat`; confirm nothing on the static marketing site needed touching, or if it did, that the change matches. `tsc`/lint clean, production build succeeds. Report back and fold into `CLOUD_CLAUDE.md`'s standing status.

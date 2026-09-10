@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { AuthHeader } from "@/components/AuthHeader";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
@@ -22,11 +23,13 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable}`}>
+    <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
       <body className="antialiased font-sans">
-        <ServiceWorkerRegister />
-        <AuthHeader />
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ServiceWorkerRegister />
+          <AuthHeader />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

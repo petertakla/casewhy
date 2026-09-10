@@ -14,18 +14,21 @@
   --glow-opacity: 0.06;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0e17;
-    --surface: #12182a;
-    --surface-2: #1a2238;
-    --foreground: #edf0f5;
-    --muted-foreground: #98a1b5;
-    --border: #232c45;
-    --border-strong: #303c5c;
-    --glow: 91, 158, 237;
-    --glow-opacity: 0.16;
-  }
+/* Round 54 — next-themes always resolves "system" to a concrete "light" or
+   "dark" class on <html> before first paint (no flash), so this class
+   selector is the only source of truth now — it replaces the old
+   `@media (prefers-color-scheme: dark)` block, which only ever followed the
+   OS setting and had no way to honor a manual override. */
+:root.dark {
+  --background: #0a0e17;
+  --surface: #12182a;
+  --surface-2: #1a2238;
+  --foreground: #edf0f5;
+  --muted-foreground: #98a1b5;
+  --border: #232c45;
+  --border-strong: #303c5c;
+  --glow: 91, 158, 237;
+  --glow-opacity: 0.16;
 }
 
 body {

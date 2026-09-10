@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { useTheme } from "next-themes";
 import { updateStatusChangeEmails, updateNewsSource } from "./actions";
 import type { NewsSource } from "@/lib/news/sources";
 import {
@@ -196,6 +197,51 @@ function PushNotificationsRow() {
   );
 }
 
+const APPEARANCE_OPTIONS = [
+  { value: "system", label: "System" },
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+] as const;
+
+/**
+ * Round 54 — a real override on top of the OS's prefers-color-scheme, not
+ * just following it. `theme` is undefined until after mount (next-themes
+ * avoids guessing on the server to prevent a hydration mismatch), so this
+ * renders a disabled placeholder for one tick rather than flash a wrong
+ * selection.
+ */
+function AppearanceRow() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  return (
+    <div className="py-3">
+      <span className="block text-sm font-medium text-foreground">Appearance</span>
+      <span className="block text-xs text-muted">
+        System follows your device&apos;s setting automatically.
+      </span>
+      <div className="mt-2 inline-flex rounded-lg border border-border-strong p-1">
+        {APPEARANCE_OPTIONS.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            disabled={!mounted}
+            onClick={() => setTheme(option.value)}
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-60 ${
+              mounted && theme === option.value
+                ? "bg-brand-500 text-white"
+                : "text-muted hover:text-foreground"
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function SettingsForm({
   initialStatusChangeEmailsEnabled,
   newsSources,
@@ -211,6 +257,15 @@ export function SettingsForm({
 
   return (
     <div className="space-y-8">
+      <section>
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-muted">
+          Appearance
+        </h2>
+        <div className="mt-2 divide-y divide-border rounded-xl border border-border bg-surface px-5">
+          <AppearanceRow />
+        </div>
+      </section>
+
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-widest text-muted">
           Notifications

@@ -18,7 +18,13 @@
 // this isn't holding.
 
 const WINDOW_MS = 24 * 60 * 60 * 1000;
-export const DAILY_CAP_PER_IP = 5;
+// Round 63 — dropped 5 -> 3 to match the signed-in free tier's cap
+// (TIER_LIMITS.free.chatQuestionsPerMonth, round 52). Different windows,
+// deliberately not unified further (Peter's own call): 3/day here vs.
+// 3/month signed-in, so an anonymous visitor can still ask more total
+// questions over a month than a signed-in free user — a real, known
+// asymmetry, not a bug to fix in this round.
+export const DAILY_CAP_PER_IP = 3;
 
 interface Bucket {
   count: number;

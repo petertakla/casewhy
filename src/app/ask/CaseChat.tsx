@@ -54,6 +54,12 @@ export function CaseChat({
   const [usedPills, setUsedPills] = useState<Set<string>>(new Set());
   const pills = pool.filter((q) => !usedPills.has(q)).slice(0, 3);
 
+  // Round 63 Part 4 — a pasted CaseWhy policy/news link, resolved and
+  // validated server-side (never trusted client-side) the moment it's
+  // actually used to ask one of the two fixed questions below.
+  const [linkInput, setLinkInput] = useState("");
+  const [linkedUrl, setLinkedUrl] = useState<string | null>(null);
+
   async function send(override?: string) {
     const text = (override ?? input).trim();
     if (!text || pending || limitReached) return;
@@ -68,7 +74,11 @@ export function CaseChat({
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ receiptNumber, messages: nextMessages }),
+        body: JSON.stringify({
+          receiptNumber,
+          messages: nextMessages,
+          ...(linkedUrl ? { linkedUrl } : {}),
+        }),
       });
       const data = await res.json();
 
@@ -110,14 +120,9 @@ export function CaseChat({
           <ul className="mt-1.5 space-y-1 text-xs">
             {relatedPolicies.map((p) => (
               <li key={p.id}>
-                <a
-                  href={p.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-brand-600 dark:text-brand-400 hover:underline"
-                >
+                <Link href={`/policy/${p.id}`} className="text-brand-600 dark:text-brand-400 hover:underline">
                   {p.title}
-                </a>
+                </Link>
                 <span className="text-muted"> — {p.sourceTitle}</span>
               </li>
             ))}
@@ -189,6 +194,71 @@ export function CaseChat({
                 {q}
               </button>
             ))}
+          </div>
+        )}
+
+        {!limitReached && (
+          <div className="mb-3 rounded-lg border border-border-strong p-3">
+            {linkedUrl ? (
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="truncate text-xs text-muted" title={linkedUrl}>
+                  Linked: {linkedUrl}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setLinkedUrl(null)}
+                  className="shrink-0 text-xs text-muted underline decoration-dotted hover:text-foreground"
+                >
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!linkInput.trim()) return;
+                  setLinkedUrl(linkInput.trim());
+                  setLinkInput("");
+                }}
+                className="flex gap-2"
+              >
+                <input
+                  type="text"
+                  value={linkInput}
+                  onChange={(e) => setLinkInput(e.target.value)}
+                  placeholder="Paste a CaseWhy policy or news link…"
+                  aria-label="Paste a CaseWhy link"
+                  className="flex-1 rounded-lg border border-border-strong bg-background px-3 py-1.5 text-xs outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
+                />
+                <button
+                  type="submit"
+                  disabled={!linkInput.trim()}
+                  className="rounded-lg border border-border-strong px-3 py-1.5 text-xs font-medium text-brand-600 transition-colors hover:border-brand-500 disabled:cursor-not-allowed disabled:opacity-40 dark:text-brand-400"
+                >
+                  Attach
+                </button>
+              </form>
+            )}
+            {linkedUrl && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => send("Does this apply to my case?")}
+                  className="rounded-full border border-border-strong bg-surface-2 px-3 py-1.5 text-xs font-medium text-brand-600 transition-colors hover:border-brand-500 disabled:opacity-60 dark:text-brand-400"
+                >
+                  Does this apply to my case?
+                </button>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => send("What does this mean for my case?")}
+                  className="rounded-full border border-border-strong bg-surface-2 px-3 py-1.5 text-xs font-medium text-brand-600 transition-colors hover:border-brand-500 disabled:opacity-60 dark:text-brand-400"
+                >
+                  What does this mean for my case?
+                </button>
+              </div>
+            )}
           </div>
         )}
         <form

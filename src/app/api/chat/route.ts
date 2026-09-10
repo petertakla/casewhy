@@ -5,6 +5,7 @@ import { getSubscriptionTier } from "@/lib/billing/tier";
 import { getChatUsage, incrementChatUsage } from "@/lib/billing/chat-usage";
 import { getCaseStatus, UscisApiError } from "@/lib/uscis/client";
 import { chatAboutCase, type ChatMessage } from "@/lib/ai/chat";
+import { resolveLinkedContent, isLinkResolutionError } from "@/lib/ai/link-context";
 
 const MAX_MESSAGE_LENGTH = 4000;
 
@@ -38,7 +39,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const { receiptNumber, messages } = body as { receiptNumber?: unknown; messages?: unknown };
+  const { receiptNumber, messages, linkedUrl } = body as {
+    receiptNumber?: unknown;
+    messages?: unknown;
+    linkedUrl?: unknown;
+  };
   if (typeof receiptNumber !== "string" || !receiptNumber) {
     return NextResponse.json({ error: "receiptNumber is required." }, { status: 400 });
   }
@@ -47,6 +52,18 @@ export async function POST(request: NextRequest) {
       { error: "messages must be a non-empty array ending with a user message." },
       { status: 400 }
     );
+  }
+
+  // Round 63 — a pasted link is resolved server-side from the URL itself,
+  // never trusted from any client-supplied "content" field. The client
+  // only ever names which internal page it means.
+  let linkedContent;
+  if (typeof linkedUrl === "string" && linkedUrl.trim()) {
+    const resolved = await resolveLinkedContent(linkedUrl);
+    if (isLinkResolutionError(resolved)) {
+      return NextResponse.json({ error: resolved.error }, { status: 400 });
+    }
+    linkedContent = resolved;
   }
 
   // Re-derived server-side from the authenticated session every time, not
@@ -86,7 +103,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = await chatAboutCase(status, messages);
+    const result = await chatAboutCase(status, messages, linkedContent);
     await incrementChatUsage(session.user.id);
     const updatedUsage = await getChatUsage(session.user.id, tier);
     return NextResponse.json({ ...result, usage: updatedUsage });

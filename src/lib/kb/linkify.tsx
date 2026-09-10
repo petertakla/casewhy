@@ -43,9 +43,12 @@ export function linkifyExplanation(
         matches.push({
           start: idx,
           end: idx + keyword.length,
-          url: policy.sourceUrl,
+          // Round 63 — internal permalink (/policy/[id]), not sourceUrl
+          // directly, so this is copyable into the chat's "paste a link"
+          // feature. No fetch involved — CaseWhy's own curated data.
+          url: `/policy/${policy.id}`,
           title: policy.title,
-          internal: false,
+          internal: true,
           text: text.slice(idx, idx + keyword.length),
         });
         break; // one link per policy, first mention only

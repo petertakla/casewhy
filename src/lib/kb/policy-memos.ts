@@ -268,3 +268,12 @@ export function findRelevantPolicyContext(facts: CaseFactsForMatching): PolicyMe
 
   return matches.slice(0, 2);
 }
+
+// Round 63 — a real internal permalink for a policy memo (/policy/[id]),
+// so relatedPolicies links (CaseChat, the dashboard explanation) point
+// somewhere internal a signed-in user can copy into the chat's "paste a
+// link" feature, instead of straight out to sourceUrl. No fetch needed —
+// this is CaseWhy's own already-curated data.
+export function findPolicyMemoById(id: string): PolicyMemo | undefined {
+  return POLICY_MEMOS.find((memo) => memo.id === id);
+}

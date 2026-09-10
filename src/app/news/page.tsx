@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { auth } from "@/lib/auth/server";
 import { getEnabledNewsSourceIds } from "@/lib/settings/settings";
 import { fetchNews } from "@/lib/news/fetch-news";
+import { newsItemId } from "@/lib/news/permalink";
 import { ShareButton } from "@/components/ShareButton";
 
 function formatDate(date: Date | null): string {
@@ -46,11 +48,9 @@ export default async function NewsPage() {
       ) : (
         <div className="space-y-4">
           {items.map((item) => (
-            <a
+            <Link
               key={`${item.sourceId}-${item.link}`}
-              href={item.link}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={`/news/${newsItemId(item)}`}
               className="block rounded-xl border border-border bg-surface p-5 hover:border-brand-500/50"
             >
               <p className="text-xs font-semibold uppercase tracking-widest text-muted">
@@ -58,7 +58,7 @@ export default async function NewsPage() {
                 {item.publishedAt && <span> · {formatDate(item.publishedAt)}</span>}
               </p>
               <p className="mt-1.5 font-semibold text-foreground">{item.title}</p>
-            </a>
+            </Link>
           ))}
         </div>
       )}

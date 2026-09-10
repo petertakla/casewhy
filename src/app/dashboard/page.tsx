@@ -160,14 +160,9 @@ function ExplanationBox({ explanation }: { explanation: CaseExplanation }) {
               <ul className="mt-1.5 space-y-1 text-xs">
                 {explanation.relatedPolicies.map((p) => (
                   <li key={p.id}>
-                    <a
-                      href={p.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-brand-600 dark:text-brand-400 hover:underline"
-                    >
+                    <Link href={`/policy/${p.id}`} className="text-brand-600 dark:text-brand-400 hover:underline">
                       {p.title}
-                    </a>
+                    </Link>
                     <span className="text-muted"> — {p.sourceTitle}</span>
                   </li>
                 ))}

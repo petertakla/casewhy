@@ -14,9 +14,10 @@ import { ShareButton } from "@/components/ShareButton";
 // be added card-by-card as each ships — same "informational listing, not an
 // endorsement" framing as /attorneys applies to the page as a whole, stated
 // once at the top. Round 34 moved legal aid orgs from "Coming soon" to
-// live; round 43 did the same for DSOs and community orgs. Only employers
-// (entity type 6, gated on a team-accounts product decision) remains a
-// placeholder.
+// live; round 43 did the same for DSOs and community orgs. Round 58 added
+// a 7th entity type (pro bono immigration-court representation), not part
+// of the original six-part backlog. Only employers (entity type 6, gated
+// on a team-accounts product decision) remains a placeholder.
 const LIVE_CATEGORIES = [
   {
     href: "/attorneys",
@@ -34,6 +35,11 @@ const LIVE_CATEGORIES = [
     href: "/legal-aid",
     label: "Legal aid & nonprofit organizations",
     description: "Immigration help for those who can't afford a private attorney.",
+  },
+  {
+    href: "/pro-bono-representation",
+    label: "Pro bono immigration-court representation",
+    description: "Free representation in immigration court proceedings, organized by court.",
   },
   {
     href: "/dso",

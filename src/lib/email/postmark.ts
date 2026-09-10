@@ -387,6 +387,66 @@ export async function sendCommunityOrgApplicationNotification({
   }
 }
 
+export async function sendProBonoRepresentationApplicationNotification({
+  organizationName,
+  contactPerson,
+  immigrationCourtsServed,
+  languages,
+  caseTypeLimits,
+  intakePolicy,
+  contactEmail,
+  contactPhone,
+  websiteUrl,
+}: {
+  organizationName: string;
+  contactPerson: string;
+  immigrationCourtsServed: string;
+  languages?: string;
+  caseTypeLimits?: string;
+  intakePolicy?: string;
+  contactEmail: string;
+  contactPhone?: string;
+  websiteUrl?: string;
+}): Promise<void> {
+  const token = process.env.POSTMARK_API_TOKEN;
+  if (!token) {
+    console.warn(
+      `[postmark] POSTMARK_API_TOKEN not set — skipping pro-bono-representation-application notification for ${organizationName}`
+    );
+    return;
+  }
+
+  const res = await fetch("https://api.postmarkapp.com/email", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Postmark-Server-Token": token,
+    },
+    body: JSON.stringify({
+      From: FROM_ADDRESS,
+      To: ADMIN_NOTIFICATION_ADDRESS,
+      Subject: `New pro bono representation application: ${organizationName}`,
+      TextBody: [
+        `Organization: ${organizationName}`,
+        `Contact person: ${contactPerson}`,
+        `Immigration court(s) served: ${immigrationCourtsServed}`,
+        `Languages: ${languages || "(not provided)"}`,
+        `Case-type limits: ${caseTypeLimits || "(not provided)"}`,
+        `Intake policy: ${intakePolicy || "(not provided)"}`,
+        `Contact email: ${contactEmail}`,
+        `Contact phone: ${contactPhone || "(not provided)"}`,
+        `Website: ${websiteUrl || "(not provided)"}`,
+      ].join("\n"),
+      MessageStream: "outbound",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
+  }
+}
+
 export async function sendLegalAidApplicationNotification({
   organizationName,
   orgType,

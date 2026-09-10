@@ -21,6 +21,7 @@ export const REPORTABLE_ENTITY_TYPES = [
   "legal_aid",
   "dso",
   "community_org",
+  "pro_bono_representation",
 ] as const;
 export type ReportableEntityType = (typeof REPORTABLE_ENTITY_TYPES)[number];
 

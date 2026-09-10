@@ -616,6 +616,69 @@ export const communityOrgDirectory = pgTable(
   ]
 );
 
+// Round 58 — self-enroll applications for the pro bono immigration-court
+// representation directory, entity type 7. Fields differ from the other
+// applications tables since this list's real focus is EOIR-court-specific
+// pro bono representation, not general legal aid.
+export const proBonoRepresentationApplications = pgTable("pro_bono_representation_applications", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  organizationName: text("organization_name").notNull(),
+  contactPerson: text("contact_person").notNull(),
+  immigrationCourtsServed: text("immigration_courts_served").notNull(),
+  languages: text("languages"),
+  caseTypeLimits: text("case_type_limits"),
+  intakePolicy: text("intake_policy"),
+  contactEmail: text("contact_email").notNull(),
+  contactPhone: text("contact_phone"),
+  websiteUrl: text("website_url"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Round 58 — the public pro bono immigration-court representation
+// directory, the 7th Get Help entity type. Machine-seeded from EOIR's own
+// quarterly "List of Pro Bono Legal Service Providers"
+// (justice.gov/eoir/file/probonofulllist/download), organized by
+// immigration court rather than state directly — state is derived from
+// which court section an entry sits under. Deliberately a standalone
+// entity type, not merged into legalAidDirectory — EOIR's own page states
+// it "does not endorse" these listings (a meaningfully weaker guarantee
+// than legalAidDirectory's DOJ recognition), and the data shape is
+// genuinely different (immigration-court jurisdiction, languages,
+// walk-in/appointment intake policy, case-type limits aren't fields DOJ
+// recognition data has or needs). Real overlap with legalAidDirectory/
+// accreditedRepresentativeDirectory is expected and not deduped away —
+// see CLOUD_CLAUDE.md "Round 58" for the confirmed overlap figure. Not
+// encrypted — EOIR's own already-public data.
+export const proBonoRepresentationDirectory = pgTable(
+  "pro_bono_representation_directory",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    slug: text("slug").notNull(),
+    organizationName: text("organization_name").notNull(),
+    streetAddress: text("street_address"),
+    cityStateZip: text("city_state_zip"),
+    state: text("state").notNull(),
+    immigrationCourt: text("immigration_court").notNull(),
+    phone: text("phone"),
+    email: text("email"),
+    website: text("website"),
+    languages: text("languages"),
+    caseTypeLimits: text("case_type_limits"),
+    intakePolicy: text("intake_policy"),
+    isReferralService: boolean("is_referral_service").notNull().default(false),
+    sourceCitation: text("source_citation").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique("pro_bono_representation_directory_slug_unique").on(table.slug),
+    index("pro_bono_representation_directory_state_idx").on(table.state),
+  ]
+);
+
 // Round 41 — "report incorrect information" on every live Get Help listing
 // (attorneys, accredited representatives, legal aid; future entity types
 // per partner-marketing-domain-concept.md's standing template). A report

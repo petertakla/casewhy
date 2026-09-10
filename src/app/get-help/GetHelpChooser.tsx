@@ -55,17 +55,16 @@ function OutcomeCard({ id }: { id: OutcomeId }) {
   if (id === "ask_ai") {
     return (
       <div className="rounded-xl border border-brand-500/30 bg-brand-500/5 p-5">
-        <p className="font-semibold text-foreground">CaseWhy&apos;s AI chat</p>
+        <p className="font-semibold text-foreground">Ask CaseWhy</p>
         <p className="mt-1 text-sm text-muted">
-          Create a free account and track your case, then ask us anything about it — grounded in
-          CaseWhy&apos;s own USCIS policy knowledge base, with citations. No cost, no cap on the
-          free plan today.
+          Ask a free general question right now — no sign-in required. Grounded in CaseWhy&apos;s
+          own USCIS policy knowledge base, not your specific case.
         </p>
         <Link
-          href="/auth/sign-up"
+          href="/get-help/ask"
           className="mt-2 inline-block text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
         >
-          Create a free account →
+          Ask a question →
         </Link>
       </div>
     );

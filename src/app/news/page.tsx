@@ -48,17 +48,24 @@ export default async function NewsPage() {
       ) : (
         <div className="space-y-4">
           {items.map((item) => (
-            <Link
+            <div
               key={`${item.sourceId}-${item.link}`}
-              href={`/news/${newsItemId(item)}`}
-              className="block rounded-xl border border-border bg-surface p-5 hover:border-brand-500/50"
+              className="rounded-xl border border-border bg-surface p-5 hover:border-brand-500/50"
             >
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted">
-                {item.sourceName}
-                {item.publishedAt && <span> · {formatDate(item.publishedAt)}</span>}
-              </p>
-              <p className="mt-1.5 font-semibold text-foreground">{item.title}</p>
-            </Link>
+              <a href={item.link} target="_blank" rel="noopener noreferrer" className="block">
+                <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+                  {item.sourceName}
+                  {item.publishedAt && <span> · {formatDate(item.publishedAt)}</span>}
+                </p>
+                <p className="mt-1.5 font-semibold text-foreground">{item.title}</p>
+              </a>
+              <Link
+                href={`/news/${newsItemId(item)}`}
+                className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
+              >
+                Ask CaseWhy about this →
+              </Link>
+            </div>
           ))}
         </div>
       )}

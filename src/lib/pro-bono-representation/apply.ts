@@ -8,6 +8,7 @@ import { z } from "zod";
 import { getDb } from "@/lib/db/client";
 import { proBonoRepresentationApplications } from "@/lib/db/schema";
 import { sendProBonoRepresentationApplicationNotification } from "@/lib/email/postmark";
+import { screenForDiscipline } from "@/lib/discipline/screen";
 
 const ApplicationInput = z.object({
   organizationName: z.string().trim().min(1, "Enter your organization's name.").max(200),
@@ -49,6 +50,11 @@ export async function submitProBonoRepresentationApplication(input: {
     return { ok: true };
   }
 
+  // Round 59 — screens the individual contact person's name, not the
+  // organization name. No state field exists on this form, so this is a
+  // name-only match (see the schema column's own comment on this limit).
+  const disciplineMatchNote = await screenForDiscipline(parsed.data.contactPerson, "");
+
   const db = getDb();
   await db.insert(proBonoRepresentationApplications).values({
     organizationName: parsed.data.organizationName,
@@ -60,6 +66,7 @@ export async function submitProBonoRepresentationApplication(input: {
     contactEmail: parsed.data.contactEmail,
     contactPhone: parsed.data.contactPhone || null,
     websiteUrl: parsed.data.websiteUrl || null,
+    disciplineMatchNote,
   });
 
   try {
@@ -73,6 +80,7 @@ export async function submitProBonoRepresentationApplication(input: {
       contactEmail: parsed.data.contactEmail,
       contactPhone: parsed.data.contactPhone,
       websiteUrl: parsed.data.websiteUrl,
+      disciplineMatchNote,
     });
   } catch (err) {
     console.error("Failed to send pro-bono-representation-application notification email", err);

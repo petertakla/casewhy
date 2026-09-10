@@ -10,6 +10,7 @@ import { z } from "zod";
 import { getDb } from "@/lib/db/client";
 import { accreditedRepresentativeApplications } from "@/lib/db/schema";
 import { sendRepresentativeApplicationNotification } from "@/lib/email/postmark";
+import { screenForDiscipline } from "@/lib/discipline/screen";
 
 const ApplicationInput = z.object({
   name: z.string().trim().min(1, "Enter your name.").max(200),
@@ -51,6 +52,10 @@ export async function submitRepresentativeApplication(input: {
     return { ok: true };
   }
 
+  // Round 59 — screened before insert so the match note lands in the same
+  // row as the application it's about.
+  const disciplineMatchNote = await screenForDiscipline(parsed.data.name, parsed.data.statesServed);
+
   const db = getDb();
   await db.insert(accreditedRepresentativeApplications).values({
     name: parsed.data.name,
@@ -60,6 +65,7 @@ export async function submitRepresentativeApplication(input: {
     practiceFocus: parsed.data.practiceFocus,
     contactEmail: parsed.data.contactEmail,
     contactPhone: parsed.data.contactPhone || null,
+    disciplineMatchNote,
   });
 
   // Best-effort — a Postmark hiccup shouldn't fail a real applicant's
@@ -74,6 +80,7 @@ export async function submitRepresentativeApplication(input: {
       practiceFocus: parsed.data.practiceFocus,
       contactEmail: parsed.data.contactEmail,
       contactPhone: parsed.data.contactPhone,
+      disciplineMatchNote,
     });
   } catch (err) {
     console.error("Failed to send representative-application notification email", err);

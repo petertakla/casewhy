@@ -320,6 +320,12 @@ export const accreditedRepresentativeApplications = pgTable("accredited_represen
   practiceFocus: text("practice_focus").notNull(),
   contactEmail: text("contact_email").notNull(),
   contactPhone: text("contact_phone"),
+  // Round 59 — a short human-readable summary if this applicant's name+state
+  // matched an entry on EOIR's disciplined-practitioners list at submission
+  // time (see src/lib/discipline/match.ts). Null means no match, not "not
+  // checked" — never auto-rejected, just surfaced prominently in the
+  // notification email so Peter sees it before manually reviewing.
+  disciplineMatchNote: text("discipline_match_note"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -386,6 +392,8 @@ export const attorneyApplications = pgTable("attorney_applications", {
   practiceAreas: text("practice_areas").notNull(),
   contactEmail: text("contact_email").notNull(),
   contactPhone: text("contact_phone"),
+  // Round 59 — see accreditedRepresentativeApplications' own comment above.
+  disciplineMatchNote: text("discipline_match_note"),
   // Round 40 — an attorney submitting their own listing obviously knows
   // their own site; added so self-enroll approvals can carry a website the
   // same way machine-seeded (board-certified) entries do.
@@ -633,6 +641,12 @@ export const proBonoRepresentationApplications = pgTable("pro_bono_representatio
   contactEmail: text("contact_email").notNull(),
   contactPhone: text("contact_phone"),
   websiteUrl: text("website_url"),
+  // Round 59 — screened against contactPerson (an individual's name), not
+  // organizationName — see accreditedRepresentativeApplications' own
+  // comment above for what this field means. No state field exists on this
+  // form to narrow the match against, so this entity type's matches are
+  // name-only — a real, honestly-noted limitation, not silently ignored.
+  disciplineMatchNote: text("discipline_match_note"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -677,6 +691,37 @@ export const proBonoRepresentationDirectory = pgTable(
     unique("pro_bono_representation_directory_slug_unique").on(table.slug),
     index("pro_bono_representation_directory_state_idx").on(table.state),
   ]
+);
+
+// Round 59 — a cached copy of EOIR's own "List of Currently Disciplined
+// Practitioners" (justice.gov/eoir/list-of-currently-disciplined-
+// practitioners), a real HTML table (not a downloadable file), refreshed by
+// scripts/refresh-disciplined-practitioners.ts (delete-and-reseed, same
+// pattern as every other directory). Cached rather than fetched live on
+// every application/recheck so a single EOIR outage or slow response can't
+// block a real applicant, and so the matching logic (src/lib/discipline/
+// match.ts) doesn't need network access. states is a comma-separated list
+// of 2-letter codes derived from the source's free-text city/state field
+// (which mixes "City, ST", "State1/State2", and bare state-name formats) —
+// derived once at scrape time so matching doesn't re-parse it per lookup.
+export const disciplinedPractitioners = pgTable(
+  "disciplined_practitioners",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    name: text("name").notNull(),
+    normalizedName: text("normalized_name").notNull(),
+    cityState: text("city_state").notNull(),
+    states: text("states").notNull(),
+    dateImmediateSuspension: text("date_immediate_suspension"),
+    finalDisciplineImposed: text("final_discipline_imposed"),
+    effectiveDate: text("effective_date"),
+    reinstated: boolean("reinstated").notNull().default(false),
+    sourceCitation: text("source_citation").notNull(),
+    scrapedAt: timestamp("scraped_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("disciplined_practitioners_normalized_name_idx").on(table.normalizedName)]
 );
 
 // Round 41 — "report incorrect information" on every live Get Help listing

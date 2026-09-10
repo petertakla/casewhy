@@ -112,6 +112,7 @@ export async function sendAttorneyApplicationNotification({
   contactEmail,
   contactPhone,
   websiteUrl,
+  disciplineMatchNote,
 }: {
   name: string;
   firm: string;
@@ -121,6 +122,10 @@ export async function sendAttorneyApplicationNotification({
   contactEmail: string;
   contactPhone?: string;
   websiteUrl?: string;
+  // Round 59 — set when this applicant's name+state matched EOIR's
+  // disciplined-practitioners list. Surfaced in the subject line so it
+  // can't be missed, never used to auto-reject.
+  disciplineMatchNote?: string | null;
 }): Promise<void> {
   const token = process.env.POSTMARK_API_TOKEN;
   if (!token) {
@@ -130,6 +135,7 @@ export async function sendAttorneyApplicationNotification({
     return;
   }
 
+  const subjectPrefix = disciplineMatchNote ? "⚠️ POSSIBLE DISCIPLINE MATCH — " : "";
   const res = await fetch("https://api.postmarkapp.com/email", {
     method: "POST",
     headers: {
@@ -140,8 +146,15 @@ export async function sendAttorneyApplicationNotification({
     body: JSON.stringify({
       From: FROM_ADDRESS,
       To: ADMIN_NOTIFICATION_ADDRESS,
-      Subject: `New attorney application: ${name}`,
+      Subject: `${subjectPrefix}New attorney application: ${name}`,
       TextBody: [
+        ...(disciplineMatchNote
+          ? [
+              "*** This applicant's name/state matched EOIR's disciplined-practitioners list. Review before approving — this is a flag, not an automatic rejection. ***",
+              disciplineMatchNote,
+              "",
+            ]
+          : []),
         `Name: ${name}`,
         `Firm: ${firm}`,
         `States licensed: ${statesLicensed}`,
@@ -172,6 +185,7 @@ export async function sendRepresentativeApplicationNotification({
   practiceFocus,
   contactEmail,
   contactPhone,
+  disciplineMatchNote,
 }: {
   name: string;
   organization: string;
@@ -180,6 +194,7 @@ export async function sendRepresentativeApplicationNotification({
   practiceFocus: string;
   contactEmail: string;
   contactPhone?: string;
+  disciplineMatchNote?: string | null;
 }): Promise<void> {
   const token = process.env.POSTMARK_API_TOKEN;
   if (!token) {
@@ -189,6 +204,7 @@ export async function sendRepresentativeApplicationNotification({
     return;
   }
 
+  const subjectPrefix = disciplineMatchNote ? "⚠️ POSSIBLE DISCIPLINE MATCH — " : "";
   const res = await fetch("https://api.postmarkapp.com/email", {
     method: "POST",
     headers: {
@@ -199,8 +215,15 @@ export async function sendRepresentativeApplicationNotification({
     body: JSON.stringify({
       From: FROM_ADDRESS,
       To: ADMIN_NOTIFICATION_ADDRESS,
-      Subject: `New accredited representative application: ${name}`,
+      Subject: `${subjectPrefix}New accredited representative application: ${name}`,
       TextBody: [
+        ...(disciplineMatchNote
+          ? [
+              "*** This applicant's name/state matched EOIR's disciplined-practitioners list. Review before approving — this is a flag, not an automatic rejection. ***",
+              disciplineMatchNote,
+              "",
+            ]
+          : []),
         `Name: ${name}`,
         `Organization: ${organization}`,
         `Accreditation details: ${accreditationDetails}`,
@@ -397,6 +420,7 @@ export async function sendProBonoRepresentationApplicationNotification({
   contactEmail,
   contactPhone,
   websiteUrl,
+  disciplineMatchNote,
 }: {
   organizationName: string;
   contactPerson: string;
@@ -407,6 +431,7 @@ export async function sendProBonoRepresentationApplicationNotification({
   contactEmail: string;
   contactPhone?: string;
   websiteUrl?: string;
+  disciplineMatchNote?: string | null;
 }): Promise<void> {
   const token = process.env.POSTMARK_API_TOKEN;
   if (!token) {
@@ -416,6 +441,7 @@ export async function sendProBonoRepresentationApplicationNotification({
     return;
   }
 
+  const subjectPrefix = disciplineMatchNote ? "⚠️ POSSIBLE DISCIPLINE MATCH — " : "";
   const res = await fetch("https://api.postmarkapp.com/email", {
     method: "POST",
     headers: {
@@ -426,8 +452,15 @@ export async function sendProBonoRepresentationApplicationNotification({
     body: JSON.stringify({
       From: FROM_ADDRESS,
       To: ADMIN_NOTIFICATION_ADDRESS,
-      Subject: `New pro bono representation application: ${organizationName}`,
+      Subject: `${subjectPrefix}New pro bono representation application: ${organizationName}`,
       TextBody: [
+        ...(disciplineMatchNote
+          ? [
+              "*** This application's contact person name matched EOIR's disciplined-practitioners list (name-only — no state field on this form to narrow it). Review before approving — this is a flag, not an automatic rejection. ***",
+              disciplineMatchNote,
+              "",
+            ]
+          : []),
         `Organization: ${organizationName}`,
         `Contact person: ${contactPerson}`,
         `Immigration court(s) served: ${immigrationCourtsServed}`,

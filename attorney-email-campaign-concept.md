@@ -12,13 +12,13 @@
 
 ## Real constraint: the LLC and CAN-SPAM's physical-address requirement
 
-Confirmed via CAN-SPAM Act research (FTC's own compliance guide, 16 CFR Part 316): every commercial email needs a real physical mailing address, and B2B cold outreach to attorneys is squarely "commercial" under the Act's definition — there's no B2B exemption. As of Sep 8, 2026, CaseWhy's Florida LLC filing was just submitted (delayed a day by a state holiday); Florida takes 10-12 business days to process new formations, putting real registration at roughly **Sep 22-24, 2026**. The EIN application happens only after that, per the formation service's own standard order. **This doesn't block building the landing page or setting up list sourcing/the sending domain now — it only blocks the actual send**, until there's a real address to put in the required footer (the LLC's registered address once formed, or an interim address Peter explicitly chooses, e.g. a PO box, if he wants to send sooner).
+Confirmed via CAN-SPAM Act research (FTC's own compliance guide, 16 CFR Part 316): every commercial email needs a real physical mailing address, and B2B cold outreach to attorneys is squarely "commercial" under the Act's definition — there's no B2B exemption. **Resolved Sep 10, 2026:** CaseWhy LLC's formation was confirmed by the state (Northwest Registered Agent, order #88978WW) — well ahead of the ~Sep 22-24 estimate above, which assumed the standard 10-12 business day processing time. Peter provided the LLC's registered address (7901 4th St N, Ste 300, St. Petersburg, FL 33702, US) the same day; it's now live in `privacy.html`'s Contact section (round 67). **This resolves the address blocker for the actual send** — the same address goes in this campaign's required email footer whenever sending is otherwise ready (domain warm-up, list sourcing, sending tool still outstanding per the sections below).
 
 **Worth Peter's own confirmation, not resolved here:** round 13 (live Stripe billing) has separately been marked done and verified live for a while, even though several earlier sections of `CLOUD_CLAUDE.md` gated flipping Stripe to live keys on this same LLC/EIN chain being complete. Flagged directly in `CLOUD_CLAUDE.md` rather than assumed one way or the other.
 
-## Compliance checklist for the actual send (once the address question is resolved)
+## Compliance checklist for the actual send
 
-- Real physical postal address (street address, PO box registered with USPS, or a registered private mailbox) in every email.
+- Real physical postal address in every email — **resolved**: CaseWhy LLC, 7901 4th St N, Ste 300, St. Petersburg, FL 33702, US (see "Real constraint" above).
 - Accurate "From" name/domain — no deceptive headers.
 - Subject lines that reflect the actual content — no bait-and-switch framing.
 - A clear, one-click (or near-one-click) unsubscribe mechanism; opt-outs honored within 10 business days; no fee, login, or extra info required to opt out beyond an email address.

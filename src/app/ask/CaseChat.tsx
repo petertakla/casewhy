@@ -87,6 +87,11 @@ export function CaseChat({
       }
       if (data.usage) {
         setUsage(data.usage);
+        // The question that hits the cap still succeeds (the server only
+        // blocks the *next* attempt) — sync limitReached here too, not just
+        // on the eventual 402, so the upgrade message shows right after
+        // this reply lands instead of after a wasted extra attempt.
+        if (data.usage.limitReached) setLimitReached(true);
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -156,7 +161,9 @@ export function CaseChat({
       <div className="border-t border-border p-4">
         {limitReached && (
           <div className="mb-3 rounded-lg border border-brand-500/30 bg-brand-500/5 p-3 text-sm">
-            <p className="font-medium text-foreground">You&apos;ve used all 10 free questions this month.</p>
+            <p className="font-medium text-foreground">
+              You&apos;ve used all {usage?.limit ?? "your free"} questions this month.
+            </p>
             <p className="mt-1 text-muted">
               Get unlimited questions with{" "}
               <Link href="/plus#ai-chat" className="font-medium text-brand-600 hover:underline dark:text-brand-400">

@@ -1,6 +1,8 @@
-# New task for Claude Code — round 52: beef up "Unlimited AI questions" as a headline CaseWhy Plus differentiator
+# New task for Claude Code — round 52: beef up "Unlimited AI questions" as a headline CaseWhy Plus differentiator, and drop the free-tier chat cap 10 → 3
 
-**Status: authorized now, Sep 9.** Peter's ask: the unlimited AI chat on Plus (already built, CW-35 — free tier is metered at 10 questions/month, Plus has no limit) is real value nobody else in this space offers, and it's currently buried as the first row of a feature-comparison table on `/plus` rather than pitched as a headline reason to subscribe. Same instinct as round 46's "market case tracking as unlimited" — elevate the framing, not the underlying limit (which is already unlimited and needs no change).
+**Status: authorized now, Sep 9 — revised Sep 10 with a second, related change.** Peter's original ask: the unlimited AI chat on Plus (already built, CW-35 — free tier is metered at 10 questions/month, Plus has no limit) is real value nobody else in this space offers, and it's currently buried as the first row of a feature-comparison table on `/plus` rather than pitched as a headline reason to subscribe. Same instinct as round 46's "market case tracking as unlimited" — elevate the framing.
+
+**Sep 10 addition, same round since it touches the same copy:** Peter's direct follow-up — 10 free questions/month is generous enough that it quietly undercuts the upgrade pitch this round is trying to strengthen. Drop `TIER_LIMITS.free.chatQuestionsPerMonth` in `src/lib/billing/tier.ts` from `10` to `3`. Same constant-plus-copy-sweep pattern as round 17/47's case-cap changes — grep for hardcoded "10" near chat/question copy rather than relying on memory of where it appears: `CaseChat.tsx`'s "X of 10 free questions left this month" message, the `/plus` feature table's free-tier `"10 / month"` value (`PLUS_FEATURES` in `src/app/plus/page.tsx`), and that same file's `ai-chat` explanation paragraph, which currently reads "On the free tier, 10 questions a month sounds like a lot until the week your case actually changes" — that sentence needs rewriting for 3 (a much tighter, more obviously-real constraint at 3/month — don't just swap the digit, the surrounding argument should reflect that 3 runs out fast, not "sounds like a lot until..."). Check the static marketing site too, same as item 4 below. No schema change — this is a config constant, same as every prior tier-limit round.
 
 ## Where this lives today, checked directly in `src/app/plus/page.tsx`
 
@@ -15,7 +17,7 @@ The `ai-chat` row already has strong explanatory copy ("so you can ask a questio
 
 ## What NOT to change
 
-- The underlying limit itself (free: 10/month, Plus: unlimited) — already correct, not part of this ask.
+- Plus's own limit (unlimited) — already correct, not part of this ask.
 - The homepage hero headline/subheadline (`casewhy.com`) — round 45 made a deliberate call to lead with Get Help there; this round is scoped to `/plus` and the in-app upgrade moment, not reopening that decision.
 - The feature-comparison table's structure/other rows — only the `ai-chat` row's surrounding page context changes, not the table mechanics.
 
@@ -25,4 +27,4 @@ Unlimited AI chat is a different cost shape than round 46's unlimited case track
 
 ## Verify live
 
-Confirm the new callout and updated subheadline render on `/plus` in both light/dark mode; confirm the free-tier chat cap message (test with a real disposable free-tier account that actually uses all 10 questions) shows the strengthened copy and links correctly to `/plus#ai-chat`; confirm nothing on the static marketing site needed touching, or if it did, that the change matches. `tsc`/lint clean, production build succeeds. Report back and fold into `CLOUD_CLAUDE.md`'s standing status.
+Confirm the new callout and updated subheadline render on `/plus` in both light/dark mode; confirm a real disposable free-tier account is correctly blocked after 3 questions (not 10), sees the strengthened cap-reached message, and it links correctly to `/plus#ai-chat`; confirm every "10" reference found in the copy sweep was actually updated (re-grep after editing, don't just trust the initial pass); confirm nothing on the static marketing site needed touching, or if it did, that the change matches. `tsc`/lint clean, production build succeeds. Report back and fold into `CLOUD_CLAUDE.md`'s standing status.

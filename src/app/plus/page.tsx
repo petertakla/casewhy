@@ -21,10 +21,10 @@ const PLUS_FEATURES: PlusFeature[] = [
   {
     id: "ai-chat",
     title: "AI chat about your case",
-    free: "10 / month",
+    free: "3 / month",
     plus: "Unlimited",
     explanation:
-      "Your status just changed to \"Request for Evidence\" and you don't know what that means, whether your timeline just reset, or what USCIS actually wants — that's exactly what the chat is for. Ask in plain English and get an answer grounded in CaseWhy's own curated policy and case-law knowledge base, with visible citations you can check yourself, instead of a generic chatbot guessing from general training data. On the free tier, 10 questions a month sounds like a lot until the week your case actually changes — that's usually when you have five follow-up questions in a single evening, and by Thursday you're locked out until next month. Plus removes the limit entirely, so you can ask a question the moment you're anxious about one, not ration them.",
+      "Your status just changed to \"Request for Evidence\" and you don't know what that means, whether your timeline just reset, or what USCIS actually wants — that's exactly what the chat is for. Ask in plain English and get an answer grounded in CaseWhy's own curated policy and case-law knowledge base, with visible citations you can check yourself, instead of a generic chatbot guessing from general training data. On the free tier, 3 questions a month runs out fast — one real update to your case can easily produce three follow-up questions in a single evening, and then you're locked out until next month right when you need it most. Plus removes the limit entirely, so you can ask a question the moment you're anxious about one, not ration them.",
   },
   {
     id: "tracked-cases",

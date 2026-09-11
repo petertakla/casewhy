@@ -69,6 +69,12 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+  // Round 69 — the policy-acknowledgment check queries Postgres directly
+  // (pg's raw TCP Pool via src/lib/db/client.ts), which the default Edge
+  // middleware runtime can't support (confirmed live: a real 500 on every
+  // request once this landed). auth.getSession() alone never needed this,
+  // since it's an HTTP fetch to Neon Auth, not a direct DB connection.
+  runtime: "nodejs",
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|icon.svg|apple-icon.png|auth|api/auth|api/webhooks|api/cron|policy-update).*)",
   ],

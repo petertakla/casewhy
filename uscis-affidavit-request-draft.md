@@ -1,6 +1,6 @@
 # USCIS production access affidavit request — draft, not sent
 
-Drafted by Claude Code, Sep 11, 2026. For Peter to review and send himself (same pattern as every other USCIS email on this project — see `CLOUD_CLAUDE.md`'s "USCIS API access" section). Fill in the bracketed items before sending.
+Drafted by Claude Code, Sep 11, 2026. For Peter to review and send himself (same pattern as every other USCIS email on this project — see `CLOUD_CLAUDE.md`'s "USCIS API access" section). Ready to send as-is.
 
 ---
 
@@ -24,9 +24,9 @@ Please let us know if there's anything further you need from us to issue the aff
 
 Thank you,
 Peter Takla
-[Your title, e.g. "Founder, CaseWhy LLC"]
+Founder, CaseWhy LLC
 info@casewhy.com
 
 ---
 
-**Sourcing note:** required fields (business/organization name, business home page URL, authorized signatory) pulled directly from the USCIS Torch API onboarding execution spec's step 06. One placeholder left open: title for the signature line.
+**Sourcing note:** required fields (business/organization name, business home page URL, authorized signatory) pulled directly from the USCIS Torch API onboarding execution spec's step 06. No placeholders remaining — ready to send.

@@ -1,6 +1,6 @@
-# USCIS production access affidavit request — draft, not sent
+# USCIS production access affidavit request — SENT Sep 11, 2026
 
-Drafted by Claude Code, Sep 11, 2026. For Peter to review and send himself (same pattern as every other USCIS email on this project — see `CLOUD_CLAUDE.md`'s "USCIS API access" section). Ready to send as-is.
+Drafted by Claude Code, Sep 11, 2026. Peter tried sending it himself from `info@casewhy.com` first and it didn't go out (cause not diagnosed). Peter then asked Claude Code to send it — sent via Claude Code's Gmail tool, real confirmed delivery: Gmail message ID `1a0908fbb2ddc3e0`, 2026-09-11 13:02 UTC, to `developersupport@uscis.dhs.gov`. **Note: it went out `From: ptakla@gmail.com`, not `info@casewhy.com` as the header below says** — that's the only identity Claude Code's Gmail tool can send as. The body still signs off with `info@casewhy.com` as the reply-to contact. See `CLOUD_CLAUDE.md`'s "USCIS API access" section for the full note, including the still-open question of why the `info@casewhy.com` send path failed.
 
 ---
 

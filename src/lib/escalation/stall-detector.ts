@@ -15,7 +15,7 @@
 
 import type { CaseStatus } from "@/lib/uscis/client";
 
-const MILESTONE_KEYWORDS = ["interview", "ceremony", "oath"];
+export const MILESTONE_KEYWORDS = ["interview", "ceremony", "oath"];
 const STALL_THRESHOLD_DAYS = 90;
 
 export interface StallResult {

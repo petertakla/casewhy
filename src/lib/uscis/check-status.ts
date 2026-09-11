@@ -6,12 +6,13 @@
 
 import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
-import { trackedCases } from "@/lib/db/schema";
+import { trackedCases, caseStatusHistory } from "@/lib/db/schema";
 import { encryptField, decryptField } from "@/lib/db/crypto";
 import { getCaseStatus, type CaseStatus } from "@/lib/uscis/client";
 import { sendStatusChangeEmail } from "@/lib/email/postmark";
 import { getStatusChangeEmailsEnabled } from "@/lib/settings/settings";
 import { sendPushToUser } from "@/lib/push/send";
+import { MILESTONE_KEYWORDS } from "@/lib/escalation/stall-detector";
 
 export interface TrackedCaseRow {
   id: string;
@@ -19,6 +20,8 @@ export interface TrackedCaseRow {
   receiptNumber: string; // encrypted
   email: string; // encrypted
   lastStatusText: string | null; // encrypted
+  /** One of CASE_TYPES' ids, or null for a case tracked before round 21. */
+  caseType?: string | null;
 }
 
 export async function checkTrackedCaseNow(
@@ -30,6 +33,7 @@ export async function checkTrackedCaseNow(
 
   const status = await getCaseStatus(receiptNumber);
   let notified = false;
+  const db = getDb();
 
   if (previousStatusText !== null && previousStatusText !== status.statusText) {
     if (await getStatusChangeEmailsEnabled(row.userId)) {
@@ -51,9 +55,23 @@ export async function checkTrackedCaseNow(
       body: status.statusDescription,
       url: `/dashboard?receipt=${encodeURIComponent(receiptNumber)}`,
     });
+
+    // Round 69, Part 2 — one row per real detected change, same gate as the
+    // notifications above (never on the first check). Only the receipt
+    // number's 3-letter service-center prefix is stored, not the full
+    // number a second time.
+    const milestoneEntry = status.history.find((entry) =>
+      MILESTONE_KEYWORDS.some((kw) => entry.completed_text_en.toLowerCase().includes(kw))
+    );
+    await db.insert(caseStatusHistory).values({
+      trackedCaseId: row.id,
+      caseType: row.caseType ?? null,
+      servicePrefix: receiptNumber.slice(0, 3),
+      statusText: status.statusText,
+      milestoneDate: milestoneEntry ? new Date(milestoneEntry.date) : null,
+    });
   }
 
-  const db = getDb();
   await db
     .update(trackedCases)
     .set({ lastStatusText: encryptField(status.statusText), lastCheckedAt: new Date() })

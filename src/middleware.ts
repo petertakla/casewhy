@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "@/lib/auth/server";
+import { getStalePolicies } from "@/lib/policy/acknowledgments";
 
 // Round 53 — gates the real production app (app.casewhy.com) to a single
 // allow-listed account for the first week of live-key acceptance testing.
@@ -37,23 +38,38 @@ const HOLDING_PAGE_HTML = `<!doctype html>
 </body>
 </html>`;
 
-export async function middleware() {
+export async function middleware(request: NextRequest) {
   const gateEmail = process.env.ACCEPTANCE_TESTING_EMAIL;
-  if (!gateEmail) return NextResponse.next();
 
-  const { data: session } = await auth.getSession();
-  if (session?.user?.email === gateEmail) {
+  if (gateEmail) {
+    const { data: session } = await auth.getSession();
+    if (session?.user?.email !== gateEmail) {
+      return new NextResponse(HOLDING_PAGE_HTML, {
+        status: 503,
+        headers: { "Content-Type": "text/html; charset=utf-8", "Retry-After": "86400" },
+      });
+    }
     return NextResponse.next();
   }
 
-  return new NextResponse(HOLDING_PAGE_HTML, {
-    status: 503,
-    headers: { "Content-Type": "text/html; charset=utf-8", "Retry-After": "86400" },
-  });
+  // Round 69 — USCIS's affidavit checklist wants "active consent" for a
+  // material ToS/Privacy change, not just the existing email notice.
+  // Signed-out visitors are unaffected (no session, nothing to check);
+  // /policy-update itself is excluded via the matcher below so the redirect
+  // can't loop.
+  const { data: session } = await auth.getSession();
+  if (session?.user) {
+    const stale = await getStalePolicies(session.user.id, new Date(session.user.createdAt));
+    if (stale.length > 0) {
+      return NextResponse.redirect(new URL("/policy-update", request.url));
+    }
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|icon.svg|apple-icon.png|auth|api/auth|api/webhooks|api/cron).*)",
+    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|icon.svg|apple-icon.png|auth|api/auth|api/webhooks|api/cron|policy-update).*)",
   ],
 };

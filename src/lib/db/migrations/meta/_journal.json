@@ -162,6 +162,13 @@
       "when": 1789048017636,
       "tag": "0022_chief_jigsaw",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1789146593361,
+      "tag": "0023_flat_hex",
+      "breakpoints": true
     }
   ]
 }

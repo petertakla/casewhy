@@ -747,3 +747,57 @@ export const listingReports = pgTable("listing_reports", {
   status: text("status").notNull().default("new"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const policyTypeEnum = pgEnum("policy_type", ["tos", "privacy"]);
+
+// Round 69, Part 1 — closes the "active consent" gap in USCIS's Developer
+// Portal Affidavit privacy/ToS checklist (privacy.html Section 10 / terms.html
+// Section 15 previously only promised an email on material changes, which
+// satisfies "notify," not "active consent"). One row per explicit
+// acknowledgment click — src/lib/policy/acknowledgments.ts is the only
+// writer. `version` is the literal "Last updated" date string from the
+// corresponding static page (src/lib/policy/versions.ts), reusing that
+// existing convention rather than inventing a separate version scheme.
+export const policyAcknowledgments = pgTable(
+  "policy_acknowledgments",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id").notNull(),
+    policyType: policyTypeEnum("policy_type").notNull(),
+    version: text("version").notNull(),
+    acknowledgedAt: timestamp("acknowledged_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("policy_acknowledgments_user_id_idx").on(table.userId)]
+);
+
+// Round 69, Part 2 — append-only case status-history logging, data-capture
+// groundwork for CW-33(b)'s comparative analytics (still deferred as a
+// *feature* — this table just stops that future feature from being blocked
+// on "we never logged it"). One row per detected status *change* (not
+// every check) — written from the same change-detection point the cron
+// already uses (src/lib/uscis/check-status.ts), never a second, drifting
+// detector. servicePrefix (not the full receipt number) is deliberately
+// the only case-identifying field here, so a future aggregate query never
+// needs to join back to a specific user's tracked case to be useful.
+export const caseStatusHistory = pgTable(
+  "case_status_history",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    trackedCaseId: text("tracked_case_id").notNull(),
+    caseType: text("case_type"),
+    // The 3-letter USCIS service-center prefix only (e.g. "EAC") — a
+    // coarse regional signal, never the full receipt number a second time.
+    servicePrefix: text("service_prefix").notNull(),
+    statusText: text("status_text").notNull(),
+    // Set only when this check's history also surfaced an interview/oath-
+    // ceremony milestone (same MILESTONE_KEYWORDS match as
+    // src/lib/escalation/stall-detector.ts) — null on most rows.
+    milestoneDate: timestamp("milestone_date", { withTimezone: true }),
+    detectedAt: timestamp("detected_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("case_status_history_tracked_case_id_idx").on(table.trackedCaseId)]
+);

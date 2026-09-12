@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getCaseStatus, UscisApiError, type CaseStatus } from "@/lib/uscis/client";
+import { recordCaseHistory } from "@/lib/uscis/check-status";
 import { explainCaseStatus, type CaseExplanation } from "@/lib/ai/explain";
 import { auth } from "@/lib/auth/server";
 import { getTrackedCases } from "./actions";
@@ -57,7 +58,17 @@ function statusTone(statusText: string): { dot: string; text: string; bg: string
   return { dot: "bg-brand-500", text: "text-brand-600 dark:text-brand-400", bg: "bg-brand-500/10" };
 }
 
-function SearchForm({ receiptNumber }: { receiptNumber?: string }) {
+function SearchForm({
+  receiptNumber,
+  trackedCaseCount,
+}: {
+  receiptNumber?: string;
+  /** Round 71 — an account with ≥1 already-tracked case gets "Add New Case"
+   * instead of the plain "Track case" copy, which previously read as if
+   * nothing were tracked yet regardless of how many cases the account
+   * already had. */
+  trackedCaseCount: number;
+}) {
   return (
     <form action="/dashboard" method="get" className="flex flex-col gap-3 sm:flex-row">
       <ReceiptNumberInput defaultValue={receiptNumber} />
@@ -65,7 +76,7 @@ function SearchForm({ receiptNumber }: { receiptNumber?: string }) {
         type="submit"
         className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
       >
-        Track case
+        {trackedCaseCount > 0 ? "Add New Case" : "Track case"}
       </button>
     </form>
   );
@@ -421,6 +432,19 @@ export default async function DashboardPage({
       } catch {
         // Explanation is a nice-to-have — show the raw status even if the model call fails.
       }
+      // Round 71 — this is the earliest real point a freshly-tracked case's
+      // full USCIS history can be backfilled: the dashboard fetches a live
+      // status the moment its owner looks at it, well before the next daily
+      // cron run. Only for an actual tracked case, never an ad-hoc ?receipt=
+      // lookup of something the account doesn't own. Safe to call on every
+      // render — recordCaseHistory() dedupes on its own.
+      if (trackedMatch) {
+        try {
+          await recordCaseHistory(trackedMatch.id, trackedMatch.caseType, receiptNumber, status);
+        } catch {
+          // Best-effort — never block rendering the dashboard on this.
+        }
+      }
     } catch (err) {
       errorMessage = err instanceof UscisApiError
         ? friendlyErrorMessage(err)
@@ -447,7 +471,7 @@ export default async function DashboardPage({
         Enter your USCIS receipt number to see its current status.
       </p>
 
-      <SearchForm receiptNumber={receiptNumber} />
+      <SearchForm receiptNumber={receiptNumber} trackedCaseCount={trackedCasesList.length} />
 
       {trackedCasesList.length > 1 && (
         <CaseSwitcher

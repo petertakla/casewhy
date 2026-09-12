@@ -775,12 +775,28 @@ export const policyAcknowledgments = pgTable(
 // Round 69, Part 2 — append-only case status-history logging, data-capture
 // groundwork for CW-33(b)'s comparative analytics (still deferred as a
 // *feature* — this table just stops that future feature from being blocked
-// on "we never logged it"). One row per detected status *change* (not
-// every check) — written from the same change-detection point the cron
-// already uses (src/lib/uscis/check-status.ts), never a second, drifting
-// detector. servicePrefix (not the full receipt number) is deliberately
-// the only case-identifying field here, so a future aggregate query never
-// needs to join back to a specific user's tracked case to be useful.
+// on "we never logged it"). servicePrefix (not the full receipt number) is
+// deliberately the only case-identifying field here, so a future aggregate
+// query never needs to join back to a specific user's tracked case to be
+// useful.
+//
+// Round 71 — widened + repurposed from "one row per detected change" to
+// "one row per real USCIS history entry, plus one row for the live current
+// status." USCIS's own case_status response includes a hist_case_status
+// array (confirmed real, not guessed, against a live sandbox call at the
+// original scaffold's build time — see the header comment in
+// src/lib/uscis/client.ts) that round 69 discarded entirely except for a
+// milestone-keyword scan. src/lib/uscis/check-status.ts's recordCaseHistory()
+// now upserts every entry it finds (statusText/eventDate keyed,
+// onConflictDoNothing — safe to call on every check, including the very
+// first one right after tracking, without duplicating). New fields only
+// exist where USCIS's real response actually has the data:
+// statusDescription (current_case_status_desc_en — only present for the
+// live current-status row, hist_case_status entries don't carry a separate
+// description) and filingDate (submittedDate — a case-level fact, same
+// value repeated across a case's rows, absent for IOE-prefixed receipts).
+// `source` is CaseWhy's own bookkeeping (not USCIS data), same precedent as
+// the pre-existing detectedAt column.
 export const caseStatusHistory = pgTable(
   "case_status_history",
   {
@@ -793,13 +809,39 @@ export const caseStatusHistory = pgTable(
     // coarse regional signal, never the full receipt number a second time.
     servicePrefix: text("service_prefix").notNull(),
     statusText: text("status_text").notNull(),
-    // Set only when this check's history also surfaced an interview/oath-
-    // ceremony milestone (same MILESTONE_KEYWORDS match as
-    // src/lib/escalation/stall-detector.ts) — null on most rows.
+    // Real, from current_case_status_desc_en — only populated for the row
+    // representing the live current status; hist_case_status entries don't
+    // include a separate description, so null there.
+    statusDescription: text("status_description"),
+    // The USCIS-reported date this specific entry corresponds to: a
+    // hist_case_status entry's own `date` for a historical row, or
+    // modifiedDate for the live current-status row. Null when USCIS didn't
+    // provide one (e.g. IOE-prefixed receipts omit modifiedDate).
+    eventDate: timestamp("event_date", { withTimezone: true }),
+    // Real, from submittedDate — a case-level fact (filing date), the same
+    // value repeated across a case's rows. Null for IOE-prefixed receipts.
+    filingDate: timestamp("filing_date", { withTimezone: true }),
+    // Set only when this entry's own text matches an interview/oath-ceremony
+    // milestone keyword (MILESTONE_KEYWORDS, src/lib/escalation/stall-detector.ts)
+    // — null on most rows.
     milestoneDate: timestamp("milestone_date", { withTimezone: true }),
+    // CaseWhy's own bookkeeping, not USCIS data: "history_sync" for a row
+    // backfilled/synced from hist_case_status, "current_status" for the row
+    // representing the live current status as of this check.
+    source: text("source").notNull().default("history_sync"),
     detectedAt: timestamp("detected_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index("case_status_history_tracked_case_id_idx").on(table.trackedCaseId)]
+  (table) => [
+    index("case_status_history_tracked_case_id_idx").on(table.trackedCaseId),
+    // Dedup key — lets recordCaseHistory() safely re-run on every check
+    // (including the first one right after tracking) without ever
+    // inserting the same entry twice.
+    unique("case_status_history_dedup_unique").on(
+      table.trackedCaseId,
+      table.statusText,
+      table.eventDate
+    ),
+  ]
 );
 
 export const aliasActionLevelEnum = pgEnum("alias_action_level", ["draft_only", "draft_and_flag_urgent"]);

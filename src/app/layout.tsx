@@ -17,6 +17,12 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "CaseWhy",
   },
+  // Google Search Console property verification (app.casewhy.com), added
+  // as part of round 73's sitemap-submission follow-up. Don't remove —
+  // verification is re-checked periodically, not just at setup time.
+  verification: {
+    google: "OxpvzULCMU8GPqyzaWLxHGFbAepeiRLiQjiXYsWvTBQ",
+  },
 };
 
 export default function RootLayout({

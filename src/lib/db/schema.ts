@@ -151,6 +151,25 @@ export const chatUsage = pgTable(
   (table) => [primaryKey({ columns: [table.userId, table.yearMonth] })]
 );
 
+// Round 71 — replaces src/lib/get-help/rate-limit.ts's in-memory 24-hour
+// rolling window, which genuinely reset every day forever by design (round
+// 60/63's own build) — a signed-out visitor could ask 3 free questions
+// every single day indefinitely, a better long-run deal than a signed-in
+// free account's 3-per-*month* cap, exactly backwards from what should
+// nudge someone toward signing up. A lifetime cap needs a durable store —
+// an in-memory counter genuinely can't represent "never resets" across
+// cold starts/redeploys. clientKey is the requester's IP address (see the
+// "IP vs. cookie/device-id" tradeoff comment in
+// src/lib/get-help/anonymous-usage.ts for why IP was chosen over a
+// first-party cookie). No userId here at all — this table exists
+// specifically for requests with no account to attach to.
+export const anonymousQuestionUsage = pgTable("anonymous_question_usage", {
+  clientKey: text("client_key").primaryKey(),
+  count: integer("count").notNull().default(0),
+  firstSeenAt: timestamp("first_seen_at", { withTimezone: true }).notNull().defaultNow(),
+  lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 // CW-38 — supporting-document vault. Tied to a specific tracked case (not
 // just a user), per CW-36's multi-case model: an I-693 or RFE response
 // belongs to one case, not the whole account. userId is denormalized here

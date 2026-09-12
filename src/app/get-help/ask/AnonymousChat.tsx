@@ -90,11 +90,10 @@ export function AnonymousChat() {
       <div className="border-t border-border p-4">
         {limitReached && (
           <div className="mb-3 rounded-lg border border-brand-500/30 bg-brand-500/5 p-3 text-sm">
-            <p className="font-medium text-foreground">You&apos;ve reached today&apos;s free question limit.</p>
+            <p className="font-medium text-foreground">You&apos;ve used all 3 free questions.</p>
             <p className="mt-1 text-muted">
-              Try again tomorrow, or{" "}
               <Link href="/auth/sign-up" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
-                sign in and track a case
+                Sign in and track a case
               </Link>{" "}
               for unlimited questions about it.
             </p>
@@ -111,7 +110,7 @@ export function AnonymousChat() {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={limitReached ? "Today's free question limit reached" : "Ask a general USCIS process question…"}
+            placeholder={limitReached ? "Free question limit reached" : "Ask a general USCIS process question…"}
             aria-label="Your question"
             disabled={pending || limitReached}
             className="flex-1 rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500 disabled:opacity-60"

@@ -7,7 +7,12 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { askAnonymousQuestion, type AnonymousChatMessage } from "@/lib/get-help/anonymous-chat";
-import { checkAndConsumeRateLimit, clientKeyFromHeaders, DAILY_CAP_PER_IP } from "@/lib/get-help/rate-limit";
+import {
+  clientKeyFromHeaders,
+  getAnonymousQuestionUsage,
+  incrementAnonymousQuestionUsage,
+  LIFETIME_CAP_PER_IP,
+} from "@/lib/get-help/anonymous-usage";
 
 const MAX_MESSAGE_LENGTH = 2000;
 
@@ -30,11 +35,11 @@ function isValidMessages(value: unknown): value is AnonymousChatMessage[] {
 
 export async function POST(request: NextRequest) {
   const clientKey = clientKeyFromHeaders(request.headers);
-  const { allowed, remaining } = checkAndConsumeRateLimit(clientKey);
-  if (!allowed) {
+  const usage = await getAnonymousQuestionUsage(clientKey);
+  if (!usage.allowed) {
     return NextResponse.json(
       {
-        error: `You've reached today's limit of ${DAILY_CAP_PER_IP} free questions. Try again tomorrow, or sign in and track a case for unlimited questions about it.`,
+        error: `You've used all ${LIFETIME_CAP_PER_IP} free questions. Sign in and track a case for unlimited questions about it.`,
         limitReached: true,
       },
       { status: 429 }
@@ -58,7 +63,11 @@ export async function POST(request: NextRequest) {
 
   try {
     const reply = await askAnonymousQuestion(messages);
-    return NextResponse.json({ reply, remaining });
+    // Round 71 — only counted against the lifetime cap on a real, successful
+    // reply, same "don't burn a question on a failed call" rule as
+    // src/lib/billing/chat-usage.ts.
+    await incrementAnonymousQuestionUsage(clientKey);
+    return NextResponse.json({ reply, remaining: usage.remaining - 1 });
   } catch {
     return NextResponse.json(
       { error: "The assistant is temporarily unavailable. Please try again shortly." },

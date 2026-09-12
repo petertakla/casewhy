@@ -183,6 +183,13 @@
       "when": 1789238054603,
       "tag": "0025_giant_veda",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1789238910565,
+      "tag": "0026_mushy_scourge",
+      "breakpoints": true
     }
   ]
 }

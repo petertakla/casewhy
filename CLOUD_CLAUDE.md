@@ -1874,6 +1874,11 @@ CaseWhy was fully invisible to search (confirmed via `site:casewhy.com`/`site:ap
 | `/robots.txt` | both domains | yes (item 1) |
 | `/faq.html` | casewhy.com | yes, Sep 12 follow-up — a dedicated static mirror of `/faq`'s content (Peter asked for it after the app-only version shipped). `index.html`'s footer FAQ link now points here instead of out to `app.casewhy.com/faq`; added to `casewhy.com`'s `sitemap.xml`. |
 
+**At merge time, revisit this list — it's a lookup, not a fresh audit:**
+1. **`/sitemap`'s link targets** (`src/app/sitemap/page.tsx`) — currently lists `casewhy.com`, `privacy.html`, `terms.html` as external/cross-domain links; on a merged domain these become same-domain links instead.
+2. **Dedupe the two FAQ pages** — `casewhy.com/faq.html` and `app.casewhy.com/faq` would become duplicate content on one domain once merged. Pick one as canonical (or redirect one to the other), and drop `/sitemap` back to listing just the single surviving FAQ page.
+3. **Nothing else changes** — every path above is already a clean top-level shape (not nested under an app-specific prefix), specifically so it maps straight onto `casewhy.com/<path>` without renaming anything else on the list.
+
 **Update, Sep 12 (Claude Code, via Claude in Chrome, Peter's own already-authenticated browser session — same pattern as round 15's Cloudflare DNS edit): the "flagged for Peter" item above is now done.** Both properties verified in Google Search Console via the HTML-tag method (a `google-site-verification` meta tag committed to `src/app/layout.tsx` for `app.casewhy.com`, and to `index.html` for `www.casewhy.com` — casewhy.com bare-domain 308-redirects to www, so www is the actual property) rather than DNS, since no Cloudflare credentials exist in this project and the meta-tag route needed no DNS access at all. Both sitemaps submitted and confirmed accepted:
 - `https://app.casewhy.com/sitemap.xml` — Search Console: submitted successfully.
 - `https://www.casewhy.com/sitemap.xml` — Search Console: submitted successfully, 3 pages discovered immediately (index/privacy/terms).

@@ -1872,6 +1872,7 @@ CaseWhy was fully invisible to search (confirmed via `site:casewhy.com`/`site:ap
 | `/faq` | app.casewhy.com | yes (item 8) |
 | `/sitemap.xml` | both domains | yes (item 1, machine-readable) |
 | `/robots.txt` | both domains | yes (item 1) |
+| `/faq.html` | casewhy.com | yes, Sep 12 follow-up — a dedicated static mirror of `/faq`'s content (Peter asked for it after the app-only version shipped). `index.html`'s footer FAQ link now points here instead of out to `app.casewhy.com/faq`; added to `casewhy.com`'s `sitemap.xml`. |
 
 **Update, Sep 12 (Claude Code, via Claude in Chrome, Peter's own already-authenticated browser session — same pattern as round 15's Cloudflare DNS edit): the "flagged for Peter" item above is now done.** Both properties verified in Google Search Console via the HTML-tag method (a `google-site-verification` meta tag committed to `src/app/layout.tsx` for `app.casewhy.com`, and to `index.html` for `www.casewhy.com` — casewhy.com bare-domain 308-redirects to www, so www is the actual property) rather than DNS, since no Cloudflare credentials exist in this project and the meta-tag route needed no DNS access at all. Both sitemaps submitted and confirmed accepted:
 - `https://app.casewhy.com/sitemap.xml` — Search Console: submitted successfully.

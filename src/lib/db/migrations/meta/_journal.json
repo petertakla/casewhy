@@ -169,6 +169,13 @@
       "when": 1789146593361,
       "tag": "0023_flat_hex",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1789225567913,
+      "tag": "0024_purple_silverclaw",
+      "breakpoints": true
     }
   ]
 }

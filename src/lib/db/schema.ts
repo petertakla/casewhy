@@ -801,3 +801,74 @@ export const caseStatusHistory = pgTable(
   },
   (table) => [index("case_status_history_tracked_case_id_idx").on(table.trackedCaseId)]
 );
+
+export const aliasActionLevelEnum = pgEnum("alias_action_level", ["draft_only", "draft_and_flag_urgent"]);
+
+// Round 70 — one row per casewhy.com response alias (privacy@, security@,
+// etc, all Workspace aliases on the same info@casewhy.com inbox — see the
+// task doc for why this project deliberately doesn't provision separate
+// mailboxes). Editable without a code change, per Peter's own explicit
+// point that monitoring/response cadence needs to be customizable per
+// alias — this table is that config, not a hardcoded map.
+export const emailAliasConfigs = pgTable("email_alias_configs", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  // The local part only (e.g. "privacy", not "privacy@casewhy.com") —
+  // the domain is always casewhy.com, enforced in application code.
+  alias: text("alias").notNull().unique(),
+  purpose: text("purpose").notNull(),
+  // Gmail label applied by that alias's filter (e.g. "Alias/Privacy") —
+  // this is what the poller actually queries against, not the alias
+  // string itself, since Gmail search is label-based here.
+  gmailLabel: text("gmail_label").notNull(),
+  pollIntervalMinutes: integer("poll_interval_minutes").notNull(),
+  actionLevel: aliasActionLevelEnum("action_level").notNull().default("draft_only"),
+  enabled: boolean("enabled").notNull().default(true),
+  // Null until the poller's first real run against this alias.
+  lastPolledAt: timestamp("last_polled_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const pendingAliasActionStatusEnum = pgEnum("pending_alias_action_status", [
+  "pending",
+  "approved",
+  "rejected",
+  "sent",
+]);
+
+// Round 70 — the approval queue itself. Nothing here is ever sent or
+// executed by the poller that creates a row — only the approve action
+// (src/app/admin/inbox/actions.ts) does that, and only on a real click.
+// This table is the entire enforcement mechanism for "never auto-send,"
+// not just a UI convention layered on top of something that could act
+// on its own.
+export const pendingAliasActions = pgTable(
+  "pending_alias_actions",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    aliasConfigId: text("alias_config_id").notNull(),
+    gmailMessageId: text("gmail_message_id").notNull().unique(),
+    fromAddress: text("from_address").notNull(),
+    subject: text("subject").notNull(),
+    receivedAt: timestamp("received_at", { withTimezone: true }).notNull(),
+    summary: text("summary").notNull(),
+    draftReply: text("draft_reply"),
+    proposedAction: text("proposed_action"),
+    status: pendingAliasActionStatusEnum("status").notNull().default("pending"),
+    // Mirrors the parent alias config's actionLevel at creation time (not
+    // a live join) so a later config edit can't silently change how an
+    // already-queued item is triaged.
+    urgent: boolean("urgent").notNull().default(false),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewedBy: text("reviewed_by"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("pending_alias_actions_alias_config_id_idx").on(table.aliasConfigId),
+    index("pending_alias_actions_status_idx").on(table.status),
+  ]
+);

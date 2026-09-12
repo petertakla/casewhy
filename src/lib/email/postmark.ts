@@ -246,6 +246,58 @@ export async function sendRepresentativeApplicationNotification({
 // no admin dashboard" call already made for join applications; the report
 // itself always lands in `listing_reports` regardless of whether this send
 // succeeds.
+// Round 70 — fires immediately when a `security@`/`legal@`/`abuse@`
+// (any alias config marked `draft_and_flag_urgent`) message comes in, on
+// top of the routine pending-approval queue entry, never in place of it.
+// Deliberately its own function rather than reusing sendListingReportNotification
+// verbatim — this one's subject/urgency framing needs to read as
+// unmistakably different from routine notifications.
+export async function sendUrgentAliasAlert({
+  alias,
+  fromAddress,
+  subject,
+  summary,
+}: {
+  alias: string;
+  fromAddress: string;
+  subject: string;
+  summary: string;
+}): Promise<void> {
+  const token = process.env.POSTMARK_API_TOKEN;
+  if (!token) {
+    console.warn(`[postmark] POSTMARK_API_TOKEN not set — skipping urgent alias alert for ${alias}@casewhy.com`);
+    return;
+  }
+
+  const res = await fetch("https://api.postmarkapp.com/email", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Postmark-Server-Token": token,
+    },
+    body: JSON.stringify({
+      From: FROM_ADDRESS,
+      To: ADMIN_NOTIFICATION_ADDRESS,
+      Subject: `⚠️ URGENT — new ${alias}@casewhy.com message: ${subject}`,
+      TextBody: [
+        `A new message came in to ${alias}@casewhy.com and needs your immediate attention.`,
+        "",
+        `From: ${fromAddress}`,
+        `Subject: ${subject}`,
+        `Summary: ${summary}`,
+        "",
+        "Review and respond in the pending-approval queue: /admin/inbox",
+      ].join("\n"),
+      MessageStream: "outbound",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
+  }
+}
+
 export async function sendListingReportNotification({
   entityType,
   entityName,

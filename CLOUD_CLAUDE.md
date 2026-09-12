@@ -1873,4 +1873,10 @@ CaseWhy was fully invisible to search (confirmed via `site:casewhy.com`/`site:ap
 | `/sitemap.xml` | both domains | yes (item 1, machine-readable) |
 | `/robots.txt` | both domains | yes (item 1) |
 
-**Not done, flagged for Peter directly (needs account access, not code):** submitting `https://casewhy.com/sitemap.xml` and `https://app.casewhy.com/sitemap.xml` to Google Search Console and Bing Webmaster Tools requires domain-level account verification on each — per the task's own instruction, not attempted from here.
+**Update, Sep 12 (Claude Code, via Claude in Chrome, Peter's own already-authenticated browser session — same pattern as round 15's Cloudflare DNS edit): the "flagged for Peter" item above is now done.** Both properties verified in Google Search Console via the HTML-tag method (a `google-site-verification` meta tag committed to `src/app/layout.tsx` for `app.casewhy.com`, and to `index.html` for `www.casewhy.com` — casewhy.com bare-domain 308-redirects to www, so www is the actual property) rather than DNS, since no Cloudflare credentials exist in this project and the meta-tag route needed no DNS access at all. Both sitemaps submitted and confirmed accepted:
+- `https://app.casewhy.com/sitemap.xml` — Search Console: submitted successfully.
+- `https://www.casewhy.com/sitemap.xml` — Search Console: submitted successfully, 3 pages discovered immediately (index/privacy/terms).
+
+Bing Webmaster Tools: signed in with the same Google account, used Bing's native "Import from Google Search Console" (read-only OAuth scope, no separate verification needed) — both properties and both sitemaps imported automatically, confirmed showing "Processing" status in Bing's own Sitemaps tab for each property.
+
+**Don't remove the two verification meta tags** (`src/app/layout.tsx`'s `metadata.verification.google`, and `index.html`'s `google-site-verification` meta tag) — Google re-checks them periodically, and removing either would silently drop that property's verified status.

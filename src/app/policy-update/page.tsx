@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth/server";
 import { getStalePolicies } from "@/lib/policy/acknowledgments";
 import { acknowledgeStalePolicies } from "./actions";
+
+// Transactional interstitial (re-consent to a ToS/Privacy change), not
+// content — noindex so it never competes with real pages in search.
+export const metadata: Metadata = {
+  title: "Review Policy Updates | CaseWhy",
+  robots: { index: false, follow: false },
+};
 
 const POLICY_LABELS = { tos: "Terms of Service", privacy: "Privacy Policy" } as const;
 const POLICY_HREFS = {

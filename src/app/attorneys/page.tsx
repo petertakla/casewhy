@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getAttorneyDirectory, ATTORNEY_DIRECTORY_DISCLAIMER } from "@/lib/attorneys/directory";
+
+export const metadata: Metadata = {
+  title: "Find an Immigration Attorney | CaseWhy",
+  description:
+    "Free directory of immigration attorneys — board-certified specialists sourced from official state bar records, plus self-enrolled listings.",
+};
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
 

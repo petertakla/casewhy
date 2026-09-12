@@ -1,9 +1,24 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getDsoBySlug } from "@/lib/dso/directory";
 import { BackLink } from "@/components/BackLink";
 import { ReportListingLink } from "@/components/ReportListingLink";
 import { ShareButton } from "@/components/ShareButton";
 import { VerificationLinks } from "@/components/VerificationLinks";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const school = await getDsoBySlug(slug);
+  if (!school) return { title: "School not found | CaseWhy" };
+  return {
+    title: `${school.schoolName} — International Student Office | CaseWhy`,
+    description: `SEVP-certified school listing for ${school.schoolName}${school.campusName && school.campusName !== school.schoolName ? ` (${school.campusName})` : ""}. Free directory, informational listing only.`,
+  };
+}
 
 export default async function DsoDetailPage({
   params,

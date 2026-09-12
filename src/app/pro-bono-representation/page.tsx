@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   getProBonoRepresentationDirectory,
   PRO_BONO_REPRESENTATION_DISCLAIMER,
 } from "@/lib/pro-bono-representation/directory";
+
+export const metadata: Metadata = {
+  title: "Find Free Immigration Court Representation | CaseWhy",
+  description:
+    "Directory of organizations offering free representation in immigration court (removal defense) proceedings, organized by court.",
+};
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
 

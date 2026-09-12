@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   getAccreditedRepresentativeDirectory,
   ACCREDITED_REPRESENTATIVE_DIRECTORY_DISCLAIMER,
 } from "@/lib/accredited-representatives/directory";
+
+export const metadata: Metadata = {
+  title: "Find a DOJ-Accredited Representative | CaseWhy",
+  description:
+    "Free, nationwide directory of DOJ-accredited representatives — non-lawyers authorized to practice immigration law, sourced from DOJ's own public roster.",
+};
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
 

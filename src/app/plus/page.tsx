@@ -1,9 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { auth } from "@/lib/auth/server";
 import { getSubscriptionDetails } from "@/lib/billing/tier";
 import { getAllEffectivePrices, type EffectivePrice, type PlanId } from "@/lib/billing/pricing";
 import { startCheckout, openBillingPortal } from "./actions";
 import { ShareButton } from "@/components/ShareButton";
+
+export const metadata: Metadata = {
+  title: "CaseWhy Plus — Pricing & Features | CaseWhy",
+  description:
+    "Compare CaseWhy's free and Plus tiers — multiple tracked cases, faster notifications, and unlimited AI questions about your case.",
+};
 
 // Round 14 — each feature is now a hyperlink to its own fuller explanation
 // (below, under "Plus, in depth") instead of a flat bullet, per the

@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getLegalAidDirectory, LEGAL_AID_DIRECTORY_DISCLAIMER } from "@/lib/legal-aid/directory";
+
+export const metadata: Metadata = {
+  title: "Find Free & Low-Cost Immigration Legal Aid | CaseWhy",
+  description:
+    "Free, nationwide directory of nonprofit legal aid organizations offering immigration help at low or no cost, sourced from DOJ's own public roster.",
+};
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
 

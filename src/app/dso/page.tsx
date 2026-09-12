@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getDsoDirectory, DSO_DIRECTORY_DISCLAIMER } from "@/lib/dso/directory";
+
+export const metadata: Metadata = {
+  title: "Find Your School's International Student Office (DSO) | CaseWhy",
+  description:
+    "Directory of SEVP-certified schools for F-1/M-1 international students, sourced from DHS's official school directory.",
+};
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
 

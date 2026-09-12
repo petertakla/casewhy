@@ -1,9 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { auth } from "@/lib/auth/server";
 import { getEnabledNewsSourceIds } from "@/lib/settings/settings";
 import { fetchNews } from "@/lib/news/fetch-news";
 import { newsItemId } from "@/lib/news/permalink";
 import { ShareButton } from "@/components/ShareButton";
+
+export const metadata: Metadata = {
+  title: "Immigration News — USCIS & Policy Updates | CaseWhy",
+  description:
+    "Curated USCIS announcements, federal rule changes, and immigration-law coverage from a curated set of sources, updated regularly.",
+};
 
 function formatDate(date: Date | null): string {
   if (!date) return "";

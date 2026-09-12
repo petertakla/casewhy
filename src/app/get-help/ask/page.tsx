@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import { AnonymousChat } from "./AnonymousChat";
+
+export const metadata: Metadata = {
+  title: "Ask CaseWhy — Free Immigration Questions Answered | CaseWhy",
+  description:
+    "Ask a general question about USCIS processes, statuses, or terms — free, no sign-in required, grounded in CaseWhy's curated policy knowledge base.",
+};
 
 // Round 60 Phase B — a genuinely zero-friction anonymous question-answering
 // surface: no sign-in, no tracked case. Deliberately its own route/

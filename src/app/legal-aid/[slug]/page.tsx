@@ -1,9 +1,24 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getLegalAidBySlug } from "@/lib/legal-aid/directory";
 import { BackLink } from "@/components/BackLink";
 import { ReportListingLink } from "@/components/ReportListingLink";
 import { ShareButton } from "@/components/ShareButton";
 import { VerificationLinks } from "@/components/VerificationLinks";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const org = await getLegalAidBySlug(slug);
+  if (!org) return { title: "Organization not found | CaseWhy" };
+  return {
+    title: `${org.organizationName} — Free Legal Aid | CaseWhy`,
+    description: `${org.organizationName}, a nonprofit immigration legal aid organization. Free directory, informational listing only.`,
+  };
+}
 
 export default async function LegalAidDetailPage({
   params,

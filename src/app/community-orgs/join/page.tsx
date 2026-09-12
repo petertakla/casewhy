@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import { ApplicationForm } from "./ApplicationForm";
+
+export const metadata: Metadata = {
+  title: "List Your Organization — Free for Community Groups | CaseWhy",
+  description:
+    "Community and cultural organizations serving immigrants can apply to be listed in CaseWhy's free directory.",
+};
 
 export default function CommunityOrgJoinPage() {
   return (

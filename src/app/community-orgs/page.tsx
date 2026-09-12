@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getCommunityOrgDirectory, COMMUNITY_ORG_DIRECTORY_DISCLAIMER } from "@/lib/community-orgs/directory";
+
+export const metadata: Metadata = {
+  title: "Find a Community or Cultural Organization | CaseWhy",
+  description:
+    "Directory of community and cultural organizations that received a federal USCIS grant for citizenship instruction and naturalization help.",
+};
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
 

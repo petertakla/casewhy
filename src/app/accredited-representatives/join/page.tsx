@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import { ApplicationForm } from "./ApplicationForm";
+
+export const metadata: Metadata = {
+  title: "List Your Organization — Free for Accredited Representatives | CaseWhy",
+  description:
+    "BIA-accredited representatives can apply to be listed in CaseWhy's free directory — no cost to join, reviewed against DOJ's Recognition & Accreditation roster.",
+};
 
 export default function RepresentativeJoinPage() {
   return (

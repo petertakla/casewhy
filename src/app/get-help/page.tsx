@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ShareButton } from "@/components/ShareButton";
 import { ENTITY_TYPES } from "@/lib/get-help/entity-types";
 import { GetHelpChooser } from "./GetHelpChooser";
+
+export const metadata: Metadata = {
+  title: "Get Help — Find an Immigration Attorney or Free Legal Aid | CaseWhy",
+  description:
+    "Free directory of immigration attorneys, accredited representatives, legal aid organizations, and more — no fees, no ads, no sign-in required.",
+};
 
 // Round 29 — ties the separate "talk to a professional" directories
 // together so they're discoverable as one coherent feature instead of a

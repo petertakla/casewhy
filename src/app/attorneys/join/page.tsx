@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import { ApplicationForm } from "./ApplicationForm";
+
+export const metadata: Metadata = {
+  title: "List Your Firm — Free for Immigration Attorneys | CaseWhy",
+  description:
+    "Immigration attorneys can apply to be listed in CaseWhy's free directory — no cost to join, reviewed against your state bar's public record.",
+};
 
 export default function AttorneyJoinPage() {
   return (

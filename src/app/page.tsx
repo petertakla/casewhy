@@ -376,6 +376,12 @@ export default function LandingPage() {
             <a href="/get-help" className="hover:text-foreground">
               Get Help
             </a>
+            <a href="/faq" className="hover:text-foreground">
+              FAQ
+            </a>
+            <a href="/sitemap" className="hover:text-foreground">
+              Site Index
+            </a>
           </div>
           <ShareButton
             url="https://casewhy.com"

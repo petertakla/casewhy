@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { findPolicyMemoById } from "@/lib/kb/policy-memos";
 import { BackLink } from "@/components/BackLink";
@@ -8,18 +9,68 @@ import { BackLink } from "@/components/BackLink";
 // of only ever linking straight out to sourceUrl. Same shell pattern as an
 // entity permalink page (e.g. /legal-aid/[slug]) for visual consistency.
 // No fetch — this is CaseWhy's own already-curated data.
+//
+// Round 73 — this content was previously invisible to search/AI-answer
+// engines (login-adjacent, no metadata, no /policy list page linking to
+// it). Added generateMetadata, a one-line direct-answer callout, and
+// FAQPage schema (the summary/current-status pair genuinely already reads
+// as Q&A) — see round73-seo-geo-foundation-task.md item 5.
+
+function firstSentence(text: string): string {
+  const match = text.match(/^.*?[.!?](?:\s|$)/);
+  return (match ? match[0] : text).trim();
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const memo = findPolicyMemoById(id);
+  if (!memo) return { title: "Policy memo not found | CaseWhy" };
+  return {
+    title: `${memo.title}, Explained | CaseWhy`,
+    description: firstSentence(memo.summary),
+  };
+}
 
 export default async function PolicyMemoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const memo = findPolicyMemoById(id);
   if (!memo) notFound();
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: `What is ${memo.title}?`,
+        acceptedAnswer: { "@type": "Answer", text: memo.summary },
+      },
+      {
+        "@type": "Question",
+        name: `What is the current status of ${memo.title}?`,
+        acceptedAnswer: { "@type": "Answer", text: memo.currentStatus },
+      },
+    ],
+  };
+
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-10">
-      <BackLink href="/" label="Back" />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <BackLink href="/policy" label="All policy memos" />
 
       <h1 className="mt-4 text-2xl font-bold tracking-tight">{memo.title}</h1>
       {memo.memoNumber && <p className="mt-1 text-muted">{memo.memoNumber}</p>}
+
+      <p className="mt-4 rounded-lg border border-border-strong bg-surface-2 p-3 text-sm text-foreground/90">
+        {firstSentence(memo.summary)}
+      </p>
 
       <div className="mt-6 space-y-4 rounded-xl border border-border bg-surface p-5 text-sm">
         <div>

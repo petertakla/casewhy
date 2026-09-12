@@ -1845,3 +1845,32 @@ Peter asked Claude Code to locate CaseWhy's marketing-plan documents after the c
 - `src/lib/marketing/subscribe.ts` (code, not a plan doc — kept as a plain text file, not converted) → https://drive.google.com/file/d/1RB2zmehS2vszyJ-0bnPYtCK5SLWLkfsv/view
 
 **These are one-time snapshots, not synced copies** — if any of the four repo files change later, the Drive copies go stale and need re-pushing by hand; there's no live link between them.
+
+## Round 73, DONE Sep 12 — SEO/GEO technical foundation
+
+CaseWhy was fully invisible to search (confirmed via `site:casewhy.com`/`site:app.casewhy.com`, zero results, neither domain ever crawled — see `round73-seo-geo-foundation-task.md`, updated mid-round to add items 7-8). Built on both `main` (casewhy.com) and `nextjs-app` (app.casewhy.com); `tsc`/lint clean, production build succeeds on both, verified via a real local `next start` (not just build success) — sitemap.xml returns 10,330 real URLs including live DB-backed entity slugs, page titles/descriptions render uniquely per page, FAQPage JSON-LD confirmed present in the actual HTML response on `/faq`, `/policy/[id]`, `/processing-times`, `/visa-bulletin`.
+
+**Item 1 — indexability.** `app.casewhy.com`: new `src/app/robots.ts` (allows everything except `/dashboard`, `/settings`, `/ask`, `/auth/`, `/admin/`, `/api/`, `/policy-update`) and `src/app/sitemap.ts` (build-time/hourly-revalidated, enumerates every static public path plus every attorney/accredited-rep/legal-aid/dso/community-org/pro-bono-representation slug from their live DB tables, plus every `POLICY_MEMOS` id — `/news/[id]` deliberately excluded, those permalinks resolve against a live feed and age out in days/weeks, not stable enough for a sitemap). Added `generateMetadata`/`export const metadata` to all 27 public pages (previously every single one inherited the root layout's identical title/description — a real, confirmed gap, not assumed). `casewhy.com`: new hand-maintained `robots.txt`/`sitemap.xml` (hand-maintained is the right call here, not a violation of the "no static file" instruction — this is a fixed 3-page static site with zero build step to generate one from) and a missing meta description added to `privacy.html`/`terms.html` (titles were already unique).
+
+**Item 2 — acceptance-gate crawlability.** Already correct — `src/middleware.ts`'s round-53 gate already returns a real HTTP 503 on every route when `ACCEPTANCE_TESTING_EMAIL` is set, confirmed by reading the actual response construction (not assumed). No code change needed; verified by code inspection rather than toggling the env var live in production, since there was no safe way to do that from this session.
+
+**Item 3 — direct-answer blocks.** `/processing-times` and `/visa-bulletin` didn't have one (jumped straight to the data tables) — added a top-line callout to each (processing-times: real computed min/max range across `PROCESSING_TIMES`; visa-bulletin: the existing "what does Current mean" text plus a real computed forward/retrogressed count vs. last month via the page's own `computeMovement`). The six Get Help entity-type pages already had an equivalent one-line "what this is and who it's for" paragraph directly under their `<h1>` — confirmed by reading all six, no changes needed there.
+
+**Item 4 — FAQPage schema.** Added to `/processing-times` (the "80% of cases" note), `/visa-bulletin` (the "what does Current mean" note), `/policy/[id]` (summary + current-status as a Q&A pair), and `/faq` (all five questions). HowTo schema not added anywhere — the escalation toolkit has no public-facing explanation page (`src/app/escalation/` is `actions.ts` only, no `page.tsx`), so there's nothing that genuinely reads as a step sequence on a public page, per the task's own "don't fabricate" instruction.
+
+**Item 5 — public policy-memo mirror.** Confirmed before building anything: round 63 already built `/policy/[id]` (a real, live, public permalink per memo) — that was the actual "public mirror," not missing. What was genuinely missing (confirmed real, not assumed) was a list/index page — every `/policy/[id]` was an orphan, reachable only from inside signed-in chat/dashboard context, with nothing linking out to all of them. Built `src/app/policy/page.tsx`, rendering the existing `POLICY_MEMOS` array (no new data work) as a browsable list.
+
+**Items 7-8 (added mid-round by the cloud session).** Item 7: `/sitemap` — a human-facing site index (distinct from `sitemap.xml`), linking every public content area including all six Get Help entity-type pages individually, not just the hub. Item 8: `/faq` — five real Q&A pairs, content pulled verbatim-in-substance from already-approved `terms.html`/`privacy.html` language (UPL section, data-retention/deletion language, "not affiliated with USCIS") and the Get Help hub's own "free, no ads, ever" line — no new trust/legal claims drafted from scratch, so nothing needs Peter's review before publishing. Both linked from both domains' footers (`app.casewhy.com`'s landing-page footer and `casewhy.com`'s `index.html` footer, alongside the existing Privacy/Terms/Get Help links) and from each other.
+
+**Item 6 — path-structure log, for a future casewhy.com/app.casewhy.com merge.** Every new public path this round is already a clean, top-level shape that maps directly onto `casewhy.com/<path>` if/when the domains merge — no redirect-map rework needed later:
+
+| Path | Domain | New this round |
+|---|---|---|
+| `/policy` | app.casewhy.com | yes (item 5) |
+| `/policy/[id]` | app.casewhy.com | pre-existing (round 63), metadata/direct-answer/schema added this round |
+| `/sitemap` | app.casewhy.com | yes (item 7) |
+| `/faq` | app.casewhy.com | yes (item 8) |
+| `/sitemap.xml` | both domains | yes (item 1, machine-readable) |
+| `/robots.txt` | both domains | yes (item 1) |
+
+**Not done, flagged for Peter directly (needs account access, not code):** submitting `https://casewhy.com/sitemap.xml` and `https://app.casewhy.com/sitemap.xml` to Google Search Console and Bing Webmaster Tools requires domain-level account verification on each — per the task's own instruction, not attempted from here.

@@ -1,6 +1,21 @@
+import type { Metadata } from "next";
 import { findNewsItemById } from "@/lib/news/permalink";
 import { extractArticle } from "@/lib/news/extract-article";
 import { BackLink } from "@/components/BackLink";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const item = await findNewsItemById(id);
+  if (!item) return { title: "Story no longer available | CaseWhy", robots: { index: false } };
+  return {
+    title: `${item.title} — ${item.sourceName} | CaseWhy`,
+    description: `Immigration news from ${item.sourceName}: ${item.title}`,
+  };
+}
 
 // Round 63 — a real internal permalink for a news item, resolved by
 // matching against the live feed (no new DB table, Peter's explicit

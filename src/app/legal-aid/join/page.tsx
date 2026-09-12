@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import { ApplicationForm } from "./ApplicationForm";
+
+export const metadata: Metadata = {
+  title: "List Your Organization — Free for Legal Aid Providers | CaseWhy",
+  description:
+    "Nonprofit immigration legal aid organizations can apply to be listed in CaseWhy's free directory — no cost to join.",
+};
 
 export default function LegalAidJoinPage() {
   return (

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   FAMILY_FINAL_ACTION,
   EMPLOYMENT_FINAL_ACTION,
@@ -10,6 +11,12 @@ import {
   type BulletinMovement,
 } from "@/lib/kb/visa-bulletin";
 import { ShareButton } from "@/components/ShareButton";
+
+export const metadata: Metadata = {
+  title: "Visa Bulletin — Final Action Dates | CaseWhy",
+  description:
+    "Track family- and employment-based visa bulletin Final Action Dates each month, with movement indicators since the prior bulletin.",
+};
 
 function MovementBadge({ movement }: { movement: BulletinMovement | null }) {
   if (!movement) return null;
@@ -76,14 +83,67 @@ function BulletinTable({ rows, previousRows }: { rows: BulletinRow[]; previousRo
   );
 }
 
+// Round 73 — direct-answer block + FAQPage schema, so the page's own
+// existing "what does current mean" explanation (previously only at the
+// very bottom) is extractable near the top too. See
+// round73-seo-geo-foundation-task.md item 3-4.
+const CURRENT_MEANS_ANSWER =
+  "\"Current\" means visas are available to all qualified applicants in that category regardless of priority date. A listed date means only applicants with a priority date earlier than that date currently have a visa available.";
+
+function summarizeMovement(rows: BulletinRow[], previousRows?: BulletinRow[]): string {
+  if (!previousRows) return "";
+  let forward = 0;
+  let retrogressed = 0;
+  for (const row of rows) {
+    const prev = previousRows.find((r) => r.category === row.category);
+    if (!prev) continue;
+    (["allOther", "china", "india", "mexico", "philippines"] as const).forEach((col) => {
+      const movement = computeMovement(row[col], prev[col]);
+      if (movement === "forward") forward++;
+      if (movement === "retrogressed") retrogressed++;
+    });
+  }
+  if (forward === 0 && retrogressed === 0) return "No categories moved since last month's bulletin.";
+  const parts: string[] = [];
+  if (forward > 0) parts.push(`${forward} moved forward`);
+  if (retrogressed > 0) parts.push(`${retrogressed} retrogressed`);
+  return `${parts.join(", ")} since last month's bulletin.`;
+}
+
 export default function VisaBulletinPage() {
+  const movementSummary = VISA_BULLETIN_PREVIOUS_MONTH
+    ? summarizeMovement(
+        [...FAMILY_FINAL_ACTION, ...EMPLOYMENT_FINAL_ACTION],
+        [...(VISA_BULLETIN_PREVIOUS_MONTH.family ?? []), ...(VISA_BULLETIN_PREVIOUS_MONTH.employment ?? [])]
+      )
+    : "";
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What does 'Current' mean on the visa bulletin?",
+        acceptedAnswer: { "@type": "Answer", text: CURRENT_MEANS_ANSWER },
+      },
+    ],
+  };
+
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <h1 className="text-2xl font-bold tracking-tight">Visa bulletin</h1>
       <p className="mb-2 mt-2 text-muted">
         Final Action Dates — the chart that determines when a family- or employment-based green
         card can actually be issued or adjustment of status approved, once a petition is
         approved and a priority date is waiting for a visa to become available.
+      </p>
+      <p className="mb-2 rounded-lg border border-border-strong bg-surface-2 p-3 text-sm text-foreground/90">
+        {CURRENT_MEANS_ANSWER} {movementSummary}
       </p>
       <p className="mb-8 text-xs text-muted">
         {VISA_BULLETIN_MONTH} —{" "}

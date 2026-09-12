@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import { ApplicationForm } from "./ApplicationForm";
+
+export const metadata: Metadata = {
+  title: "List Your Organization — Free for Pro Bono Providers | CaseWhy",
+  description:
+    "Organizations offering free immigration-court representation can apply to be listed in CaseWhy's free directory.",
+};
 
 export default function ProBonoRepresentationJoinPage() {
   return (

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   PROCESSING_TIMES,
   PROCESSING_TIMES_AS_OF,
@@ -9,12 +10,50 @@ import {
 } from "@/lib/kb/processing-times";
 import { ShareButton } from "@/components/ShareButton";
 
+export const metadata: Metadata = {
+  title: "USCIS Processing Times by Form | CaseWhy",
+  description:
+    "USCIS's own published processing-time estimates for N-400, I-485, I-765, I-130, and other common case types, kept current.",
+};
+
+// Round 73 — direct-answer block + FAQPage schema, so the page's own
+// existing "80% of cases..." explanation (previously only at the very
+// bottom) is extractable near the top for search snippets/AI answers too.
+// See round73-seo-geo-foundation-task.md item 3-4.
+const PERCENTILE_FAQ_ANSWER =
+  "USCIS bases each processing-time figure on how long it took to complete 80% of cases over the past six months. It's a reference point, not a guarantee — individual cases vary, and the figure updates as USCIS republishes its own data.";
+
 export default function ProcessingTimesPage() {
+  const months = PROCESSING_TIMES.map((e) => e.percentile80Months);
+  const minMonths = Math.min(...months);
+  const maxMonths = Math.max(...months);
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What does '80% of cases completed within X months' mean?",
+        acceptedAnswer: { "@type": "Answer", text: PERCENTILE_FAQ_ANSWER },
+      },
+    ],
+  };
+
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <h1 className="text-2xl font-bold tracking-tight">Processing times</h1>
       <p className="mb-2 mt-2 text-muted">
         USCIS&apos;s own published processing-time estimates, for the case types CaseWhy tracks.
+      </p>
+      <p className="mb-2 rounded-lg border border-border-strong bg-surface-2 p-3 text-sm text-foreground/90">
+        USCIS&apos;s own published estimates for the case types CaseWhy tracks currently range
+        from {minMonths} to {maxMonths} months for 80% of cases to complete, depending on form and
+        office.
       </p>
       <p className="mb-8 text-xs text-muted">
         As of {PROCESSING_TIMES_AS_OF} —{" "}

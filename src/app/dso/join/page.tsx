@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import { ApplicationForm } from "./ApplicationForm";
+
+export const metadata: Metadata = {
+  title: "Add or Update a DSO Contact | CaseWhy",
+  description:
+    "Designated School Officials can submit or update their school's contact info in CaseWhy's free directory.",
+};
 
 export default function DsoJoinPage() {
   return (

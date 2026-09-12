@@ -1,9 +1,24 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProBonoRepresentationBySlug } from "@/lib/pro-bono-representation/directory";
 import { BackLink } from "@/components/BackLink";
 import { ReportListingLink } from "@/components/ReportListingLink";
 import { ShareButton } from "@/components/ShareButton";
 import { VerificationLinks } from "@/components/VerificationLinks";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const org = await getProBonoRepresentationBySlug(slug);
+  if (!org) return { title: "Organization not found | CaseWhy" };
+  return {
+    title: `${org.organizationName} — Pro Bono Immigration Court Representation | CaseWhy`,
+    description: `${org.organizationName}, offering free representation before the ${org.immigrationCourt} immigration court. Free directory, informational listing only.`,
+  };
+}
 
 export default async function ProBonoRepresentationDetailPage({
   params,

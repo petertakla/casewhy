@@ -1,9 +1,24 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAttorneyBySlug } from "@/lib/attorneys/directory";
 import { BackLink } from "@/components/BackLink";
 import { ReportListingLink } from "@/components/ReportListingLink";
 import { ShareButton } from "@/components/ShareButton";
 import { VerificationLinks } from "@/components/VerificationLinks";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const attorney = await getAttorneyBySlug(id);
+  if (!attorney) return { title: "Attorney not found | CaseWhy" };
+  return {
+    title: `${attorney.name}${attorney.firm ? ` — ${attorney.firm}` : ""} | CaseWhy`,
+    description: `Immigration attorney listing for ${attorney.name}${attorney.firm ? ` of ${attorney.firm}` : ""}, licensed in ${attorney.statesLicensed.join(", ")}. Free directory, informational listing only.`,
+  };
+}
 
 // Round 40 — now reads a real DB table by slug rather than the static
 // array's id field. Directory param name kept as [id] (unchanged route)

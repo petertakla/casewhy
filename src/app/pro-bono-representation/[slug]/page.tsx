@@ -9,17 +9,32 @@ import { VerificationLinks } from "@/components/VerificationLinks";
 import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 
+// Complete-check follow-up — see attorneys/[id]/page.tsx's identical fix.
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ lang?: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const { lang } = await searchParams;
+  const es = await isSpanishLocale(lang);
   const org = await getProBonoRepresentationBySlug(slug);
-  if (!org) return { title: "Organization not found | CaseWhy" };
+  if (!org) return { title: es ? "Organización no encontrada | CaseWhy" : "Organization not found | CaseWhy" };
   return {
-    title: `${org.organizationName} — Pro Bono Immigration Court Representation | CaseWhy`,
-    description: `${org.organizationName}, offering free representation before the ${org.immigrationCourt} immigration court. Free directory, informational listing only.`,
+    title: es
+      ? `${org.organizationName} — Representación Gratuita en la Corte de Inmigración | CaseWhy`
+      : `${org.organizationName} — Pro Bono Immigration Court Representation | CaseWhy`,
+    description: es
+      ? `${org.organizationName}, ofreciendo representación gratuita ante la corte de inmigración de ${org.immigrationCourt}. Directorio gratuito, solo listado informativo.`
+      : `${org.organizationName}, offering free representation before the ${org.immigrationCourt} immigration court. Free directory, informational listing only.`,
+    alternates: {
+      languages: {
+        en: `https://app.casewhy.com/pro-bono-representation/${org.slug}`,
+        es: `https://app.casewhy.com/pro-bono-representation/${org.slug}?lang=es`,
+      },
+    },
   };
 }
 

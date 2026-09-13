@@ -9,17 +9,36 @@ import { VerificationLinks } from "@/components/VerificationLinks";
 import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 
+// Complete-check follow-up — this generateMetadata() had no searchParams
+// at all, so the <title>/description stayed English even after round 84
+// made the page body locale-aware via ?lang=es. The person/firm name
+// itself doesn't translate, but the descriptive sentence and hreflang
+// pairing do, same pattern as round 83's fix to processing-times/
+// visa-bulletin/news.
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ lang?: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
+  const { lang } = await searchParams;
+  const es = await isSpanishLocale(lang);
   const attorney = await getAttorneyBySlug(id);
-  if (!attorney) return { title: "Attorney not found | CaseWhy" };
+  if (!attorney) return { title: es ? "Abogado no encontrado | CaseWhy" : "Attorney not found | CaseWhy" };
+  const nameFirm = `${attorney.name}${attorney.firm ? ` — ${attorney.firm}` : ""}`;
   return {
-    title: `${attorney.name}${attorney.firm ? ` — ${attorney.firm}` : ""} | CaseWhy`,
-    description: `Immigration attorney listing for ${attorney.name}${attorney.firm ? ` of ${attorney.firm}` : ""}, licensed in ${attorney.statesLicensed.join(", ")}. Free directory, informational listing only.`,
+    title: `${nameFirm} | CaseWhy`,
+    description: es
+      ? `Listado de abogado de inmigración para ${attorney.name}${attorney.firm ? ` de ${attorney.firm}` : ""}, con licencia en ${attorney.statesLicensed.join(", ")}. Directorio gratuito, solo listado informativo.`
+      : `Immigration attorney listing for ${attorney.name}${attorney.firm ? ` of ${attorney.firm}` : ""}, licensed in ${attorney.statesLicensed.join(", ")}. Free directory, informational listing only.`,
+    alternates: {
+      languages: {
+        en: `https://app.casewhy.com/attorneys/${attorney.slug}`,
+        es: `https://app.casewhy.com/attorneys/${attorney.slug}?lang=es`,
+      },
+    },
   };
 }
 

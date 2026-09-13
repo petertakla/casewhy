@@ -9,17 +9,30 @@ import { VerificationLinks } from "@/components/VerificationLinks";
 import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 
+// Complete-check follow-up — see attorneys/[id]/page.tsx's identical fix.
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ lang?: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const { lang } = await searchParams;
+  const es = await isSpanishLocale(lang);
   const rep = await getAccreditedRepresentativeBySlug(slug);
-  if (!rep) return { title: "Representative not found | CaseWhy" };
+  if (!rep) return { title: es ? "Representante no encontrado | CaseWhy" : "Representative not found | CaseWhy" };
   return {
     title: `${rep.representativeName} — ${rep.organizationName} | CaseWhy`,
-    description: `DOJ-accredited representative ${rep.representativeName} at ${rep.organizationName}. Free directory, informational listing only.`,
+    description: es
+      ? `Representante acreditado por el DOJ, ${rep.representativeName} en ${rep.organizationName}. Directorio gratuito, solo listado informativo.`
+      : `DOJ-accredited representative ${rep.representativeName} at ${rep.organizationName}. Free directory, informational listing only.`,
+    alternates: {
+      languages: {
+        en: `https://app.casewhy.com/accredited-representatives/${rep.slug}`,
+        es: `https://app.casewhy.com/accredited-representatives/${rep.slug}?lang=es`,
+      },
+    },
   };
 }
 

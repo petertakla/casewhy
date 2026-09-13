@@ -9,17 +9,31 @@ import { VerificationLinks } from "@/components/VerificationLinks";
 import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 
+// Complete-check follow-up — see attorneys/[id]/page.tsx's identical fix.
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ lang?: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const { lang } = await searchParams;
+  const es = await isSpanishLocale(lang);
   const school = await getDsoBySlug(slug);
-  if (!school) return { title: "School not found | CaseWhy" };
+  if (!school) return { title: es ? "Escuela no encontrada | CaseWhy" : "School not found | CaseWhy" };
+  const campusSuffix = school.campusName && school.campusName !== school.schoolName ? ` (${school.campusName})` : "";
   return {
-    title: `${school.schoolName} — International Student Office | CaseWhy`,
-    description: `SEVP-certified school listing for ${school.schoolName}${school.campusName && school.campusName !== school.schoolName ? ` (${school.campusName})` : ""}. Free directory, informational listing only.`,
+    title: es ? `${school.schoolName} — Oficina de Estudiantes Internacionales | CaseWhy` : `${school.schoolName} — International Student Office | CaseWhy`,
+    description: es
+      ? `Listado de escuela certificada por SEVP para ${school.schoolName}${campusSuffix}. Directorio gratuito, solo listado informativo.`
+      : `SEVP-certified school listing for ${school.schoolName}${campusSuffix}. Free directory, informational listing only.`,
+    alternates: {
+      languages: {
+        en: `https://app.casewhy.com/dso/${school.slug}`,
+        es: `https://app.casewhy.com/dso/${school.slug}?lang=es`,
+      },
+    },
   };
 }
 

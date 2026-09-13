@@ -9,17 +9,30 @@ import { VerificationLinks } from "@/components/VerificationLinks";
 import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 
+// Complete-check follow-up — see attorneys/[id]/page.tsx's identical fix.
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ lang?: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const { lang } = await searchParams;
+  const es = await isSpanishLocale(lang);
   const org = await getLegalAidBySlug(slug);
-  if (!org) return { title: "Organization not found | CaseWhy" };
+  if (!org) return { title: es ? "Organización no encontrada | CaseWhy" : "Organization not found | CaseWhy" };
   return {
-    title: `${org.organizationName} — Free Legal Aid | CaseWhy`,
-    description: `${org.organizationName}, a nonprofit immigration legal aid organization. Free directory, informational listing only.`,
+    title: es ? `${org.organizationName} — Asistencia Legal Gratuita | CaseWhy` : `${org.organizationName} — Free Legal Aid | CaseWhy`,
+    description: es
+      ? `${org.organizationName}, una organización sin fines de lucro de asistencia legal de inmigración. Directorio gratuito, solo listado informativo.`
+      : `${org.organizationName}, a nonprofit immigration legal aid organization. Free directory, informational listing only.`,
+    alternates: {
+      languages: {
+        en: `https://app.casewhy.com/legal-aid/${org.slug}`,
+        es: `https://app.casewhy.com/legal-aid/${org.slug}?lang=es`,
+      },
+    },
   };
 }
 

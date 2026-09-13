@@ -167,7 +167,7 @@ function AuthHeaderInner() {
   return (
     <header className="sticky top-0 z-10 border-b border-border bg-surface/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-4 text-sm">
-        <Link href="/">
+        <Link href={isSpanish ? "/?lang=es" : "/"}>
           <Logo />
         </Link>
 

@@ -1,5 +1,6 @@
 import { redirect, permanentRedirect } from "next/navigation";
 import { auth } from "@/lib/auth/server";
+import { isSpanishLocale } from "@/lib/i18n/locale";
 
 // Round 74 — app.casewhy.com's signed-out landing page had drifted out of
 // sync with casewhy.com's real marketing site three times (round 68, round
@@ -20,12 +21,23 @@ import { auth } from "@/lib/auth/server";
 // content is being deleted regardless, signed-in visitors are sent to
 // /dashboard (their real home, which already handles its own session
 // state) rather than left on a redirect meant for signed-out visitors.
-export default async function RootPage() {
+export default async function RootPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string }>;
+}) {
   const { data: session } = await auth.getSession();
+  const { lang } = await searchParams;
+  const es = await isSpanishLocale(lang);
 
   if (session?.user) {
-    redirect("/dashboard");
+    redirect(es ? "/dashboard?lang=es" : "/dashboard");
   }
 
-  permanentRedirect("https://casewhy.com");
+  // Round 84 follow-up — this unconditionally sent every signed-out
+  // visitor to the English casewhy.com, even one who'd just been reading
+  // an /es/* page and clicked the logo. casewhy.com/es (round 78) is a
+  // real, live Spanish landing page — route to it when the sticky
+  // preference says Spanish, instead of silently bouncing back to English.
+  permanentRedirect(es ? "https://casewhy.com/es" : "https://casewhy.com");
 }

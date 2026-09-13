@@ -13,11 +13,46 @@ import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { ShareButton } from "@/components/ShareButton";
 
-export const metadata: Metadata = {
-  title: "USCIS Processing Times by Form | CaseWhy",
-  description:
-    "USCIS's own published processing-time estimates for N-400, I-485, I-765, I-130, and other common case types, kept current.",
-};
+// Round 83 — was a static `export const metadata`, so every visitor got
+// the English title/description regardless of `?lang=es`, and there was
+// no hreflang link between the two language states at all. Converted to
+// generateMetadata() so it can read the same lang signal the page body
+// already does. Query-param-based hreflang annotations (rather than a
+// separate path like /es/get-help) are explicitly supported by Google's
+// own multilingual-sites guidance, as long as each language state
+// consistently self-references — that's what the `alternates.languages`
+// block below does.
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string }>;
+}): Promise<Metadata> {
+  const { lang } = await searchParams;
+  const es = await isSpanishLocale(lang);
+  return es
+    ? {
+        title: "Tiempos de Procesamiento de USCIS por Formulario | CaseWhy",
+        description:
+          "Las propias estimaciones de tiempo de procesamiento publicadas por USCIS para N-400, I-485, I-765, I-130, y otros tipos de caso comunes, siempre actualizadas.",
+        alternates: {
+          languages: {
+            en: "https://app.casewhy.com/processing-times",
+            es: "https://app.casewhy.com/processing-times?lang=es",
+          },
+        },
+      }
+    : {
+        title: "USCIS Processing Times by Form | CaseWhy",
+        description:
+          "USCIS's own published processing-time estimates for N-400, I-485, I-765, I-130, and other common case types, kept current.",
+        alternates: {
+          languages: {
+            en: "https://app.casewhy.com/processing-times",
+            es: "https://app.casewhy.com/processing-times?lang=es",
+          },
+        },
+      };
+}
 
 // Round 73 — direct-answer block + FAQPage schema, so the page's own
 // existing "80% of cases..." explanation (previously only at the very
@@ -25,6 +60,13 @@ export const metadata: Metadata = {
 // See round73-seo-geo-foundation-task.md item 3-4.
 const PERCENTILE_FAQ_ANSWER =
   "USCIS bases each processing-time figure on how long it took to complete 80% of cases over the past six months. It's a reference point, not a guarantee — individual cases vary, and the figure updates as USCIS republishes its own data.";
+
+// Round 83 — the FAQPage schema below was hardcoded English regardless of
+// `?lang=es`, even though the visible on-page answer this schema mirrors
+// was already translated. A Spanish visitor's rich-result/AI-answer
+// snippet would have shown English text pulled from a Spanish page.
+const PERCENTILE_FAQ_ANSWER_ES =
+  "USCIS basa cada cifra de tiempo de procesamiento en cuánto tiempo tomó completar el 80% de los casos durante los últimos seis meses. Es un punto de referencia, no una garantía — los casos individuales varían, y la cifra se actualiza a medida que USCIS vuelve a publicar sus propios datos.";
 
 // Round 80 follow-up — this page has no session/auth logic (pure reference
 // content from in-memory constants), so it was static (prerendered) before
@@ -50,11 +92,14 @@ export default async function ProcessingTimesPage({
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
+    inLanguage: es ? "es" : "en",
     mainEntity: [
       {
         "@type": "Question",
-        name: "What does '80% of cases completed within X months' mean?",
-        acceptedAnswer: { "@type": "Answer", text: PERCENTILE_FAQ_ANSWER },
+        name: es
+          ? "¿Qué significa '80% de los casos completados dentro de X meses'?"
+          : "What does '80% of cases completed within X months' mean?",
+        acceptedAnswer: { "@type": "Answer", text: es ? PERCENTILE_FAQ_ANSWER_ES : PERCENTILE_FAQ_ANSWER },
       },
     ],
   };

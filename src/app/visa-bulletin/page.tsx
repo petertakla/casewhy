@@ -15,11 +15,41 @@ import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { ShareButton } from "@/components/ShareButton";
 
-export const metadata: Metadata = {
-  title: "Visa Bulletin — Final Action Dates | CaseWhy",
-  description:
-    "Track family- and employment-based visa bulletin Final Action Dates each month, with movement indicators since the prior bulletin.",
-};
+// Round 83 — was a static `export const metadata`; converted to
+// generateMetadata() so a Spanish visitor gets a Spanish title/description
+// and a self-referencing hreflang pair, same reasoning as
+// processing-times/page.tsx's identical fix.
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string }>;
+}): Promise<Metadata> {
+  const { lang } = await searchParams;
+  const es = await isSpanishLocale(lang);
+  return es
+    ? {
+        title: "Boletín de Visas — Fechas de Acción Final | CaseWhy",
+        description:
+          "Rastrea las Fechas de Acción Final del boletín de visas familiares y de empleo cada mes, con indicadores de movimiento desde el boletín anterior.",
+        alternates: {
+          languages: {
+            en: "https://app.casewhy.com/visa-bulletin",
+            es: "https://app.casewhy.com/visa-bulletin?lang=es",
+          },
+        },
+      }
+    : {
+        title: "Visa Bulletin — Final Action Dates | CaseWhy",
+        description:
+          "Track family- and employment-based visa bulletin Final Action Dates each month, with movement indicators since the prior bulletin.",
+        alternates: {
+          languages: {
+            en: "https://app.casewhy.com/visa-bulletin",
+            es: "https://app.casewhy.com/visa-bulletin?lang=es",
+          },
+        },
+      };
+}
 
 // Round 80 follow-up — same static→dynamic tradeoff as processing-times/page.tsx.
 export const dynamic = "force-dynamic";
@@ -178,14 +208,19 @@ export default async function VisaBulletinPage({
       [...(VISA_BULLETIN_PREVIOUS_MONTH.family ?? []), ...(VISA_BULLETIN_PREVIOUS_MONTH.employment ?? [])]
     ) : "";
 
+  // Round 83 — this schema was hardcoded English regardless of `?lang=es`,
+  // even though CURRENT_MEANS_ANSWER_ES (used in the visible body text
+  // just below) already existed — the translation existed, it just wasn't
+  // wired into the structured data.
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
+    inLanguage: es ? "es" : "en",
     mainEntity: [
       {
         "@type": "Question",
-        name: "What does 'Current' mean on the visa bulletin?",
-        acceptedAnswer: { "@type": "Answer", text: CURRENT_MEANS_ANSWER },
+        name: es ? "¿Qué significa 'Vigente' en el boletín de visas?" : "What does 'Current' mean on the visa bulletin?",
+        acceptedAnswer: { "@type": "Answer", text: es ? CURRENT_MEANS_ANSWER_ES : CURRENT_MEANS_ANSWER },
       },
     ],
   };

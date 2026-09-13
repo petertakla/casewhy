@@ -8,11 +8,38 @@ import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { ShareButton } from "@/components/ShareButton";
 
-export const metadata: Metadata = {
-  title: "Immigration News — USCIS & Policy Updates | CaseWhy",
-  description:
-    "Curated USCIS announcements, federal rule changes, and immigration-law coverage from a curated set of sources, updated regularly.",
-};
+// Round 83 — same static-metadata gap as processing-times/visa-bulletin.
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string }>;
+}): Promise<Metadata> {
+  const { lang } = await searchParams;
+  const es = await isSpanishLocale(lang);
+  return es
+    ? {
+        title: "Noticias de Inmigración — Actualizaciones de USCIS y Políticas | CaseWhy",
+        description:
+          "Anuncios curados de USCIS, cambios en reglas federales, y cobertura de ley de inmigración de un conjunto curado de fuentes, actualizado regularmente.",
+        alternates: {
+          languages: {
+            en: "https://app.casewhy.com/news",
+            es: "https://app.casewhy.com/news?lang=es",
+          },
+        },
+      }
+    : {
+        title: "Immigration News — USCIS & Policy Updates | CaseWhy",
+        description:
+          "Curated USCIS announcements, federal rule changes, and immigration-law coverage from a curated set of sources, updated regularly.",
+        alternates: {
+          languages: {
+            en: "https://app.casewhy.com/news",
+            es: "https://app.casewhy.com/news?lang=es",
+          },
+        },
+      };
+}
 
 function formatDate(date: Date | null, es: boolean): string {
   if (!date) return "";

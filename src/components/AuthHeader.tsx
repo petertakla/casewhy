@@ -10,12 +10,31 @@ const NAV_LINKS = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/ask", label: "Ask a question" },
   { href: "/plus", label: "CaseWhy Plus" },
-  { href: "/get-help", label: "Get Help" },
+  { href: "/get-help", label: "Get Help", labelEs: "Obtener ayuda" },
   { href: "/processing-times", label: "Processing times" },
   { href: "/visa-bulletin", label: "Visa bulletin" },
   { href: "/news", label: "News" },
   { href: "/settings", label: "Settings" },
 ];
+
+// Every English page that has a real /es/* counterpart — landing on one of
+// these exactly is treated as an explicit "back to English" signal (see
+// LOCALE_COOKIE below). Everything else (Dashboard, Ask, Settings, News,
+// Processing times, Visa bulletin, the auth pages) has no Spanish version
+// at all, so visiting one of those doesn't say anything about intent either
+// way — the sticky preference is left alone.
+const TRANSLATED_EN_PATHS = [
+  "/plus",
+  "/get-help",
+  "/attorneys",
+  "/accredited-representatives",
+  "/legal-aid",
+  "/dso",
+  "/community-orgs",
+  "/pro-bono-representation",
+];
+
+const LOCALE_COOKIE = "casewhy_locale";
 
 export function AuthHeader() {
   const { data: session, isPending } = authClient.useSession();
@@ -35,7 +54,39 @@ export function AuthHeader() {
   // and /get-help have Spanish counterparts (Dashboard, Ask, Settings,
   // Processing times, Visa bulletin, News, and the sign-in form itself
   // don't) — so those are the only destinations that switch here.
-  const isSpanish = pathname === "/es" || pathname.startsWith("/es/");
+  const onEsPath = pathname === "/es" || pathname.startsWith("/es/");
+
+  // Second follow-up, same day — Peter caught that signing in from an /es/*
+  // page still dropped the visitor back to English: /auth/sign-in redirects
+  // to /dashboard, which has no Spanish version, so path-only detection
+  // above goes false the instant they land there. A short-lived cookie
+  // carries the preference across that jump. It's only ever read after
+  // mount (see the `mounted` guard) so the server-rendered HTML — which has
+  // no way to know the cookie's value without wiring cookies() through the
+  // root layout — always matches the client's first paint; the label/href
+  // upgrade to Spanish happens a beat later as a normal state update, not a
+  // hydration mismatch.
+  const [mounted, setMounted] = useState(false);
+  const [localeCookie, setLocaleCookie] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+    const match = document.cookie.match(/(?:^|; )casewhy_locale=([^;]*)/);
+    setLocaleCookie(match ? decodeURIComponent(match[1]) : null);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    if (onEsPath) {
+      document.cookie = `${LOCALE_COOKIE}=es; path=/; max-age=2592000`; // 30 days
+      setLocaleCookie("es");
+    } else if (TRANSLATED_EN_PATHS.includes(pathname)) {
+      document.cookie = `${LOCALE_COOKIE}=; path=/; max-age=0`;
+      setLocaleCookie(null);
+    }
+  }, [pathname, mounted, onEsPath]);
+
+  const isSpanish = onEsPath || (mounted && localeCookie === "es");
   const ES_HREF: Record<string, string> = {
     "/get-help": "/es/get-help",
     "/plus": "/es/plus",
@@ -99,7 +150,7 @@ export function AuthHeader() {
                         : "text-muted hover:text-foreground"
                     }`}
                   >
-                    {link.label}
+                    {isSpanish && link.labelEs ? link.labelEs : link.label}
                   </Link>
                 );
               })}

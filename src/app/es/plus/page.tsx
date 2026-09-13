@@ -255,7 +255,7 @@ export default async function PlusPageEs({
           {!session?.user && (
             <div className="mt-4">
               <Link
-                href="/auth/sign-in"
+                href="/auth/sign-in?lang=es"
                 className="inline-block rounded-lg bg-brand-500 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-600"
               >
                 Inicia sesión para suscribirte

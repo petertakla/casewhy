@@ -17,22 +17,26 @@ const NAV_LINKS = [
   { href: "/settings", label: "Settings", labelEs: "Configuración" },
 ];
 
-// Every English page that has a real /es/* counterpart — landing on one of
-// these exactly is treated as an explicit "back to English" signal (see
-// LOCALE_COOKIE below). Everything else (Dashboard, Ask, Settings, News,
-// Processing times, Visa bulletin, the auth pages) has no Spanish version
-// at all, so visiting one of those doesn't say anything about intent either
-// way — the sticky preference is left alone.
-const TRANSLATED_EN_PATHS = [
-  "/plus",
-  "/get-help",
-  "/attorneys",
-  "/accredited-representatives",
-  "/legal-aid",
-  "/dso",
-  "/community-orgs",
-  "/pro-bono-representation",
-];
+// Round 83 — replaces the original narrower TRANSLATED_EN_PATHS allowlist
+// (just /plus, /get-help, and the six round-79 entity-list pages). That
+// list only cleared the cookie on pages known to have a real /es/*
+// counterpart, leaving it untouched everywhere else — including plain
+// English-only pages with no locale awareness at all (/, /faq, /policy,
+// entity detail pages like /attorneys/[id], etc.). A visitor who'd set
+// the cookie earlier and later landed on one of those saw the header
+// (and its Sign in link, still built off the stale cookie) silently stay
+// in Spanish while the page body was English — reported directly: "click
+// sign in and it flips the language." The round-80 family below is the
+// opposite case and has to stay excluded: those pages ARE locale-aware
+// (read the same cookie/query-param signal server-side via
+// isSpanishLocale()), so arriving with no explicit `?lang=` shouldn't
+// reset anything — the whole point of the cookie is to survive exactly
+// that kind of ordinary, param-less navigation.
+const LOCALE_AWARE_EN_PATHS = ["/dashboard", "/ask", "/settings", "/processing-times", "/visa-bulletin", "/news"];
+
+function isLocaleAwarePath(pathname: string): boolean {
+  return pathname === "/es" || pathname.startsWith("/es/") || pathname.startsWith("/auth/") || LOCALE_AWARE_EN_PATHS.includes(pathname);
+}
 
 const LOCALE_COOKIE = "casewhy_locale";
 
@@ -97,7 +101,7 @@ function AuthHeaderInner() {
     if (onEsPath || langParamEs) {
       document.cookie = `${LOCALE_COOKIE}=es; path=/; max-age=2592000`; // 30 days
       setLocaleCookie("es");
-    } else if (langParamEn || TRANSLATED_EN_PATHS.includes(pathname)) {
+    } else if (langParamEn || !isLocaleAwarePath(pathname)) {
       document.cookie = `${LOCALE_COOKIE}=; path=/; max-age=0`;
       setLocaleCookie(null);
     }

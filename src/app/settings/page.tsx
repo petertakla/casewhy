@@ -3,7 +3,9 @@ import { auth } from "@/lib/auth/server";
 import { getStatusChangeEmailsEnabled, getEnabledNewsSourceIds } from "@/lib/settings/settings";
 import { NEWS_SOURCES } from "@/lib/news/sources";
 import { RESOURCE_LINKS } from "@/lib/resources/links";
+import Link from "next/link";
 import { isSpanishLocale } from "@/lib/i18n/locale";
+import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { SettingsForm } from "./SettingsForm";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +30,11 @@ export default async function SettingsPage({
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+      <div className="mb-2 text-right text-sm">
+        <Link href={localeToggleHref("/settings", {}, es)} className="text-brand-600 hover:underline dark:text-brand-400">
+          {es ? "English" : "Español"}
+        </Link>
+      </div>
       <h1 className="text-2xl font-bold tracking-tight">{es ? "Configuración" : "Settings"}</h1>
       <p className="mb-8 mt-2 text-muted">
         {es

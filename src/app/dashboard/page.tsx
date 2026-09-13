@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth/server";
 import { getTrackedCases } from "./actions";
 import { getSubscriptionDetails, TIER_LIMITS, PLUS_HARD_CEILING_MAX_CASES } from "@/lib/billing/tier";
 import { isSpanishLocale } from "@/lib/i18n/locale";
+import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { TrackCaseButton } from "./TrackCaseButton";
 import { CheckNowButton } from "./CheckNowButton";
 import { DownloadReportLink } from "./DownloadReportLink";
@@ -540,6 +541,11 @@ export default async function DashboardPage({
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+      <div className="mb-2 text-right text-sm">
+        <Link href={localeToggleHref("/dashboard", { receipt }, es)} className="text-brand-600 hover:underline dark:text-brand-400">
+          {es ? "English" : "Español"}
+        </Link>
+      </div>
       <h1 className="text-2xl font-bold tracking-tight">{es ? "Tu caso" : "Your case"}</h1>
       <p className="mb-8 mt-2 text-muted">
         {es ? "Ingresa tu número de recibo de USCIS para ver su estado actual." : "Enter your USCIS receipt number to see its current status."}

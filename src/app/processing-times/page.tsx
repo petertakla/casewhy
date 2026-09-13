@@ -8,7 +8,9 @@ import {
   OFFICE_LOCATOR_URL,
   ASC_LOCATOR_URL,
 } from "@/lib/kb/processing-times";
+import Link from "next/link";
 import { isSpanishLocale } from "@/lib/i18n/locale";
+import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { ShareButton } from "@/components/ShareButton";
 
 export const metadata: Metadata = {
@@ -63,6 +65,11 @@ export default async function ProcessingTimesPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
+      <div className="mb-2 text-right text-sm">
+        <Link href={localeToggleHref("/processing-times", {}, es)} className="text-brand-600 hover:underline dark:text-brand-400">
+          {es ? "English" : "Español"}
+        </Link>
+      </div>
       <h1 className="text-2xl font-bold tracking-tight">{es ? "Tiempos de procesamiento" : "Processing times"}</h1>
       <p className="mb-2 mt-2 text-muted">
         {es

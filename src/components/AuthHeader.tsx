@@ -86,19 +86,24 @@ function AuthHeaderInner() {
   // treats it as onEsPath-equivalent and re-arms the cookie for whatever
   // navigation happens next.
   const langParamEs = searchParams.get("lang") === "es";
+  // Round 82 — the page-level language switcher on in-place-localized pages
+  // sends an explicit `?lang=en` to flip back from a sticky Spanish cookie;
+  // without this branch the cookie would just re-assert Spanish on the very
+  // next ordinary nav click, making the switcher's English link a no-op.
+  const langParamEn = searchParams.get("lang") === "en";
 
   useEffect(() => {
     if (!mounted) return;
     if (onEsPath || langParamEs) {
       document.cookie = `${LOCALE_COOKIE}=es; path=/; max-age=2592000`; // 30 days
       setLocaleCookie("es");
-    } else if (TRANSLATED_EN_PATHS.includes(pathname)) {
+    } else if (langParamEn || TRANSLATED_EN_PATHS.includes(pathname)) {
       document.cookie = `${LOCALE_COOKIE}=; path=/; max-age=0`;
       setLocaleCookie(null);
     }
-  }, [pathname, mounted, onEsPath, langParamEs]);
+  }, [pathname, mounted, onEsPath, langParamEs, langParamEn]);
 
-  const isSpanish = onEsPath || langParamEs || (mounted && localeCookie === "es");
+  const isSpanish = !langParamEn && (onEsPath || langParamEs || (mounted && localeCookie === "es"));
   const ES_HREF: Record<string, string> = {
     "/get-help": "/es/get-help",
     "/plus": "/es/plus",

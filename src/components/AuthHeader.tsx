@@ -27,6 +27,23 @@ export function AuthHeader() {
   // Settings, etc.), regardless of which page they're on.
   const isSignedIn = !isPending && !!session?.user;
 
+  // Round 79 follow-up — this header renders on every page via the root
+  // layout, including the /es/* pages round 79 added, but it was never made
+  // locale-aware: it always showed English labels and always linked back to
+  // the English /get-help and /plus, silently bouncing a Spanish-page
+  // visitor out of Spanish the moment they touched the header. Only /plus
+  // and /get-help have Spanish counterparts (Dashboard, Ask, Settings,
+  // Processing times, Visa bulletin, News, and the sign-in form itself
+  // don't) — so those are the only destinations that switch here.
+  const isSpanish = pathname === "/es" || pathname.startsWith("/es/");
+  const ES_HREF: Record<string, string> = {
+    "/get-help": "/es/get-help",
+    "/plus": "/es/plus",
+  };
+  function localizeHref(href: string) {
+    return isSpanish ? (ES_HREF[href] ?? href) : href;
+  }
+
   // Round 71, item 7 — a fade-mask affordance at the scrollable edges,
   // shown only on the side there's actually more nav to reveal (never a
   // static decoration that's wrong once the user scrolls to the true end).
@@ -70,11 +87,12 @@ export function AuthHeader() {
               className="flex gap-x-5 gap-y-1 overflow-x-auto text-sm"
             >
               {NAV_LINKS.map((link) => {
-                const active = pathname.startsWith(link.href);
+                const href = localizeHref(link.href);
+                const active = pathname.startsWith(href);
                 return (
                   <Link
                     key={link.href}
-                    href={link.href}
+                    href={href}
                     className={`whitespace-nowrap pb-0.5 ${
                       active
                         ? "border-b-2 border-brand-500 font-semibold text-foreground"
@@ -131,14 +149,14 @@ export function AuthHeader() {
           </div>
         ) : (
           <div className="flex items-center gap-4">
-            <Link href="/get-help" className="text-muted hover:text-foreground">
-              Get Help
+            <Link href={localizeHref("/get-help")} className="text-muted hover:text-foreground">
+              {isSpanish ? "Obtener ayuda" : "Get Help"}
             </Link>
             <Link
               href="/auth/sign-in"
               className="font-semibold text-brand-600 dark:text-brand-400 hover:underline"
             >
-              Sign in
+              {isSpanish ? "Iniciar sesión" : "Sign in"}
             </Link>
           </div>
         )}

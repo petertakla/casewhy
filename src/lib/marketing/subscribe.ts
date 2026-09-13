@@ -9,7 +9,16 @@ import { emailSubscribers } from "@/lib/db/schema";
 
 const SubscribeInput = z.object({
   email: z.string().trim().toLowerCase().email(),
-  sourcePage: z.enum(["landing-hero", "landing-footer", "static-hero", "static-footer"]),
+  // Round 78 — "-es" variants added for casewhy.com/es (the Spanish landing
+  // page), so which language a signup came from stays distinguishable.
+  sourcePage: z.enum([
+    "landing-hero",
+    "landing-footer",
+    "static-hero",
+    "static-footer",
+    "static-hero-es",
+    "static-footer-es",
+  ]),
   // Honeypot — a real visitor never sees or fills this field (hidden via
   // CSS, not a "type=hidden" input a form-fill tool would skip over the
   // same way). A bot that fills every field trips this; humans don't.

@@ -5,6 +5,7 @@ import { explainCaseStatus, type CaseExplanation } from "@/lib/ai/explain";
 import { auth } from "@/lib/auth/server";
 import { getTrackedCases } from "./actions";
 import { getSubscriptionDetails, TIER_LIMITS, PLUS_HARD_CEILING_MAX_CASES } from "@/lib/billing/tier";
+import { isSpanishLocale } from "@/lib/i18n/locale";
 import { TrackCaseButton } from "./TrackCaseButton";
 import { CheckNowButton } from "./CheckNowButton";
 import { DownloadReportLink } from "./DownloadReportLink";
@@ -18,12 +19,23 @@ import { PositiveShareNudge } from "./PositiveShareNudge";
 
 export const dynamic = "force-dynamic";
 
-function friendlyErrorMessage(err: UscisApiError): string {
+// Round 80 — three of these four branches are CaseWhy's own authored copy
+// (fixed UI chrome for the 404/401/generic-fallback cases), so those get
+// translated. The one real exception is the middle try/catch: `message`
+// there is extracted straight from USCIS's own JSON error body — genuinely
+// upstream text, same Track 2 reasoning as the raw status text elsewhere on
+// this page — left untouched either way since it's already dynamic, not a
+// hardcoded string to translate.
+function friendlyErrorMessage(err: UscisApiError, es: boolean): string {
   if (err.status === 404) {
-    return "We couldn't find a case with that receipt number. Double-check it and try again.";
+    return es
+      ? "No pudimos encontrar un caso con ese número de recibo. Verifícalo e intenta de nuevo."
+      : "We couldn't find a case with that receipt number. Double-check it and try again.";
   }
   if (err.status === 401) {
-    return "We're having trouble authenticating with USCIS right now. Please try again shortly.";
+    return es
+      ? "Estamos teniendo problemas para autenticarnos con USCIS en este momento. Por favor intenta de nuevo en un momento."
+      : "We're having trouble authenticating with USCIS right now. Please try again shortly.";
   }
   try {
     const parsed = JSON.parse(err.detail) as { message?: string; error?: { message?: string } };
@@ -32,7 +44,9 @@ function friendlyErrorMessage(err: UscisApiError): string {
   } catch {
     // detail wasn't JSON — fall through to the generic message below.
   }
-  return "USCIS's case status service is temporarily unavailable. Please try again shortly.";
+  return es
+    ? "El servicio de estado de casos de USCIS no está disponible temporalmente. Por favor intenta de nuevo en un momento."
+    : "USCIS's case status service is temporarily unavailable. Please try again shortly.";
 }
 
 /** True for the same "good news" statuses statusTone() colors emerald —
@@ -61,6 +75,7 @@ function statusTone(statusText: string): { dot: string; text: string; bg: string
 function SearchForm({
   receiptNumber,
   trackedCaseCount,
+  es,
 }: {
   receiptNumber?: string;
   /** Round 71 — an account with ≥1 already-tracked case gets "Add New Case"
@@ -68,15 +83,16 @@ function SearchForm({
    * nothing were tracked yet regardless of how many cases the account
    * already had. */
   trackedCaseCount: number;
+  es: boolean;
 }) {
   return (
     <form action="/dashboard" method="get" className="flex flex-col gap-3 sm:flex-row">
-      <ReceiptNumberInput defaultValue={receiptNumber} />
+      <ReceiptNumberInput defaultValue={receiptNumber} es={es} />
       <button
         type="submit"
         className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
       >
-        {trackedCaseCount > 0 ? "Add New Case" : "Track case"}
+        {trackedCaseCount > 0 ? (es ? "Agregar caso nuevo" : "Add New Case") : es ? "Rastrear caso" : "Track case"}
       </button>
     </form>
   );
@@ -88,7 +104,15 @@ function SearchForm({
  * Plus-gated. See src/lib/escalation/stall-detector.ts for the (honestly
  * approximate — see its own comment) benchmark this uses.
  */
-function StalledCaseCard({ daysSinceLastUpdate, milestoneText }: { daysSinceLastUpdate: number; milestoneText: string }) {
+function StalledCaseCard({
+  daysSinceLastUpdate,
+  milestoneText,
+  es,
+}: {
+  daysSinceLastUpdate: number;
+  milestoneText: string;
+  es: boolean;
+}) {
   return (
     <div className="mt-4 overflow-hidden rounded-xl border border-amber-500/20 bg-amber-500/5">
       <div className="flex gap-3 border-l-4 border-l-amber-500 p-4">
@@ -105,19 +129,36 @@ function StalledCaseCard({ daysSinceLastUpdate, milestoneText }: { daysSinceLast
         </div>
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400">
-            This case looks delayed
+            {es ? "Este caso parece retrasado" : "This case looks delayed"}
           </p>
           <p className="mt-1.5 text-sm text-foreground/90">
-            It&apos;s been {daysSinceLastUpdate} days since &quot;{milestoneText}&quot; with no further update —
-            longer than typical for this stage. Sign in and{" "}
-            <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
-              upgrade to CaseWhy Plus
-            </Link>{" "}
-            to find your representative and draft a follow-up letter, or{" "}
-            <Link href="/get-help" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
-              get help from a licensed professional
-            </Link>{" "}
-            now.
+            {es ? (
+              <>
+                Han pasado {daysSinceLastUpdate} días desde &quot;{milestoneText}&quot; sin ninguna actualización más —
+                más tiempo de lo típico para esta etapa. Inicia sesión y{" "}
+                <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                  actualiza a CaseWhy Plus
+                </Link>{" "}
+                para encontrar a tu representante y redactar una carta de seguimiento, o{" "}
+                <Link href="/get-help" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                  obtén ayuda de un profesional con licencia
+                </Link>{" "}
+                ahora.
+              </>
+            ) : (
+              <>
+                It&apos;s been {daysSinceLastUpdate} days since &quot;{milestoneText}&quot; with no further update —
+                longer than typical for this stage. Sign in and{" "}
+                <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                  upgrade to CaseWhy Plus
+                </Link>{" "}
+                to find your representative and draft a follow-up letter, or{" "}
+                <Link href="/get-help" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                  get help from a licensed professional
+                </Link>{" "}
+                now.
+              </>
+            )}
           </p>
         </div>
       </div>
@@ -129,6 +170,7 @@ function ExplanationBox({
   explanation,
   receiptNumber,
   alreadyTracked,
+  es,
 }: {
   explanation: CaseExplanation;
   receiptNumber: string;
@@ -138,7 +180,12 @@ function ExplanationBox({
    * not-yet-tracked lookup would otherwise get misrouted to the wrong case
    * instead of the one this citation is actually about. */
   alreadyTracked: boolean;
+  es: boolean;
 }) {
+  // Round 80 — explanation.explanation / .nextSteps and each policy's
+  // .title / .sourceTitle are AI-generated / KB content, Track 2 per the
+  // task doc's explicit boundary — never translated here, only the box's
+  // own static labels (headings, quick-ask button text, the disclaimer).
   return (
     <div className="mt-5 overflow-hidden rounded-xl border border-brand-500/20 bg-surface-2">
       <div className="flex gap-3 border-l-4 border-l-brand-500 p-4">
@@ -155,7 +202,7 @@ function ExplanationBox({
         </div>
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
-            What this means
+            {es ? "Qué significa esto" : "What this means"}
           </p>
           <p className="mt-1.5 text-sm text-foreground/90">
             {linkifyExplanation(explanation.explanation, explanation.relatedPolicies)}
@@ -179,7 +226,7 @@ function ExplanationBox({
           {explanation.relatedPolicies.length > 0 && (
             <div className="mt-3 border-t border-brand-500/15 pt-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-muted">
-                Policy background referenced above
+                {es ? "Antecedentes de política referenciados arriba" : "Policy background referenced above"}
               </p>
               <ul className="mt-1.5 space-y-1 text-xs">
                 {explanation.relatedPolicies.map((p) => (
@@ -198,16 +245,16 @@ function ExplanationBox({
                     {alreadyTracked && (
                       <span className="flex shrink-0 gap-3 text-muted">
                         <Link
-                          href={`/ask?link=${encodeURIComponent(`/policy/${p.id}`)}&ask=applies&receipt=${receiptNumber}`}
+                          href={`/ask?link=${encodeURIComponent(`/policy/${p.id}`)}&ask=applies&receipt=${receiptNumber}${es ? "&lang=es" : ""}`}
                           className="underline decoration-dotted hover:text-foreground"
                         >
-                          Does it apply to me?
+                          {es ? "¿Aplica a mi caso?" : "Does it apply to me?"}
                         </Link>
                         <Link
-                          href={`/ask?link=${encodeURIComponent(`/policy/${p.id}`)}&ask=explains&receipt=${receiptNumber}`}
+                          href={`/ask?link=${encodeURIComponent(`/policy/${p.id}`)}&ask=explains&receipt=${receiptNumber}${es ? "&lang=es" : ""}`}
                           className="underline decoration-dotted hover:text-foreground"
                         >
-                          How it applies to me?
+                          {es ? "¿Cómo aplica a mi caso?" : "How it applies to me?"}
                         </Link>
                       </span>
                     )}
@@ -217,12 +264,25 @@ function ExplanationBox({
             </div>
           )}
           <p className="mt-3 text-xs text-muted">
-            General information, not legal advice. For guidance specific to your case, talk to a
-            licensed professional —{" "}
-            <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
-              get help finding one
-            </Link>
-            .
+            {es ? (
+              <>
+                Información general, no asesoría legal. Para orientación específica a tu caso, habla con un
+                profesional con licencia —{" "}
+                <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+                  obtén ayuda para encontrar uno
+                </Link>
+                .
+              </>
+            ) : (
+              <>
+                General information, not legal advice. For guidance specific to your case, talk to a
+                licensed professional —{" "}
+                <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+                  get help finding one
+                </Link>
+                .
+              </>
+            )}
           </p>
         </div>
       </div>
@@ -234,9 +294,11 @@ function StatusCard({
   status,
   explanation,
   tracking,
+  es,
 }: {
   status: CaseStatus;
   explanation: CaseExplanation | null;
+  es: boolean;
   tracking: {
     signedIn: boolean;
     alreadyTracked: boolean;
@@ -274,7 +336,7 @@ function StatusCard({
           </div>
         </div>
         {status.modifiedDate && (
-          <p className="text-xs text-muted">Updated {status.modifiedDate}</p>
+          <p className="text-xs text-muted">{es ? `Actualizado ${status.modifiedDate}` : `Updated ${status.modifiedDate}`}</p>
         )}
       </div>
 
@@ -283,16 +345,20 @@ function StatusCard({
           explanation={explanation}
           receiptNumber={status.receiptNumber}
           alreadyTracked={tracking?.alreadyTracked ?? false}
+          es={es}
         />
       )}
 
+      {/* Round 80 — statusDescription and each history entry's
+          completed_text_en are USCIS's own raw words, Track 2, never
+          translated. */}
       <p className="mt-4 text-sm leading-relaxed text-foreground/90">{status.statusDescription}</p>
 
       {stall.isStalled && stall.milestoneText && (
-        <StalledCaseCard daysSinceLastUpdate={stall.daysSinceLastUpdate} milestoneText={stall.milestoneText} />
+        <StalledCaseCard daysSinceLastUpdate={stall.daysSinceLastUpdate} milestoneText={stall.milestoneText} es={es} />
       )}
 
-      {!stall.isStalled && isPositiveStatus(status.statusText) && <PositiveShareNudge />}
+      {!stall.isStalled && isPositiveStatus(status.statusText) && <PositiveShareNudge es={es} />}
 
       {tracking && (
         <div className="mt-3">
@@ -307,6 +373,7 @@ function StatusCard({
                 plusMaxCases={TIER_LIMITS.plus.maxCases}
                 willQueueForReview={tracking.willQueueForReview}
                 isPlusHardCeiling={tracking.isPlusHardCeiling}
+                es={es}
               />
               {tracking.alreadyTracked && tracking.trackedCaseId && (
                 <>
@@ -314,20 +381,22 @@ function StatusCard({
                     trackedCaseId={tracking.trackedCaseId}
                     lastCheckedAt={tracking.lastCheckedAt ?? null}
                     canCheckNow={tracking.canCheckNow}
+                    es={es}
                   />
                   <DownloadReportLink
                     receiptNumber={status.receiptNumber}
                     canDownload={tracking.canDownloadReport}
+                    es={es}
                   />
                 </>
               )}
             </>
           ) : (
             <p className="text-xs text-muted">
-              <Link href="/auth/sign-in" className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
-                Sign in
+              <Link href={es ? "/auth/sign-in?lang=es" : "/auth/sign-in"} className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+                {es ? "Inicia sesión" : "Sign in"}
               </Link>{" "}
-              to save this case.
+              {es ? "para guardar este caso." : "to save this case."}
             </p>
           )}
         </div>
@@ -335,7 +404,7 @@ function StatusCard({
 
       {status.history.length > 0 && (
         <div className="mt-6 border-t border-border pt-5">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted">History</p>
+          <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Historial" : "History"}</p>
           <ol className="relative space-y-5 border-l border-border pl-5">
             {status.history.map((entry, i) => (
               <li key={i} className="relative text-sm">
@@ -352,10 +421,10 @@ function StatusCard({
         </div>
       )}
 
-      <DocumentVault trackedCaseId={tracking?.trackedCaseId} canUseVault={tracking?.canUseVault ?? false} />
+      <DocumentVault trackedCaseId={tracking?.trackedCaseId} canUseVault={tracking?.canUseVault ?? false} es={es} />
 
       {tracking?.trackedCaseId && (
-        <EscalationToolkit trackedCaseId={tracking.trackedCaseId} canUseToolkit={tracking?.canUseVault ?? false} />
+        <EscalationToolkit trackedCaseId={tracking.trackedCaseId} canUseToolkit={tracking?.canUseVault ?? false} es={es} />
       )}
     </div>
   );
@@ -375,15 +444,17 @@ function ErrorCard({ message }: { message: string }) {
  * getCaseStatus() for a pending case — that's the whole point of the gate,
  * not just the cron job's own polling.
  */
-function PendingReviewCard({ receiptNumber }: { receiptNumber: string }) {
+function PendingReviewCard({ receiptNumber, es }: { receiptNumber: string; es: boolean }) {
   return (
     <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6">
       <p className="font-mono text-xs uppercase tracking-widest text-muted">{receiptNumber}</p>
-      <p className="mt-2 text-sm font-semibold text-amber-600 dark:text-amber-400">Pending review</p>
+      <p className="mt-2 text-sm font-semibold text-amber-600 dark:text-amber-400">
+        {es ? "Revisión pendiente" : "Pending review"}
+      </p>
       <p className="mt-1.5 text-sm text-foreground/90">
-        You&apos;re tracking more than 10 cases, so this one needs a quick check before CaseWhy
-        starts polling it — we&apos;ll email you within 1 business day. Your other active cases
-        keep updating normally in the meantime.
+        {es
+          ? "Estás rastreando más de 10 casos, así que este necesita una revisión rápida antes de que CaseWhy empiece a consultarlo — te enviaremos un correo dentro de 1 día hábil. Tus otros casos activos siguen actualizándose normalmente mientras tanto."
+          : "You're tracking more than 10 cases, so this one needs a quick check before CaseWhy starts polling it — we'll email you within 1 business day. Your other active cases keep updating normally in the meantime."}
       </p>
     </div>
   );
@@ -392,9 +463,10 @@ function PendingReviewCard({ receiptNumber }: { receiptNumber: string }) {
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ receipt?: string }>;
+  searchParams: Promise<{ receipt?: string; lang?: string }>;
 }) {
-  const { receipt } = await searchParams;
+  const { receipt, lang } = await searchParams;
+  const es = await isSpanishLocale(lang);
   const { data: session } = await auth.getSession();
 
   let trackedCasesList: Awaited<ReturnType<typeof getTrackedCases>> = [];
@@ -447,8 +519,10 @@ export default async function DashboardPage({
       }
     } catch (err) {
       errorMessage = err instanceof UscisApiError
-        ? friendlyErrorMessage(err)
-        : "Something went wrong looking up your case. Please try again.";
+        ? friendlyErrorMessage(err, es)
+        : es
+          ? "Algo salió mal al buscar tu caso. Por favor intenta de nuevo."
+          : "Something went wrong looking up your case. Please try again.";
     }
   }
 
@@ -466,27 +540,29 @@ export default async function DashboardPage({
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-      <h1 className="text-2xl font-bold tracking-tight">Your case</h1>
+      <h1 className="text-2xl font-bold tracking-tight">{es ? "Tu caso" : "Your case"}</h1>
       <p className="mb-8 mt-2 text-muted">
-        Enter your USCIS receipt number to see its current status.
+        {es ? "Ingresa tu número de recibo de USCIS para ver su estado actual." : "Enter your USCIS receipt number to see its current status."}
       </p>
 
-      <SearchForm receiptNumber={receiptNumber} trackedCaseCount={trackedCasesList.length} />
+      <SearchForm receiptNumber={receiptNumber} trackedCaseCount={trackedCasesList.length} es={es} />
 
       {trackedCasesList.length > 1 && (
         <CaseSwitcher
           cases={trackedCasesList}
           activeReceiptNumber={receiptNumber}
           basePath="/dashboard"
+          es={es}
         />
       )}
 
       <div className="mt-6">
-        {isPendingReview && receiptNumber && <PendingReviewCard receiptNumber={receiptNumber} />}
+        {isPendingReview && receiptNumber && <PendingReviewCard receiptNumber={receiptNumber} es={es} />}
         {status && (
           <StatusCard
             status={status}
             explanation={explanation}
+            es={es}
             tracking={{
               signedIn: !!session?.user,
               alreadyTracked: trackedCasesList.some((c) => c.receiptNumber === status.receiptNumber),
@@ -506,7 +582,7 @@ export default async function DashboardPage({
         {!status && !isPendingReview && !errorMessage && !receiptNumber && (
           <div className="rounded-2xl border border-dashed border-border-strong p-8 text-center">
             <p className="text-sm text-muted">
-              No case tracked yet — enter a receipt number above to get started.
+              {es ? "Ningún caso rastreado aún — ingresa un número de recibo arriba para comenzar." : "No case tracked yet — enter a receipt number above to get started."}
             </p>
           </div>
         )}

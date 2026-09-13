@@ -10,7 +10,7 @@ import { isValidReceiptNumberFormat } from "@/lib/uscis/receipt-number";
  * it's well-formed. Feedback only starts once there's enough input to be
  * meaningful, so an empty/just-started field doesn't flash red immediately.
  */
-export function ReceiptNumberInput({ defaultValue }: { defaultValue?: string }) {
+export function ReceiptNumberInput({ defaultValue, es }: { defaultValue?: string; es?: boolean }) {
   const [value, setValue] = useState(defaultValue ?? "");
   const trimmed = value.trim();
   const showFeedback = trimmed.length >= 3;
@@ -32,10 +32,10 @@ export function ReceiptNumberInput({ defaultValue }: { defaultValue?: string }) 
         required
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="e.g. EAC9999103403"
+        placeholder={es ? "ej. EAC9999103403" : "e.g. EAC9999103403"}
         autoCapitalize="characters"
         autoComplete="off"
-        aria-label="USCIS receipt number"
+        aria-label={es ? "Número de recibo de USCIS" : "USCIS receipt number"}
         aria-invalid={showFeedback && !valid}
         className={`w-full rounded-lg border bg-surface pl-10 pr-9 py-2.5 font-mono text-sm outline-none transition-shadow focus:ring-2 ${
           showFeedback && !valid
@@ -58,7 +58,9 @@ export function ReceiptNumberInput({ defaultValue }: { defaultValue?: string }) 
       )}
       {showFeedback && !valid && (
         <p className="mt-1.5 text-xs text-red-500">
-          Receipt numbers are 3 letters followed by 10 digits (e.g. EAC9999103403).
+          {es
+            ? "Los números de recibo son 3 letras seguidas de 10 dígitos (ej. EAC9999103403)."
+            : "Receipt numbers are 3 letters followed by 10 digits (e.g. EAC9999103403)."}
         </p>
       )}
     </div>

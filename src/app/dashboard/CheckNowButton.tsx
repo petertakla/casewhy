@@ -4,14 +4,15 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { checkCaseNow } from "./actions";
 
-function formatCheckedAt(date: Date | null): string {
-  if (!date) return "Never checked";
-  return `Checked ${date.toLocaleString(undefined, {
+function formatCheckedAt(date: Date | null, es: boolean): string {
+  if (!date) return es ? "Nunca revisado" : "Never checked";
+  const formatted = date.toLocaleString(es ? "es" : undefined, {
     month: "short",
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
-  })}`;
+  });
+  return es ? `Revisado ${formatted}` : `Checked ${formatted}`;
 }
 
 /**
@@ -24,10 +25,12 @@ export function CheckNowButton({
   trackedCaseId,
   lastCheckedAt,
   canCheckNow,
+  es,
 }: {
   trackedCaseId: string;
   lastCheckedAt: Date | null;
   canCheckNow: boolean;
+  es: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -36,18 +39,18 @@ export function CheckNowButton({
   if (!canCheckNow) {
     return (
       <p className="mt-1.5 text-xs text-muted">
-        {formatCheckedAt(checkedAt)} ·{" "}
+        {formatCheckedAt(checkedAt, es)} ·{" "}
         <Link href="/plus" className="text-brand-600 hover:underline dark:text-brand-400">
-          Upgrade to CaseWhy Plus
+          {es ? "Actualiza a CaseWhy Plus" : "Upgrade to CaseWhy Plus"}
         </Link>{" "}
-        to check on demand
+        {es ? "para revisar bajo demanda" : "to check on demand"}
       </p>
     );
   }
 
   return (
     <div className="mt-1.5 flex items-center gap-2 text-xs text-muted">
-      <span>{formatCheckedAt(checkedAt)}</span>
+      <span>{formatCheckedAt(checkedAt, es)}</span>
       <span>·</span>
       <button
         type="button"
@@ -59,13 +62,13 @@ export function CheckNowButton({
               await checkCaseNow(trackedCaseId);
               setCheckedAt(new Date());
             } catch (err) {
-              setError(err instanceof Error ? err.message : "Something went wrong.");
+              setError(err instanceof Error ? err.message : es ? "Algo salió mal." : "Something went wrong.");
             }
           })
         }
         className="font-semibold text-brand-600 hover:underline disabled:opacity-60 dark:text-brand-400"
       >
-        {isPending ? "Checking…" : "Check now"}
+        {isPending ? (es ? "Revisando…" : "Checking…") : es ? "Revisar ahora" : "Check now"}
       </button>
       {error && <span className="text-red-500">{error}</span>}
     </div>

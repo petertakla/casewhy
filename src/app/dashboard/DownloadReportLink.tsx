@@ -10,17 +10,19 @@ import Link from "next/link";
 export function DownloadReportLink({
   receiptNumber,
   canDownload,
+  es,
 }: {
   receiptNumber: string;
   canDownload: boolean;
+  es: boolean;
 }) {
   if (!canDownload) {
     return (
       <p className="mt-1.5 text-xs text-muted">
         <Link href="/plus" className="text-brand-600 hover:underline dark:text-brand-400">
-          Upgrade to CaseWhy Plus
+          {es ? "Actualiza a CaseWhy Plus" : "Upgrade to CaseWhy Plus"}
         </Link>{" "}
-        for a downloadable attorney-handoff PDF report
+        {es ? "para un reporte PDF descargable para el abogado" : "for a downloadable attorney-handoff PDF report"}
       </p>
     );
   }
@@ -30,7 +32,7 @@ export function DownloadReportLink({
       href={`/api/report?receiptNumber=${encodeURIComponent(receiptNumber)}`}
       className="mt-1.5 inline-block text-xs font-semibold text-brand-600 hover:underline dark:text-brand-400"
     >
-      Download attorney report (PDF)
+      {es ? "Descargar reporte para el abogado (PDF)" : "Download attorney report (PDF)"}
     </a>
   );
 }

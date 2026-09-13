@@ -28,9 +28,11 @@ function formatSize(bytes: number): string {
 export function DocumentVault({
   trackedCaseId,
   canUseVault,
+  es,
 }: {
   trackedCaseId?: string;
   canUseVault: boolean;
+  es: boolean;
 }) {
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -64,12 +66,12 @@ export function DocumentVault({
       const res = await fetch("/api/documents", { method: "POST", body: form });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Upload failed.");
+        setError(data.error ?? (es ? "La subida falló." : "Upload failed."));
         return;
       }
       await load();
     } catch {
-      setError("Upload failed. Please try again.");
+      setError(es ? "La subida falló. Por favor intenta de nuevo." : "Upload failed. Please try again.");
     } finally {
       setUploading(false);
     }
@@ -84,9 +86,11 @@ export function DocumentVault({
     return (
       <div className="mt-6 border-t border-border pt-5">
         <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted">
-          Supporting documents
+          {es ? "Documentos de apoyo" : "Supporting documents"}
         </p>
-        <p className="text-sm text-muted">Track this case to store supporting documents for it.</p>
+        <p className="text-sm text-muted">
+          {es ? "Rastrea este caso para almacenar documentos de apoyo para él." : "Track this case to store supporting documents for it."}
+        </p>
       </div>
     );
   }
@@ -95,13 +99,13 @@ export function DocumentVault({
     return (
       <div className="mt-6 border-t border-border pt-5">
         <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted">
-          Supporting documents
+          {es ? "Documentos de apoyo" : "Supporting documents"}
         </p>
         <p className="text-sm text-muted">
           <Link href="/plus" className="text-brand-600 hover:underline dark:text-brand-400">
-            Upgrade to CaseWhy Plus
+            {es ? "Actualiza a CaseWhy Plus" : "Upgrade to CaseWhy Plus"}
           </Link>{" "}
-          for a secure document vault.
+          {es ? "para una bóveda segura de documentos." : "for a secure document vault."}
         </p>
       </div>
     );
@@ -110,7 +114,7 @@ export function DocumentVault({
   return (
     <div className="mt-6 border-t border-border pt-5">
       <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted">
-        Supporting documents
+        {es ? "Documentos de apoyo" : "Supporting documents"}
       </p>
 
       <div className="flex flex-col gap-3 rounded-xl border border-dashed border-border-strong bg-background/40 p-4 sm:flex-row sm:items-center">
@@ -123,10 +127,10 @@ export function DocumentVault({
             handleUpload(file);
           }}
           disabled={uploading}
-          aria-label="Upload a supporting document"
+          aria-label={es ? "Subir un documento de apoyo" : "Upload a supporting document"}
           className="flex-1 text-sm text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-surface-2 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-foreground disabled:opacity-50"
         />
-        {uploading && <span className="text-xs text-muted">Uploading…</span>}
+        {uploading && <span className="text-xs text-muted">{es ? "Subiendo…" : "Uploading…"}</span>}
       </div>
 
       {error && <p className="mt-2 text-xs text-red-600 dark:text-red-400">{error}</p>}
@@ -151,7 +155,7 @@ export function DocumentVault({
                   onClick={() => handleDelete(doc.id)}
                   className="text-red-600 hover:underline dark:text-red-400"
                 >
-                  Remove
+                  {es ? "Eliminar" : "Remove"}
                 </button>
               </div>
             </li>
@@ -160,7 +164,7 @@ export function DocumentVault({
       )}
 
       {!loading && documents.length === 0 && (
-        <p className="mt-3 text-xs text-muted">No documents uploaded yet.</p>
+        <p className="mt-3 text-xs text-muted">{es ? "Ningún documento subido aún." : "No documents uploaded yet."}</p>
       )}
     </div>
   );

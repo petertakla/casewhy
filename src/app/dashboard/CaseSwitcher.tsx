@@ -6,10 +6,12 @@ export function CaseSwitcher({
   cases,
   activeReceiptNumber,
   basePath,
+  es,
 }: {
   cases: TrackedCase[];
   activeReceiptNumber?: string;
   basePath: string;
+  es?: boolean;
 }) {
   return (
     <div className="mb-6 flex flex-wrap gap-2">
@@ -19,7 +21,7 @@ export function CaseSwitcher({
         return (
           <Link
             key={c.id}
-            href={`${basePath}?receipt=${encodeURIComponent(c.receiptNumber)}`}
+            href={`${basePath}?receipt=${encodeURIComponent(c.receiptNumber)}${es ? "&lang=es" : ""}`}
             className={`rounded-full px-3 py-1 font-mono text-xs transition-colors ${
               active
                 ? "bg-brand-500 text-white"
@@ -29,7 +31,11 @@ export function CaseSwitcher({
             }`}
           >
             {c.receiptNumber}
-            {pending && <span className="ml-1.5 font-sans text-[10px] uppercase tracking-wide">Pending</span>}
+            {pending && (
+              <span className="ml-1.5 font-sans text-[10px] uppercase tracking-wide">
+                {es ? "Pendiente" : "Pending"}
+              </span>
+            )}
           </Link>
         );
       })}

@@ -14,6 +14,7 @@ export function TrackCaseButton({
   plusMaxCases,
   willQueueForReview = false,
   isPlusHardCeiling = false,
+  es,
 }: {
   receiptNumber: string;
   /** Present when alreadyTracked — the row id, needed to untrack. */
@@ -30,6 +31,7 @@ export function TrackCaseButton({
    * a flat-tier cap — swaps the message to "contact us" instead of
    * "upgrade to Plus," since the account is already on Plus. */
   isPlusHardCeiling?: boolean;
+  es: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +63,7 @@ export function TrackCaseButton({
           <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5 text-emerald-500">
             <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          Tracked
+          {es ? "Rastreado" : "Tracked"}
         </p>
         <button
           type="button"
@@ -71,7 +73,7 @@ export function TrackCaseButton({
           })}
           className="text-xs font-semibold text-muted hover:text-red-500 hover:underline disabled:opacity-60"
         >
-          {isPending ? "Removing…" : "Stop tracking"}
+          {isPending ? (es ? "Eliminando…" : "Removing…") : es ? "Dejar de rastrear" : "Stop tracking"}
         </button>
       </div>
     );
@@ -80,12 +82,25 @@ export function TrackCaseButton({
   if (atCap && isPlusHardCeiling) {
     return (
       <p className="text-xs text-muted">
-        You&apos;re tracking the maximum of {maxCases} cases CaseWhy Plus supports. Need to track
-        more?{" "}
-        <a href="mailto:hello@casewhy.com" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
-          Contact us
-        </a>
-        .
+        {es ? (
+          <>
+            Estás rastreando el máximo de {maxCases} casos que CaseWhy Plus admite. ¿Necesitas rastrear
+            más?{" "}
+            <a href="mailto:hello@casewhy.com" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+              Contáctanos
+            </a>
+            .
+          </>
+        ) : (
+          <>
+            You&apos;re tracking the maximum of {maxCases} cases CaseWhy Plus supports. Need to track
+            more?{" "}
+            <a href="mailto:hello@casewhy.com" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+              Contact us
+            </a>
+            .
+          </>
+        )}
       </p>
     );
   }
@@ -93,12 +108,25 @@ export function TrackCaseButton({
   if (atCap) {
     return (
       <p className="text-xs text-muted">
-        You&apos;re tracking the maximum of {maxCases} case{maxCases === 1 ? "" : "s"} on your
-        plan. Untrack one to add this, or{" "}
-        <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
-          upgrade to CaseWhy Plus
-        </Link>{" "}
-        for up to {plusMaxCases} cases.
+        {es ? (
+          <>
+            Estás rastreando el máximo de {maxCases} caso{maxCases === 1 ? "" : "s"} de tu
+            plan. Deja de rastrear uno para agregar este, o{" "}
+            <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+              actualiza a CaseWhy Plus
+            </Link>{" "}
+            para hasta {plusMaxCases} casos.
+          </>
+        ) : (
+          <>
+            You&apos;re tracking the maximum of {maxCases} case{maxCases === 1 ? "" : "s"} on your
+            plan. Untrack one to add this, or{" "}
+            <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+              upgrade to CaseWhy Plus
+            </Link>{" "}
+            for up to {plusMaxCases} cases.
+          </>
+        )}
       </p>
     );
   }
@@ -106,7 +134,7 @@ export function TrackCaseButton({
   return (
     <div>
       <label className="block text-xs font-medium text-muted" htmlFor="track-case-type">
-        What kind of case is this?
+        {es ? "¿Qué tipo de caso es este?" : "What kind of case is this?"}
       </label>
       <select
         id="track-case-type"
@@ -115,31 +143,43 @@ export function TrackCaseButton({
         required
         className="mt-1 w-full max-w-xs rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
       >
-        <option value="">Select a case type…</option>
+        <option value="">{es ? "Selecciona un tipo de caso…" : "Select a case type…"}</option>
         {groupedOptions.map((g) => (
-          <optgroup key={g.group} label={g.group}>
+          <optgroup key={g.group} label={(es && g.options[0]?.groupEs) || g.group}>
             {g.options.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.label}
+                {es && c.labelEs ? c.labelEs : c.label}
               </option>
             ))}
           </optgroup>
         ))}
         {ungrouped.map((c) => (
           <option key={c.id} value={c.id}>
-            {c.label}
+            {es && c.labelEs ? c.labelEs : c.label}
           </option>
         ))}
       </select>
       <p className="mt-1 text-xs text-muted">
-        Enter your form type for a more detailed, form-specific AI response.
+        {es
+          ? "Ingresa tu tipo de formulario para una respuesta de IA más detallada y específica."
+          : "Enter your form type for a more detailed, form-specific AI response."}
       </p>
       {selected && <p className="mt-1.5 max-w-xl text-xs leading-relaxed text-muted">{selected.timelineBlurb}</p>}
       {willQueueForReview && (
         <p className="mt-1.5 max-w-xl text-xs leading-relaxed text-amber-600 dark:text-amber-400">
-          Tracking more than 10 cases needs a quick check — we&apos;ll email you within 1 business
-          day. This one will show as &quot;Pending review&quot; until then; your existing cases
-          keep updating normally.
+          {es ? (
+            <>
+              Rastrear más de 10 casos necesita una revisión rápida — te enviaremos un correo dentro de 1 día
+              hábil. Este se mostrará como &quot;Revisión pendiente&quot; hasta entonces; tus casos
+              existentes siguen actualizándose normalmente.
+            </>
+          ) : (
+            <>
+              Tracking more than 10 cases needs a quick check — we&apos;ll email you within 1 business
+              day. This one will show as &quot;Pending review&quot; until then; your existing cases
+              keep updating normally.
+            </>
+          )}
         </p>
       )}
       <button
@@ -150,12 +190,12 @@ export function TrackCaseButton({
           try {
             await trackCase(receiptNumber, caseType);
           } catch (err) {
-            setError(err instanceof Error ? err.message : "Something went wrong.");
+            setError(err instanceof Error ? err.message : es ? "Algo salió mal." : "Something went wrong.");
           }
         })}
         className="mt-2 text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline disabled:cursor-not-allowed disabled:opacity-40"
       >
-        {isPending ? "Saving…" : "Track this case"}
+        {isPending ? (es ? "Guardando…" : "Saving…") : es ? "Rastrear este caso" : "Track this case"}
       </button>
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
     </div>

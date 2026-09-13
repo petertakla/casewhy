@@ -19,6 +19,7 @@ function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+  const es = searchParams.get("lang") === "es";
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -30,16 +31,18 @@ function ResetPasswordForm() {
     setErrorMessage(null);
 
     if (!token) {
-      setErrorMessage("This reset link is missing or invalid. Request a new one.");
+      setErrorMessage(es ? "Este enlace de restablecimiento falta o no es válido. Solicita uno nuevo." : "This reset link is missing or invalid. Request a new one.");
       setStatus("error");
       return;
     }
     if (password.length < MIN_PASSWORD_LENGTH) {
-      setErrorMessage(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
+      setErrorMessage(
+        es ? `La contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres.` : `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`
+      );
       return;
     }
     if (password !== confirmPassword) {
-      setErrorMessage("Passwords don't match.");
+      setErrorMessage(es ? "Las contraseñas no coinciden." : "Passwords don't match.");
       return;
     }
 
@@ -48,13 +51,15 @@ function ResetPasswordForm() {
       const { error } = await authClient.resetPassword({ newPassword: password, token });
       if (error) {
         setStatus("error");
-        setErrorMessage(error.message || "This reset link is invalid or has expired. Request a new one.");
+        setErrorMessage(
+          error.message || (es ? "Este enlace de restablecimiento no es válido o ha expirado. Solicita uno nuevo." : "This reset link is invalid or has expired. Request a new one.")
+        );
         return;
       }
       setStatus("done");
     } catch {
       setStatus("error");
-      setErrorMessage("Something went wrong. Request a new reset link and try again.");
+      setErrorMessage(es ? "Algo salió mal. Solicita un nuevo enlace y vuelve a intentarlo." : "Something went wrong. Request a new reset link and try again.");
     }
   }
 
@@ -73,7 +78,7 @@ function ResetPasswordForm() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Set a new password</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{es ? "Establece una nueva contraseña" : "Set a new password"}</h1>
         </div>
 
         <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
@@ -84,19 +89,19 @@ function ResetPasswordForm() {
                   <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
-              <p className="text-sm font-medium">Password updated</p>
+              <p className="text-sm font-medium">{es ? "Contraseña actualizada" : "Password updated"}</p>
               <button
                 type="button"
-                onClick={() => router.push("/auth/sign-in")}
+                onClick={() => router.push(es ? "/auth/sign-in?lang=es" : "/auth/sign-in")}
                 className="mt-4 w-full rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
               >
-                Sign in
+                {es ? "Iniciar sesión" : "Sign in"}
               </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               <label htmlFor="password" className="sr-only">
-                New password
+                {es ? "Nueva contraseña" : "New password"}
               </label>
               <input
                 id="password"
@@ -105,12 +110,12 @@ function ResetPasswordForm() {
                 minLength={MIN_PASSWORD_LENGTH}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={`New password (min. ${MIN_PASSWORD_LENGTH} characters)`}
+                placeholder={es ? `Nueva contraseña (mín. ${MIN_PASSWORD_LENGTH} caracteres)` : `New password (min. ${MIN_PASSWORD_LENGTH} characters)`}
                 autoComplete="new-password"
                 className="rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
               />
               <label htmlFor="confirm-password" className="sr-only">
-                Confirm new password
+                {es ? "Confirmar nueva contraseña" : "Confirm new password"}
               </label>
               <input
                 id="confirm-password"
@@ -118,7 +123,7 @@ function ResetPasswordForm() {
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm new password"
+                placeholder={es ? "Confirmar nueva contraseña" : "Confirm new password"}
                 autoComplete="new-password"
                 className="rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
               />
@@ -127,13 +132,13 @@ function ResetPasswordForm() {
                 disabled={status === "loading"}
                 className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:opacity-60"
               >
-                {status === "loading" ? "Updating…" : "Update password"}
+                {status === "loading" ? (es ? "Actualizando…" : "Updating…") : es ? "Actualizar contraseña" : "Update password"}
               </button>
               {status === "error" && errorMessage && (
                 <p className="text-sm text-red-500">
                   {errorMessage}{" "}
-                  <Link href="/auth/forgot-password" className="font-semibold underline">
-                    Request a new link
+                  <Link href={es ? "/auth/forgot-password?lang=es" : "/auth/forgot-password"} className="font-semibold underline">
+                    {es ? "Solicitar un nuevo enlace" : "Request a new link"}
                   </Link>
                 </p>
               )}

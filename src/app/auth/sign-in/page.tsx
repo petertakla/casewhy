@@ -19,7 +19,7 @@ function EnvelopeIcon() {
   );
 }
 
-function AuthCard({ children }: { children: React.ReactNode }) {
+function AuthCard({ children, es }: { children: React.ReactNode; es: boolean }) {
   return (
     <main className="flex min-h-[calc(100vh-73px)] items-center justify-center px-6 py-10">
       <div className="w-full max-w-sm">
@@ -27,7 +27,7 @@ function AuthCard({ children }: { children: React.ReactNode }) {
           <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 to-brand-700 shadow-sm">
             <EnvelopeIcon />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Sign in</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{es ? "Iniciar sesión" : "Sign in"}</h1>
         </div>
         <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">{children}</div>
       </div>
@@ -35,7 +35,15 @@ function AuthCard({ children }: { children: React.ReactNode }) {
   );
 }
 
-function MagicLinkForm({ onBack, dashboardHref }: { onBack: () => void; dashboardHref: string }) {
+function MagicLinkForm({
+  onBack,
+  dashboardHref,
+  es,
+}: {
+  onBack: () => void;
+  dashboardHref: string;
+  es: boolean;
+}) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -49,13 +57,15 @@ function MagicLinkForm({ onBack, dashboardHref }: { onBack: () => void; dashboar
       const { error } = await authClient.signIn.magicLink({ email, callbackURL: dashboardHref });
       if (error) {
         setStatus("error");
-        setErrorMessage(error.message || "Something went wrong sending the link. Please try again.");
+        setErrorMessage(
+          error.message || (es ? "Algo salió mal al enviar el enlace. Por favor intenta de nuevo." : "Something went wrong sending the link. Please try again.")
+        );
         return;
       }
       setStatus("sent");
     } catch {
       setStatus("error");
-      setErrorMessage("Something went wrong sending the link. Please try again.");
+      setErrorMessage(es ? "Algo salió mal al enviar el enlace. Por favor intenta de nuevo." : "Something went wrong sending the link. Please try again.");
     }
   }
 
@@ -67,9 +77,13 @@ function MagicLinkForm({ onBack, dashboardHref }: { onBack: () => void; dashboar
             <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <p className="text-sm font-medium">Check your email</p>
+        <p className="text-sm font-medium">{es ? "Revisa tu correo" : "Check your email"}</p>
         <p className="mt-1 text-sm text-muted">
-          We sent a sign-in link to <span className="font-medium text-foreground">{email}</span>.
+          {es ? (
+            <>Enviamos un enlace de inicio de sesión a <span className="font-medium text-foreground">{email}</span>.</>
+          ) : (
+            <>We sent a sign-in link to <span className="font-medium text-foreground">{email}</span>.</>
+          )}
         </p>
       </div>
     );
@@ -77,9 +91,11 @@ function MagicLinkForm({ onBack, dashboardHref }: { onBack: () => void; dashboar
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <p className="text-sm text-muted">We&apos;ll email you a link — no password needed.</p>
+      <p className="text-sm text-muted">
+        {es ? "Te enviaremos un enlace por correo — no necesitas contraseña." : "We'll email you a link — no password needed."}
+      </p>
       <label htmlFor="magic-email" className="sr-only">
-        Email address
+        {es ? "Correo electrónico" : "Email address"}
       </label>
       <input
         id="magic-email"
@@ -87,7 +103,7 @@ function MagicLinkForm({ onBack, dashboardHref }: { onBack: () => void; dashboar
         required
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="you@example.com"
+        placeholder={es ? "tu@correo.com" : "you@example.com"}
         autoComplete="email"
         className="rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
       />
@@ -96,7 +112,7 @@ function MagicLinkForm({ onBack, dashboardHref }: { onBack: () => void; dashboar
         disabled={status === "sending"}
         className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:opacity-60"
       >
-        {status === "sending" ? "Sending…" : "Send sign-in link"}
+        {status === "sending" ? (es ? "Enviando…" : "Sending…") : es ? "Enviar enlace de inicio de sesión" : "Send sign-in link"}
       </button>
       {status === "error" && errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
       <button
@@ -104,7 +120,7 @@ function MagicLinkForm({ onBack, dashboardHref }: { onBack: () => void; dashboar
         onClick={onBack}
         className="text-center text-xs font-semibold text-brand-600 hover:underline dark:text-brand-400"
       >
-        Sign in with a password instead
+        {es ? "Iniciar sesión con contraseña en su lugar" : "Sign in with a password instead"}
       </button>
     </form>
   );
@@ -113,9 +129,11 @@ function MagicLinkForm({ onBack, dashboardHref }: { onBack: () => void; dashboar
 function PasswordSignInForm({
   onUseMagicLink,
   dashboardHref,
+  es,
 }: {
   onUseMagicLink: () => void;
   dashboardHref: string;
+  es: boolean;
 }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -132,20 +150,20 @@ function PasswordSignInForm({
       const { error } = await authClient.signIn.email({ email, password });
       if (error) {
         setStatus("error");
-        setErrorMessage(error.message || "Incorrect email or password.");
+        setErrorMessage(error.message || (es ? "Correo o contraseña incorrectos." : "Incorrect email or password."));
         return;
       }
       router.push(dashboardHref);
     } catch {
       setStatus("error");
-      setErrorMessage("Something went wrong signing in. Please try again.");
+      setErrorMessage(es ? "Algo salió mal al iniciar sesión. Por favor intenta de nuevo." : "Something went wrong signing in. Please try again.");
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <label htmlFor="email" className="sr-only">
-        Email address
+        {es ? "Correo electrónico" : "Email address"}
       </label>
       <input
         id="email"
@@ -153,12 +171,12 @@ function PasswordSignInForm({
         required
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="you@example.com"
+        placeholder={es ? "tu@correo.com" : "you@example.com"}
         autoComplete="email"
         className="rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
       />
       <label htmlFor="password" className="sr-only">
-        Password
+        {es ? "Contraseña" : "Password"}
       </label>
       <input
         id="password"
@@ -166,22 +184,22 @@ function PasswordSignInForm({
         required
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
+        placeholder={es ? "Contraseña" : "Password"}
         autoComplete="current-password"
         className="rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
       />
       <Link
-        href="/auth/forgot-password"
+        href={es ? "/auth/forgot-password?lang=es" : "/auth/forgot-password"}
         className="-mt-1 text-right text-xs font-semibold text-brand-600 hover:underline dark:text-brand-400"
       >
-        Forgot password?
+        {es ? "¿Olvidaste tu contraseña?" : "Forgot password?"}
       </Link>
       <button
         type="submit"
         disabled={status === "loading"}
         className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:opacity-60"
       >
-        {status === "loading" ? "Signing in…" : "Sign in"}
+        {status === "loading" ? (es ? "Iniciando sesión…" : "Signing in…") : es ? "Iniciar sesión" : "Sign in"}
       </button>
       {status === "error" && errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
       <button
@@ -189,13 +207,22 @@ function PasswordSignInForm({
         onClick={onUseMagicLink}
         className="text-center text-xs font-semibold text-brand-600 hover:underline dark:text-brand-400"
       >
-        Sign in with an email link instead
+        {es ? "Iniciar sesión con un enlace por correo en su lugar" : "Sign in with an email link instead"}
       </button>
       <p className="text-center text-xs text-muted">
-        Don&apos;t have an account?{" "}
-        <Link href="/auth/sign-up" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
-          Sign up
-        </Link>
+        {es ? (
+          <>¿No tienes una cuenta?{" "}
+            <Link href="/auth/sign-up?lang=es" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+              Regístrate
+            </Link>
+          </>
+        ) : (
+          <>Don&apos;t have an account?{" "}
+            <Link href="/auth/sign-up" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+              Sign up
+            </Link>
+          </>
+        )}
       </p>
     </form>
   );
@@ -211,21 +238,24 @@ function SignInForms() {
   // network round-trip away from the page the cookie was set on, where a
   // timing assumption is worth not needing at all.
   const lang = useSearchParams().get("lang");
-  const dashboardHref = lang === "es" ? "/dashboard?lang=es" : "/dashboard";
+  const es = lang === "es";
+  const dashboardHref = es ? "/dashboard?lang=es" : "/dashboard";
 
-  return mode === "password" ? (
-    <PasswordSignInForm onUseMagicLink={() => setMode("magic-link")} dashboardHref={dashboardHref} />
-  ) : (
-    <MagicLinkForm onBack={() => setMode("password")} dashboardHref={dashboardHref} />
+  return (
+    <AuthCard es={es}>
+      {mode === "password" ? (
+        <PasswordSignInForm onUseMagicLink={() => setMode("magic-link")} dashboardHref={dashboardHref} es={es} />
+      ) : (
+        <MagicLinkForm onBack={() => setMode("password")} dashboardHref={dashboardHref} es={es} />
+      )}
+    </AuthCard>
   );
 }
 
 export default function SignInPage() {
   return (
-    <AuthCard>
-      <Suspense fallback={null}>
-        <SignInForms />
-      </Suspense>
-    </AuthCard>
+    <Suspense fallback={null}>
+      <SignInForms />
+    </Suspense>
   );
 }

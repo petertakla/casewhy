@@ -29,15 +29,20 @@ interface UsageStatus {
 // is deliberately fuller and differently-shaped for each, so the two
 // answers come back genuinely distinct (a relevance check vs. a concrete
 // effect-on-the-case explanation) rather than near-identical rewordings of
-// the same question.
+// the same question. Round 80 — labelEs translates the button per the
+// task doc's explicit call-out; `message` (what's actually sent to the
+// model) stays English regardless of locale — it's the Track 2 prompt
+// text, not UI chrome.
 const QUICK_ASK = {
   applies: {
     label: "Does it apply to me?",
+    labelEs: "¿Aplica a mi caso?",
     message:
       "Does this specific policy or news item actually apply to my case? Answer yes, no, or uncertain based on my case's actual form type, status, and dates, and explain your reasoning — don't get into what it would mean for my case yet, just whether it applies.",
   },
   explains: {
     label: "How it applies to me?",
+    labelEs: "¿Cómo aplica a mi caso?",
     message:
       "Assuming this does apply to my case, explain concretely how it affects my case specifically — what it changes about my expected next steps or timeline, not just whether it's relevant.",
   },
@@ -51,6 +56,7 @@ export function CaseChat({
   formType,
   initialLinkedUrl,
   initialAutoAsk,
+  es,
 }: {
   receiptNumber: string;
   /** Case's current status/form type, for the contextual suggested-question pills below. */
@@ -59,6 +65,7 @@ export function CaseChat({
   /** Round 66 — a policy/news path arriving via `/ask?link=...`, auto-attached and auto-asked on first load. */
   initialLinkedUrl?: string;
   initialAutoAsk?: QuickAskKind;
+  es: boolean;
 }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -121,7 +128,7 @@ export function CaseChat({
           setLimitReached(true);
           if (data.usage) setUsage(data.usage);
         }
-        setError(typeof data.error === "string" ? data.error : "Something went wrong.");
+        setError(typeof data.error === "string" ? data.error : es ? "Algo salió mal." : "Something went wrong.");
         return;
       }
 
@@ -138,7 +145,7 @@ export function CaseChat({
         if (data.usage.limitReached) setLimitReached(true);
       }
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(es ? "Algo salió mal. Por favor intenta de nuevo." : "Something went wrong. Please try again.");
     } finally {
       setPending(false);
     }
@@ -173,7 +180,7 @@ export function CaseChat({
       {relatedPolicies.length > 0 && (
         <div className="border-b border-border bg-surface-2 px-5 py-3">
           <p className="text-xs font-semibold uppercase tracking-widest text-muted">
-            Policy background that may apply to this case
+            {es ? "Antecedentes de política que pueden aplicar a este caso" : "Policy background that may apply to this case"}
           </p>
           <ul className="mt-1.5 space-y-1 text-xs">
             {relatedPolicies.map((p) => (
@@ -196,7 +203,7 @@ export function CaseChat({
                     onClick={() => attachAndAsk(`/policy/${p.id}`, QUICK_ASK.applies.message)}
                     className="text-muted underline decoration-dotted hover:text-foreground disabled:opacity-60"
                   >
-                    {QUICK_ASK.applies.label}
+                    {es ? QUICK_ASK.applies.labelEs : QUICK_ASK.applies.label}
                   </button>
                   <button
                     type="button"
@@ -204,7 +211,7 @@ export function CaseChat({
                     onClick={() => attachAndAsk(`/policy/${p.id}`, QUICK_ASK.explains.message)}
                     className="text-muted underline decoration-dotted hover:text-foreground disabled:opacity-60"
                   >
-                    {QUICK_ASK.explains.label}
+                    {es ? QUICK_ASK.explains.labelEs : QUICK_ASK.explains.label}
                   </button>
                 </span>
               </li>
@@ -216,8 +223,18 @@ export function CaseChat({
       <div className="max-h-[60vh] min-h-[240px] space-y-4 overflow-y-auto p-5">
         {messages.length === 0 && (
           <p className="text-sm text-muted">
-            Ask anything about your case status — for example, &quot;what does this status mean
-            for my timeline?&quot; or &quot;why might this be taking longer than usual?&quot;
+            {es ? (
+              <>
+                Pregunta cualquier cosa sobre el estado de tu caso — por ejemplo, &quot;¿qué significa este
+                estado para mi cronograma?&quot; o &quot;¿por qué podría estar tomando más tiempo de lo
+                normal?&quot;
+              </>
+            ) : (
+              <>
+                Ask anything about your case status — for example, &quot;what does this status mean
+                for my timeline?&quot; or &quot;why might this be taking longer than usual?&quot;
+              </>
+            )}
           </p>
         )}
         {messages.map((m, i) => (
@@ -242,7 +259,7 @@ export function CaseChat({
             </div>
           </div>
         ))}
-        {pending && <p className="text-sm text-muted">Thinking…</p>}
+        {pending && <p className="text-sm text-muted">{es ? "Pensando…" : "Thinking…"}</p>}
         {error && <p className="text-sm text-red-500">{error}</p>}
       </div>
 
@@ -250,14 +267,28 @@ export function CaseChat({
         {limitReached && (
           <div className="mb-3 rounded-lg border border-brand-500/30 bg-brand-500/5 p-3 text-sm">
             <p className="font-medium text-foreground">
-              You&apos;ve used all {usage?.limit ?? "your free"} questions this month.
+              {es
+                ? `Has usado las ${usage?.limit ?? "tus"} preguntas gratuitas de este mes.`
+                : <>You&apos;ve used all {usage?.limit ?? "your free"} questions this month.</>}
             </p>
             <p className="mt-1 text-muted">
-              Get unlimited questions with{" "}
-              <Link href="/plus#ai-chat" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
-                CaseWhy Plus
-              </Link>{" "}
-              — every answer still grounded in real USCIS policy, with citations.
+              {es ? (
+                <>
+                  Obtén preguntas ilimitadas con{" "}
+                  <Link href="/plus#ai-chat" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
+                    CaseWhy Plus
+                  </Link>{" "}
+                  — cada respuesta sigue fundamentada en la política real de USCIS, con citas.
+                </>
+              ) : (
+                <>
+                  Get unlimited questions with{" "}
+                  <Link href="/plus#ai-chat" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
+                    CaseWhy Plus
+                  </Link>{" "}
+                  — every answer still grounded in real USCIS policy, with citations.
+                </>
+              )}
             </p>
           </div>
         )}
@@ -285,14 +316,15 @@ export function CaseChat({
             {linkedUrl ? (
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="truncate text-xs text-muted" title={linkedUrl}>
-                  Linked: {linkedUrl}
+                  {es ? "Enlazado: " : "Linked: "}
+                  {linkedUrl}
                 </p>
                 <button
                   type="button"
                   onClick={() => setLinkedUrl(null)}
                   className="shrink-0 text-xs text-muted underline decoration-dotted hover:text-foreground"
                 >
-                  Remove
+                  {es ? "Quitar" : "Remove"}
                 </button>
               </div>
             ) : (
@@ -309,8 +341,8 @@ export function CaseChat({
                   type="text"
                   value={linkInput}
                   onChange={(e) => setLinkInput(e.target.value)}
-                  placeholder="Paste a CaseWhy policy or news link…"
-                  aria-label="Paste a CaseWhy link"
+                  placeholder={es ? "Pega un enlace de política o noticia de CaseWhy…" : "Paste a CaseWhy policy or news link…"}
+                  aria-label={es ? "Pega un enlace de CaseWhy" : "Paste a CaseWhy link"}
                   className="flex-1 rounded-lg border border-border-strong bg-background px-3 py-1.5 text-xs outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
                 />
                 <button
@@ -318,7 +350,7 @@ export function CaseChat({
                   disabled={!linkInput.trim()}
                   className="rounded-lg border border-border-strong px-3 py-1.5 text-xs font-medium text-brand-600 transition-colors hover:border-brand-500 disabled:cursor-not-allowed disabled:opacity-40 dark:text-brand-400"
                 >
-                  Attach
+                  {es ? "Adjuntar" : "Attach"}
                 </button>
               </form>
             )}
@@ -330,7 +362,7 @@ export function CaseChat({
                   onClick={() => send(QUICK_ASK.applies.message)}
                   className="rounded-full border border-border-strong bg-surface-2 px-3 py-1.5 text-xs font-medium text-brand-600 transition-colors hover:border-brand-500 disabled:opacity-60 dark:text-brand-400"
                 >
-                  {QUICK_ASK.applies.label}
+                  {es ? QUICK_ASK.applies.labelEs : QUICK_ASK.applies.label}
                 </button>
                 <button
                   type="button"
@@ -338,7 +370,7 @@ export function CaseChat({
                   onClick={() => send(QUICK_ASK.explains.message)}
                   className="rounded-full border border-border-strong bg-surface-2 px-3 py-1.5 text-xs font-medium text-brand-600 transition-colors hover:border-brand-500 disabled:opacity-60 dark:text-brand-400"
                 >
-                  {QUICK_ASK.explains.label}
+                  {es ? QUICK_ASK.explains.labelEs : QUICK_ASK.explains.label}
                 </button>
               </div>
             )}
@@ -355,8 +387,16 @@ export function CaseChat({
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={limitReached ? "Free monthly question limit reached" : "Ask a question about your case…"}
-            aria-label="Your question"
+            placeholder={
+              limitReached
+                ? es
+                  ? "Límite mensual de preguntas gratuitas alcanzado"
+                  : "Free monthly question limit reached"
+                : es
+                  ? "Haz una pregunta sobre tu caso…"
+                  : "Ask a question about your case…"
+            }
+            aria-label={es ? "Tu pregunta" : "Your question"}
             disabled={pending || limitReached}
             className="flex-1 rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500 disabled:opacity-60"
           />
@@ -365,21 +405,36 @@ export function CaseChat({
             disabled={pending || limitReached || !input.trim()}
             className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Send
+            {es ? "Enviar" : "Send"}
           </button>
         </form>
         {usage && usage.limit !== null && !limitReached && (
           <p className="mt-2 text-xs text-muted">
-            {usage.remaining} of {usage.limit} free questions left this month.
+            {es
+              ? `${usage.remaining} de ${usage.limit} preguntas gratuitas restantes este mes.`
+              : `${usage.remaining} of ${usage.limit} free questions left this month.`}
           </p>
         )}
         <p className="mt-3 text-xs text-muted">
-          General information, not legal advice. For guidance specific to your case, talk to a
-          licensed professional —{" "}
-          <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
-            get help finding one
-          </Link>
-          .
+          {es ? (
+            <>
+              Información general, no asesoría legal. Para orientación específica a tu caso, habla con un
+              profesional con licencia —{" "}
+              <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+                obtén ayuda para encontrar uno
+              </Link>
+              .
+            </>
+          ) : (
+            <>
+              General information, not legal advice. For guidance specific to your case, talk to a
+              licensed professional —{" "}
+              <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+                get help finding one
+              </Link>
+              .
+            </>
+          )}
         </p>
       </div>
     </div>

@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 
 const MIN_PASSWORD_LENGTH = 8;
 
-export default function SignUpPage() {
+function SignUpForm() {
   const router = useRouter();
+  const es = useSearchParams().get("lang") === "es";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -20,11 +21,13 @@ export default function SignUpPage() {
     setErrorMessage(null);
 
     if (password.length < MIN_PASSWORD_LENGTH) {
-      setErrorMessage(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
+      setErrorMessage(
+        es ? `La contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres.` : `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`
+      );
       return;
     }
     if (password !== confirmPassword) {
-      setErrorMessage("Passwords don't match.");
+      setErrorMessage(es ? "Las contraseñas no coinciden." : "Passwords don't match.");
       return;
     }
 
@@ -33,13 +36,13 @@ export default function SignUpPage() {
       const { error } = await authClient.signUp.email({ email, password, name: "" });
       if (error) {
         setStatus("error");
-        setErrorMessage(error.message || "Something went wrong creating your account.");
+        setErrorMessage(error.message || (es ? "Algo salió mal al crear tu cuenta." : "Something went wrong creating your account."));
         return;
       }
-      router.push("/dashboard");
+      router.push(es ? "/dashboard?lang=es" : "/dashboard");
     } catch {
       setStatus("error");
-      setErrorMessage("Something went wrong creating your account. Please try again.");
+      setErrorMessage(es ? "Algo salió mal al crear tu cuenta. Por favor intenta de nuevo." : "Something went wrong creating your account. Please try again.");
     }
   }
 
@@ -58,13 +61,13 @@ export default function SignUpPage() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Create your account</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{es ? "Crea tu cuenta" : "Create your account"}</h1>
         </div>
 
         <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <label htmlFor="email" className="sr-only">
-              Email address
+              {es ? "Correo electrónico" : "Email address"}
             </label>
             <input
               id="email"
@@ -72,12 +75,12 @@ export default function SignUpPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder={es ? "tu@correo.com" : "you@example.com"}
               autoComplete="email"
               className="rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
             />
             <label htmlFor="password" className="sr-only">
-              Password
+              {es ? "Contraseña" : "Password"}
             </label>
             <input
               id="password"
@@ -86,12 +89,12 @@ export default function SignUpPage() {
               minLength={MIN_PASSWORD_LENGTH}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder={`Password (min. ${MIN_PASSWORD_LENGTH} characters)`}
+              placeholder={es ? `Contraseña (mín. ${MIN_PASSWORD_LENGTH} caracteres)` : `Password (min. ${MIN_PASSWORD_LENGTH} characters)`}
               autoComplete="new-password"
               className="rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
             />
             <label htmlFor="confirm-password" className="sr-only">
-              Confirm password
+              {es ? "Confirmar contraseña" : "Confirm password"}
             </label>
             <input
               id="confirm-password"
@@ -99,7 +102,7 @@ export default function SignUpPage() {
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm password"
+              placeholder={es ? "Confirmar contraseña" : "Confirm password"}
               autoComplete="new-password"
               className="rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
             />
@@ -108,18 +111,35 @@ export default function SignUpPage() {
               disabled={status === "loading"}
               className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:opacity-60"
             >
-              {status === "loading" ? "Creating account…" : "Create account"}
+              {status === "loading" ? (es ? "Creando cuenta…" : "Creating account…") : es ? "Crear cuenta" : "Create account"}
             </button>
             {status === "error" && errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
             <p className="text-center text-xs text-muted">
-              Already have an account?{" "}
-              <Link href="/auth/sign-in" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
-                Sign in
-              </Link>
+              {es ? (
+                <>¿Ya tienes una cuenta?{" "}
+                  <Link href="/auth/sign-in?lang=es" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                    Iniciar sesión
+                  </Link>
+                </>
+              ) : (
+                <>Already have an account?{" "}
+                  <Link href="/auth/sign-in" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                    Sign in
+                  </Link>
+                </>
+              )}
             </p>
           </form>
         </div>
       </div>
     </main>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignUpForm />
+    </Suspense>
   );
 }

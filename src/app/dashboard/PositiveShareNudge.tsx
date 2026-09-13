@@ -13,29 +13,33 @@
 import { useState } from "react";
 import { ShareButton } from "@/components/ShareButton";
 
-export function PositiveShareNudge() {
+export function PositiveShareNudge({ es }: { es: boolean }) {
   const [dismissed, setDismissed] = useState(false);
   if (dismissed) return null;
 
   return (
     <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface-2 p-4">
       <p className="text-sm text-foreground/90">
-        Know someone else waiting on a case? Tell them about CaseWhy.
+        {es ? "¿Conoces a alguien más esperando en un caso? Cuéntale sobre CaseWhy." : "Know someone else waiting on a case? Tell them about CaseWhy."}
       </p>
       <div className="flex items-center gap-2">
         <ShareButton
           url="https://casewhy.com"
           title="CaseWhy"
-          text="Just used CaseWhy to keep track of my USCIS case — it explains what's actually happening in plain English and connects you to real help. Free, no ads, ever."
-          label="Share"
+          text={
+            es
+              ? "Acabo de usar CaseWhy para dar seguimiento a mi caso de USCIS — explica lo que realmente está pasando en español sencillo y te conecta con ayuda real. Gratis, sin anuncios, siempre."
+              : "Just used CaseWhy to keep track of my USCIS case — it explains what's actually happening in plain English and connects you to real help. Free, no ads, ever."
+          }
+          label={es ? "Compartir" : "Share"}
         />
         <button
           type="button"
           onClick={() => setDismissed(true)}
-          aria-label="Dismiss"
+          aria-label={es ? "Descartar" : "Dismiss"}
           className="text-xs text-muted hover:text-foreground"
         >
-          Dismiss
+          {es ? "Descartar" : "Dismiss"}
         </button>
       </div>
     </div>

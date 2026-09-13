@@ -7,14 +7,14 @@ import { authClient } from "@/lib/auth/client";
 import { Logo } from "./Logo";
 
 const NAV_LINKS = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/ask", label: "Ask a question" },
+  { href: "/dashboard", label: "Dashboard", labelEs: "Panel" },
+  { href: "/ask", label: "Ask a question", labelEs: "Hacer una pregunta" },
   { href: "/plus", label: "CaseWhy Plus" },
   { href: "/get-help", label: "Get Help", labelEs: "Obtener ayuda" },
   { href: "/processing-times", label: "Processing times" },
   { href: "/visa-bulletin", label: "Visa bulletin" },
   { href: "/news", label: "News" },
-  { href: "/settings", label: "Settings" },
+  { href: "/settings", label: "Settings", labelEs: "Configuración" },
 ];
 
 // Every English page that has a real /es/* counterpart — landing on one of
@@ -207,7 +207,7 @@ function AuthHeaderInner() {
               }
               className="font-semibold text-brand-600 dark:text-brand-400 hover:underline"
             >
-              Sign out
+              {isSpanish ? "Cerrar sesión" : "Sign out"}
             </button>
           </div>
         ) : (

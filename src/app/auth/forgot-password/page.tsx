@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 
-export default function ForgotPasswordPage() {
+function ForgotPasswordForm() {
+  const es = useSearchParams().get("lang") === "es";
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -17,19 +19,20 @@ export default function ForgotPasswordPage() {
     // redirectTo must be an absolute, trusted URL (Neon Auth's Domains
     // allowlist) — origin is read from the browser at submit time so this
     // works correctly on both app.casewhy.com and any preview deployment
-    // already added to that allowlist.
-    const redirectTo = `${window.location.origin}/auth/reset-password`;
+    // already added to that allowlist. Carries ?lang=es through to the
+    // reset-password page too, same pattern as the sign-in redirect.
+    const redirectTo = `${window.location.origin}/auth/reset-password${es ? "?lang=es" : ""}`;
     try {
       const { error } = await authClient.requestPasswordReset({ email, redirectTo });
       if (error) {
         setStatus("error");
-        setErrorMessage(error.message || "Something went wrong. Please try again.");
+        setErrorMessage(error.message || (es ? "Algo salió mal. Por favor intenta de nuevo." : "Something went wrong. Please try again."));
         return;
       }
       setStatus("sent");
     } catch {
       setStatus("error");
-      setErrorMessage("Something went wrong. Please try again.");
+      setErrorMessage(es ? "Algo salió mal. Por favor intenta de nuevo." : "Something went wrong. Please try again.");
     }
   }
 
@@ -48,8 +51,10 @@ export default function ForgotPasswordPage() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Forgot password?</h1>
-          <p className="mt-2 text-muted">We&apos;ll email you a link to reset it.</p>
+          <h1 className="text-2xl font-bold tracking-tight">{es ? "¿Olvidaste tu contraseña?" : "Forgot password?"}</h1>
+          <p className="mt-2 text-muted">
+            {es ? "Te enviaremos un enlace por correo para restablecerla." : "We'll email you a link to reset it."}
+          </p>
         </div>
 
         <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
@@ -60,16 +65,19 @@ export default function ForgotPasswordPage() {
                   <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
-              <p className="text-sm font-medium">Check your email</p>
+              <p className="text-sm font-medium">{es ? "Revisa tu correo" : "Check your email"}</p>
               <p className="mt-1 text-sm text-muted">
-                If an account exists for <span className="font-medium text-foreground">{email}</span>, we&apos;ve
-                sent a password-reset link.
+                {es ? (
+                  <>Si existe una cuenta para <span className="font-medium text-foreground">{email}</span>, te hemos enviado un enlace para restablecer la contraseña.</>
+                ) : (
+                  <>If an account exists for <span className="font-medium text-foreground">{email}</span>, we&apos;ve sent a password-reset link.</>
+                )}
               </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               <label htmlFor="email" className="sr-only">
-                Email address
+                {es ? "Correo electrónico" : "Email address"}
               </label>
               <input
                 id="email"
@@ -77,7 +85,7 @@ export default function ForgotPasswordPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder={es ? "tu@correo.com" : "you@example.com"}
                 autoComplete="email"
                 className="rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
               />
@@ -86,12 +94,12 @@ export default function ForgotPasswordPage() {
                 disabled={status === "sending"}
                 className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:opacity-60"
               >
-                {status === "sending" ? "Sending…" : "Send reset link"}
+                {status === "sending" ? (es ? "Enviando…" : "Sending…") : es ? "Enviar enlace de restablecimiento" : "Send reset link"}
               </button>
               {status === "error" && errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
               <p className="text-center text-xs text-muted">
-                <Link href="/auth/sign-in" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
-                  Back to sign in
+                <Link href={es ? "/auth/sign-in?lang=es" : "/auth/sign-in"} className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                  {es ? "Volver a iniciar sesión" : "Back to sign in"}
                 </Link>
               </p>
             </form>
@@ -99,5 +107,13 @@ export default function ForgotPasswordPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function ForgotPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ForgotPasswordForm />
+    </Suspense>
   );
 }

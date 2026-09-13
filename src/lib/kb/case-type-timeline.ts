@@ -51,6 +51,12 @@ import {
 export interface CaseTypeOption {
   id: string;
   label: string;
+  /** Round 80 — dropdown label only, per the task doc's explicit scope
+   * ("the dropdown and its category labels"). timelineBlurb stays English
+   * regardless of locale — it's substantive, legal-adjacent guidance
+   * content (like the KB policy memos), not simple UI chrome, and wasn't
+   * listed in scope. */
+  labelEs?: string;
   timelineBlurb: string;
   /**
    * Round 22 — the list outgrew a flat dropdown; groups it into optgroups in
@@ -58,6 +64,7 @@ export interface CaseTypeOption {
    * inside any group — see TrackCaseButton.tsx.
    */
   group?: "Citizenship & status" | "Family-based" | "Employment-based" | "Travel & green card" | "Asylum & humanitarian";
+  groupEs?: string;
 }
 
 const n400Note = FIELD_OFFICE_ONLY_FORMS.find((f) => f.formType === "N-400")!.note;
@@ -76,88 +83,111 @@ export const CASE_TYPES: CaseTypeOption[] = [
   {
     id: "n400",
     label: "Naturalization (N-400)",
+    labelEs: "Naturalización (N-400)",
     timelineBlurb: n400Note,
     group: "Citizenship & status",
+    groupEs: "Ciudadanía y estatus",
   },
   {
     id: "n600",
     label: "Certificate of Citizenship (N-600)",
+    labelEs: "Certificado de Ciudadanía (N-600)",
     timelineBlurb:
       "No fixed national timeline figure sourced yet for N-600 — processing time varies widely by service center; see the Processing Times page for what CaseWhy has on file. N-600 doesn't grant citizenship — it requests proof for someone who is already a U.S. citizen by operation of law (through a citizen parent, either automatically at birth abroad or as a minor under the Child Citizenship Act of 2000).",
     group: "Citizenship & status",
+    groupEs: "Ciudadanía y estatus",
   },
   {
     id: "family-green-card",
     label: "Family-based green card (I-130 / I-485)",
+    labelEs: "Tarjeta verde familiar (I-130 / I-485)",
     timelineBlurb: i130
       ? `The initial I-130 petition (Immediate Relative — spouse, parent, or child under 21 of a U.S. citizen) is currently taking around ${i130.percentile80Months} months for 80% of cases (Service Center Operations, as of ${PROCESSING_TIMES_AS_OF}). The follow-on I-485 adjustment stage is different: ${familyI485Note} Other family preference categories (siblings, married children, etc.) mostly don't get a fixed months figure at all — ${VISA_BULLETIN_TIED_NOTE}`
       : familyI485Note,
     group: "Family-based",
+    groupEs: "Basado en familia",
   },
   {
     id: "i751",
     label: "Removing conditions on residence (I-751)",
+    labelEs: "Remoción de condiciones de residencia (I-751)",
     timelineBlurb: i751
       ? `I-751s are currently taking around ${i751.percentile80Months} months for 80% of cases (${i751.office}, as of ${PROCESSING_TIMES_AS_OF}). File within the 90 days immediately before your 2-year conditional card expires (joint petitions). Missing that window is serious, not a soft deadline: your conditional status automatically terminates and USCIS can start removal proceedings — late filing is only possible with a written good-cause explanation, and approval isn't guaranteed. If you're divorced, widowed, were abused during the marriage, or would face extreme hardship, you may be able to file a waiver instead — without the other spouse, and without the 90-day window restriction.`
       : "See the Processing Times page for what CaseWhy has on file for I-751.",
     group: "Family-based",
+    groupEs: "Basado en familia",
   },
   {
     id: "employment-based",
     label: "Employment-based green card (I-140 / I-485)",
+    labelEs: "Tarjeta verde de empleo (I-140 / I-485)",
     timelineBlurb:
       i140e1 && i140e2 && i485Employment
         ? `The I-140 petition stage varies a lot by category: around ${i140e2.percentile80Months} months for EB-2 when a visa is currently available, versus around ${i140e1.percentile80Months} months for EB-1 (Service Center Operations, as of ${PROCESSING_TIMES_AS_OF}). The I-485 adjustment stage that follows is around ${i485Employment.percentile80Months} months — but that SCOPS figure only covers EB-4/EB-5; EB-1/EB-2/EB-3 I-485s are adjudicated by field offices instead, with no published national aggregate.`
         : "Employment-based timelines vary significantly by preference category and whether a visa is currently available — see the Processing Times page for what CaseWhy has on file.",
     group: "Employment-based",
+    groupEs: "Basado en empleo",
   },
   {
     id: "i129",
     label: "Nonimmigrant worker petition (I-129 — H-1B, L-1, O-1, TN, etc.)",
+    labelEs: "Petición de trabajador no inmigrante (I-129 — H-1B, L-1, O-1, TN, etc.)",
     timelineBlurb:
       "No fixed national timeline figure sourced yet for I-129 — timelines vary a lot by visa classification (H-1B, L-1, O-1, TN, and others) and service center; see the Processing Times page for what CaseWhy has on file. One important fact regardless of timeline, specific to H-1B: once a new or transfer I-129 petition is properly filed and receipted, you can generally start working for the new employer right away — you don't need to wait for approval — provided you're maintaining valid status (or within the 60-day grace period after your last job ended), the new employer's Labor Condition Application is certified, and you have no history of unauthorized work. If that petition is later denied, work authorization under it ends immediately.",
     group: "Employment-based",
+    groupEs: "Basado en empleo",
   },
   {
     id: "i765",
     label: "Employment Authorization Document (I-765)",
+    labelEs: "Documento de Autorización de Empleo (I-765)",
     timelineBlurb: i765PendingI485
       ? `Timelines vary a lot by eligibility category. One data point CaseWhy has: an I-765 based on a pending I-485 adjustment, category (c)(9), is currently taking around ${i765PendingI485.percentile80Months} months (${i765PendingI485.office}, as of ${PROCESSING_TIMES_AS_OF}). Other categories (asylum-based, DACA, OPT/STEM, etc.) can differ significantly — see the Processing Times page for what else CaseWhy has on file.`
       : "See the Processing Times page for what CaseWhy has on file for I-765.",
     group: "Employment-based",
+    groupEs: "Basado en empleo",
   },
   {
     id: "i131",
     label: "Travel document — Advance Parole / Re-entry Permit (I-131)",
+    labelEs: "Documento de viaje — Permiso Anticipado / Permiso de Reingreso (I-131)",
     timelineBlurb:
       "No fixed national timeline figure sourced yet for I-131 — see the Processing Times page for what CaseWhy has on file. One critical thing to know regardless of timeline: if you're requesting Advance Parole and you leave the U.S. before it's approved and in hand, USCIS considers the I-131 abandoned — and for pending I-485 applicants, an unauthorized departure can jeopardize the adjustment application too, not just the travel document.",
     group: "Travel & green card",
+    groupEs: "Viaje y tarjeta verde",
   },
   {
     id: "i90",
     label: "Green Card renewal/replacement (I-90)",
+    labelEs: "Renovación/reemplazo de tarjeta verde (I-90)",
     timelineBlurb: i90
       ? `I-90s are currently taking around ${i90.percentile80Months} months for 80% of cases (${i90.office}, as of ${PROCESSING_TIMES_AS_OF}). USCIS recommends filing up to 6 months before your card expires. Your filing receipt notice extends your expired card's validity for employment/I-9 purposes — this doesn't change your actual permanent-resident status, which doesn't change while an I-90 is pending.`
       : "See the Processing Times page for what CaseWhy has on file for I-90.",
     group: "Travel & green card",
+    groupEs: "Viaje y tarjeta verde",
   },
   {
     id: "i589",
     label: "Asylum (I-589)",
+    labelEs: "Asilo (I-589)",
     timelineBlurb:
       "No fixed national timeline figure sourced yet for I-589 — see the Processing Times page for what CaseWhy has on file. Must generally file within one year of arrival, with real exceptions for changed or extraordinary circumstances — never something to assess without an attorney. Affirmative asylum (filed with USCIS) and defensive asylum (raised in immigration court, under EOIR, not USCIS) are different processes — if you're not sure which applies to you, ask an attorney rather than assume. As of September 2026, the wait for an initial work permit (EAD) is roughly 150 days after filing (approximate, not exact) — a DHS rule proposed in February 2026 would extend this to 365 days, but it remains proposed, not finalized, as of this writing.",
     group: "Asylum & humanitarian",
+    groupEs: "Asilo y humanitario",
   },
   {
     id: "i821d",
     label: "DACA (I-821D)",
+    labelEs: "DACA (I-821D)",
     timelineBlurb:
       "As of this writing, USCIS is processing DACA renewals only — it is not accepting or processing new initial applications, so a first-time DACA case genuinely isn't possible right now. DACA's legal status is still being litigated: a federal appeals court found its work-authorization component may be unlawful, and the case has been sent back to a district court for a decision that, as of this writing, hasn't been issued — the outcome and timing are genuinely unresolved, not something CaseWhy can predict.",
     group: "Asylum & humanitarian",
+    groupEs: "Asilo y humanitario",
   },
   {
     id: "other",
     label: "Other",
+    labelEs: "Otro",
     timelineBlurb:
       "We don't have a typical-timeline estimate for this yet — you can still track your case and use AI chat.",
   },

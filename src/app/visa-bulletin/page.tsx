@@ -236,7 +236,8 @@ export default async function VisaBulletinPage({
         <ShareButton
           url="https://app.casewhy.com/visa-bulletin"
           title="CaseWhy — Visa bulletin"
-          text="Track visa bulletin movement for free with CaseWhy."
+          text={es ? "Rastrea el movimiento del boletín de visas gratis con CaseWhy." : "Track visa bulletin movement for free with CaseWhy."}
+          es={es}
         />
       </div>
 

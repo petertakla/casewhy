@@ -217,6 +217,7 @@ export default async function PlusPageEs({
           url="https://app.casewhy.com/es/plus"
           title="CaseWhy Plus"
           text="Rastrea los casos de USCIS de toda tu familia con chat de IA ilimitado sobre lo que está pasando — CaseWhy Plus."
+          es
         />
       </div>
 

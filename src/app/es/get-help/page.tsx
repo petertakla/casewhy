@@ -115,6 +115,7 @@ export default function GetHelpPageEs() {
           url="https://app.casewhy.com/es/get-help"
           title="CaseWhy — Obtener Ayuda"
           text="Asistencia legal gratuita, representantes acreditados, abogados y más — todo en un solo lugar. Sin cuotas. Sin anuncios."
+          es
         />
       </div>
 

@@ -31,7 +31,7 @@ export function PositiveShareNudge({ es }: { es: boolean }) {
               ? "Acabo de usar CaseWhy para dar seguimiento a mi caso de USCIS — explica lo que realmente está pasando en español sencillo y te conecta con ayuda real. Gratis, sin anuncios, siempre."
               : "Just used CaseWhy to keep track of my USCIS case — it explains what's actually happening in plain English and connects you to real help. Free, no ads, ever."
           }
-          label={es ? "Compartir" : "Share"}
+          es={es}
         />
         <button
           type="button"

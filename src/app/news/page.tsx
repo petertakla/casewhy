@@ -70,7 +70,8 @@ export default async function NewsPage({
         <ShareButton
           url="https://app.casewhy.com/news"
           title="CaseWhy — Immigration news"
-          text="Curated USCIS and immigration-law news, for free, with CaseWhy."
+          text={es ? "Noticias curadas de USCIS y ley de inmigración, gratis, con CaseWhy." : "Curated USCIS and immigration-law news, for free, with CaseWhy."}
+          es={es}
         />
       </div>
 

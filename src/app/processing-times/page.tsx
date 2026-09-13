@@ -98,7 +98,8 @@ export default async function ProcessingTimesPage({
         <ShareButton
           url="https://app.casewhy.com/processing-times"
           title="CaseWhy — Processing times"
-          text="See USCIS processing-time estimates for real case types, for free, with CaseWhy."
+          text={es ? "Consulta estimaciones de tiempo de procesamiento de USCIS para tipos de caso reales, gratis, con CaseWhy." : "See USCIS processing-time estimates for real case types, for free, with CaseWhy."}
+          es={es}
         />
       </div>
 

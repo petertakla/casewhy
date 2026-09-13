@@ -82,17 +82,20 @@ export function ShareButton({
   url,
   title,
   text,
-  label = "Share",
+  label,
+  es = false,
   className = "",
 }: {
   url: string;
   title: string;
   text: string;
   label?: string;
+  es?: boolean;
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const resolvedLabel = label ?? (es ? "Compartir" : "Share");
 
   const shareUrl = withRefParam(url);
 
@@ -126,31 +129,31 @@ export function ShareButton({
   const links = [
     {
       key: "x",
-      label: "Share on X",
+      label: es ? "Compartir en X" : "Share on X",
       href: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
       Icon: XIcon,
     },
     {
       key: "facebook",
-      label: "Share on Facebook",
+      label: es ? "Compartir en Facebook" : "Share on Facebook",
       href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
       Icon: FacebookIcon,
     },
     {
       key: "linkedin",
-      label: "Share on LinkedIn",
+      label: es ? "Compartir en LinkedIn" : "Share on LinkedIn",
       href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
       Icon: LinkedInIcon,
     },
     {
       key: "whatsapp",
-      label: "Share on WhatsApp",
+      label: es ? "Compartir en WhatsApp" : "Share on WhatsApp",
       href: `https://wa.me/?text=${encodeURIComponent(`${text} ${shareUrl}`)}`,
       Icon: WhatsAppIcon,
     },
     {
       key: "email",
-      label: "Share by email",
+      label: es ? "Compartir por correo" : "Share by email",
       href: `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${text}\n\n${shareUrl}`)}`,
       Icon: EmailIcon,
     },
@@ -169,7 +172,7 @@ export function ShareButton({
           <circle cx="18" cy="19" r="3" />
           <path d="m8.6 10.5 6.8-3.9M8.6 13.5l6.8 3.9" />
         </svg>
-        {label}
+        {resolvedLabel}
       </button>
 
       {open && (
@@ -190,13 +193,13 @@ export function ShareButton({
           <button
             type="button"
             onClick={handleCopy}
-            aria-label="Copy link"
-            title="Copy link"
+            aria-label={es ? "Copiar enlace" : "Copy link"}
+            title={es ? "Copiar enlace" : "Copy link"}
             className="flex h-8 w-8 items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
           >
             <LinkIcon />
           </button>
-          {copied && <span className="pl-1 text-xs text-muted">Copied!</span>}
+          {copied && <span className="pl-1 text-xs text-muted">{es ? "¡Copiado!" : "Copied!"}</span>}
         </div>
       )}
     </div>

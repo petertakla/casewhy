@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import Link from "next/link";
 
 // Round 73 item 8 — the common trust/product questions this audience
@@ -17,9 +18,19 @@ export const metadata: Metadata = {
 
 interface Faq {
   question: string;
-  answer: string;
+  answer: ReactNode;
+  /** Plain-text version for the FAQPage schema below — JSON-LD "text" can't
+   * hold JSX, so any answer converted to JSX for real links needs its
+   * link-free equivalent spelled out here too. Answers that are already a
+   * plain string don't need this — the schema falls back to `answer` itself. */
+  plainText?: string;
 }
 
+// Complete-check follow-up (round 84's internal-linking audit) — these
+// answers reference the Plus page, Get Help, processing-time estimates,
+// and visa bulletin information by name without linking to any of them.
+// Only the two answers that actually reference other CaseWhy pages needed
+// converting from a plain string to JSX; the rest stay plain strings.
 const FAQS: Faq[] = [
   {
     question: "Is CaseWhy affiliated with USCIS?",
@@ -28,13 +39,47 @@ const FAQS: Faq[] = [
   },
   {
     question: "Is CaseWhy really free?",
-    answer:
+    plainText:
       "CaseWhy has a free tier — one tracked case, a status timeline, and AI-generated plain-language explanations — plus an optional paid Plus tier for tracking multiple cases and other add-ons (see the Plus page for current pricing). Get Help — CaseWhy's directories of attorneys, accredited representatives, legal aid organizations, and other resources — is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost.",
+    answer: (
+      <>
+        CaseWhy has a free tier — one tracked case, a status timeline, and AI-generated plain-language explanations
+        — plus an optional paid Plus tier for tracking multiple cases and other add-ons (see the{" "}
+        <Link href="/plus" className="text-brand-600 hover:underline dark:text-brand-400">
+          Plus page
+        </Link>{" "}
+        for current pricing).{" "}
+        <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+          Get Help
+        </Link>{" "}
+        — CaseWhy&apos;s directories of attorneys, accredited representatives, legal aid organizations, and other
+        resources — is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost.
+      </>
+    ),
   },
   {
     question: "Is anything CaseWhy tells me legal advice?",
-    answer:
+    plainText:
       "No. CaseWhy is not a law firm, does not provide legal advice, and using it does not create an attorney-client relationship of any kind. Explanations of your case status, AI chat answers, processing-time estimates, visa bulletin information, and escalation-toolkit drafting assistance are all general, informational content drawn from public USCIS materials — describing what a status or process generally means, never a conclusion about what you, specifically, should do about your case. For asylum (I-589) and DACA (I-821D) cases in particular, CaseWhy will never tell you whether you're eligible for relief or predict your case's outcome — only a licensed immigration attorney or accredited representative can do that, and CaseWhy will direct you to one whenever a question depends on your individual facts.",
+    answer: (
+      <>
+        No. CaseWhy is not a law firm, does not provide legal advice, and using it does not create an
+        attorney-client relationship of any kind. Explanations of your case status, AI chat answers,{" "}
+        <Link href="/processing-times" className="text-brand-600 hover:underline dark:text-brand-400">
+          processing-time estimates
+        </Link>
+        ,{" "}
+        <Link href="/visa-bulletin" className="text-brand-600 hover:underline dark:text-brand-400">
+          visa bulletin information
+        </Link>
+        , and escalation-toolkit drafting assistance are all general, informational content drawn from public USCIS
+        materials — describing what a status or process generally means, never a conclusion about what you,
+        specifically, should do about your case. For asylum (I-589) and DACA (I-821D) cases in particular, CaseWhy
+        will never tell you whether you&apos;re eligible for relief or predict your case&apos;s outcome — only a
+        licensed immigration attorney or accredited representative can do that, and CaseWhy will direct you to one
+        whenever a question depends on your individual facts.
+      </>
+    ),
   },
   {
     question: "How is my case data protected?",
@@ -54,7 +99,7 @@ const faqJsonLd = {
   mainEntity: FAQS.map((faq) => ({
     "@type": "Question",
     name: faq.question,
-    acceptedAnswer: { "@type": "Answer", text: faq.answer },
+    acceptedAnswer: { "@type": "Answer", text: faq.plainText ?? (faq.answer as string) },
   })),
 };
 

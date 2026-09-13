@@ -933,3 +933,48 @@ export const pendingAliasActions = pgTable(
     index("pending_alias_actions_status_idx").on(table.status),
   ]
 );
+
+export const pendingBacklinkOutreachStatusEnum = pgEnum("pending_backlink_outreach_status", [
+  "pending",
+  "approved",
+  "rejected",
+]);
+
+// Round 84 — partner backlink outreach, draft-and-queue only, same hard
+// boundary as pendingAliasActions above: nothing in this table is ever
+// sent by anything that writes to it. There's no "sent" status at all
+// (unlike pendingAliasActions) because no send capability exists yet —
+// the real blocker is the LLC's registered mailing address, required for
+// the CAN-SPAM footer, still pending from Peter pulling it off the
+// Northwest Registered Agent formation documents. "approved" here means
+// "reviewed and ready whenever sending is actually built," not "sent."
+//
+// Scoped to attorneys only, not all six Get Help entity types — checked
+// live, not assumed: only attorneyDirectory has a real per-listing email
+// column. legalAidDirectory, accreditedRepresentativeDirectory,
+// dsoDirectory, communityOrgDirectory, and proBonoRepresentationDirectory
+// have no email field in the schema at all (only some have websiteUrl) —
+// there's no per-listing contact to draft an email to for those five
+// entity types without a separate future data-sourcing round.
+export const pendingBacklinkOutreach = pgTable(
+  "pending_backlink_outreach",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    attorneyId: text("attorney_id").notNull(),
+    attorneyName: text("attorney_name").notNull(),
+    attorneyEmail: text("attorney_email").notNull(),
+    listingUrl: text("listing_url").notNull(),
+    draftSubject: text("draft_subject").notNull(),
+    draftBody: text("draft_body").notNull(),
+    status: pendingBacklinkOutreachStatusEnum("status").notNull().default("pending"),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewedBy: text("reviewed_by"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique("pending_backlink_outreach_attorney_id_unique").on(table.attorneyId),
+    index("pending_backlink_outreach_status_idx").on(table.status),
+  ]
+);

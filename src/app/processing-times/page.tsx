@@ -185,6 +185,9 @@ export default async function ProcessingTimesPage({
           ))}
         </ul>
         <p className="mt-4 text-sm text-muted">{VISA_BULLETIN_TIED_NOTE}</p>
+        <Link href={es ? "/visa-bulletin?lang=es" : "/visa-bulletin"} className="mt-2 inline-block text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400">
+          {es ? "Ver el boletín de visas →" : "See the visa bulletin →"}
+        </Link>
       </div>
 
       <div className="mt-8 rounded-xl border border-border bg-surface p-5">

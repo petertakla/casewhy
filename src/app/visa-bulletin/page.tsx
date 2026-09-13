@@ -286,6 +286,10 @@ export default async function VisaBulletinPage({
       </h2>
       <BulletinTable rows={EMPLOYMENT_FINAL_ACTION} previousRows={VISA_BULLETIN_PREVIOUS_MONTH?.employment} es={es} />
 
+      <Link href={es ? "/processing-times?lang=es" : "/processing-times"} className="mt-4 inline-block text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400">
+        {es ? "Ver tiempos de procesamiento →" : "See processing times →"}
+      </Link>
+
       {!VISA_BULLETIN_PREVIOUS_MONTH && (
         <p className="mt-4 text-xs text-muted">
           {es

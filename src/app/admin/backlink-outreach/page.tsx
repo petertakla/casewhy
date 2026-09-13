@@ -11,11 +11,14 @@ export const dynamic = "force-dynamic";
 // Round 84 — partner backlink outreach, draft-and-queue only. See
 // pendingBacklinkOutreach's own comment in schema.ts and actions.ts's
 // comment on approveOutreachDraft for why "approved" here still isn't
-// "sent": the CAN-SPAM footer needs the LLC's real registered mailing
-// address, still pending from Peter pulling it off the Northwest
-// Registered Agent formation documents. This page and its two actions are
-// the entire mechanism — nothing else in the codebase writes to or reads
-// from pending_backlink_outreach's draftBody/status for sending purposes.
+// "sent": there's no send capability wired up at all yet (which Postmark
+// stream/from-address to use, and when to actually authorize sending, is
+// still an open decision) — not a CAN-SPAM blocker. The LLC's registered
+// mailing address (round 67, Sep 10) is already in the draft footer
+// (see generate-backlink-outreach-drafts.ts). This page and its two
+// actions are the entire mechanism — nothing else in the codebase writes
+// to or reads from pending_backlink_outreach's draftBody/status for
+// sending purposes.
 export default async function BacklinkOutreachAdminPage() {
   const { data: session } = await auth.getSession();
   if (!isAdminEmail(session?.user?.email)) {
@@ -34,8 +37,9 @@ export default async function BacklinkOutreachAdminPage() {
       <h1 className="text-2xl font-bold tracking-tight">Backlink outreach — draft queue</h1>
       <p className="mb-2 mt-2 text-muted">
         Nothing here has been sent, and nothing here <em>can</em> be sent yet — there&apos;s no send capability
-        wired up at all. &quot;Approve&quot; marks a draft ready for whenever sending is actually built, which is
-        blocked on the LLC&apos;s registered mailing address for the CAN-SPAM footer.
+        wired up at all. &quot;Approve&quot; marks a draft ready for whenever sending is actually built. The
+        CAN-SPAM mailing-address requirement is already covered (the LLC&apos;s registered address is in the
+        footer of every draft) — sending is just genuinely not built yet.
       </p>
       <p className="mb-8 text-xs text-muted">
         Scoped to the attorney directory only — the other five Get Help entity types (legal aid, accredited

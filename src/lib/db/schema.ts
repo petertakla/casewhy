@@ -943,11 +943,16 @@ export const pendingBacklinkOutreachStatusEnum = pgEnum("pending_backlink_outrea
 // Round 84 — partner backlink outreach, draft-and-queue only, same hard
 // boundary as pendingAliasActions above: nothing in this table is ever
 // sent by anything that writes to it. There's no "sent" status at all
-// (unlike pendingAliasActions) because no send capability exists yet —
-// the real blocker is the LLC's registered mailing address, required for
-// the CAN-SPAM footer, still pending from Peter pulling it off the
-// Northwest Registered Agent formation documents. "approved" here means
-// "reviewed and ready whenever sending is actually built," not "sent."
+// (unlike pendingAliasActions) because no send capability exists yet.
+// Correction: round 84's own task doc assumed the CAN-SPAM mailing-address
+// requirement was still blocked on Peter pulling it off the Northwest
+// Registered Agent formation documents — stale. Round 67 (Sep 10) already
+// got that address and applied it elsewhere; it's now baked into every
+// draft's footer here too (see generate-backlink-outreach-drafts.ts). The
+// actual reason nothing sends yet is simpler: no send capability was built
+// at all (no chosen Postmark stream/from-address, no send authorization
+// decision). "approved" here means "reviewed and ready whenever sending is
+// actually built," not "sent."
 //
 // Scoped to attorneys only, not all six Get Help entity types — checked
 // live, not assumed: only attorneyDirectory has a real per-listing email

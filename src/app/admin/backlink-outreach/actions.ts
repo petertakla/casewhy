@@ -18,8 +18,11 @@ async function requireAdmin() {
 
 // Round 84 — deliberately does NOT send anything. "Approved" here means
 // "reviewed and ready whenever a real send capability exists" — the task
-// doc's own explicit boundary (real blocker: the LLC's registered mailing
-// address, required for the CAN-SPAM footer, still pending). There is no
+// doc's own explicit boundary. The CAN-SPAM mailing-address requirement is
+// already satisfied (round 67's LLC address is baked into every draft's
+// footer, see generate-backlink-outreach-drafts.ts); the real reason send
+// doesn't exist yet is that no Postmark stream/from-address or send
+// authorization decision has been made for outreach mail. There is no
 // approve-and-send path in this file at all, unlike admin/inbox/actions.ts's
 // approvePendingAction — that's intentional, not an oversight.
 export async function approveOutreachDraft(id: string, editedBody: string) {

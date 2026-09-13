@@ -20,27 +20,41 @@ import { isNotNull } from "drizzle-orm";
 import { getDb } from "../src/lib/db/client";
 import { attorneyDirectory, pendingBacklinkOutreach } from "../src/lib/db/schema";
 
+// Round 84 correction — the original version of this file assumed the LLC's
+// registered mailing address was still unavailable (round 84's own task doc
+// said so). That was stale: round 67 (Sep 10) already resolved it and
+// applied it to privacy.html and the attorney-email-campaign's CAN-SPAM
+// footer requirement. Since this IS real marketing/outreach email (not
+// transactional), CAN-SPAM requires a physical address and a functional
+// opt-out in the message itself — both included below now that the address
+// is confirmed available. Actually sending is still a separate decision
+// (see actions.ts's own comment) — this only makes the draft itself
+// legally complete once someone does approve and send it.
+const CAN_SPAM_FOOTER =
+  "\n\n---\nCaseWhy LLC, 7901 4th St N, Ste 300, St. Petersburg, FL 33702, US\nDon't want emails like this? Reply and let us know — we'll take care of it.";
+
 function draftFor(attorney: { name: string; firm: string | null; slug: string }): { subject: string; body: string } {
   const listingUrl = `https://app.casewhy.com/attorneys/${attorney.slug}`;
   const firmLine = attorney.firm ? ` at ${attorney.firm}` : "";
   return {
     subject: `Your free listing on CaseWhy's immigration attorney directory`,
-    body: [
-      `Hi ${attorney.name.split(" ")[0]},`,
-      "",
-      `I wanted to let you know${firmLine ? " that" : ""} you're listed on CaseWhy's free immigration attorney directory${firmLine}:`,
-      "",
-      listingUrl,
-      "",
-      "CaseWhy is a free tool that helps people track and understand their USCIS case status. The directory is entirely free — no fees, no ads, no referral cut — sourced from your state bar's own board-certification records.",
-      "",
-      "If you'd like, feel free to link to your listing page from your own site or social profiles — it's a real, permanent page, not a landing page that'll disappear.",
-      "",
-      "If anything on the listing is out of date, you can report it directly from the page, or just reply to this email.",
-      "",
-      "Best,",
-      "The CaseWhy team",
-    ].join("\n"),
+    body:
+      [
+        `Hi ${attorney.name.split(" ")[0]},`,
+        "",
+        `I wanted to let you know${firmLine ? " that" : ""} you're listed on CaseWhy's free immigration attorney directory${firmLine}:`,
+        "",
+        listingUrl,
+        "",
+        "CaseWhy is a free tool that helps people track and understand their USCIS case status. The directory is entirely free — no fees, no ads, no referral cut — sourced from your state bar's own board-certification records.",
+        "",
+        "If you'd like, feel free to link to your listing page from your own site or social profiles — it's a real, permanent page, not a landing page that'll disappear.",
+        "",
+        "If anything on the listing is out of date, you can report it directly from the page, or just reply to this email.",
+        "",
+        "Best,",
+        "The CaseWhy team",
+      ].join("\n") + CAN_SPAM_FOOTER,
   };
 }
 

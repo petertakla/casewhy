@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { authClient } from "@/lib/auth/client";
 import { Logo } from "./Logo";
 
@@ -36,10 +36,11 @@ const TRANSLATED_EN_PATHS = [
 
 const LOCALE_COOKIE = "casewhy_locale";
 
-export function AuthHeader() {
+function AuthHeaderInner() {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   // Gated on session, not path — several public marketing pages (e.g. /plus,
   // /news) are also NAV_LINKS entries, and a signed-out visitor landing on
   // one of those must never see the signed-in-only links (Dashboard,
@@ -75,18 +76,29 @@ export function AuthHeader() {
     setLocaleCookie(match ? decodeURIComponent(match[1]) : null);
   }, []);
 
+  // Third follow-up, same day — the cookie alone wasn't reliably surviving
+  // the real sign-in form submission (Peter reproduced it with actual
+  // credentials; a synthetic click-through couldn't). Rather than keep
+  // chasing an unconfirmed timing theory, `?lang=es` is now threaded
+  // explicitly through the one hop that matters — /auth/sign-in's redirect
+  // to /dashboard (see sign-in/page.tsx) — so that specific hop no longer
+  // depends on a cookie write having landed in time at all. This still
+  // treats it as onEsPath-equivalent and re-arms the cookie for whatever
+  // navigation happens next.
+  const langParamEs = searchParams.get("lang") === "es";
+
   useEffect(() => {
     if (!mounted) return;
-    if (onEsPath) {
+    if (onEsPath || langParamEs) {
       document.cookie = `${LOCALE_COOKIE}=es; path=/; max-age=2592000`; // 30 days
       setLocaleCookie("es");
     } else if (TRANSLATED_EN_PATHS.includes(pathname)) {
       document.cookie = `${LOCALE_COOKIE}=; path=/; max-age=0`;
       setLocaleCookie(null);
     }
-  }, [pathname, mounted, onEsPath]);
+  }, [pathname, mounted, onEsPath, langParamEs]);
 
-  const isSpanish = onEsPath || (mounted && localeCookie === "es");
+  const isSpanish = onEsPath || langParamEs || (mounted && localeCookie === "es");
   const ES_HREF: Record<string, string> = {
     "/get-help": "/es/get-help",
     "/plus": "/es/plus",
@@ -204,7 +216,7 @@ export function AuthHeader() {
               {isSpanish ? "Obtener ayuda" : "Get Help"}
             </Link>
             <Link
-              href="/auth/sign-in"
+              href={isSpanish ? "/auth/sign-in?lang=es" : "/auth/sign-in"}
               className="font-semibold text-brand-600 dark:text-brand-400 hover:underline"
             >
               {isSpanish ? "Iniciar sesión" : "Sign in"}
@@ -213,5 +225,18 @@ export function AuthHeader() {
         )}
       </div>
     </header>
+  );
+}
+
+// useSearchParams() requires a Suspense boundary for any page that's part of
+// static generation — and this header renders on every page via the root
+// layout, including the app's statically-prerendered marketing/content
+// pages, so the boundary has to live here rather than assume every caller
+// already has one above it.
+export function AuthHeader() {
+  return (
+    <Suspense fallback={null}>
+      <AuthHeaderInner />
+    </Suspense>
   );
 }

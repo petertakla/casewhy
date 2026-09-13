@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 
 function EnvelopeIcon() {
@@ -35,7 +35,7 @@ function AuthCard({ children }: { children: React.ReactNode }) {
   );
 }
 
-function MagicLinkForm({ onBack }: { onBack: () => void }) {
+function MagicLinkForm({ onBack, dashboardHref }: { onBack: () => void; dashboardHref: string }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -46,7 +46,7 @@ function MagicLinkForm({ onBack }: { onBack: () => void }) {
     setErrorMessage(null);
 
     try {
-      const { error } = await authClient.signIn.magicLink({ email, callbackURL: "/dashboard" });
+      const { error } = await authClient.signIn.magicLink({ email, callbackURL: dashboardHref });
       if (error) {
         setStatus("error");
         setErrorMessage(error.message || "Something went wrong sending the link. Please try again.");
@@ -110,7 +110,13 @@ function MagicLinkForm({ onBack }: { onBack: () => void }) {
   );
 }
 
-function PasswordSignInForm({ onUseMagicLink }: { onUseMagicLink: () => void }) {
+function PasswordSignInForm({
+  onUseMagicLink,
+  dashboardHref,
+}: {
+  onUseMagicLink: () => void;
+  dashboardHref: string;
+}) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -129,7 +135,7 @@ function PasswordSignInForm({ onUseMagicLink }: { onUseMagicLink: () => void }) 
         setErrorMessage(error.message || "Incorrect email or password.");
         return;
       }
-      router.push("/dashboard");
+      router.push(dashboardHref);
     } catch {
       setStatus("error");
       setErrorMessage("Something went wrong signing in. Please try again.");
@@ -195,16 +201,31 @@ function PasswordSignInForm({ onUseMagicLink }: { onUseMagicLink: () => void }) 
   );
 }
 
-export default function SignInPage() {
+function SignInForms() {
   const [mode, setMode] = useState<"password" | "magic-link">("password");
+  // Round 79 follow-up 3 — carries the "came from an /es/* page" signal
+  // straight through the sign-in redirect via a query param instead of
+  // relying on the AuthHeader's cookie write having landed before the
+  // click. The cookie approach still covers ordinary nav clicks; this
+  // covers the one hop (sign-in form submit -> /dashboard) that's a real
+  // network round-trip away from the page the cookie was set on, where a
+  // timing assumption is worth not needing at all.
+  const lang = useSearchParams().get("lang");
+  const dashboardHref = lang === "es" ? "/dashboard?lang=es" : "/dashboard";
 
+  return mode === "password" ? (
+    <PasswordSignInForm onUseMagicLink={() => setMode("magic-link")} dashboardHref={dashboardHref} />
+  ) : (
+    <MagicLinkForm onBack={() => setMode("password")} dashboardHref={dashboardHref} />
+  );
+}
+
+export default function SignInPage() {
   return (
     <AuthCard>
-      {mode === "password" ? (
-        <PasswordSignInForm onUseMagicLink={() => setMode("magic-link")} />
-      ) : (
-        <MagicLinkForm onBack={() => setMode("password")} />
-      )}
+      <Suspense fallback={null}>
+        <SignInForms />
+      </Suspense>
     </AuthCard>
   );
 }

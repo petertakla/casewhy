@@ -2131,3 +2131,13 @@ Peter asked to re-check every page one more time for remaining English. Audit fo
 **No new caching tradeoff:** all six detail pages were already server-rendered dynamically (real DB lookups by slug), so adding `isSpanishLocale()`'s `cookies()` read costs nothing that wasn't already being paid.
 
 **Verified live end-to-end, not just via curl:** clicked from `/es/attorneys` into a specific attorney's detail page with no `?lang` param anywhere in the URL, and confirmed every label, the switcher, `VerificationLinks`, and `ReportListingLink` all correctly rendered in Spanish purely via the sticky cookie set on the list page — the same mechanism already proven for `/es/plus` → `/dashboard`. `tsc`/lint clean, build succeeds, all six detail pages still dynamically rendered as before.
+
+## Fix, DONE Sep 13 — clicking the CaseWhy logo reverted a Spanish visitor to English
+
+Peter reported this directly, and separately asked for the reverse of round 84's audit — English pages linking unexpectedly into `/es/*` paths. Checked: clean. Grepped every hardcoded `/es/` link across the codebase and found only the intentional round-79 "Español" switchers on each English list page — nothing stray sending an English-context visitor into Spanish content by accident.
+
+**The logo bug was real, though:** `src/app/page.tsx` (the bare `/` route) unconditionally sent every signed-out visitor to the English `https://casewhy.com` via `permanentRedirect()` — even one who'd just been reading an `/es/*` page and clicked the logo expecting to stay in Spanish. `casewhy.com/es` (round 78) is a real, live Spanish landing page that had simply never been wired up as a destination here. Signed-in visitors were less broken — redirected to `/dashboard`, which is locale-aware and does correctly follow the cookie — but still lacked the explicit `?lang=es` signal every other locale-aware redirect in this app already threads through rather than relying on the cookie alone.
+
+**Fix:** `/` now reads the same `isSpanishLocale()` signal as everywhere else and redirects to `casewhy.com/es` (signed out) or `/dashboard?lang=es` (signed in) when Spanish. `AuthHeader.tsx`'s own Logo link now carries `?lang=es` explicitly too, matching the Sign in/Get Help links sitting right next to it in the same signed-out block.
+
+**Verified live:** clicked the logo from `/es/plus` (signed in) and confirmed it landed on `/dashboard?lang=es`, rendered fully in Spanish; confirmed via `curl` that the signed-out path correctly 308s to `casewhy.com/es` with the param present and to plain `casewhy.com` without it. `tsc`/lint clean, build succeeds.

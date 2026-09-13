@@ -31,6 +31,16 @@ export interface RouteResult {
 // a visitor sees Attorneys/pro bono representation alongside other
 // options, which is never wrong to show; a false negative means the model
 // alone has to get it right, which is the risk this list exists to reduce.
+//
+// Round 83 — Spanish variants added. This list was English-only from
+// round 60 until the Get Help chooser's free-text box only had an English
+// caller (GetHelpChooser.tsx); the Spanish caller added this round
+// (GetHelpChooserEs.tsx) means a Spanish-phrased query can reach this
+// function for the first time, and the original English-only keywords
+// don't match Spanish spellings (e.g. "deportación" doesn't match
+// /deportation/i) — silently skipping the deterministic fast-path and
+// falling through to the model alone for the exact situation this list
+// exists to not depend on the model alone for.
 const COURT_REMOVAL_KEYWORDS = [
   /removal proceeding/i,
   /deportation/i,
@@ -44,6 +54,15 @@ const COURT_REMOVAL_KEYWORDS = [
   /detained/i,
   /detention center/i,
   /bond hearing/i,
+  /proceso(s)? de deportaci[oó]n/i,
+  /procesos? de remoci[oó]n/i,
+  /corte de inmigraci[oó]n/i,
+  /audiencia (de|con) (el )?juez de inmigraci[oó]n/i,
+  /juez de inmigraci[oó]n/i,
+  /notificaci[oó]n de comparecencia/i,
+  /detenid[oa]/i,
+  /centro de detenci[oó]n/i,
+  /audiencia de fianza/i,
 ];
 
 const HARD_ROUTE_OUTCOMES: RouteOutcomeId[] = ["attorneys", "pro_bono_representation"];

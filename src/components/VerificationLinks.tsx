@@ -21,7 +21,7 @@
 // one more click from the visitor), short of what was originally hoped for
 // but still real, on-page context instead of a blank chat.
 
-export function VerificationLinks({ name, context }: { name: string; context?: string }) {
+export function VerificationLinks({ name, context, es }: { name: string; context?: string; es?: boolean }) {
   const query = context ? `"${name}" ${context}` : `"${name}"`;
   const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
   const chatGptUrl = `https://chatgpt.com/?q=${encodeURIComponent(query)}`;
@@ -34,7 +34,7 @@ export function VerificationLinks({ name, context }: { name: string; context?: s
         rel="noopener noreferrer"
         className="text-brand-600 hover:underline dark:text-brand-400"
       >
-        Search {name} on Google
+        {es ? `Buscar a ${name} en Google` : `Search ${name} on Google`}
       </a>
       <a
         href={chatGptUrl}
@@ -42,7 +42,7 @@ export function VerificationLinks({ name, context }: { name: string; context?: s
         rel="noopener noreferrer"
         className="text-brand-600 hover:underline dark:text-brand-400"
       >
-        Ask ChatGPT about {name}
+        {es ? `Preguntarle a ChatGPT sobre ${name}` : `Ask ChatGPT about ${name}`}
       </a>
     </div>
   );

@@ -34,8 +34,27 @@ const NAV_LINKS = [
 // that kind of ordinary, param-less navigation.
 const LOCALE_AWARE_EN_PATHS = ["/dashboard", "/ask", "/settings", "/processing-times", "/visa-bulletin", "/news"];
 
+// Round 83 follow-up — the six entity-type detail pages (/attorneys/[id],
+// /legal-aid/[slug], etc.) became locale-aware too, reading the same
+// cookie/query-param signal. Prefix-matched rather than added to the exact
+// list above since the slug varies per listing — but each entity type's
+// /join application-form sub-route is deliberately excluded: that page has
+// no Spanish version at all, so it should still reset to English like any
+// other English-only page.
+const LOCALE_AWARE_EN_PREFIXES = [
+  "/attorneys/",
+  "/legal-aid/",
+  "/dso/",
+  "/community-orgs/",
+  "/pro-bono-representation/",
+  "/accredited-representatives/",
+];
+
 function isLocaleAwarePath(pathname: string): boolean {
-  return pathname === "/es" || pathname.startsWith("/es/") || pathname.startsWith("/auth/") || LOCALE_AWARE_EN_PATHS.includes(pathname);
+  if (pathname === "/es" || pathname.startsWith("/es/") || pathname.startsWith("/auth/") || LOCALE_AWARE_EN_PATHS.includes(pathname)) {
+    return true;
+  }
+  return LOCALE_AWARE_EN_PREFIXES.some((prefix) => pathname.startsWith(prefix) && !pathname.endsWith("/join"));
 }
 
 const LOCALE_COOKIE = "casewhy_locale";

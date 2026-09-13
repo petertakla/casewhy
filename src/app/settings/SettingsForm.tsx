@@ -47,7 +47,7 @@ function ToggleRow({
  * checked-state is determined client-side on mount via
  * pushManager.getSubscription(), not passed in as an initial prop.
  */
-function PushNotificationsRow() {
+function PushNotificationsRow({ es }: { es: boolean }) {
   const [status, setStatus] = useState<
     "checking" | "unsupported" | "ios-not-installed" | "denied" | "off" | "on"
   >("checking");
@@ -100,7 +100,7 @@ function PushNotificationsRow() {
       if (!res.ok) throw new Error();
       setStatus("on");
     } catch {
-      setError("Couldn't enable push notifications. Please try again.");
+      setError(es ? "No se pudieron activar las notificaciones push. Por favor intenta de nuevo." : "Couldn't enable push notifications. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -122,7 +122,7 @@ function PushNotificationsRow() {
       }
       setStatus("off");
     } catch {
-      setError("Couldn't disable push notifications. Please try again.");
+      setError(es ? "No se pudieron desactivar las notificaciones push. Por favor intenta de nuevo." : "Couldn't disable push notifications. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -133,7 +133,7 @@ function PushNotificationsRow() {
   if (status === "unsupported") {
     return (
       <p className="py-3 text-xs text-muted">
-        Push notifications aren&apos;t supported in this browser.
+        {es ? "Las notificaciones push no son compatibles con este navegador." : "Push notifications aren't supported in this browser."}
       </p>
     );
   }
@@ -141,8 +141,9 @@ function PushNotificationsRow() {
   if (status === "ios-not-installed") {
     return (
       <p className="py-3 text-xs text-muted">
-        On iPhone/iPad, add CaseWhy to your home screen first (Share → Add to Home Screen) to
-        enable push notifications — Safari doesn&apos;t support them in a regular browser tab.
+        {es
+          ? "En iPhone/iPad, primero agrega CaseWhy a tu pantalla de inicio (Compartir → Agregar a pantalla de inicio) para activar las notificaciones push — Safari no las admite en una pestaña de navegador normal."
+          : "On iPhone/iPad, add CaseWhy to your home screen first (Share → Add to Home Screen) to enable push notifications — Safari doesn't support them in a regular browser tab."}
       </p>
     );
   }
@@ -152,10 +153,12 @@ function PushNotificationsRow() {
       <label className="flex cursor-pointer items-start justify-between gap-4">
         <span>
           <span className="block text-sm font-medium text-foreground">
-            Enable push notifications
+            {es ? "Activar notificaciones push" : "Enable push notifications"}
           </span>
           <span className="block text-xs text-muted">
-            Get a notification on this device the moment a tracked case&apos;s status changes.
+            {es
+              ? "Recibe una notificación en este dispositivo en el momento en que el estado de un caso rastreado cambie."
+              : "Get a notification on this device the moment a tracked case's status changes."}
           </span>
         </span>
         <input
@@ -169,8 +172,9 @@ function PushNotificationsRow() {
       {status === "denied" && (
         <div className="mt-1">
           <p className="text-xs text-red-500">
-            Notifications are blocked for this site in your browser settings. Allow notifications
-            for casewhy.com to turn this on.
+            {es
+              ? "Las notificaciones están bloqueadas para este sitio en la configuración de tu navegador. Permite las notificaciones para casewhy.com para activar esto."
+              : "Notifications are blocked for this site in your browser settings. Allow notifications for casewhy.com to turn this on."}
           </p>
           {blockedHelp && (
             <p className="mt-1 text-xs text-muted">
@@ -198,9 +202,9 @@ function PushNotificationsRow() {
 }
 
 const APPEARANCE_OPTIONS = [
-  { value: "system", label: "System" },
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
+  { value: "system", label: "System", labelEs: "Sistema" },
+  { value: "light", label: "Light", labelEs: "Claro" },
+  { value: "dark", label: "Dark", labelEs: "Oscuro" },
 ] as const;
 
 /**
@@ -210,16 +214,16 @@ const APPEARANCE_OPTIONS = [
  * renders a disabled placeholder for one tick rather than flash a wrong
  * selection.
  */
-function AppearanceRow() {
+function AppearanceRow({ es }: { es: boolean }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
   return (
     <div className="py-3">
-      <span className="block text-sm font-medium text-foreground">Appearance</span>
+      <span className="block text-sm font-medium text-foreground">{es ? "Apariencia" : "Appearance"}</span>
       <span className="block text-xs text-muted">
-        System follows your device&apos;s setting automatically.
+        {es ? "Sistema sigue la configuración de tu dispositivo automáticamente." : "System follows your device's setting automatically."}
       </span>
       <div className="mt-2 inline-flex rounded-lg border border-border-strong p-1">
         {APPEARANCE_OPTIONS.map((option) => (
@@ -234,7 +238,7 @@ function AppearanceRow() {
                 : "text-muted hover:text-foreground"
             }`}
           >
-            {option.label}
+            {es ? option.labelEs : option.label}
           </button>
         ))}
       </div>
@@ -246,10 +250,12 @@ export function SettingsForm({
   initialStatusChangeEmailsEnabled,
   newsSources,
   initialEnabledSourceIds,
+  es,
 }: {
   initialStatusChangeEmailsEnabled: boolean;
   newsSources: NewsSource[];
   initialEnabledSourceIds: string[];
+  es: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
   const [statusChangeEmails, setStatusChangeEmails] = useState(initialStatusChangeEmailsEnabled);
@@ -259,21 +265,21 @@ export function SettingsForm({
     <div className="space-y-8">
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-widest text-muted">
-          Appearance
+          {es ? "Apariencia" : "Appearance"}
         </h2>
         <div className="mt-2 divide-y divide-border rounded-xl border border-border bg-surface px-5">
-          <AppearanceRow />
+          <AppearanceRow es={es} />
         </div>
       </section>
 
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-widest text-muted">
-          Notifications
+          {es ? "Notificaciones" : "Notifications"}
         </h2>
         <div className="mt-2 divide-y divide-border rounded-xl border border-border bg-surface px-5">
           <ToggleRow
-            label="Email me when a tracked case's status changes"
-            description="Sent to the email on your account, once per status change."
+            label={es ? "Avísame por correo cuando el estado de un caso rastreado cambie" : "Email me when a tracked case's status changes"}
+            description={es ? "Enviado al correo de tu cuenta, una vez por cambio de estado." : "Sent to the email on your account, once per status change."}
             checked={statusChangeEmails}
             onChange={(checked) => {
               setStatusChangeEmails(checked);
@@ -282,15 +288,17 @@ export function SettingsForm({
               });
             }}
           />
-          <PushNotificationsRow />
+          <PushNotificationsRow es={es} />
         </div>
       </section>
 
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-widest text-muted">
-          News sources
+          {es ? "Fuentes de noticias" : "News sources"}
         </h2>
-        <p className="mt-2 text-xs text-muted">Choose which sources show up on the News page.</p>
+        <p className="mt-2 text-xs text-muted">
+          {es ? "Elige qué fuentes aparecen en la página de Noticias." : "Choose which sources show up on the News page."}
+        </p>
         <div className="mt-2 divide-y divide-border rounded-xl border border-border bg-surface px-5">
           {newsSources.map((source) => (
             <ToggleRow
@@ -313,7 +321,7 @@ export function SettingsForm({
         </div>
       </section>
 
-      {isPending && <p className="text-xs text-muted">Saving…</p>}
+      {isPending && <p className="text-xs text-muted">{es ? "Guardando…" : "Saving…"}</p>}
     </div>
   );
 }

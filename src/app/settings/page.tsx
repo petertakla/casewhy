@@ -35,17 +35,17 @@ export default async function SettingsPage({
           : "Notification preferences, news sources, and useful links."}
       </p>
 
-      {/* Round 80 — SettingsForm.tsx (Appearance/Notifications/News-source
-          toggle labels) is NOT translated here. It has round 75's own
-          paused, uncommitted work sitting in it (push-notification-blocked
-          help clarity, on hold "until further notice") — editing it now
-          would entangle round 80's translation with round 75's unrelated,
-          unreviewed changes. Flagged in CLOUD_CLAUDE.md, not silently
-          skipped. */}
+      {/* Round 80 follow-up — SettingsForm.tsx is now translated too. It
+          still has round 75's own paused, uncommitted work sitting in it
+          (push-notification-blocked help clarity, on hold "until further
+          notice"); that specific block (the blockedHelp instructions/steps
+          rendering) was left untouched — everything else in the file was
+          safe to translate around it. */}
       <SettingsForm
         initialStatusChangeEmailsEnabled={statusChangeEmailsEnabled}
         newsSources={NEWS_SOURCES}
         initialEnabledSourceIds={[...enabledSourceIds]}
+        es={es}
       />
 
       <section className="mt-8">

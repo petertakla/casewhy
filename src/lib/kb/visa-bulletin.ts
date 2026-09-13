@@ -43,9 +43,9 @@ export const EMPLOYMENT_FINAL_ACTION: BulletinRow[] = [
 ];
 
 /** "C" = current (no wait once other requirements are met); "U" = unauthorized (no visas currently available). */
-export function bulletinDateLabel(value: string): string {
-  if (value === "C") return "Current";
-  if (value === "U") return "Unavailable";
+export function bulletinDateLabel(value: string, es = false): string {
+  if (value === "C") return es ? "Vigente" : "Current";
+  if (value === "U") return es ? "No disponible" : "Unavailable";
   return value;
 }
 

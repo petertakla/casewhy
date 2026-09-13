@@ -11,9 +11,9 @@ const NAV_LINKS = [
   { href: "/ask", label: "Ask a question", labelEs: "Hacer una pregunta" },
   { href: "/plus", label: "CaseWhy Plus" },
   { href: "/get-help", label: "Get Help", labelEs: "Obtener ayuda" },
-  { href: "/processing-times", label: "Processing times" },
-  { href: "/visa-bulletin", label: "Visa bulletin" },
-  { href: "/news", label: "News" },
+  { href: "/processing-times", label: "Processing times", labelEs: "Tiempos de procesamiento" },
+  { href: "/visa-bulletin", label: "Visa bulletin", labelEs: "Boletín de visas" },
+  { href: "/news", label: "News", labelEs: "Noticias" },
   { href: "/settings", label: "Settings", labelEs: "Configuración" },
 ];
 

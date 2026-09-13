@@ -10,6 +10,7 @@ import {
   type BulletinRow,
   type BulletinMovement,
 } from "@/lib/kb/visa-bulletin";
+import { isSpanishLocale } from "@/lib/i18n/locale";
 import { ShareButton } from "@/components/ShareButton";
 
 export const metadata: Metadata = {
@@ -18,18 +19,42 @@ export const metadata: Metadata = {
     "Track family- and employment-based visa bulletin Final Action Dates each month, with movement indicators since the prior bulletin.",
 };
 
-function MovementBadge({ movement }: { movement: BulletinMovement | null }) {
+// Round 80 follow-up — same static→dynamic tradeoff as processing-times/page.tsx.
+export const dynamic = "force-dynamic";
+
+function MovementBadge({ movement, es }: { movement: BulletinMovement | null; es: boolean }) {
   if (!movement) return null;
   if (movement === "forward") {
-    return <span className="ml-1.5 inline-block rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400" title="Moved forward since last month">▲</span>;
+    return (
+      <span
+        className="ml-1.5 inline-block rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400"
+        title={es ? "Avanzó desde el mes pasado" : "Moved forward since last month"}
+      >
+        ▲
+      </span>
+    );
   }
   if (movement === "retrogressed") {
-    return <span className="ml-1.5 inline-block rounded-full bg-red-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-red-600 dark:text-red-400" title="Retrogressed since last month">▼</span>;
+    return (
+      <span
+        className="ml-1.5 inline-block rounded-full bg-red-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-red-600 dark:text-red-400"
+        title={es ? "Retrocedió desde el mes pasado" : "Retrogressed since last month"}
+      >
+        ▼
+      </span>
+    );
   }
-  return <span className="ml-1.5 inline-block rounded-full bg-border px-1.5 py-0.5 text-[10px] font-semibold text-muted" title="No change since last month">—</span>;
+  return (
+    <span
+      className="ml-1.5 inline-block rounded-full bg-border px-1.5 py-0.5 text-[10px] font-semibold text-muted"
+      title={es ? "Sin cambio desde el mes pasado" : "No change since last month"}
+    >
+      —
+    </span>
+  );
 }
 
-function BulletinTable({ rows, previousRows }: { rows: BulletinRow[]; previousRows?: BulletinRow[] }) {
+function BulletinTable({ rows, previousRows, es }: { rows: BulletinRow[]; previousRows?: BulletinRow[]; es: boolean }) {
   const previousFor = (category: string) => previousRows?.find((r) => r.category === category);
 
   return (
@@ -37,12 +62,12 @@ function BulletinTable({ rows, previousRows }: { rows: BulletinRow[]; previousRo
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="border-b border-border bg-surface-2 text-xs uppercase tracking-widest text-muted">
-            <th className="px-4 py-3 font-semibold">Category</th>
-            <th className="px-4 py-3 font-semibold">All other countries</th>
-            <th className="px-4 py-3 font-semibold">China</th>
-            <th className="px-4 py-3 font-semibold">India</th>
-            <th className="px-4 py-3 font-semibold">Mexico</th>
-            <th className="px-4 py-3 font-semibold">Philippines</th>
+            <th className="px-4 py-3 font-semibold">{es ? "Categoría" : "Category"}</th>
+            <th className="px-4 py-3 font-semibold">{es ? "Todos los demás países" : "All other countries"}</th>
+            <th className="px-4 py-3 font-semibold">{es ? "China" : "China"}</th>
+            <th className="px-4 py-3 font-semibold">{es ? "India" : "India"}</th>
+            <th className="px-4 py-3 font-semibold">{es ? "México" : "Mexico"}</th>
+            <th className="px-4 py-3 font-semibold">{es ? "Filipinas" : "Philippines"}</th>
           </tr>
         </thead>
         <tbody>
@@ -55,24 +80,24 @@ function BulletinTable({ rows, previousRows }: { rows: BulletinRow[]; previousRo
                   <span className="ml-2 text-muted">{row.label}</span>
                 </td>
                 <td className="px-4 py-3 font-mono">
-                  {bulletinDateLabel(row.allOther)}
-                  <MovementBadge movement={computeMovement(row.allOther, prev?.allOther)} />
+                  {bulletinDateLabel(row.allOther, es)}
+                  <MovementBadge movement={computeMovement(row.allOther, prev?.allOther)} es={es} />
                 </td>
                 <td className="px-4 py-3 font-mono">
-                  {row.china ? bulletinDateLabel(row.china) : "—"}
-                  <MovementBadge movement={computeMovement(row.china, prev?.china)} />
+                  {row.china ? bulletinDateLabel(row.china, es) : "—"}
+                  <MovementBadge movement={computeMovement(row.china, prev?.china)} es={es} />
                 </td>
                 <td className="px-4 py-3 font-mono">
-                  {row.india ? bulletinDateLabel(row.india) : "—"}
-                  <MovementBadge movement={computeMovement(row.india, prev?.india)} />
+                  {row.india ? bulletinDateLabel(row.india, es) : "—"}
+                  <MovementBadge movement={computeMovement(row.india, prev?.india)} es={es} />
                 </td>
                 <td className="px-4 py-3 font-mono">
-                  {row.mexico ? bulletinDateLabel(row.mexico) : "—"}
-                  <MovementBadge movement={computeMovement(row.mexico, prev?.mexico)} />
+                  {row.mexico ? bulletinDateLabel(row.mexico, es) : "—"}
+                  <MovementBadge movement={computeMovement(row.mexico, prev?.mexico)} es={es} />
                 </td>
                 <td className="px-4 py-3 font-mono">
-                  {row.philippines ? bulletinDateLabel(row.philippines) : "—"}
-                  <MovementBadge movement={computeMovement(row.philippines, prev?.philippines)} />
+                  {row.philippines ? bulletinDateLabel(row.philippines, es) : "—"}
+                  <MovementBadge movement={computeMovement(row.philippines, prev?.philippines)} es={es} />
                 </td>
               </tr>
             );
@@ -89,6 +114,9 @@ function BulletinTable({ rows, previousRows }: { rows: BulletinRow[]; previousRo
 // round73-seo-geo-foundation-task.md item 3-4.
 const CURRENT_MEANS_ANSWER =
   "\"Current\" means visas are available to all qualified applicants in that category regardless of priority date. A listed date means only applicants with a priority date earlier than that date currently have a visa available.";
+
+const CURRENT_MEANS_ANSWER_ES =
+  "\"Vigente\" significa que las visas están disponibles para todos los solicitantes calificados en esa categoría sin importar la fecha de prioridad. Una fecha indicada significa que solo los solicitantes con una fecha de prioridad anterior a esa fecha tienen actualmente una visa disponible.";
 
 function summarizeMovement(rows: BulletinRow[], previousRows?: BulletinRow[]): string {
   if (!previousRows) return "";
@@ -110,13 +138,43 @@ function summarizeMovement(rows: BulletinRow[], previousRows?: BulletinRow[]): s
   return `${parts.join(", ")} since last month's bulletin.`;
 }
 
-export default function VisaBulletinPage() {
+function summarizeMovementEs(rows: BulletinRow[], previousRows?: BulletinRow[]): string {
+  if (!previousRows) return "";
+  let forward = 0;
+  let retrogressed = 0;
+  for (const row of rows) {
+    const prev = previousRows.find((r) => r.category === row.category);
+    if (!prev) continue;
+    (["allOther", "china", "india", "mexico", "philippines"] as const).forEach((col) => {
+      const movement = computeMovement(row[col], prev[col]);
+      if (movement === "forward") forward++;
+      if (movement === "retrogressed") retrogressed++;
+    });
+  }
+  if (forward === 0 && retrogressed === 0) return "Ninguna categoría avanzó desde el boletín del mes pasado.";
+  const parts: string[] = [];
+  if (forward > 0) parts.push(`${forward} avanzaron`);
+  if (retrogressed > 0) parts.push(`${retrogressed} retrocedieron`);
+  return `${parts.join(", ")} desde el boletín del mes pasado.`;
+}
+
+export default async function VisaBulletinPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string }>;
+}) {
+  const { lang } = await searchParams;
+  const es = await isSpanishLocale(lang);
   const movementSummary = VISA_BULLETIN_PREVIOUS_MONTH
     ? summarizeMovement(
         [...FAMILY_FINAL_ACTION, ...EMPLOYMENT_FINAL_ACTION],
         [...(VISA_BULLETIN_PREVIOUS_MONTH.family ?? []), ...(VISA_BULLETIN_PREVIOUS_MONTH.employment ?? [])]
       )
     : "";
+  const movementSummaryEs = VISA_BULLETIN_PREVIOUS_MONTH ? summarizeMovementEs(
+      [...FAMILY_FINAL_ACTION, ...EMPLOYMENT_FINAL_ACTION],
+      [...(VISA_BULLETIN_PREVIOUS_MONTH.family ?? []), ...(VISA_BULLETIN_PREVIOUS_MONTH.employment ?? [])]
+    ) : "";
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -136,14 +194,24 @@ export default function VisaBulletinPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <h1 className="text-2xl font-bold tracking-tight">Visa bulletin</h1>
+      <h1 className="text-2xl font-bold tracking-tight">{es ? "Boletín de visas" : "Visa bulletin"}</h1>
       <p className="mb-2 mt-2 text-muted">
-        Final Action Dates — the chart that determines when a family- or employment-based green
-        card can actually be issued or adjustment of status approved, once a petition is
-        approved and a priority date is waiting for a visa to become available.
+        {es ? (
+          <>
+            Fechas de Acción Final — la tabla que determina cuándo una tarjeta verde basada en familia o
+            empleo puede realmente emitirse, o un ajuste de estatus aprobarse, una vez que una petición
+            ha sido aprobada y una fecha de prioridad está esperando a que una visa esté disponible.
+          </>
+        ) : (
+          <>
+            Final Action Dates — the chart that determines when a family- or employment-based green
+            card can actually be issued or adjustment of status approved, once a petition is
+            approved and a priority date is waiting for a visa to become available.
+          </>
+        )}
       </p>
       <p className="mb-2 rounded-lg border border-border-strong bg-surface-2 p-3 text-sm text-foreground/90">
-        {CURRENT_MEANS_ANSWER} {movementSummary}
+        {es ? CURRENT_MEANS_ANSWER_ES : CURRENT_MEANS_ANSWER} {es ? movementSummaryEs : movementSummary}
       </p>
       <p className="mb-8 text-xs text-muted">
         {VISA_BULLETIN_MONTH} —{" "}
@@ -153,7 +221,7 @@ export default function VisaBulletinPage() {
           rel="noopener noreferrer"
           className="text-brand-600 dark:text-brand-400 hover:underline"
         >
-          view the official Department of State bulletin
+          {es ? "ver el boletín oficial del Departamento de Estado" : "view the official Department of State bulletin"}
         </a>
       </p>
 
@@ -166,28 +234,41 @@ export default function VisaBulletinPage() {
       </div>
 
       <h2 className="mb-3 text-sm font-semibold uppercase tracking-widest text-muted">
-        Family-sponsored preferences
+        {es ? "Preferencias por patrocinio familiar" : "Family-sponsored preferences"}
       </h2>
-      <BulletinTable rows={FAMILY_FINAL_ACTION} previousRows={VISA_BULLETIN_PREVIOUS_MONTH?.family} />
+      <BulletinTable rows={FAMILY_FINAL_ACTION} previousRows={VISA_BULLETIN_PREVIOUS_MONTH?.family} es={es} />
 
       <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-widest text-muted">
-        Employment-based preferences
+        {es ? "Preferencias basadas en empleo" : "Employment-based preferences"}
       </h2>
-      <BulletinTable rows={EMPLOYMENT_FINAL_ACTION} previousRows={VISA_BULLETIN_PREVIOUS_MONTH?.employment} />
+      <BulletinTable rows={EMPLOYMENT_FINAL_ACTION} previousRows={VISA_BULLETIN_PREVIOUS_MONTH?.employment} es={es} />
 
       {!VISA_BULLETIN_PREVIOUS_MONTH && (
         <p className="mt-4 text-xs text-muted">
-          Month-over-month movement badges will start appearing once next month&apos;s bulletin is
-          added alongside this one.
+          {es
+            ? "Las insignias de movimiento mes a mes empezarán a aparecer una vez que se agregue el boletín del próximo mes junto a este."
+            : "Month-over-month movement badges will start appearing once next month's bulletin is added alongside this one."}
         </p>
       )}
 
       <p className="mt-8 text-xs text-muted">
-        &quot;Current&quot; means visas are available to all qualified applicants in that category
-        regardless of priority date. A listed date means only applicants with a priority date
-        earlier than that date currently have a visa available. This table is refreshed monthly —
-        always confirm against the official bulletin above before relying on it for a filing
-        decision.
+        {es ? (
+          <>
+            &quot;Vigente&quot; significa que las visas están disponibles para todos los solicitantes
+            calificados en esa categoría sin importar la fecha de prioridad. Una fecha indicada significa
+            que solo los solicitantes con una fecha de prioridad anterior a esa fecha tienen actualmente
+            una visa disponible. Esta tabla se actualiza mensualmente — siempre confirma con el boletín
+            oficial de arriba antes de basarte en ella para una decisión de presentación.
+          </>
+        ) : (
+          <>
+            &quot;Current&quot; means visas are available to all qualified applicants in that category
+            regardless of priority date. A listed date means only applicants with a priority date
+            earlier than that date currently have a visa available. This table is refreshed monthly —
+            always confirm against the official bulletin above before relying on it for a filing
+            decision.
+          </>
+        )}
       </p>
     </main>
   );

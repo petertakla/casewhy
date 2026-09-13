@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
+import { useIsSpanish } from "@/lib/i18n/use-is-spanish";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -20,7 +21,7 @@ function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
-  const es = searchParams.get("lang") === "es";
+  const es = useIsSpanish();
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

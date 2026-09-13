@@ -2,15 +2,16 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
+import { useIsSpanish } from "@/lib/i18n/use-is-spanish";
 
 const MIN_PASSWORD_LENGTH = 8;
 
 function SignUpForm() {
   const router = useRouter();
-  const es = useSearchParams().get("lang") === "es";
+  const es = useIsSpanish();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

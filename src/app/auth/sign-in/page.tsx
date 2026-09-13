@@ -2,9 +2,10 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
+import { useIsSpanish } from "@/lib/i18n/use-is-spanish";
 
 function EnvelopeIcon() {
   return (
@@ -243,8 +244,7 @@ function SignInForms() {
   // covers the one hop (sign-in form submit -> /dashboard) that's a real
   // network round-trip away from the page the cookie was set on, where a
   // timing assumption is worth not needing at all.
-  const lang = useSearchParams().get("lang");
-  const es = lang === "es";
+  const es = useIsSpanish();
   const dashboardHref = es ? "/dashboard?lang=es" : "/dashboard";
 
   return (

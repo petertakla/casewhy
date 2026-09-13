@@ -2,12 +2,12 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
+import { useIsSpanish } from "@/lib/i18n/use-is-spanish";
 
 function ForgotPasswordForm() {
-  const es = useSearchParams().get("lang") === "es";
+  const es = useIsSpanish();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

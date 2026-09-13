@@ -56,12 +56,25 @@ interface StateFilterProps {
   items: StateFilterItem[];
   searchPlaceholder?: string;
   emptyMessage?: string;
+  // Round 79 — optional label overrides so casewhy.com/es's directory pages
+  // can reuse this component as-is instead of forking it. Defaults keep
+  // every existing English caller byte-for-byte unchanged.
+  filterByStateLabel?: string;
+  // A plain label rather than a function — this component is a Client
+  // Component and the page passing this prop is a Server Component, so a
+  // function prop (an "All states (N)" formatter) can't cross that
+  // boundary. The item count is appended here instead.
+  allStatesLabel?: string;
+  noneYetLabel?: string;
 }
 
 export function StateFilter({
   items,
   searchPlaceholder = "Search by name, organization, or city",
   emptyMessage = "No entries match.",
+  filterByStateLabel = "Filter by state",
+  allStatesLabel = "All states",
+  noneYetLabel = "(none yet)",
 }: StateFilterProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -101,7 +114,7 @@ export function StateFilter({
     <div>
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <label htmlFor="state-filter-select" className="text-sm text-muted">
-          Filter by state
+          {filterByStateLabel}
         </label>
         <select
           id="state-filter-select"
@@ -112,10 +125,10 @@ export function StateFilter({
           }}
           className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-foreground"
         >
-          <option value="">All states ({items.length})</option>
+          <option value="">{allStatesLabel} ({items.length})</option>
           {STATES.map((s) => (
             <option key={s} value={s} disabled={!counts.has(s)}>
-              {s} {counts.has(s) ? `(${counts.get(s)})` : "(none yet)"}
+              {s} {counts.has(s) ? `(${counts.get(s)})` : noneYetLabel}
             </option>
           ))}
         </select>

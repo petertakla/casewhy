@@ -6,6 +6,12 @@ export const metadata: Metadata = {
   title: "Find Free & Low-Cost Immigration Legal Aid | CaseWhy",
   description:
     "Free, nationwide directory of nonprofit legal aid organizations offering immigration help at low or no cost, sourced from DOJ's own public roster.",
+  alternates: {
+    languages: {
+      en: "https://app.casewhy.com/legal-aid",
+      es: "https://app.casewhy.com/es/legal-aid",
+    },
+  },
 };
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
@@ -21,6 +27,12 @@ export default async function LegalAidPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+      <div className="mb-2 text-right text-sm">
+        <Link href="/es/legal-aid" hrefLang="es" lang="es" className="text-brand-600 hover:underline dark:text-brand-400">
+          Español
+        </Link>
+      </div>
+
       <h1 className="text-2xl font-bold tracking-tight">Find a legal aid organization</h1>
       <p className="mb-2 mt-2 text-muted">
         Nonprofit organizations recognized by the DOJ to provide immigration legal help, often at

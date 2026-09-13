@@ -10,6 +10,12 @@ export const metadata: Metadata = {
   title: "CaseWhy Plus — Pricing & Features | CaseWhy",
   description:
     "Compare CaseWhy's free and Plus tiers — multiple tracked cases, faster notifications, and unlimited AI questions about your case.",
+  alternates: {
+    languages: {
+      en: "https://app.casewhy.com/plus",
+      es: "https://app.casewhy.com/es/plus",
+    },
+  },
 };
 
 // Round 14 — each feature is now a hyperlink to its own fuller explanation
@@ -178,6 +184,12 @@ export default async function PlusPage({
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+      <div className="mb-6 text-right text-sm">
+        <Link href="/es/plus" hrefLang="es" lang="es" className="text-brand-600 hover:underline dark:text-brand-400">
+          Español
+        </Link>
+      </div>
+
       {checkout === "success" && (
         <div className="mb-6 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-700 dark:text-emerald-400">
           You&apos;re subscribed to CaseWhy Plus. It may take a few seconds for every feature to unlock.

@@ -20,15 +20,45 @@ import type { ReportableEntityType } from "@/lib/reports/report";
 const inputClass =
   "w-full rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500";
 
+// Round 79 — optional label overrides so casewhy.com/es's directory pages
+// can reuse this component as-is instead of forking it. Every field
+// defaults to the existing English copy, so no existing caller changes.
+export interface ReportListingLinkLabels {
+  trigger?: string;
+  success?: string;
+  whatsWrong?: string;
+  whatsWrongPlaceholder?: string;
+  email?: string;
+  sending?: string;
+  send?: string;
+  cancel?: string;
+  defaultError?: string;
+}
+
 export function ReportListingLink({
   entityType,
   entityId,
   entityName,
+  labels,
 }: {
   entityType: ReportableEntityType;
   entityId: string;
   entityName: string;
+  labels?: ReportListingLinkLabels;
 }) {
+  const t = {
+    trigger: labels?.trigger ?? "See something wrong with this listing? Report it",
+    success: labels?.success ?? "Thanks — we'll take a look.",
+    whatsWrong: labels?.whatsWrong ?? "What's wrong with this listing?",
+    whatsWrongPlaceholder:
+      labels?.whatsWrongPlaceholder ??
+      "e.g. phone number is disconnected, no longer at this address, organization closed",
+    email: labels?.email ?? "Your email (optional, if you'd like a reply)",
+    sending: labels?.sending ?? "Sending…",
+    send: labels?.send ?? "Send report",
+    cancel: labels?.cancel ?? "Cancel",
+    defaultError: labels?.defaultError ?? "Something went wrong. Please try again.",
+  };
   const [open, setOpen] = useState(false);
   const [reportText, setReportText] = useState("");
   const [reporterEmail, setReporterEmail] = useState("");
@@ -54,7 +84,7 @@ export function ReportListingLink({
         setStatus("success");
       } else {
         setStatus("error");
-        setError(result.error ?? "Something went wrong. Please try again.");
+        setError(result.error ?? t.defaultError);
       }
     });
   }
@@ -70,13 +100,13 @@ export function ReportListingLink({
         }}
         className="text-xs text-muted underline decoration-dotted hover:text-foreground"
       >
-        See something wrong with this listing? Report it
+        {t.trigger}
       </button>
     );
   }
 
   if (status === "success") {
-    return <p className="text-xs text-muted">Thanks — we&apos;ll take a look.</p>;
+    return <p className="text-xs text-muted">{t.success}</p>;
   }
 
   return (
@@ -87,20 +117,20 @@ export function ReportListingLink({
     >
       <label className="block">
         <span className="mb-1 block text-xs font-medium text-foreground">
-          What&apos;s wrong with this listing?
+          {t.whatsWrong}
         </span>
         <textarea
           required
           rows={2}
           value={reportText}
           onChange={(e) => setReportText(e.target.value)}
-          placeholder="e.g. phone number is disconnected, no longer at this address, organization closed"
+          placeholder={t.whatsWrongPlaceholder}
           className={inputClass}
         />
       </label>
       <label className="block">
         <span className="mb-1 block text-xs font-medium text-foreground">
-          Your email (optional, if you&apos;d like a reply)
+          {t.email}
         </span>
         <input
           type="email"
@@ -125,7 +155,7 @@ export function ReportListingLink({
           disabled={isPending}
           className="rounded-lg bg-brand-500 px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isPending ? "Sending…" : "Send report"}
+          {isPending ? t.sending : t.send}
         </button>
         <button
           type="button"
@@ -136,7 +166,7 @@ export function ReportListingLink({
           }}
           className="text-xs text-muted hover:text-foreground"
         >
-          Cancel
+          {t.cancel}
         </button>
       </div>
       {error && <p className="text-xs text-red-500">{error}</p>}

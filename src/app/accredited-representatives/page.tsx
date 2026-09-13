@@ -9,6 +9,12 @@ export const metadata: Metadata = {
   title: "Find a DOJ-Accredited Representative | CaseWhy",
   description:
     "Free, nationwide directory of DOJ-accredited representatives — non-lawyers authorized to practice immigration law, sourced from DOJ's own public roster.",
+  alternates: {
+    languages: {
+      en: "https://app.casewhy.com/accredited-representatives",
+      es: "https://app.casewhy.com/es/accredited-representatives",
+    },
+  },
 };
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
@@ -24,6 +30,12 @@ export default async function AccreditedRepresentativesPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+      <div className="mb-2 text-right text-sm">
+        <Link href="/es/accredited-representatives" hrefLang="es" lang="es" className="text-brand-600 hover:underline dark:text-brand-400">
+          Español
+        </Link>
+      </div>
+
       <h1 className="text-2xl font-bold tracking-tight">Find an accredited representative</h1>
       <p className="mb-2 mt-2 text-muted">
         DOJ-accredited representatives — non-lawyers authorized to practice immigration law,

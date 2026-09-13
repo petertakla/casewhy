@@ -8,6 +8,12 @@ export const metadata: Metadata = {
   title: "Get Help — Find an Immigration Attorney or Free Legal Aid | CaseWhy",
   description:
     "Free directory of immigration attorneys, accredited representatives, legal aid organizations, and more — no fees, no ads, no sign-in required.",
+  alternates: {
+    languages: {
+      en: "https://app.casewhy.com/get-help",
+      es: "https://app.casewhy.com/es/get-help",
+    },
+  },
 };
 
 // Round 29 — ties the separate "talk to a professional" directories
@@ -37,6 +43,12 @@ export const metadata: Metadata = {
 export default function GetHelpPage() {
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+      <div className="mb-2 text-right text-sm">
+        <Link href="/es/get-help" hrefLang="es" lang="es" className="text-brand-600 hover:underline dark:text-brand-400">
+          Español
+        </Link>
+      </div>
+
       <h1 className="text-2xl font-bold tracking-tight">Get help</h1>
       <p className="mt-2 text-muted">
         CaseWhy gives you plain-language information, not legal advice. When your situation needs

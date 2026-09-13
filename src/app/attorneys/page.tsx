@@ -6,6 +6,12 @@ export const metadata: Metadata = {
   title: "Find an Immigration Attorney | CaseWhy",
   description:
     "Free directory of immigration attorneys — board-certified specialists sourced from official state bar records, plus self-enrolled listings.",
+  alternates: {
+    languages: {
+      en: "https://app.casewhy.com/attorneys",
+      es: "https://app.casewhy.com/es/attorneys",
+    },
+  },
 };
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
@@ -21,6 +27,12 @@ export default async function AttorneysPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+      <div className="mb-2 text-right text-sm">
+        <Link href="/es/attorneys" hrefLang="es" lang="es" className="text-brand-600 hover:underline dark:text-brand-400">
+          Español
+        </Link>
+      </div>
+
       <h1 className="text-2xl font-bold tracking-tight">Find an attorney</h1>
       <p className="mb-2 mt-2 text-muted">
         Immigration attorneys — board-certified specialists sourced from official state bar

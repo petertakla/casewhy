@@ -9,6 +9,12 @@ export const metadata: Metadata = {
   title: "Find Free Immigration Court Representation | CaseWhy",
   description:
     "Directory of organizations offering free representation in immigration court (removal defense) proceedings, organized by court.",
+  alternates: {
+    languages: {
+      en: "https://app.casewhy.com/pro-bono-representation",
+      es: "https://app.casewhy.com/es/pro-bono-representation",
+    },
+  },
 };
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
@@ -20,6 +26,12 @@ export default async function ProBonoRepresentationPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+      <div className="mb-2 text-right text-sm">
+        <Link href="/es/pro-bono-representation" hrefLang="es" lang="es" className="text-brand-600 hover:underline dark:text-brand-400">
+          Español
+        </Link>
+      </div>
+
       <h1 className="text-2xl font-bold tracking-tight">Find pro bono immigration-court representation</h1>
       <p className="mb-2 mt-2 text-muted">
         Organizations offering free representation in immigration court proceedings (removal

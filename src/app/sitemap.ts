@@ -42,6 +42,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/plus",
     "/processing-times",
     "/visa-bulletin",
+    // Round 79 — Spanish translations of /plus, /get-help, and the six
+    // entity-type list pages. Join forms and detail/permalink pages stay
+    // English-only, out of this round's scope.
+    "/es/plus",
+    "/es/get-help",
+    "/es/attorneys",
+    "/es/accredited-representatives",
+    "/es/legal-aid",
+    "/es/dso",
+    "/es/community-orgs",
+    "/es/pro-bono-representation",
   ];
 
   const [attorneys, reps, legalAid, dsos, communityOrgs, proBono] = await Promise.all([

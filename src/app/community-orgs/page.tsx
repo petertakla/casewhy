@@ -6,6 +6,12 @@ export const metadata: Metadata = {
   title: "Find a Community or Cultural Organization | CaseWhy",
   description:
     "Directory of community and cultural organizations that received a federal USCIS grant for citizenship instruction and naturalization help.",
+  alternates: {
+    languages: {
+      en: "https://app.casewhy.com/community-orgs",
+      es: "https://app.casewhy.com/es/community-orgs",
+    },
+  },
 };
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
@@ -17,6 +23,12 @@ export default async function CommunityOrgsPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+      <div className="mb-2 text-right text-sm">
+        <Link href="/es/community-orgs" hrefLang="es" lang="es" className="text-brand-600 hover:underline dark:text-brand-400">
+          Español
+        </Link>
+      </div>
+
       <h1 className="text-2xl font-bold tracking-tight">Find a community or cultural organization</h1>
       <p className="mb-2 mt-2 text-muted">
         Community and cultural organizations that have received a federal USCIS grant specifically

@@ -9,7 +9,11 @@ import {
   isIosNotInstalled,
   isPushSupported,
   detectBrowser,
+  detectPlatform,
   NOTIFICATION_BLOCKED_HELP,
+  NOTIFICATION_BLOCKED_WHY,
+  NOTIFICATION_BLOCKED_WHY_ES,
+  type BlockedHelp,
 } from "@/lib/push/client";
 
 function ToggleRow({
@@ -53,9 +57,7 @@ function PushNotificationsRow({ es }: { es: boolean }) {
   >("checking");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [blockedHelp, setBlockedHelp] = useState<
-    (typeof NOTIFICATION_BLOCKED_HELP)[keyof typeof NOTIFICATION_BLOCKED_HELP] | null
-  >(null);
+  const [blockedHelp, setBlockedHelp] = useState<BlockedHelp | null>(null);
 
   useEffect(() => {
     if (!isPushSupported()) {
@@ -68,7 +70,7 @@ function PushNotificationsRow({ es }: { es: boolean }) {
     }
     if (Notification.permission === "denied") {
       setStatus("denied");
-      setBlockedHelp(NOTIFICATION_BLOCKED_HELP[detectBrowser()]);
+      setBlockedHelp(NOTIFICATION_BLOCKED_HELP[detectBrowser()][detectPlatform()]);
       return;
     }
     navigator.serviceWorker.ready
@@ -84,7 +86,7 @@ function PushNotificationsRow({ es }: { es: boolean }) {
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
         setStatus("denied");
-        setBlockedHelp(NOTIFICATION_BLOCKED_HELP[detectBrowser()]);
+        setBlockedHelp(NOTIFICATION_BLOCKED_HELP[detectBrowser()][detectPlatform()]);
         return;
       }
       const registration = await navigator.serviceWorker.ready;
@@ -177,22 +179,24 @@ function PushNotificationsRow({ es }: { es: boolean }) {
               : "Notifications are blocked for this site in your browser settings. Allow notifications for casewhy.com to turn this on."}
           </p>
           {blockedHelp && (
-            <p className="mt-1 text-xs text-muted">
-              {blockedHelp.instructions}
+            <div className="mt-2 text-xs text-muted">
+              <p>{es ? NOTIFICATION_BLOCKED_WHY_ES : NOTIFICATION_BLOCKED_WHY}</p>
+              <ol className="mt-2 list-decimal space-y-1 pl-4">
+                {(es ? blockedHelp.stepsEs : blockedHelp.steps).map((step, i) => (
+                  <li key={i}>{step}</li>
+                ))}
+              </ol>
               {blockedHelp.helpUrl && (
-                <>
-                  {" "}
-                  <a
-                    href={blockedHelp.helpUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline"
-                  >
-                    Learn more
-                  </a>
-                </>
+                <a
+                  href={blockedHelp.helpUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-block underline"
+                >
+                  {es ? "Más información" : "Learn more"}
+                </a>
               )}
-            </p>
+            </div>
           )}
         </div>
       )}

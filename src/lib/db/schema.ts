@@ -983,3 +983,79 @@ export const pendingBacklinkOutreach = pgTable(
     index("pending_backlink_outreach_status_idx").on(table.status),
   ]
 );
+
+export const communitySourceEnum = pgEnum("community_source", ["reddit", "rss"]);
+
+export const communityReplyStatusEnum = pgEnum("community_reply_status", [
+  "pending",
+  "approved",
+  "rejected",
+  // Not a queue-review outcome — set automatically by the poller when the
+  // classifier judges a thread not relevant (or a guardrail hard-excludes
+  // it, e.g. hostile/bad-faith, self-harm signal, EO 14161 vetting-rule
+  // questions per SOCIAL_MEDIA_GUARDRAILS.md Section 3). Excluded from the
+  // default admin queue view. Exists so a thread that keeps reappearing in
+  // "new" listings across multiple poll runs isn't re-classified (and
+  // re-billed as an LLM call) every single time — threadUrl's unique
+  // constraint below is the actual dedupe key, same mechanism as
+  // pendingAliasActions.gmailMessageId.
+  "skipped",
+]);
+
+// Round 85 — community-forum monitoring and draft-reply queue, the same
+// draft-then-approve pattern as pendingAliasActions (round 70) and
+// pendingBacklinkOutreach (round 84), with one deliberate difference:
+// "approved" here never triggers any send/post action, because none
+// exists or safely could — see SOCIAL_MEDIA_GUARDRAILS.md Section 0
+// ("nothing is posted, submitted, or sent by any automated process") and
+// the task doc's own explicit instruction that a scripted Reddit/forum
+// posting credential risks account suspension. "approved" means "reviewed,
+// final text ready for Peter to copy and paste himself" — see the UI
+// copy in PendingCommunityReplyCard.tsx, which says exactly that rather
+// than implying anything already went out.
+//
+// escalationReason is set instead of draftReply when
+// SOCIAL_MEDIA_GUARDRAILS.md Section 3 says this thread shouldn't get a
+// normal drafted reply at all (legal-advice request, hostile/bad-faith,
+// existing mod pushback, EO 14161 questions, first post in a brand-new
+// community) — the row still surfaces in the queue so Peter sees it, but
+// with no draft text and no "approve" action, only acknowledge/reject.
+export const pendingCommunityReplies = pgTable(
+  "pending_community_replies",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    source: communitySourceEnum("source").notNull(),
+    // Human-readable source label, e.g. "r/USCIS" or "Immigration.com News"
+    // — not just the enum, since "reddit" alone doesn't say which subreddit.
+    sourceName: text("source_name").notNull(),
+    threadUrl: text("thread_url").notNull(),
+    threadTitle: text("thread_title").notNull(),
+    threadExcerpt: text("thread_excerpt").notNull(),
+    // Why the classifier judged this worth a reply (or, for a skipped row,
+    // why not) — always set, unlike draftReply/escalationReason which are
+    // mutually exclusive.
+    relevanceReason: text("relevance_reason").notNull(),
+    draftReply: text("draft_reply"),
+    escalationReason: text("escalation_reason"),
+    // Which real CaseWhy data the draft cites (e.g. "Processing times:
+    // I-485 Immediate Relative, updated 2026-09-05") — shown alongside the
+    // draft per SOCIAL_MEDIA_GUARDRAILS.md Section 2's sourcing
+    // requirement. Null for skipped/escalated rows with no draft.
+    sourceCitation: text("source_citation"),
+    // That specific community's self-promotion rule, shown next to the
+    // draft per the task doc's explicit instruction — see
+    // src/lib/community/self-promo-notes.ts. Null for skipped/escalated
+    // rows.
+    selfPromoNote: text("self_promo_note"),
+    status: communityReplyStatusEnum("status").notNull().default("pending"),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewedBy: text("reviewed_by"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique("pending_community_replies_thread_url_unique").on(table.threadUrl),
+    index("pending_community_replies_status_idx").on(table.status),
+  ]
+);

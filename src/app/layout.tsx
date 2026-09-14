@@ -21,17 +21,14 @@ export const metadata: Metadata = {
   // as part of round 73's sitemap-submission follow-up. Don't remove —
   // verification is re-checked periodically, not just at setup time.
   //
-  // Round 84 — checked live for a Bing verification artifact (meta tag,
-  // BingSiteAuth.xml, DNS TXT record) on this domain and found none,
-  // despite an earlier memory note saying Bing was verified — flagging
-  // that discrepancy rather than trusting it. Creating the actual Bing
-  // Webmaster Tools property is an account-level action only Peter can
-  // do (same reasoning as Search Console itself). Once he has a
-  // verification code from Bing, drop it into `other` below, e.g.:
-  //   other: { "msvalidate.01": "PASTE_BING_CODE_HERE" }
-  // No placeholder value is set here on purpose — an empty content
-  // attribute would render a confusing, non-functional meta tag into
-  // production HTML instead of doing nothing until a real code exists.
+  // Round 84 correction: an earlier check here found no Bing verification
+  // artifact and left a placeholder for a future msvalidate.01 meta tag.
+  // That's now stale — Peter verified both app.casewhy.com and
+  // www.casewhy.com in Bing Webmaster Tools via the "import from Google
+  // Search Console" flow, which doesn't use a meta tag at all (it trusts
+  // the existing GSC verification instead). No code needed here; nothing
+  // to add. Both properties' sitemaps are already imported and crawled
+  // successfully (confirmed live in Bing Webmaster Tools, Sep 13).
   verification: {
     google: "OxpvzULCMU8GPqyzaWLxHGFbAepeiRLiQjiXYsWvTBQ",
   },

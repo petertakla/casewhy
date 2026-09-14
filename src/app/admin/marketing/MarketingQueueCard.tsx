@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { markPosted, rejectItem, approveForAutoPost } from "./actions";
+import { REGISTERED_POSTER_CHANNELS } from "@/lib/marketing/posters/registry";
 
 const CHANNEL_LABELS: Record<string, string> = {
   reddit: "Reddit",
@@ -43,6 +44,11 @@ export function MarketingQueueCard({
   const [done, setDone] = useState<string | null>(null);
 
   const isEscalationOnly = !draftText;
+  // Round 89's own instruction: if a channel's poster isn't configured,
+  // the queue UI shows the item as manual_post (text ready to copy)
+  // instead of offering an "auto-post" action that would just no-op.
+  const hasRealPoster = REGISTERED_POSTER_CHANNELS.includes(channel);
+  const effectiveMode = mode === "auto_post" && !hasRealPoster ? "manual_post" : mode;
 
   async function handlePosted(edited: boolean) {
     setPending(true);
@@ -72,10 +78,10 @@ export function MarketingQueueCard({
     setPending(true);
     setError(null);
     try {
-      await approveForAutoPost(id, text);
-      setDone("approved");
+      await approveForAutoPost(id, text, channel);
+      setDone("posted");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error ? err.message : "Approved, but posting failed — check the error and retry, or handle it manually.");
       setPending(false);
     }
   }
@@ -98,7 +104,8 @@ export function MarketingQueueCard({
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="font-mono text-xs uppercase tracking-widest text-muted">
-          {CHANNEL_LABELS[channel] ?? channel} · {mode === "auto_post" ? "auto-post (will post on approval)" : "manual — you post this yourself"}
+          {CHANNEL_LABELS[channel] ?? channel} ·{" "}
+          {effectiveMode === "auto_post" ? "auto-post (will post on approval)" : "manual — you post this yourself"}
         </p>
         {isEscalationOnly && (
           <span className="rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:text-amber-400">
@@ -143,7 +150,7 @@ export function MarketingQueueCard({
       {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
 
       <div className="mt-3 flex flex-wrap gap-3">
-        {!isEscalationOnly && mode === "manual_post" && (
+        {!isEscalationOnly && effectiveMode === "manual_post" && (
           <>
             <button
               type="button"
@@ -163,7 +170,7 @@ export function MarketingQueueCard({
             </button>
           </>
         )}
-        {!isEscalationOnly && mode === "auto_post" && (
+        {!isEscalationOnly && effectiveMode === "auto_post" && (
           <button
             type="button"
             disabled={pending || !text.trim()}

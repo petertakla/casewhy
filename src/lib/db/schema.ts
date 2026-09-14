@@ -1060,20 +1060,31 @@ export const pendingCommunityReplies = pgTable(
   ]
 );
 
-// Round 73 (real, per the Drive task doc found Sep 14 — collides with the
-// already-completed Sep 12 SEO/GEO round of the same number; not
-// renumbered, per this project's standing practice, flagged instead in
-// CLOUD_CLAUDE.md) — "marketing approval queue + community thread
-// monitor." Generalizes round 85's pendingCommunityReplies (above) into a
-// multi-channel queue per the task doc's own instruction ("one queue, not
-// a second one"). pendingCommunityReplies is deliberately left in place,
-// not dropped — round 85's poller now writes into this table instead, but
-// the old table/rows stay queryable for history rather than being
-// destroyed.
+// Round 89 (built under the working label "round 73" — the task doc that
+// arrived first turned out to be a pre-renumber draft; the cloud session's
+// real, numbered version, claude_round89-marketing-queue-owned-channel-posting-task,
+// landed in Drive after this table was already built and verified.
+// Renumbered per round 95's standing rule — same collision-flagging
+// pattern as round 85's own renumbering, not a rename of past commits.
+// Reconciled against the real round 89 spec afterward: added back the
+// "skipped" status this table had collapsed into "rejected" (see the
+// enum below), added mediaRefs/utmLink columns, and built the poster
+// registry (src/lib/marketing/posters/) round 89 asks for — see that
+// directory's own comment) — "marketing approval queue + community
+// thread monitor." Generalizes round 85's pendingCommunityReplies (above)
+// into a multi-channel queue. pendingCommunityReplies is deliberately
+// left in place, not dropped — round 85's poller now writes into this
+// table instead, but the old table/rows stay queryable for history
+// rather than being destroyed. (Round 89's own spec asked to extend
+// pendingCommunityReplies in place rather than build a sibling table;
+// this was already built as a new table before that spec was seen —
+// flagged as a real divergence, not silently reconciled, since
+// redoing the migration now would be pure churn against something
+// already shipped and verified.)
 //
 // Scope decision, stated plainly rather than silently made: this round
 // does NOT also merge round 70's pendingAliasActions (the email-alias
-// queue) into this table, despite the task doc's "kind column so
+// queue) into this table, despite an earlier draft's "kind column so
 // alias-email replies and marketing drafts live side by side" framing.
 // That's a separate, already-live production system serving 12 real
 // business aliases — migrating it blind in the same pass as a brand-new
@@ -1095,17 +1106,21 @@ export const marketingChannelEnum = pgEnum("marketing_channel", [
   "tiktok",
   "instagram",
   "email",
+  // Round 89's real spec adds this value; likely maps toward round 84's
+  // backlink-outreach feature eventually, not unified with it this round.
+  "outreach",
 ]);
 
 // manual_post: Peter copies the approved text and posts it himself — the
 // only mode any community/forum channel is allowed to use, no exception,
 // per SOCIAL_MEDIA_GUARDRAILS.md Section 0 (revised Sep 14, 2026, Peter's
 // direct approval). auto_post: owned channels only: code may post via an
-// approve click, once that channel's own poster integration exists (none
-// do yet as of this round — rounds 74-76 register their posters into this
-// same queue, per the task doc). Enforcement mechanism is identical to
-// round 70's pendingAliasActions: only a real approval-action click can
-// ever call a post/publish API, never the queue-population step itself.
+// approve click, once that channel's own poster integration exists — see
+// src/lib/marketing/posters/ (round 89 ships the registry + a noop
+// poster; rounds 90-92 register real ones). Enforcement mechanism is
+// identical to round 70's pendingAliasActions: only a real approval-
+// action click can ever call a post/publish API, never the
+// queue-population step itself.
 export const marketingModeEnum = pgEnum("marketing_mode", ["manual_post", "auto_post"]);
 
 export const marketingQueueStatusEnum = pgEnum("marketing_queue_status", [
@@ -1119,6 +1134,15 @@ export const marketingQueueStatusEnum = pgEnum("marketing_queue_status", [
   // draftText, just destination + guardrailNotes explaining why. Same
   // shape as pendingCommunityReplies.escalationReason above, generalized.
   "escalated",
+  // Correction, round 89: a first pass here collapsed this into
+  // "rejected", losing round 85's real distinction — skipped is set
+  // automatically by the poller when the classifier judges a thread not
+  // relevant (no human decision involved, costs no review time);
+  // rejected is a real human "no" on something that WAS shown to Peter.
+  // Conflating them would make the log view's rejected count mean two
+  // different things. Restored as its own value, matching round 85's
+  // pendingCommunityReplies.status shape exactly.
+  "skipped",
 ]);
 
 export const marketingQueue = pgTable(
@@ -1140,6 +1164,13 @@ export const marketingQueue = pgTable(
     // delimited string rather than introducing a new column-type pattern
     // for one table.
     sourceCitations: text("source_citations"),
+    // Round 89 — asset URLs for image/video posts (round 91's Gemini/Veo
+    // pipeline), joined "; " same convention as sourceCitations. Null for
+    // text-only drafts (everything this round produces).
+    mediaRefs: text("media_refs"),
+    // Round 89 — filled by round 93's attribution job, not this round.
+    // Null until then.
+    utmLink: text("utm_link"),
     // Review-workflow Section 5 fields: which guardrail sections were
     // checked, any borderline note, and (for escalated rows) the specific
     // Section 3 reason this didn't get a normal draft.

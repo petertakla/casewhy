@@ -155,7 +155,7 @@ export async function POST(request: Request) {
             mode: "manual_post",
             destination: candidate.destination,
             guardrailNotes: `Not relevant: ${outcome.reason}`,
-            status: "rejected",
+            status: "skipped",
           })
           .onConflictDoNothing({ target: [marketingQueue.channel, marketingQueue.destination] });
         skipped++;
@@ -199,7 +199,7 @@ export async function POST(request: Request) {
             mode: "manual_post",
             destination: candidate.destination,
             guardrailNotes: `${outcome.reason} (but no draft could be grounded well in real data)`,
-            status: "rejected",
+            status: "skipped",
           })
           .onConflictDoNothing({ target: [marketingQueue.channel, marketingQueue.destination] });
         skipped++;
@@ -215,7 +215,7 @@ export async function POST(request: Request) {
             destination: candidate.destination,
             draftText: draft.draftText,
             guardrailNotes: "Near-duplicate of a draft from the last 30 days (Section 1) — not queued for review.",
-            status: "rejected",
+            status: "skipped",
           })
           .onConflictDoNothing({ target: [marketingQueue.channel, marketingQueue.destination] });
         dedupBlocked++;

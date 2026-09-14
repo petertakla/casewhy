@@ -12,6 +12,12 @@ import { organizationJsonLd, websiteJsonLd } from "@/lib/seo/organization-jsonld
 export const metadata: Metadata = {
   title: "Site Index | CaseWhy",
   description: "Every public page on CaseWhy, in one place.",
+  alternates: {
+    languages: {
+      en: "https://app.casewhy.com/sitemap",
+      es: "https://app.casewhy.com/es/sitemap",
+    },
+  },
 };
 
 interface IndexLink {
@@ -85,6 +91,12 @@ export default function SiteIndexPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }}
       />
+      <div className="mb-6 text-right text-sm">
+        <Link href="/es/sitemap" hrefLang="es" lang="es" className="text-brand-600 hover:underline dark:text-brand-400">
+          Español
+        </Link>
+      </div>
+
       <h1 className="text-2xl font-bold tracking-tight">Site index</h1>
       <p className="mb-8 mt-2 text-muted">Every public page on CaseWhy, in one place.</p>
 

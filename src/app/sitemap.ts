@@ -49,6 +49,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // English-only, out of this round's scope.
     "/es/plus",
     "/es/get-help",
+    "/es/faq",
+    "/es/sitemap",
     "/es/attorneys",
     "/es/accredited-representatives",
     "/es/legal-aid",

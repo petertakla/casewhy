@@ -14,6 +14,12 @@ export const metadata: Metadata = {
   title: "Frequently Asked Questions | CaseWhy",
   description:
     "Answers to common questions about CaseWhy — affiliation with USCIS, pricing, legal advice, and how your case data is protected.",
+  alternates: {
+    languages: {
+      en: "https://app.casewhy.com/faq",
+      es: "https://app.casewhy.com/es/faq",
+    },
+  },
 };
 
 interface Faq {
@@ -40,11 +46,12 @@ const FAQS: Faq[] = [
   {
     question: "Is CaseWhy really free?",
     plainText:
-      "CaseWhy has a free tier — one tracked case, a status timeline, and AI-generated plain-language explanations — plus an optional paid Plus tier for tracking multiple cases and other add-ons (see the Plus page for current pricing). Get Help — CaseWhy's directories of attorneys, accredited representatives, legal aid organizations, and other resources — is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost.",
+      "CaseWhy has a free tier — up to three tracked cases, a status timeline, AI-generated plain-language explanations, and three AI questions about your case each month — plus an optional paid Plus tier for tracking more cases, unlimited questions, and other add-ons (see the Plus page for current pricing). Get Help — CaseWhy's directories of free legal aid, accredited representatives, attorneys, and other resources — is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost.",
     answer: (
       <>
-        CaseWhy has a free tier — one tracked case, a status timeline, and AI-generated plain-language explanations
-        — plus an optional paid Plus tier for tracking multiple cases and other add-ons (see the{" "}
+        CaseWhy has a free tier — up to three tracked cases, a status timeline, AI-generated plain-language
+        explanations, and three AI questions about your case each month — plus an optional paid Plus tier for
+        tracking more cases, unlimited questions, and other add-ons (see the{" "}
         <Link href="/plus" className="text-brand-600 hover:underline dark:text-brand-400">
           Plus page
         </Link>{" "}
@@ -52,8 +59,8 @@ const FAQS: Faq[] = [
         <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
           Get Help
         </Link>{" "}
-        — CaseWhy&apos;s directories of attorneys, accredited representatives, legal aid organizations, and other
-        resources — is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost.
+        — CaseWhy&apos;s directories of free legal aid, accredited representatives, attorneys, and other resources —
+        is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost.
       </>
     ),
   },
@@ -110,6 +117,12 @@ export default function FaqPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
+      <div className="mb-6 text-right text-sm">
+        <Link href="/es/faq" hrefLang="es" lang="es" className="text-brand-600 hover:underline dark:text-brand-400">
+          Español
+        </Link>
+      </div>
+
       <h1 className="text-2xl font-bold tracking-tight">Frequently asked questions</h1>
       <p className="mb-8 mt-2 text-muted">
         The most common questions about CaseWhy. For full detail, see the{" "}

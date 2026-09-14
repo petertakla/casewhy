@@ -7,7 +7,7 @@ import { GetHelpChooser } from "./GetHelpChooser";
 export const metadata: Metadata = {
   title: "Get Help — Find an Immigration Attorney or Free Legal Aid | CaseWhy",
   description:
-    "Free directory of immigration attorneys, accredited representatives, legal aid organizations, and more — no fees, no ads, no sign-in required.",
+    "Free directory of legal aid organizations, accredited representatives, immigration attorneys, and more — no fees, no ads, no sign-in required.",
   alternates: {
     languages: {
       en: "https://app.casewhy.com/get-help",

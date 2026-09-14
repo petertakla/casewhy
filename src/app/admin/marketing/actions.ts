@@ -67,15 +67,21 @@ export async function approveForAutoPost(id: string, finalText: string, channel:
   const adminEmail = await requireAdmin();
   const db = getDb();
 
-  await db
+  const [updated] = await db
     .update(marketingQueue)
     .set({ status: "approved", draftText: finalText, reviewedAt: new Date(), reviewedBy: adminEmail })
-    .where(eq(marketingQueue.id, id));
+    .where(eq(marketingQueue.id, id))
+    .returning({ destination: marketingQueue.destination, mediaRefs: marketingQueue.mediaRefs });
 
   const poster = getPosterForChannel(channel);
   if (poster) {
     try {
-      const result = await poster({ channel, draftText: finalText, mediaRefs: null });
+      const result = await poster({
+        channel,
+        draftText: finalText,
+        mediaRefs: updated.mediaRefs,
+        destination: updated.destination,
+      });
       await db
         .update(marketingQueue)
         .set({ status: "posted", postedAt: new Date(), postedUrl: result.url })

@@ -57,11 +57,26 @@ export default async function PolicyMemoPage({ params }: { params: Promise<{ id:
     ],
   };
 
+  // Round 93 — Part B's BreadcrumbList ask, added alongside the existing
+  // FAQPage schema (untouched, per the task doc's explicit instruction).
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Policy memos", item: "https://app.casewhy.com/policy" },
+      { "@type": "ListItem", position: 2, name: memo.title, item: `https://app.casewhy.com/policy/${memo.id}` },
+    ],
+  };
+
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-10">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <BackLink href="/policy" label="All policy memos" />
 

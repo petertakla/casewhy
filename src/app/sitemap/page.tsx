@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { organizationJsonLd, websiteJsonLd } from "@/lib/seo/organization-jsonld";
 
 // Round 73 — a human-readable site index, distinct from sitemap.xml (the
 // machine-readable one at src/app/sitemap.ts). Same underlying goal
@@ -52,6 +53,7 @@ const SECTIONS: IndexSection[] = [
       { href: "/processing-times", label: "USCIS processing times by form" },
       { href: "/visa-bulletin", label: "Visa bulletin — Final Action Dates" },
       { href: "/policy", label: "USCIS policy memos, explained" },
+      { href: "/updates", label: "Updates — the CaseWhy blog" },
       { href: "/news", label: "Immigration news" },
       { href: "/faq", label: "Frequently asked questions" },
     ],
@@ -68,6 +70,21 @@ const SECTIONS: IndexSection[] = [
 export default function SiteIndexPage() {
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+      {/* Round 93 — app.casewhy.com's actual root ("/") only ever issues a
+          308 redirect to casewhy.com and never renders a body, so it can't
+          carry this schema. This page is app.casewhy.com's real, always-
+          served, public "everything" page, making it the closest honest
+          substitute for a root-level Organization/WebSite tag on this
+          domain. casewhy.com's own index.html carries the same schema
+          directly, since that page genuinely is the root. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }}
+      />
       <h1 className="text-2xl font-bold tracking-tight">Site index</h1>
       <p className="mb-8 mt-2 text-muted">Every public page on CaseWhy, in one place.</p>
 

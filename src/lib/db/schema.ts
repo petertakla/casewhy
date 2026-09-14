@@ -1109,6 +1109,13 @@ export const marketingChannelEnum = pgEnum("marketing_channel", [
   // Round 89's real spec adds this value; likely maps toward round 84's
   // backlink-outreach feature eventually, not unified with it this round.
   "outreach",
+  // Round 93 — the /updates blog is owned, file-based content (no CMS)
+  // that still goes through the round 89 queue for approval before a
+  // post is publicly visible, per the seed-posts doc's own instruction
+  // ("Peter reviews each post once in the round 89 queue... before it
+  // goes live"). See src/lib/updates/updates.ts's own comment for how
+  // the gating actually works.
+  "blog",
 ]);
 
 // manual_post: Peter copies the approved text and posts it himself — the
@@ -1214,3 +1221,44 @@ export const communitySourceConfigs = pgTable("community_source_configs", {
   enabled: boolean("enabled").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// Round 93 Part C — first-touch attribution. Neon Auth owns the real user
+// table (id, email, createdAt) in its own `neon_auth` schema, external to
+// this codebase and never migrated here — so "attach UTM data to the
+// account at sign-up" has to mean a new, purely-additive CaseWhy-side
+// table keyed by userId, not a column added to a table we don't own. One
+// row per user (primary key on userId itself, not a separate id column),
+// written once by src/middleware.ts the first time an authenticated
+// request carries the cw_first_touch cookie — see that file's comment for
+// why middleware (not a sign-up webhook, which Neon Auth doesn't expose
+// one of) is where this happens.
+export const firstTouchAttribution = pgTable("first_touch_attribution", {
+  userId: text("user_id").primaryKey(),
+  source: text("source").notNull(),
+  medium: text("medium").notNull(),
+  campaign: text("campaign").notNull(),
+  firstTouchAt: timestamp("first_touch_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Round 93 Part C — "landings" per source/campaign for the attribution
+// page. One row per (source, medium, campaign) combination, incremented
+// in place on every landing with utm_* params (src/middleware.ts) rather
+// than one row per visit — an unbounded per-visit events table isn't
+// needed for what the attribution page actually shows (a running count),
+// and would grow without bound for no benefit at this traffic level.
+export const marketingLandingCounts = pgTable(
+  "marketing_landing_counts",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    source: text("source").notNull(),
+    medium: text("medium").notNull(),
+    campaign: text("campaign").notNull(),
+    count: integer("count").notNull().default(0),
+    firstSeenAt: timestamp("first_seen_at", { withTimezone: true }).notNull().defaultNow(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [unique("marketing_landing_counts_source_medium_campaign_unique").on(table.source, table.medium, table.campaign)]
+);

@@ -6,6 +6,7 @@ import { getDsoDirectory } from "@/lib/dso/directory";
 import { getCommunityOrgDirectory } from "@/lib/community-orgs/directory";
 import { getProBonoRepresentationDirectory } from "@/lib/pro-bono-representation/directory";
 import { POLICY_MEMOS } from "@/lib/kb/policy-memos";
+import { getPublishedUpdates } from "@/lib/updates/updates";
 
 const BASE_URL = "https://app.casewhy.com";
 
@@ -37,6 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/pro-bono-representation/join",
     "/news",
     "/policy",
+    "/updates",
     "/sitemap",
     "/faq",
     "/plus",
@@ -55,13 +57,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/es/pro-bono-representation",
   ];
 
-  const [attorneys, reps, legalAid, dsos, communityOrgs, proBono] = await Promise.all([
+  const [attorneys, reps, legalAid, dsos, communityOrgs, proBono, updates] = await Promise.all([
     getAttorneyDirectory(),
     getAccreditedRepresentativeDirectory(),
     getLegalAidDirectory(),
     getDsoDirectory(),
     getCommunityOrgDirectory(),
     getProBonoRepresentationDirectory(),
+    getPublishedUpdates(),
   ]);
 
   const entityPaths = [
@@ -74,12 +77,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const policyPaths = POLICY_MEMOS.map((memo) => `/policy/${memo.id}`);
+  const updatePaths = updates.map((post) => `/updates/${post.slug}`);
 
   // /news/[id] permalinks deliberately excluded — they resolve against a
   // live feed and age out within days/weeks (see news/[id]/page.tsx's own
   // comment), not stable enough for a sitemap entry.
   const lastModified = new Date();
-  return [...staticPaths, ...entityPaths, ...policyPaths].map((path) => ({
+  return [...staticPaths, ...entityPaths, ...policyPaths, ...updatePaths].map((path) => ({
     url: `${BASE_URL}${path}`,
     lastModified,
   }));

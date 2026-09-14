@@ -218,6 +218,20 @@
       "when": 1789414340054,
       "tag": "0030_jittery_robbie_robertson",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1789415499984,
+      "tag": "0031_large_black_knight",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1789416065145,
+      "tag": "0032_clear_old_lace",
+      "breakpoints": true
     }
   ]
 }

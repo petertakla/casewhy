@@ -7,6 +7,12 @@ export interface MarketingPostItem {
   channel: string;
   draftText: string;
   mediaRefs: string | null;
+  // Round 93 — the blog poster needs this to resolve the canonical
+  // /updates/<slug> URL it hands back; every other poster (rounds 90-92)
+  // is free to ignore it. Real column already existed (marketingQueue.
+  // destination), just wasn't threaded through this interface before
+  // blog was the first poster that actually needed it.
+  destination: string;
 }
 
 export interface PosterResult {

@@ -298,6 +298,44 @@ export async function sendUrgentAliasAlert({
   }
 }
 
+// Round 93 Part C — weekly attribution digest, reusing this file's
+// established alias/Postmark send path (info@casewhy.com, same as every
+// other admin notification here) rather than standing up a separate send
+// mechanism for one new email.
+export async function sendWeeklyAttributionDigest({ rows }: { rows: string }): Promise<void> {
+  const token = process.env.POSTMARK_API_TOKEN;
+  if (!token) {
+    console.warn("[postmark] POSTMARK_API_TOKEN not set — skipping weekly attribution digest");
+    return;
+  }
+
+  const res = await fetch("https://api.postmarkapp.com/email", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Postmark-Server-Token": token,
+    },
+    body: JSON.stringify({
+      From: FROM_ADDRESS,
+      To: ADMIN_NOTIFICATION_ADDRESS,
+      Subject: "CaseWhy — weekly marketing attribution digest",
+      TextBody: [
+        "Per source/campaign, all-time totals (landings / sign-ups / tracked a case / went Plus):",
+        "",
+        rows,
+        "",
+        "Full breakdown: https://app.casewhy.com/admin/marketing/attribution",
+      ].join("\n"),
+      MessageStream: "outbound",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
+  }
+}
+
 export async function sendListingReportNotification({
   entityType,
   entityName,

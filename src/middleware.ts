@@ -1,6 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "@/lib/auth/server";
 import { getStalePolicies } from "@/lib/policy/acknowledgments";
+import {
+  FIRST_TOUCH_COOKIE,
+  FIRST_TOUCH_COOKIE_MAX_AGE_SECONDS,
+  recordFirstTouchForUser,
+  recordLanding,
+  type FirstTouch,
+} from "@/lib/marketing/first-touch";
 
 // Round 53 — gates the real production app (app.casewhy.com) to a single
 // allow-listed account for the first week of live-key acceptance testing.
@@ -49,7 +56,7 @@ export async function middleware(request: NextRequest) {
         headers: { "Content-Type": "text/html; charset=utf-8", "Retry-After": "86400" },
       });
     }
-    return NextResponse.next();
+    return applyFirstTouch(request, NextResponse.next(), session);
   }
 
   // Round 69 — USCIS's affidavit checklist wants "active consent" for a
@@ -65,7 +72,57 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  return applyFirstTouch(request, NextResponse.next(), session);
+}
+
+// Round 93 Part C — first-touch UTM capture. Runs on the two "normal"
+// exit paths only (the 503 holding page and the /policy-update redirect
+// are edge cases; whatever they'd capture happens on the very next normal
+// request instead, which is imminent either way). Two independent jobs:
+// 1) if this request carries utm_* params, bump the (source, medium,
+//    campaign) landing counter and, if no first-touch cookie exists yet,
+//    set one (90-day window, per the task doc). 2) if a first-touch
+//    cookie exists AND there's a real signed-in session, this is the
+//    first authenticated request since that cookie was set — persist it
+//    to firstTouchAttribution (onConflictDoNothing makes this safe to
+//    attempt on every request until the cookie is cleared) and delete the
+//    cookie so subsequent requests skip both DB calls entirely.
+async function applyFirstTouch(
+  request: NextRequest,
+  response: NextResponse,
+  session: { user?: { id: string } } | null | undefined
+): Promise<NextResponse> {
+  const params = request.nextUrl.searchParams;
+  const source = params.get("utm_source");
+  const medium = params.get("utm_medium") ?? "unknown";
+  const campaign = params.get("utm_campaign") ?? "unknown";
+  const existingCookie = request.cookies.get(FIRST_TOUCH_COOKIE)?.value;
+
+  if (source) {
+    await recordLanding({ source, medium, campaign });
+    if (!existingCookie) {
+      const touch: FirstTouch = { source, medium, campaign, at: new Date().toISOString() };
+      response.cookies.set(FIRST_TOUCH_COOKIE, JSON.stringify(touch), {
+        maxAge: FIRST_TOUCH_COOKIE_MAX_AGE_SECONDS,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+      });
+    }
+  } else if (existingCookie && session?.user?.id) {
+    try {
+      const touch = JSON.parse(existingCookie) as FirstTouch;
+      await recordFirstTouchForUser(session.user.id, touch);
+      response.cookies.delete(FIRST_TOUCH_COOKIE);
+    } catch {
+      // Malformed cookie (shouldn't happen, we're the only writer) — clear
+      // it so it doesn't keep failing to parse on every future request.
+      response.cookies.delete(FIRST_TOUCH_COOKIE);
+    }
+  }
+
+  return response;
 }
 
 export const config = {

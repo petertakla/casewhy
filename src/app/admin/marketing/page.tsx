@@ -34,9 +34,14 @@ export default async function MarketingQueueAdminPage() {
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Marketing queue</h1>
-        <Link href="/admin/marketing/log" className="text-sm text-brand-600 hover:underline dark:text-brand-400">
-          View log →
-        </Link>
+        <div className="flex gap-4">
+          <Link href="/admin/marketing/attribution" className="text-sm text-brand-600 hover:underline dark:text-brand-400">
+            Attribution →
+          </Link>
+          <Link href="/admin/marketing/log" className="text-sm text-brand-600 hover:underline dark:text-brand-400">
+            View log →
+          </Link>
+        </div>
       </div>
       <p className="mb-2 mt-2 text-muted">
         Community/forum channels never post automatically — you copy the text and post it yourself, then mark it

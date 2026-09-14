@@ -10,11 +10,14 @@
 // poster implementation/credentials into the client bundle.
 
 import type { Poster } from "./types";
+import { blogPoster } from "./blog";
 
 const POSTERS: Partial<Record<string, Poster>> = {
-  // Deliberately empty. Real entries land in rounds 90-92, e.g.:
+  // Round 93 — the first real (non-noop) entry. Real entries for the
+  // rest land in rounds 90-92, e.g.:
   //   x: postToX,
   //   linkedin: postToLinkedIn,
+  blog: blogPoster,
 };
 
 export function getPosterForChannel(channel: string): Poster | undefined {

@@ -2376,3 +2376,25 @@ CI validation added on both branches, deliberately different in kind because the
 - **`ADMIN_DIAG_SECRET` note for future sessions:** always pass `--type config` on `vercel env add` for this var — plain `vercel env add` now defaults to the unreadable "Secret" type, which defeats the entire point of this variable (see the Sep 14 self-service-diagnostic-secret entry above).
 
 Not started this round, next in the stated build order (93 done → 92 → 90 → 91 → 94): rounds 90 (X/Threads/LinkedIn posters), 91 (Gemini content pipeline + Pinterest/YouTube/TikTok/Instagram posting), 92 (email nurture cron), 94 (casewhyhub landing pages + Apollo.io attorney-campaign infra), 96 (gated `links_enabled`/referral flip).
+
+## Marketing operations manual — verified against live UI and published, Sep 14
+
+Source: `claude_marketing-operations-manual` (Drive), written by the cloud session from the round 85/89 specs with an explicit instruction for Claude Code to verify every label/path/status name against the live UI before publishing, and to fill in its 8-item screenshot shot list. Mirrored to the repo as `MARKETING_OPERATIONS_MANUAL.md` with `docs/marketing-manual-screenshots/*.jpg`.
+
+**Real corrections found by reading the actual source and testing live, not skimming:**
+- No filter control exists on `/admin/marketing` — the page is hard-scoped to `pending`+`escalated` in the query itself; "filter to Pending" isn't a step.
+- Card field order was wrong in the draft: real order is Destination → Guardrail notes → Sources ("Grounded in:") → Draft text, not Destination → Draft → Sources → Guardrail notes.
+- The draft's "five decisions" (Approve / Edit then approve / Reject / Leave it / Mark posted) don't match the real buttons. `manual_post` cards have no standalone Approve or Edit — you edit directly in the draft textarea, then click **Mark posted (as-is)** or **Mark posted (edited)** (disabled until the text differs) plus **Reject**. `auto_post` cards (only Blog has a real poster registered as of round 93) show **Approve (queue for auto-post)** instead.
+- Escalated cards resolve with one button, **Acknowledge / dismiss** — not separate "Handled"/"Left" states the draft described.
+- Skipped items never render on the queue page at all, live-confirmed — only in the log's per-channel counts.
+- `/admin/community-replies` is a plain 404 now (round 89 removed it entirely), not a redirect.
+- `/admin/marketing/attribution` and the Blog channel were both already live (round 93 shipped same-session) — draft still called them "(coming — round 93)."
+- No admin page exists anywhere for the subreddit list (`community_source_configs`) or the daily cap (`DAILY_DRAFT_CAP`, which isn't even a database value, just a source constant) — the draft's shot list asked to screenshot "whatever page it lives on"; there isn't one.
+
+**Near-miss caught before publishing, worth remembering as a pattern:** almost shipped `info@casewhy.com` as the admin sign-in email, because that's what local `.env.local` said. But round 85's own history (documented above in this file) already established `ADMIN_EMAIL` was changed to `admin@casewhy.com` in Vercel Production — `.env.local` was just stale, never re-pulled after that change. Built a temporary bearer-secured diagnostic route, confirmed the real production value directly (`admin@casewhy.com`), deleted the route. **Lesson: a local `.env.local` value is not authoritative for anything changed via `vercel env add` directly against production — verify env-var-dependent facts against production itself before writing them into anything Peter will act on, even when the local file looks definitive.**
+
+**Two real app bugs found and fixed live along the way, not just documented around:** the log page's per-channel table was missing a `skipped` column even though skipped rows were still being summed into each channel's Total (so totals silently didn't match the visible columns) — fixed by adding it to the `statuses` array. The channel-label map (`CHANNEL_LABELS`) was missing `outreach` and `blog` entries, so those channels' cards fell back to the raw enum string — both added.
+
+**Screenshots:** the real queue only had the 5 pending Blog seed posts at verification time (Reddit polling isn't live — still waiting on Reddit's API approval), so two clearly-labeled test fixture rows (a `manual_post` Reddit item, a Reddit escalation) were inserted only to have something to photograph, screenshotted through their real actions (Mark posted, Acknowledge/dismiss — both verified afterward in the log page's counts), then deleted. None of the 5 real Blog posts were approved, rejected, or otherwise touched. Two shot-list items have nothing real to show and are documented as such rather than faked: skipped items in the list view (don't exist there), and the subreddit-list/daily-cap admin page (doesn't exist at all).
+
+`ADMIN_DIAG_SECRET` was rotated again mid-session (see round 93's entry above for the `--type config` gotcha) and used for both temporary diagnostic routes here (`debug-admin-email`), each deployed, tested once for real, then deleted.

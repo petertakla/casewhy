@@ -20,5 +20,14 @@
   </url>
   <url>
     <loc>https://casewhy.com/faq.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://casewhy.com/faq.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://casewhy.com/es/faq.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://casewhy.com/faq.html"/>
+  </url>
+  <url>
+    <loc>https://casewhy.com/es/faq.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://casewhy.com/faq.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://casewhy.com/es/faq.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://casewhy.com/faq.html"/>
   </url>
 </urlset>

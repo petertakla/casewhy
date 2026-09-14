@@ -204,6 +204,13 @@
       "when": 1789349491607,
       "tag": "0028_true_mole_man",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1789413076234,
+      "tag": "0029_powerful_blink",
+      "breakpoints": true
     }
   ]
 }

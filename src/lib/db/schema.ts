@@ -1059,3 +1059,127 @@ export const pendingCommunityReplies = pgTable(
     index("pending_community_replies_status_idx").on(table.status),
   ]
 );
+
+// Round 73 (real, per the Drive task doc found Sep 14 — collides with the
+// already-completed Sep 12 SEO/GEO round of the same number; not
+// renumbered, per this project's standing practice, flagged instead in
+// CLOUD_CLAUDE.md) — "marketing approval queue + community thread
+// monitor." Generalizes round 85's pendingCommunityReplies (above) into a
+// multi-channel queue per the task doc's own instruction ("one queue, not
+// a second one"). pendingCommunityReplies is deliberately left in place,
+// not dropped — round 85's poller now writes into this table instead, but
+// the old table/rows stay queryable for history rather than being
+// destroyed.
+//
+// Scope decision, stated plainly rather than silently made: this round
+// does NOT also merge round 70's pendingAliasActions (the email-alias
+// queue) into this table, despite the task doc's "kind column so
+// alias-email replies and marketing drafts live side by side" framing.
+// That's a separate, already-live production system serving 12 real
+// business aliases — migrating it blind in the same pass as a brand-new
+// table risked destabilizing something that currently works, for a
+// consolidation benefit that isn't load-bearing to what this round
+// actually needs to ship. Flagged as a real follow-up, not done here.
+export const marketingChannelEnum = pgEnum("marketing_channel", [
+  "reddit",
+  "facebook",
+  "visajourney",
+  "trackitt",
+  "immigration_com",
+  "quora",
+  "x",
+  "threads",
+  "linkedin",
+  "pinterest",
+  "youtube",
+  "tiktok",
+  "instagram",
+  "email",
+]);
+
+// manual_post: Peter copies the approved text and posts it himself — the
+// only mode any community/forum channel is allowed to use, no exception,
+// per SOCIAL_MEDIA_GUARDRAILS.md Section 0 (revised Sep 14, 2026, Peter's
+// direct approval). auto_post: owned channels only: code may post via an
+// approve click, once that channel's own poster integration exists (none
+// do yet as of this round — rounds 74-76 register their posters into this
+// same queue, per the task doc). Enforcement mechanism is identical to
+// round 70's pendingAliasActions: only a real approval-action click can
+// ever call a post/publish API, never the queue-population step itself.
+export const marketingModeEnum = pgEnum("marketing_mode", ["manual_post", "auto_post"]);
+
+export const marketingQueueStatusEnum = pgEnum("marketing_queue_status", [
+  "pending",
+  "approved",
+  "posted",
+  "edited_posted",
+  "rejected",
+  // Guardrails Section 3 — legal-advice requests, hostile threads, mod
+  // pushback, EO 14161 questions, first post in a new community. No
+  // draftText, just destination + guardrailNotes explaining why. Same
+  // shape as pendingCommunityReplies.escalationReason above, generalized.
+  "escalated",
+]);
+
+export const marketingQueue = pgTable(
+  "marketing_queue",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    channel: marketingChannelEnum("channel").notNull(),
+    mode: marketingModeEnum("mode").notNull().default("manual_post"),
+    // Thread URL, or the literal string "new post" for a fresh post with
+    // no reply target (e.g. an X/LinkedIn post, not a reply).
+    destination: text("destination").notNull(),
+    // Null for escalated rows (Section 3 — no draft is produced at all).
+    draftText: text("draft_text"),
+    // Citations joined "; " — this codebase's established convention is
+    // plain text columns, not postgres arrays/jsonb (checked: no existing
+    // schema table uses either), so a list-shaped field stays a single
+    // delimited string rather than introducing a new column-type pattern
+    // for one table.
+    sourceCitations: text("source_citations"),
+    // Review-workflow Section 5 fields: which guardrail sections were
+    // checked, any borderline note, and (for escalated rows) the specific
+    // Section 3 reason this didn't get a normal draft.
+    guardrailNotes: text("guardrail_notes"),
+    status: marketingQueueStatusEnum("status").notNull().default("pending"),
+    postedAt: timestamp("posted_at", { withTimezone: true }),
+    postedUrl: text("posted_url"),
+    // Filled later by a future attribution job (not this round) — clicks/
+    // engagement pulled back from the platform after posting, where an
+    // API for that exists. Null until then.
+    engagementSnapshot: text("engagement_snapshot"),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewedBy: text("reviewed_by"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    // A destination can recur across channels in principle (unlikely, but
+    // not impossible), so uniqueness is scoped to (channel, destination)
+    // rather than destination alone — same dedupe intent as round 85's
+    // threadUrl-alone constraint, generalized for a multi-channel table.
+    unique("marketing_queue_channel_destination_unique").on(table.channel, table.destination),
+    index("marketing_queue_status_idx").on(table.status),
+    index("marketing_queue_channel_idx").on(table.channel),
+  ]
+);
+
+// Config-editable list of community sources to poll, per the task doc's
+// explicit "make the list config-editable" instruction — replaces a
+// hardcoded array the way emailAliasConfigs (round 70) replaced a
+// hardcoded alias list for the same stated reason.
+export const communitySourceConfigs = pgTable("community_source_configs", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  channel: marketingChannelEnum("channel").notNull(),
+  // The source identifier within that channel, e.g. "USCIS" for a
+  // subreddit (r/USCIS) or a feed URL for an RSS-based channel.
+  sourceIdentifier: text("source_identifier").notNull(),
+  // Human-readable label, e.g. "r/USCIS" or "Immigration.com News".
+  label: text("label").notNull(),
+  enabled: boolean("enabled").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

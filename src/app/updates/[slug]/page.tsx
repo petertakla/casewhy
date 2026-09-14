@@ -2,8 +2,19 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { getPublishedUpdateBySlug } from "@/lib/updates/updates";
+import { POLICY_MEMOS } from "@/lib/kb/policy-memos";
 import { BackLink } from "@/components/BackLink";
 import { ShareButton } from "@/components/ShareButton";
+
+// Round 93 task doc, Part A — "Sourcing block on every post — same
+// two-link pattern as the app's policy citations (official source +
+// 'Ask CaseWhy about this →' when a POLICY_MEMOS id matches)." A post's
+// source is matched to a policy memo by exact sourceUrl, the only stable
+// join key available (frontmatter sources[] are just title/url pairs,
+// with no memo id of their own).
+function matchingPolicyMemoId(sourceUrl: string): string | undefined {
+  return POLICY_MEMOS.find((memo) => memo.sourceUrl === sourceUrl)?.id;
+}
 
 // Round 93 — permalink page for a single /updates post. Same shell
 // pattern as /policy/[id] (BackLink, generateMetadata, JSON-LD script
@@ -111,6 +122,38 @@ export default async function UpdatePostPage({ params }: { params: Promise<{ slu
           {post.content}
         </ReactMarkdown>
       </div>
+
+      {post.sources.length > 0 && (
+        <div className="mt-8 rounded-xl border border-border bg-surface p-5">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted">Sources</p>
+          <ul className="space-y-2 text-sm">
+            {post.sources.map((source) => {
+              const memoId = matchingPolicyMemoId(source.url);
+              return (
+                <li key={source.url}>
+                  <a
+                    href={source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-brand-600 hover:underline dark:text-brand-400"
+                  >
+                    {source.title} ↗
+                  </a>
+                  {memoId && (
+                    <>
+                      {" "}
+                      ·{" "}
+                      <a href={`/policy/${memoId}`} className="text-brand-600 hover:underline dark:text-brand-400">
+                        Ask CaseWhy about this →
+                      </a>
+                    </>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
 
       <div className="mt-8">
         <ShareButton url={url} title={post.title} text={post.summary} />

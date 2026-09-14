@@ -165,3 +165,31 @@ Two small real bugs were found and fixed in the app itself while doing this veri
 ---
 
 ## Screenshots
+
+All captured live against `/admin/marketing` on Sep 14, 2026, signed in as `admin@casewhy.com`. Two of the eight cards shown (a Reddit `manual_post` item and a Reddit escalation) are clearly-labeled test fixtures inserted only for these screenshots and deleted immediately after — the app currently has no other `manual_post` or escalated items to photograph, since Reddit polling isn't live yet (waiting on Reddit's API approval). The five real Blog cards visible are genuine round 93 seed posts, untouched — none were approved or rejected while taking these.
+
+**1. The queue, a `manual_post` card in full.** Destination, guardrail notes, sources ("Grounded in:"), the editable draft box, and the real button set: **Mark posted (as-is)**, **Mark posted (edited)** (disabled until the text actually changes), **Reject**.
+
+![Queue — a manual_post card](docs/marketing-manual-screenshots/01-queue-manual-post-card.jpg)
+
+**2. An Escalated card.** Amber-highlighted, "Flagged — no draft" badge, the reason in place of a draft, and the single **Acknowledge / dismiss** control (not separate "Handled"/"Left" states).
+
+![Escalated card](docs/marketing-manual-screenshots/02-escalated-card.jpg)
+
+**3. An `auto_post` card with a real poster (Blog).** Same destination/notes/sources/draft layout, but the action button is **Approve (queue for auto-post)** instead of Mark posted — this is the one click that actually publishes a post.
+
+![auto_post card — Approve button](docs/marketing-manual-screenshots/03-auto-post-approve-button.jpg)
+
+**4. After clicking Mark posted on the fixture card.** It doesn't linger with a "posted" confirmation — it simply disappears from this view, because the page only ever shows Pending/Escalated items and a posted row no longer matches. The log page (next) is where a posted item is actually visible.
+
+![After Mark posted — card is gone from the queue](docs/marketing-manual-screenshots/04-after-mark-posted.jpg)
+
+**5. Skipped items in the list view.** Confirmed: they don't appear here, at any point — only Pending and Escalated rows ever render on `/admin/marketing`. No screenshot to show, since there's nothing to show; see #6 for where skipped counts actually live.
+
+**6. `/admin/marketing/log`.** Per-channel counts including the **Skipped** column (missing until this same session added it — see the corrections above) and the **Download CSV** link. The fixture reddit row's real `posted` count and `escalated` count are both visible here, confirming both actions from #1/#2/#4 actually recorded correctly.
+
+![Log page with per-channel counts](docs/marketing-manual-screenshots/05-log-page.jpg)
+
+**7. The admin config for the subreddit list and daily cap.** No screenshot — this page doesn't exist. Neither `community_source_configs` (the subreddit list) nor `DAILY_DRAFT_CAP` (the cap, which isn't even a database value) has any admin UI today. See Section 8.
+
+**8. One card each for X, a pin, an email issue, and a blog post.** Only Blog is real as of this version — shown in #3 above. X/Threads/LinkedIn (round 90), Pinterest/YouTube/TikTok/Instagram (round 91), and email issues (round 92) don't exist in the live queue yet; add their screenshots to this section once those rounds ship.

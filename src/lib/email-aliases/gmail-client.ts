@@ -171,3 +171,63 @@ export async function createLabelIfMissing(labelName: string): Promise<"created"
   });
   return "created";
 }
+
+// Round 87 — creates a real Gmail filter (mail to `toAddress` from
+// `fromDomain` gets `labelName` applied). This is the piece the scope
+// comment above says isn't covered by the granted domain-wide delegation
+// (gmail.settings.basic was never granted) — but round 87 pushed back
+// directly on that claim and asked for the real API error rather than a
+// repeated inference, so this function exists to actually attempt it
+// against production, not just reason about scopes from documentation.
+export async function createFilter(params: {
+  toAddress: string;
+  fromDomain: string;
+  labelId: string;
+}): Promise<{ id?: string | null }> {
+  const gmail = getGmailClient();
+  const res = await gmail.users.settings.filters.create({
+    userId: "me",
+    requestBody: {
+      criteria: { to: params.toAddress, from: params.fromDomain },
+      action: { addLabelIds: [params.labelId] },
+    },
+  });
+  return { id: res.data.id };
+}
+
+/** Looks up a label's real Gmail-assigned id by name (filters need the id, not the display name). */
+export async function getLabelId(labelName: string): Promise<string | null> {
+  const gmail = getGmailClient();
+  const existing = await gmail.users.labels.list({ userId: "me" });
+  return existing.data.labels?.find((l) => l.name === labelName)?.id ?? null;
+}
+
+/**
+ * Attempts one harmless, self-cleaning test filter creation and reports
+ * the real outcome — success or the actual Gmail API error — rather than
+ * relying on documentation of which scopes cover which methods. Deletes
+ * the test filter immediately if creation succeeds, so this is safe to
+ * call repeatedly.
+ */
+export async function testFilterCreationScope(): Promise<{ works: boolean; detail: string }> {
+  const gmail = getGmailClient();
+  try {
+    const res = await gmail.users.settings.filters.create({
+      userId: "me",
+      requestBody: {
+        criteria: { from: "round87-scope-check@example.com" },
+        action: { addLabelIds: ["INBOX"] },
+      },
+    });
+    if (res.data.id) {
+      await gmail.users.settings.filters.delete({ userId: "me", id: res.data.id });
+    }
+    return { works: true, detail: "Filter created and deleted successfully — gmail.settings.basic IS covered." };
+  } catch (err) {
+    const e = err as { code?: number; message?: string; errors?: unknown };
+    return {
+      works: false,
+      detail: `Filter creation failed: code=${e.code} message=${e.message} errors=${JSON.stringify(e.errors)}`,
+    };
+  }
+}

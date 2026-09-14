@@ -22,13 +22,12 @@
 // anyway (confirmed real in this project multiple times).
 
 import { runOneVolumeTestBatch } from "@/lib/uscis/sandbox-volume-test";
+import { isAuthorizedCronRequest } from "@/lib/auth/cron-auth";
 
 export const maxDuration = 150;
 
 export async function POST(request: Request) {
-  const expected = process.env.CRON_SECRET;
-  const authHeader = request.headers.get("authorization");
-  if (!expected || authHeader !== `Bearer ${expected}`) {
+  if (!isAuthorizedCronRequest(request)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 

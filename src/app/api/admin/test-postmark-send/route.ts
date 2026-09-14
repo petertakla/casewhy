@@ -15,7 +15,10 @@
 const FROM_ADDRESS = "info@casewhy.com";
 
 export async function POST(request: Request) {
-  const expected = process.env.CRON_SECRET;
+  // ADMIN_DIAG_SECRET, not CRON_SECRET -- see setup-community-labels's
+  // own comment on why this session's diagnostic routes use a secret it
+  // generated itself rather than the shared, unreadable CRON_SECRET.
+  const expected = process.env.ADMIN_DIAG_SECRET;
   const authHeader = request.headers.get("authorization");
   if (!expected || authHeader !== `Bearer ${expected}`) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });

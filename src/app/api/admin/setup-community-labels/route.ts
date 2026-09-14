@@ -40,7 +40,12 @@ const LABELS = ["Peter/Reddit", "Peter/Facebook", "Peter/Quora"];
 const CONFIRMED_PLATFORM_DOMAINS: Record<string, string> = {};
 
 export async function POST(request: Request) {
-  const expected = process.env.CRON_SECRET;
+  // Uses ADMIN_DIAG_SECRET, not CRON_SECRET -- this is a Claude-Code-
+  // triggered diagnostic/setup tool, not a route any external scheduler
+  // calls, so it gets its own secret that this session generated and
+  // therefore actually knows, rather than the shared CRON_SECRET whose
+  // value predates this session and was never readable back out.
+  const expected = process.env.ADMIN_DIAG_SECRET;
   const authHeader = request.headers.get("authorization");
   if (!expected || authHeader !== `Bearer ${expected}`) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });

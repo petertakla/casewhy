@@ -15,6 +15,7 @@
 import { and, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { pendingCommunityReplies } from "@/lib/db/schema";
+import { isAuthorizedCronRequest } from "@/lib/auth/cron-auth";
 import { fetchNewThreads, isRedditConfigured } from "@/lib/community/reddit-client";
 import { fetchRssThreads, RSS_SOURCES } from "@/lib/community/rss-client";
 import { classifyThread } from "@/lib/community/classify-thread";
@@ -41,9 +42,7 @@ interface Candidate {
 }
 
 export async function POST(request: Request) {
-  const expected = process.env.CRON_SECRET;
-  const authHeader = request.headers.get("authorization");
-  if (!expected || authHeader !== `Bearer ${expected}`) {
+  if (!isAuthorizedCronRequest(request)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 

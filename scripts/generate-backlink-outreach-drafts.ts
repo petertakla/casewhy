@@ -33,6 +33,17 @@ import { attorneyDirectory, pendingBacklinkOutreach } from "../src/lib/db/schema
 const CAN_SPAM_FOOTER =
   "\n\n---\nCaseWhy LLC, 7901 4th St N, Ste 300, St. Petersburg, FL 33702, US\nDon't want emails like this? Reply and let us know — we'll take care of it.";
 
+// Some attorneyDirectory records carry a preferred name in quotes at the
+// end (e.g. `William Gary Gerstein "Bill"`, sourced from state bar
+// records) — greeting with the legal first name instead reads as more
+// templated than it needs to when the record already tells us what they
+// go by. Falls back to the ordinary first name when there's no quoted
+// suffix, or when the nickname's first word matches it anyway.
+function greetingNameFor(name: string): string {
+  const match = name.match(/"([^"]+)"\s*$/);
+  return match ? match[1].split(" ")[0] : name.split(" ")[0];
+}
+
 function draftFor(attorney: { name: string; firm: string | null; slug: string }): { subject: string; body: string } {
   const listingUrl = `https://app.casewhy.com/attorneys/${attorney.slug}`;
   const firmLine = attorney.firm ? ` at ${attorney.firm}` : "";
@@ -40,7 +51,7 @@ function draftFor(attorney: { name: string; firm: string | null; slug: string })
     subject: `Your free listing on CaseWhy's immigration attorney directory`,
     body:
       [
-        `Hi ${attorney.name.split(" ")[0]},`,
+        `Hi ${greetingNameFor(attorney.name)},`,
         "",
         `I wanted to let you know${firmLine ? " that" : ""} you're listed on CaseWhy's free immigration attorney directory${firmLine}:`,
         "",

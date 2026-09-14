@@ -19,6 +19,8 @@ const CHANNEL_LABELS: Record<string, string> = {
   tiktok: "TikTok",
   instagram: "Instagram",
   email: "Email",
+  outreach: "Outreach",
+  blog: "Blog",
 };
 
 export function MarketingQueueCard({

@@ -28,7 +28,12 @@ export default async function MarketingLogPage() {
     counts[row.channel][row.status] = (counts[row.channel][row.status] ?? 0) + 1;
   }
 
-  const statuses = ["pending", "approved", "posted", "edited_posted", "rejected", "escalated"] as const;
+  // "skipped" was missing from this list -- rows with that status were
+  // still counted into each channel's Total (via Object.values(byStatus)
+  // below) with no column to show them in, so totals silently didn't
+  // match the visible columns. Round 89 restored "skipped" as a real,
+  // distinct status; this list just hadn't been updated to match.
+  const statuses = ["pending", "approved", "posted", "edited_posted", "rejected", "escalated", "skipped"] as const;
 
   return (
     <main className="mx-auto min-h-screen max-w-4xl px-6 py-10">

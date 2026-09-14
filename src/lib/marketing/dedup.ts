@@ -35,7 +35,12 @@ function jaccardSimilarity(a: Set<string>, b: Set<string>): number {
   return union === 0 ? 0 : intersection / union;
 }
 
-const SIMILARITY_THRESHOLD = 0.6;
+// Tuned against a real test case, not guessed: two genuinely
+// near-identical paraphrases of the same processing-time answer (same
+// facts, minor word substitutions like "around"->"about") scored 0.556
+// on this metric -- 0.6 missed it. 0.5 catches that case while still
+// cleanly separating it from unrelated text (which scores near 0).
+const SIMILARITY_THRESHOLD = 0.5;
 
 /** True if draftText is near-identical to any marketing_queue draft from the last DEDUP_WINDOW_DAYS. */
 export async function isNearDuplicateDraft(draftText: string): Promise<boolean> {

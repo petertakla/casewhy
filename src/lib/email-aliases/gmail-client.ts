@@ -149,3 +149,25 @@ export async function sendAsAlias(params: {
 export function isGmailApiConfigured(): boolean {
   return Boolean(process.env.GMAIL_SERVICE_ACCOUNT_KEY);
 }
+
+// Round 86 — creates a nested Gmail label (e.g. "Peter/Reddit") if it
+// doesn't already exist. Covered by the gmail.labels scope already granted
+// in round 70's domain-wide delegation, so this needs no new Peter setup.
+// Deliberately does NOT create the filter that routes mail into this label
+// — filter creation needs the gmail.settings.basic scope, which was never
+// granted (round 70's REQUIRED_SCOPES above only lists readonly/send/
+// labels/modify), so that part still requires either Peter creating the
+// filter manually in Gmail's own Settings UI, or widening the domain-wide
+// delegation grant first. See round86-finish-round85-alias-filters-task.md.
+export async function createLabelIfMissing(labelName: string): Promise<"created" | "already_existed"> {
+  const gmail = getGmailClient();
+  const existing = await gmail.users.labels.list({ userId: "me" });
+  const found = existing.data.labels?.find((l) => l.name === labelName);
+  if (found) return "already_existed";
+
+  await gmail.users.labels.create({
+    userId: "me",
+    requestBody: { name: labelName, labelListVisibility: "labelShow", messageListVisibility: "show" },
+  });
+  return "created";
+}

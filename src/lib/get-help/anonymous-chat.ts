@@ -31,6 +31,22 @@ const COURT_REMOVAL_KEYWORDS = [
   /detained/i,
   /detention center/i,
   /bond hearing/i,
+  // Round 105 — this list was English-only, so a Spanish-speaking visitor
+  // asking about court/removal in Spanish never tripped the deterministic
+  // check at all and fell straight through to the model. Caught live: a
+  // real test question in Spanish about an immigration-court hearing got
+  // a model-generated answer instead of the guaranteed redirect. Spanish
+  // equivalents of the same terms above, same discipline — this check
+  // must never depend on the model alone to catch this.
+  /proceso de expulsión/i,
+  /deportación/i,
+  /corte de inmigración/i,
+  /aviso de comparecencia/i,
+  /audiencia individual/i,
+  /juez de inmigración/i,
+  /detenid[oa]/i,
+  /centro de detención/i,
+  /audiencia de fianza/i,
 ];
 
 export const COURT_REMOVAL_REDIRECT =

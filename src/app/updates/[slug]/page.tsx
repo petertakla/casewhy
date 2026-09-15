@@ -8,6 +8,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { auth } from "@/lib/auth/server";
 import { isAdminEmail } from "@/lib/auth/admin";
 import { isSpanishLocale } from "@/lib/i18n/locale";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 type SearchParams = { preview?: string; lang?: string };
 
@@ -64,7 +65,8 @@ export async function generateMetadata({
   searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const resolved = await resolvePost(slug, await searchParams);
+  const sp = await searchParams;
+  const resolved = await resolvePost(slug, sp);
   if (!resolved) return { title: "Update not found | CaseWhy" };
   const { post, isPreview } = resolved;
 
@@ -92,7 +94,14 @@ export default async function UpdatePostPage({
   const resolved = await resolvePost(slug, sp);
   if (!resolved) notFound();
   const { post, isPreview } = resolved;
-  const isSpanish = isPreview && (await isSpanishLocale(sp.lang));
+  // Round 105 — this used to be `isPreview && ...`, so the chrome (BackLink,
+  // date format, Sources label, ShareButton) was only ever Spanish-aware on
+  // an unpublished preview and silently reset to English the moment a post
+  // went live. Chrome locale now follows the visitor on every post, live or
+  // preview, the same as /updates' list page — only the post body itself
+  // (post.content, post.title, post.summary) stays in whatever language
+  // that post was actually written in.
+  const isSpanish = await isSpanishLocale(sp.lang);
 
   const url = `https://app.casewhy.com/updates/${slug}`;
 
@@ -155,11 +164,17 @@ export default async function UpdatePostPage({
         </div>
       )}
 
-      <BackLink href="/updates" label="All updates" />
+      <div className="mb-2 flex items-center justify-between">
+        <BackLink href="/updates" label={isSpanish ? "Todas las actualizaciones" : "All updates"} />
+        <LanguageSwitcher es={isSpanish} basePath={`/updates/${slug}`} params={{ preview: sp.preview }} variant="inline" />
+      </div>
 
       <h1 className="mt-4 text-2xl font-bold tracking-tight">{post.title}</h1>
+      {isSpanish && post.lang !== "es" && (
+        <p className="mt-1 text-xs font-semibold uppercase tracking-widest text-muted">(en inglés)</p>
+      )}
       <p className="mt-1 text-muted">
-        {new Date(`${post.date}T00:00:00Z`).toLocaleDateString("en-US", {
+        {new Date(`${post.date}T00:00:00Z`).toLocaleDateString(isSpanish ? "es" : "en-US", {
           month: "short",
           day: "numeric",
           year: "numeric",
@@ -197,7 +212,9 @@ export default async function UpdatePostPage({
 
       {post.sources.length > 0 && (
         <div className="mt-8 rounded-xl border border-border bg-surface p-5">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted">Sources</p>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted">
+            {isSpanish ? "Fuentes" : "Sources"}
+          </p>
           <ul className="space-y-2 text-sm">
             {post.sources.map((source) => {
               const memoId = matchingPolicyMemoId(source.url);
@@ -215,8 +232,11 @@ export default async function UpdatePostPage({
                     <>
                       {" "}
                       ·{" "}
-                      <a href={`/policy/${memoId}`} className="text-brand-600 hover:underline dark:text-brand-400">
-                        Ask CaseWhy about this →
+                      <a
+                        href={isSpanish ? `/policy/${memoId}?lang=es` : `/policy/${memoId}`}
+                        className="text-brand-600 hover:underline dark:text-brand-400"
+                      >
+                        {isSpanish ? "Pregúntele a CaseWhy sobre esto →" : "Ask CaseWhy about this →"}
                       </a>
                     </>
                   )}
@@ -229,7 +249,7 @@ export default async function UpdatePostPage({
 
       {!isPreview && (
         <div className="mt-8">
-          <ShareButton url={url} title={post.title} text={post.summary} />
+          <ShareButton url={url} title={post.title} text={post.summary} es={isSpanish} />
         </div>
       )}
     </main>

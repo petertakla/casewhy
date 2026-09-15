@@ -259,6 +259,27 @@
   .badge.live{background:var(--brand-50);color:var(--brand-600);}
   @media (prefers-color-scheme: dark){ .badge.live{background:rgba(91,158,237,0.15);color:var(--brand-400);} }
   .badge.soon{background:var(--surface-2);color:var(--muted);}
+  /* Round 109 — the outlined Plus pill, same treatment as the Next.js
+     app's PlusBadge component. #137e58 is --logo-green (#1baf7a) scaled
+     to 72% RGB, the darkest step needed to clear WCAG AA (4.5:1) against
+     this page's own light background (#f7f5f0) — the raw --logo-green
+     value only reaches 2.58:1 there, confirmed by direct calculation,
+     not assumed from "the wordmark green passes today." Dark theme keeps
+     the original --logo-green (6.86:1, passes with room to spare). */
+  .plus-badge{
+    display:inline-block;
+    border-radius:999px;
+    font-weight:700;
+    font-size:0.625rem;
+    letter-spacing:0.08em;
+    font-variant:small-caps;
+    line-height:1;
+    padding:1px 6px;
+    vertical-align:1px;
+    border:1px solid #137e58;
+    color:#137e58;
+  }
+  @media (prefers-color-scheme: dark){ .plus-badge{border-color:var(--logo-green);color:var(--logo-green);} }
   .get-help-cta-row{text-align:center;margin-top:36px;display:flex;flex-wrap:wrap;justify-content:center;gap:14px;}
   .get-help-cta-row a.button{
     display:inline-block;
@@ -407,7 +428,7 @@
       </div>
       <div class="feature">
         <div class="num-badge">5</div>
-        <h3>CaseWhy Plus, disponible desde el lanzamiento</h3>
+        <h3>CaseWhy <span class="plus-badge">Plus</span>, disponible desde el lanzamiento</h3>
         <p>Seguimiento ilimitado de casos para toda tu familia, preguntas ilimitadas, revisiones bajo demanda, una bóveda segura de documentos, un kit de herramientas de escalamiento para casos estancados (búsqueda de representante más plantillas de cartas para el Congreso, la oficina local y el Ombudsman de USCIS), y un reporte de caso listo para llevar a una consulta con un abogado.</p>
       </div>
     </div>

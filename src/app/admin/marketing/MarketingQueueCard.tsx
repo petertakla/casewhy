@@ -4,6 +4,7 @@ import { useState } from "react";
 import { markPosted, rejectItem, approveForAutoPost } from "./actions";
 import { REGISTERED_POSTER_CHANNELS } from "@/lib/marketing/posters/registry";
 import { CHANNEL_LABELS } from "@/lib/marketing/channel-labels";
+import type { UpdatePost } from "@/lib/updates/updates";
 
 export function MarketingQueueCard({
   id,
@@ -13,6 +14,7 @@ export function MarketingQueueCard({
   draftText,
   sourceCitations,
   guardrailNotes,
+  blogPost,
 }: {
   id: string;
   channel: string;
@@ -21,6 +23,8 @@ export function MarketingQueueCard({
   draftText: string | null;
   sourceCitations: string | null;
   guardrailNotes: string | null;
+  /** Round 107 — the merged post (repo file + any DB override) for blog rows, fetched by the parent page. undefined for non-blog channels; null if somehow no matching post exists on disk. */
+  blogPost?: UpdatePost | null;
 }) {
   const [text, setText] = useState(draftText ?? "");
   const [pending, setPending] = useState(false);
@@ -29,12 +33,14 @@ export function MarketingQueueCard({
 
   const isEscalationOnly = !draftText;
   const isBlog = channel === "blog";
-  // Round 103 — scripts/seed-updates-marketing-queue.ts's own format:
-  // `${title}\n\n${summary}`. Read-only for Blog cards (there's nothing
-  // to edit here -- the real article lives in content/updates/<slug>.md).
-  const [blogTitle, ...blogSummaryParts] = (draftText ?? "").split("\n\n");
-  const blogSummary = blogSummaryParts.join("\n\n").trim();
   const blogSlug = destination.replace(/^\/updates\//, "");
+  // Round 107 — read the merged post's title/summary, not the seed
+  // draftText, so this card never disagrees with the preview or the
+  // editor once a post's been edited. Falls back to the old seed-parsing
+  // if blogPost somehow wasn't resolved (shouldn't happen in practice).
+  const [seedTitle, ...seedSummaryParts] = (draftText ?? "").split("\n\n");
+  const blogTitle = blogPost?.title ?? seedTitle;
+  const blogSummary = blogPost?.summary ?? seedSummaryParts.join("\n\n").trim();
   // Round 89's own instruction: if a channel's poster isn't configured,
   // the queue UI shows the item as manual_post (text ready to copy)
   // instead of offering an "auto-post" action that would just no-op.
@@ -121,6 +127,12 @@ export function MarketingQueueCard({
           >
             Preview post ↗
           </a>
+          <a
+            href={`/admin/updates/${blogSlug}/edit`}
+            className="text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
+          >
+            Edit
+          </a>
           <span className="font-mono text-xs text-muted">{blogSlug}</span>
         </div>
       ) : (
@@ -151,8 +163,8 @@ export function MarketingQueueCard({
               <p className="mt-1 text-sm text-muted">{blogSummary}</p>
               <p className="mt-2 text-xs text-muted">
                 Read the full post with <strong>Preview post</strong> above before deciding — this card doesn&apos;t
-                show the article itself. To change the text, edit{" "}
-                <code className="font-mono">content/updates/{blogSlug}.md</code> in the repo.
+                show the article itself. Use <strong>Edit</strong> above to change the title, summary, sources, or
+                body without a deploy.
               </p>
             </div>
           ) : (

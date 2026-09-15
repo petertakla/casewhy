@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth/server";
 import { isAdminEmail } from "@/lib/auth/admin";
 import { getDb } from "@/lib/db/client";
 import { marketingQueue } from "@/lib/db/schema";
+import { getUpdateBySlugFromDisk } from "@/lib/updates/updates";
 import { CHANNEL_LABELS, CHANNEL_ORDER } from "@/lib/marketing/channel-labels";
 import { MarketingQueueCard } from "./MarketingQueueCard";
 import { HistoryCard } from "./HistoryCard";
@@ -92,6 +93,16 @@ export default async function MarketingQueueAdminPage({
     }
     return { channel, rows: channelRows };
   }).filter((g) => g.rows.length > 0);
+
+  // Round 107 — the Blog card used to derive its title/summary from the
+  // seed draftText (`${title}\n\n${summary}`, round 103's own format),
+  // which drifts the moment an admin edits the post -- the card, the
+  // preview, and the editor would disagree. Read the merged post (repo
+  // file + DB override, same function the preview route and editor use)
+  // for every blog row instead, once here rather than per-render.
+  const blogSlugs = filteredRows.filter((r) => r.channel === "blog").map((r) => r.destination.replace(/^\/updates\//, ""));
+  const blogPostEntries = await Promise.all(blogSlugs.map(async (slug) => [slug, await getUpdateBySlugFromDisk(slug)] as const));
+  const blogPostBySlug = new Map(blogPostEntries);
 
   return (
     <div>
@@ -188,6 +199,11 @@ export default async function MarketingQueueAdminPage({
                       draftText={row.draftText}
                       sourceCitations={row.sourceCitations}
                       guardrailNotes={row.guardrailNotes}
+                      blogPost={
+                        row.channel === "blog"
+                          ? blogPostBySlug.get(row.destination.replace(/^\/updates\//, "")) ?? null
+                          : undefined
+                      }
                     />
                   )
                 )}

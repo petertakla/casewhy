@@ -12,6 +12,7 @@ import { ADMIN_NAV, ADMIN_NAV_GROUPS, findAdminNavEntry, type AdminNavEntry } fr
 
 const GROUP_LABELS_ES: Record<(typeof ADMIN_NAV_GROUPS)[number], string> = {
   Marketing: "Marketing",
+  Content: "Contenido",
   Mail: "Correo",
   Outreach: "Contacto",
   Billing: "Facturación",

@@ -18,7 +18,7 @@ export interface AdminNavEntry {
   href: string;
   label: string;
   labelEs: string;
-  group: "Marketing" | "Mail" | "Outreach" | "Billing";
+  group: "Marketing" | "Content" | "Mail" | "Outreach" | "Billing";
   description: string;
   /** True for entries nav-counts.ts's getAdminPendingCounts() computes a live number for. */
   hasPendingCount?: boolean;
@@ -61,6 +61,17 @@ export const ADMIN_NAV: AdminNavEntry[] = [
     labelEs: "Configuración",
     group: "Marketing",
     description: "The subreddit list, the daily draft cap, and the links_enabled gate.",
+  },
+  // Round 107 — a new group, placed right after Marketing per the task
+  // doc's own instruction, since editing a post is a natural next step
+  // from reviewing it in the Marketing queue (round 103), not a separate
+  // concern like Mail/Outreach/Billing.
+  {
+    href: "/admin/updates",
+    label: "Updates",
+    labelEs: "Actualizaciones",
+    group: "Content",
+    description: "Every blog post on disk: published or not, edited or not, with preview and edit links.",
   },
   {
     href: "/admin/inbox",
@@ -106,7 +117,7 @@ export const ADMIN_NAV: AdminNavEntry[] = [
   },
 ];
 
-export const ADMIN_NAV_GROUPS = ["Marketing", "Mail", "Outreach", "Billing"] as const;
+export const ADMIN_NAV_GROUPS = ["Marketing", "Content", "Mail", "Outreach", "Billing"] as const;
 
 export function findAdminNavEntry(pathname: string): AdminNavEntry | undefined {
   // Longest-href-first so a child route (e.g. /admin/marketing/log)

@@ -2485,3 +2485,42 @@ Task doc: `claude_round99-faq-and-sitemap-shared-chrome-consistency-task` (Drive
 - tsc/lint/`validate:jsonld` clean, production build succeeds on `nextjs-app`; the static site's own `validate-jsonld.mjs` passes (4 blocks) after the header/footer changes.
 
 The standing rule (added above, next to rounds 88/95/98) is the round's own item 7, now covering the public side the way round 98's rule covers `/admin/*`.
+
+## Round 100, DONE Sep 15 — Privacy Policy discloses USCIS receipt numbers as PII (Torch compliance review)
+
+Task doc: `claude_round100-privacy-policy-receipt-numbers-pii-task` (Drive). USCIS's Torch Developer Support team reviewed CaseWhy's live Privacy Policy and found it doesn't disclose that receipt numbers are PII — this blocks production API access until fixed. Verbatim from Torch (Sep 14, 8:37 PM): *"Because USCIS considers receipt numbers to be Personally Identifiable Information (PII), your Privacy Policy must clearly disclose that receipt numbers are collected and treated as PII."*
+
+**Every claim in the new section traced to a specific file/line before publishing, per the task doc's own instruction not to publish anything the code doesn't do:**
+- `tracked_cases.receiptNumber`/`.email`/`.lastStatusText` — AES-256-GCM ciphertext, application-level, key from `ENCRYPTION_KEY` env var held separately from the DB (`src/lib/db/crypto.ts`).
+- `case_status_history.servicePrefix` stores only the 3-letter service-center prefix, never the full number (`src/lib/db/schema.ts`).
+- The case-explanation AI call (`buildCaseContext()`, `src/lib/ai/case-context.ts`) deliberately omits the receipt number — confirmed via the interface's own source comment.
+- Ad-hoc/untracked lookups: `getCaseStatus()` is called directly and `recordCaseHistory()` only fires for a genuinely tracked case (`src/app/dashboard/page.tsx`) — never written to CaseWhy's own database. Worded as "not stored in our database" rather than an unqualified "not stored anywhere," since the GET-based lookup form still puts the receipt number in a URL query string that would appear in the hosting platform's own low-level request logs — outside CaseWhy's application code and not something this repo controls or can promise about.
+- No admin decrypt path exists anywhere in the codebase — grepped every `decryptField()` call site; none are under `/admin/*`. This licensed the strong statement: "No CaseWhy staff member can view your receipt number in plaintext through any administrative tool."
+- Attorney-handoff PDF (`CaseReportDocument.tsx`) includes the real receipt number by design.
+
+**A real gap found while verifying, not in the task doc's own suggested text:** `src/lib/ai/escalation-letter.ts`'s congressional/field-office/Ombudsman letter-drafting tool (CaseWhy Plus) sends the receipt number *and* the user's mailing address to the same AI service, to draft a letter that has to state them. The task doc's suggested "How we use them" paragraph said receipt numbers are used for "one purpose" (the status query) and that the AI service "receives the status text only — never your receipt number" — true for the explanation feature, false for letter drafting. Publishing that as written would have been inaccurate to a government reviewer. Fixed by broadening the new section's usage paragraph to disclose the letter-drafting use explicitly, and by editing the existing Section 4→5 "Third-Party Services" AI bullet (outside the task doc's literal scope, but left unfixed it would have directly contradicted the new section) to describe both uses instead of promising "we do not send your full account or contact details," which the letter-drafting feature doesn't honor. Confirmed the drafted letter text itself isn't persisted — `escalationLetters` (the DB row) stores only `trackedCaseId`/`userId`/`letterType`/`createdAt`, no letter body — so this doesn't create a second storage location for the receipt number.
+
+**What shipped, `main` branch (`privacy.html`):**
+- New Section 2, "USCIS Receipt Numbers Are Personal Information," inserted after Section 1 — what's collected, how it's used (including the letter-drafting disclosure above), how it's stored/encrypted, who can access it, retention, and the breach-notification cross-reference.
+- Old Sections 2–11 renumbered to 3–12. Every internal cross-reference fixed, including two the mechanical heading-renumber missed because they cited a bare digit rather than a heading string ("using an AI service (see Section 4)" → 5; "listed in Section 4" → 5).
+- Section 1's "Case information" bullet now ends "— see Section 2 for how receipt numbers are protected." New Section 6 (was 5) gets one added sentence: "Receipt numbers receive the additional application-level encryption described in Section 2."
+- "Last updated" bumped to September 15, 2026; "Effective: September 6, 2026" unchanged.
+
+**What shipped, `nextjs-app` branch:**
+- `src/lib/policy/versions.ts` — `privacy.version`/`effectiveDate` bumped to September 15, 2026; a new summary bullet added for the acknowledgment gate, kept alongside the existing September 11 bullets rather than replacing them, since `getStalePolicies()` has no per-version history — a single version string per policy type — so an account stale since before September 11 needs to see everything that's changed since it joined, not just the newest slice.
+- `src/lib/email/postmark.ts` — `sendPolicyUpdateSummaryEmail()`, one recipient per call (never a multi-recipient To/Cc, which would leak every account holder's email to every other one).
+- `scripts/send-policy-update-notice.ts` — dry-run by default; queries `neon_auth."user"` and prints who'd be notified; `--send` actually calls Postmark. **Not run against production this round** — see below.
+- `src/lib/db/schema.ts` — fixed a stale "Section 10" reference in the `policyAcknowledgments` comment (now Section 11) and `src/app/faq/page.tsx`'s own attribution comment (§3/§5 → §4/§6).
+- Confirmed no second copy of the privacy policy exists anywhere in `nextjs-app` (grepped for "Privacy Policy" + policy-shaped content across `src/`).
+- No Spanish translation this round — deliberate, matching rounds 78/79's existing English-only scope for Terms/Privacy pending attorney review.
+
+**A real finding that changes the "send the notice" instruction:** production's `neon_auth."user"` table has **zero real rows** — confirmed twice, via a temporary read-only diagnostic route (`ADMIN_DIAG_SECRET`-gated, same pattern as `test-postmark-send`, deployed and deleted this round) and independently matching round 69's own note that this was already true then. There is currently nobody to send the plain-language summary email to. `scripts/send-policy-update-notice.ts` exists and is ready; running it with `--send` once real account holders exist is a one-line command, not a rebuild.
+
+**Verify live, all real:**
+- `curl https://www.casewhy.com/privacy.html`: 12 sections, "Last updated: September 15, 2026," every `Section N` cross-reference checked by grep and confirmed resolving to the right heading.
+- `validate-jsonld.mjs` on `main`: 4/4 blocks still valid post-edit.
+- `npm run build` on `nextjs-app`: succeeds.
+- Acknowledgment gate: a disposable fixture account (`neon_auth.user` row, `createdAt` 2026-01-01, inserted → exercised → deleted via the same temporary diagnostic route) correctly returned both `tos` (September 11) and `privacy` (September 15, the new version) as stale from `getStalePolicies()`, confirming the gate will fire and show the new PII-disclosure bullet the next time any pre-existing account signs in. Cleanup confirmed via a second GET showing zero residual rows.
+- The temporary diagnostic route was deployed, used, and deleted in three separate commits on `nextjs-app`, matching this session's established "insert → exercise → delete, don't leave scaffolding behind" pattern.
+
+**Final published text and section number, for Peter to give Torch:** `https://www.casewhy.com/privacy.html`, **Section 2, "USCIS Receipt Numbers Are Personal Information"** (live as of Sep 15, 2026).

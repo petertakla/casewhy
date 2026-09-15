@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 100">
+  <rect x="0" y="0" width="100" height="100" rx="22" fill="#1baf7a"/>
+  <path d="M30 52 L44 65 L72 34" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="118" y="68" font-family="Inter, 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="52" letter-spacing="-1" fill="#111827">Case<tspan fill="#1baf7a">Why</tspan></text>
+</svg>

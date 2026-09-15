@@ -77,11 +77,16 @@ export function MarketingQueueCard({
   async function handleApproveAutoPost() {
     setPending(true);
     setError(null);
-    try {
-      await approveForAutoPost(id, text, channel);
+    // Round 90 fix: approveForAutoPost returns { ok, error } instead of
+    // throwing (a thrown Server Action Error's message is redacted from
+    // the client in Next.js production builds -- round 107's own standing
+    // lesson, missed once already in this exact function before being
+    // caught and fixed the same day).
+    const result = await approveForAutoPost(id, text, channel);
+    if (result.ok) {
       setDone("posted");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Approved, but posting failed — check the error and retry, or handle it manually.");
+    } else {
+      setError(result.error);
       setPending(false);
     }
   }

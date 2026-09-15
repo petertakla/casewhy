@@ -51,19 +51,34 @@ export async function rejectItem(id: string) {
   revalidatePath("/admin/marketing/log");
 }
 
+export type ApproveAutoPostResult = { ok: true } | { ok: false; error: string };
+
 // auto_post channels: same round-70 enforcement shape (approve is the
 // only code path that could ever call a post/publish API). Real
 // behavior now, not just a stub: looks up the channel's registered
 // poster (src/lib/marketing/posters/registry.ts). If one exists, this IS
 // the one and only place it's ever invoked, and only on this explicit
 // click -- on success the item moves straight to "posted" with the real
-// URL; on failure it stays "approved" with the error surfaced so Peter
-// can retry or fall back to manual. If no poster is registered for this
-// channel yet (every real channel, as of this round -- rounds 90-92
-// register theirs), the item just moves to "approved" and stops, same
-// as before -- the card's own rendering (not this action) is what falls
-// back to manual-post framing in that case.
-export async function approveForAutoPost(id: string, finalText: string, channel: string) {
+// URL. If no poster is registered for this channel yet, the item just
+// moves to "approved" and stops -- the card's own rendering (not this
+// action) is what falls back to manual-post framing in that case.
+//
+// Round 90 finding, twice over: (1) a poster failure used to leave the
+// row at "approved," which isn't in NEEDS_ACTION_STATUSES (pending,
+// escalated) or HISTORY_STATUSES (posted, edited_posted, rejected) on the
+// queue page -- the row became genuinely invisible, a bug that sat
+// dormant since round 89 because no real poster existed to ever throw
+// until this round's X/Threads posters did. Fixed by reverting to
+// "pending" (reviewedAt/reviewedBy cleared) on failure. (2) this function
+// used to *throw* the poster's error -- which this exact codebase already
+// has a standing lesson about (round 107, CLOUD_CLAUDE.md): a Server
+// Action's thrown Error message is redacted from the client in Next.js
+// production builds by default, so what Peter actually saw in production
+// was a generic "error occurred in Server Components render," not the
+// real "X posting isn't configured yet" message the poster threw. Fixed
+// the same way round 107 fixed it: return { ok, error } as data instead
+// of throwing.
+export async function approveForAutoPost(id: string, finalText: string, channel: string): Promise<ApproveAutoPostResult> {
   const adminEmail = await requireAdmin();
   const db = getDb();
 
@@ -87,27 +102,17 @@ export async function approveForAutoPost(id: string, finalText: string, channel:
         .set({ status: "posted", postedAt: new Date(), postedUrl: result.url })
         .where(eq(marketingQueue.id, id));
     } catch (err) {
-      // Round 90 finding: this comment used to say "stays 'approved' --
-      // Peter can see it didn't post and retry" -- that was never actually
-      // true. "approved" isn't in NEEDS_ACTION_STATUSES (pending,
-      // escalated) or HISTORY_STATUSES (posted, edited_posted, rejected)
-      // on the queue page, so the row became genuinely invisible -- a real
-      // bug that sat dormant since round 89 because no real poster existed
-      // to ever throw until this round's X/Threads posters did. Reverted
-      // to "pending" (and reviewedAt/reviewedBy cleared, since the
-      // approval didn't actually stick) so the row reappears in Needs
-      // action for Peter to retry once the missing credentials are set.
-      // The thrown error still reaches the client's catch block either way.
       await db
         .update(marketingQueue)
         .set({ status: "pending", reviewedAt: null, reviewedBy: null })
         .where(eq(marketingQueue.id, id));
       revalidatePath("/admin/marketing");
       revalidatePath("/admin/marketing/log");
-      throw err;
+      return { ok: false, error: err instanceof Error ? err.message : String(err) };
     }
   }
 
   revalidatePath("/admin/marketing");
   revalidatePath("/admin/marketing/log");
+  return { ok: true };
 }

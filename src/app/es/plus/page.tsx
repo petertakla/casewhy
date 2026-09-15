@@ -329,7 +329,9 @@ export default async function PlusPageEs({
       </p>
 
       <div className="mt-10">
-        <h2 className="text-lg font-semibold">Plus, en detalle</h2>
+        <h2 className="text-lg font-semibold">
+          <PlusBadge size="lg" /> en detalle
+        </h2>
         <div className="mt-3 divide-y divide-border rounded-2xl border border-border bg-surface px-6">
           {PLUS_FEATURES.map((feature) => (
             <div key={feature.id} id={feature.id} className="scroll-mt-20 py-4">

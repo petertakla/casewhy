@@ -13,14 +13,26 @@
 // automated discovery entirely for those two; the channel enum values
 // exist so a human-sourced draft can still be queued by hand.
 //
+// Reddit joined that manual-only list Sep 15: Reddit denied the
+// Responsible Builder Policy application (ticket 18455163, generic
+// non-compliance/insufficient-detail response) — no OAuth credentials are
+// coming. The fallback, r/USCIS's Atom RSS feed (/r/USCIS/new.rss), was
+// then live-tested from this deployed environment specifically (not just
+// a local shell, which doesn't share Vercel's IP ranges): a clean 200
+// locally, but a 403 challenge page then a 429 from Vercel — Reddit
+// blocks this route's outbound IP range, not just unauthenticated JSON.
+// See src/lib/community/reddit-client.ts's own updated comment for the
+// full finding and the dormant OAuth code kept there for a post-launch
+// reapplication (Peter's call: worth retrying once CaseWhy has real users
+// and posting history to point to, not before).
+//
 // Same external-cron-hits-a-bearer-secured-route pattern as
 // /api/cron/poll-aliases and /api/cron/check-status.
 
 import { and, eq, gte, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
-import { marketingQueue, communitySourceConfigs } from "@/lib/db/schema";
+import { marketingQueue } from "@/lib/db/schema";
 import { isAuthorizedCronRequest } from "@/lib/auth/cron-auth";
-import { fetchNewThreads, isRedditConfigured } from "@/lib/community/reddit-client";
 import { fetchRssThreads, RSS_SOURCES } from "@/lib/community/rss-client";
 import { classifyThread } from "@/lib/community/classify-thread";
 import { draftMarketingReply } from "@/lib/marketing/draft-marketing-reply";
@@ -51,29 +63,11 @@ export async function POST(request: Request) {
   const candidates: Candidate[] = [];
   const sourceErrors: Array<{ source: string; message: string }> = [];
 
-  if (isRedditConfigured()) {
-    const redditConfigs = await db
-      .select()
-      .from(communitySourceConfigs)
-      .where(and(eq(communitySourceConfigs.channel, "reddit"), eq(communitySourceConfigs.enabled, true)));
-
-    for (const config of redditConfigs) {
-      try {
-        const threads = await fetchNewThreads(config.sourceIdentifier);
-        for (const t of threads) {
-          candidates.push({
-            channel: "reddit",
-            sourceName: `r/${t.subreddit}`,
-            destination: t.url,
-            threadTitle: t.title,
-            threadExcerpt: t.bodyText.slice(0, 2000),
-          });
-        }
-      } catch (err) {
-        sourceErrors.push({ source: config.label, message: err instanceof Error ? err.message : String(err) });
-      }
-    }
-  }
+  // Reddit: no automated discovery path (OAuth denied, RSS blocked from
+  // this deployed environment — see the file header comment). Manual-only,
+  // same as Facebook/Quora — community_source_configs' reddit rows stay as
+  // Peter's own reference list of subreddits worth checking by hand, not
+  // read by this route.
 
   for (const rssSource of RSS_SOURCES) {
     try {
@@ -253,7 +247,7 @@ export async function POST(request: Request) {
   }
 
   return Response.json({
-    redditConfigured: isRedditConfigured(),
+    redditAutomated: false,
     candidatesFound: candidates.length,
     drafted,
     escalated,

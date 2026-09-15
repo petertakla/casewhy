@@ -39,8 +39,8 @@ export default async function MarketingSettingsPage() {
     <div>
       <h1 className="text-2xl font-bold tracking-tight">Marketing settings</h1>
       <p className="mb-8 mt-2 text-muted">
-        The subreddit list and the daily draft cap, live-editable. Guardrails and channel-specific rules are still a
-        document, not a setting — see <code>SOCIAL_MEDIA_GUARDRAILS.md</code>.
+        The subreddit reference list and the daily draft cap, live-editable. Guardrails and channel-specific rules
+        are still a document, not a setting — see <code>SOCIAL_MEDIA_GUARDRAILS.md</code>.
       </p>
       <MarketingSettingsForm subreddits={subreddits} dailyCap={dailyCap} />
     </div>

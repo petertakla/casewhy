@@ -24,10 +24,11 @@ export function MarketingSettingsForm({
   return (
     <div className="space-y-8">
       <section>
-        <h2 className="mb-1 text-base font-semibold text-foreground">Subreddit list</h2>
+        <h2 className="mb-1 text-base font-semibold text-foreground">Subreddit list (manual reference)</h2>
         <p className="mb-4 text-sm text-muted">
-          Sources <code>poll-marketing-sources</code> checks for candidate Reddit threads. Disabled subreddits are
-          kept, not polled.
+          Reddit is manual-only — <code>poll-marketing-sources</code> doesn&apos;t poll it (Reddit denied the API
+          application and blocks the RSS fallback from our hosting provider too). This list is just a reference of
+          subreddits worth checking by hand; the enabled toggle has no automated effect right now.
         </p>
 
         <div className="space-y-2">

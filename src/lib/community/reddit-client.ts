@@ -12,6 +12,24 @@
 // has to create at reddit.com/prefs/apps ("create app" -> type "script");
 // isRedditConfigured() lets the poller skip cleanly until they're set, same
 // pattern as isGmailApiConfigured() in round 70.
+//
+// DORMANT as of Sep 15, 2026 — do not wire this back into
+// poll-marketing-sources without a fresh check. Reddit denied the
+// Responsible Builder Policy application this code depends on (ticket
+// 18455163, generic non-compliance/insufficient-detail response) — no
+// REDDIT_CLIENT_ID/SECRET will exist, so isRedditConfigured() will stay
+// false indefinitely. The fallback (subreddit .rss feeds, no auth needed)
+// was then live-tested from the actual deployed Vercel environment: a
+// clean 200 from a local shell, but a 403 challenge page then a 429 on
+// retry from Vercel itself — Reddit blocks this app's outbound IP range at
+// the network level, not just unauthenticated JSON specifically. Reddit is
+// manual-only for now (poll-marketing-sources/route.ts), same as
+// Facebook/Quora. This file is kept, not deleted, because Peter's plan is
+// to reapply once CaseWhy has real users and posting history to point
+// to — a post-launch item. Re-verify RSS reachability from the deployed
+// environment again before ever reconnecting either path; IP-range blocks
+// like this one don't self-resolve, and OAuth approval could take a
+// different amount of time on a second application.
 
 const USER_AGENT = "web:casewhy-community-monitor:1.0 (by /u/casewhy)";
 

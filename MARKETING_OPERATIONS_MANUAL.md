@@ -138,7 +138,7 @@ Every Monday the cloud session reads `/admin/marketing/log` and the attribution 
 | You see | It means | Do |
 |---|---|---|
 | Redirected away from `/admin/marketing` | Not signed in as the admin account | Sign in as `admin@casewhy.com` |
-| Queue empty for days | Reddit polling not yet enabled (waiting on Reddit's API approval), or the cap was hit early | Nothing — check the log page's "skipped" count; if it's high, tell the cloud session |
+| Queue empty for days | Reddit is manual-only (Reddit denied the API application Sep 15 and blocks the RSS fallback too — see round 85 in `CLOUD_CLAUDE.md`), immigration.com's feed just hasn't had a matching post, or the cap was hit early | Nothing automated to fix — Reddit needs a manually-sourced draft if you want one queued; check the log page's "skipped" count for the other channels, and tell the cloud session if it's high |
 | `auto_post` item stuck in "approved" without moving to "posted" | The channel's poster errored | Copy the text and post/publish manually; mark it accordingly; tell the cloud session which channel |
 | A draft cites a figure you can't find at the source link | Sourcing failed | Reject; report it — this is the one failure that must never reach a post |
 | Two near-identical drafts for different threads | Dedup missed | Approve/post one, reject the other, report it |

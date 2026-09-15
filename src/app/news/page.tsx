@@ -7,6 +7,7 @@ import { newsItemId } from "@/lib/news/permalink";
 import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { ShareButton } from "@/components/ShareButton";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 // Round 83 — same static-metadata gap as processing-times/visa-bulletin.
 export async function generateMetadata({
@@ -59,11 +60,7 @@ export default async function NewsPage({
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-      <div className="mb-2 text-right text-sm">
-        <Link href={localeToggleHref("/news", {}, es)} className="text-brand-600 hover:underline dark:text-brand-400">
-          {es ? "English" : "Español"}
-        </Link>
-      </div>
+      <LanguageSwitcher es={es} href={localeToggleHref("/news", {}, es)} />
       <h1 className="text-2xl font-bold tracking-tight">{es ? "Noticias de inmigración" : "Immigration news"}</h1>
       <p className="mb-8 mt-2 text-muted">
         {es

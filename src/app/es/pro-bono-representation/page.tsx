@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getProBonoRepresentationDirectory } from "@/lib/pro-bono-representation/directory";
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const metadata: Metadata = {
   title: "Encuentra Representación Gratuita en la Corte de Inmigración | CaseWhy",
@@ -26,11 +27,7 @@ export default async function ProBonoRepresentationPageEs() {
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-      <div className="mb-2 text-right text-sm">
-        <Link href="/pro-bono-representation" hrefLang="en" lang="en" className="text-brand-600 hover:underline dark:text-brand-400">
-          English
-        </Link>
-      </div>
+      <LanguageSwitcher es={true} href="/pro-bono-representation" />
 
       <h1 className="text-2xl font-bold tracking-tight">Encuentra representación gratuita en la corte de inmigración</h1>
       <p className="mb-2 mt-2 text-muted">

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { PublicPage } from "@/components/PublicPage";
 
 // Round 73 item 8 — the common trust/product questions this audience
 // actually asks, previously scattered across the ToS, privacy policy, and
@@ -112,16 +113,11 @@ const faqJsonLd = {
 
 export default function FaqPage() {
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-6 py-10">
+    <PublicPage es={false} switcherHref="/es/faq">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <div className="mb-6 text-right text-sm">
-        <Link href="/es/faq" hrefLang="es" lang="es" className="text-brand-600 hover:underline dark:text-brand-400">
-          Español
-        </Link>
-      </div>
 
       <h1 className="text-2xl font-bold tracking-tight">Frequently asked questions</h1>
       <p className="mb-8 mt-2 text-muted">
@@ -154,14 +150,6 @@ export default function FaqPage() {
           </div>
         ))}
       </div>
-
-      <p className="mt-8 text-xs text-muted">
-        Have a question this doesn&apos;t answer? See the{" "}
-        <Link href="/sitemap" className="text-brand-600 hover:underline dark:text-brand-400">
-          site index
-        </Link>{" "}
-        or email <a href="mailto:hello@casewhy.com" className="text-brand-600 hover:underline dark:text-brand-400">hello@casewhy.com</a>.
-      </p>
-    </main>
+    </PublicPage>
   );
 }

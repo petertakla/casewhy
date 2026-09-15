@@ -17,6 +17,7 @@ import { EscalationToolkit } from "./EscalationToolkit";
 import { ReceiptNumberInput } from "./ReceiptNumberInput";
 import { linkifyExplanation } from "@/lib/kb/linkify";
 import { PositiveShareNudge } from "./PositiveShareNudge";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const dynamic = "force-dynamic";
 
@@ -541,11 +542,7 @@ export default async function DashboardPage({
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-      <div className="mb-2 text-right text-sm">
-        <Link href={localeToggleHref("/dashboard", { receipt }, es)} className="text-brand-600 hover:underline dark:text-brand-400">
-          {es ? "English" : "Español"}
-        </Link>
-      </div>
+      <LanguageSwitcher es={es} href={localeToggleHref("/dashboard", { receipt }, es)} />
       <h1 className="text-2xl font-bold tracking-tight">{es ? "Tu caso" : "Your case"}</h1>
       <p className="mb-8 mt-2 text-muted">
         {es ? "Ingresa tu número de recibo de USCIS para ver su estado actual." : "Enter your USCIS receipt number to see its current status."}

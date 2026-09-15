@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 };
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 // Round 40 — now reads a real DB table (machine-seeded from state-bar
 // board-certification records) rather than the static array round 27
@@ -27,11 +28,7 @@ export default async function AttorneysPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-      <div className="mb-2 text-right text-sm">
-        <Link href="/es/attorneys" hrefLang="es" lang="es" className="text-brand-600 hover:underline dark:text-brand-400">
-          Español
-        </Link>
-      </div>
+      <LanguageSwitcher es={false} href="/es/attorneys" />
 
       <h1 className="text-2xl font-bold tracking-tight">Find an attorney</h1>
       <p className="mb-2 mt-2 text-muted">

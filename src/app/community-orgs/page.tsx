@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 };
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const dynamic = "force-dynamic";
 
@@ -23,11 +24,7 @@ export default async function CommunityOrgsPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-      <div className="mb-2 text-right text-sm">
-        <Link href="/es/community-orgs" hrefLang="es" lang="es" className="text-brand-600 hover:underline dark:text-brand-400">
-          Español
-        </Link>
-      </div>
+      <LanguageSwitcher es={false} href="/es/community-orgs" />
 
       <h1 className="text-2xl font-bold tracking-tight">Find a community or cultural organization</h1>
       <p className="mb-2 mt-2 text-muted">

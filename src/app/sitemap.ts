@@ -7,6 +7,7 @@ import { getCommunityOrgDirectory } from "@/lib/community-orgs/directory";
 import { getProBonoRepresentationDirectory } from "@/lib/pro-bono-representation/directory";
 import { POLICY_MEMOS } from "@/lib/kb/policy-memos";
 import { getPublishedUpdates } from "@/lib/updates/updates";
+import { PUBLIC_PAGES } from "@/lib/site/pages";
 
 const BASE_URL = "https://app.casewhy.com";
 
@@ -20,44 +21,14 @@ const BASE_URL = "https://app.casewhy.com";
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticPaths = [
-    "",
-    "/get-help",
-    "/get-help/ask",
-    "/attorneys",
-    "/attorneys/join",
-    "/accredited-representatives",
-    "/accredited-representatives/join",
-    "/legal-aid",
-    "/legal-aid/join",
-    "/dso",
-    "/dso/join",
-    "/community-orgs",
-    "/community-orgs/join",
-    "/pro-bono-representation",
-    "/pro-bono-representation/join",
-    "/news",
-    "/policy",
-    "/updates",
-    "/sitemap",
-    "/faq",
-    "/plus",
-    "/processing-times",
-    "/visa-bulletin",
-    // Round 79 — Spanish translations of /plus, /get-help, and the six
-    // entity-type list pages. Join forms and detail/permalink pages stay
-    // English-only, out of this round's scope.
-    "/es/plus",
-    "/es/get-help",
-    "/es/faq",
-    "/es/sitemap",
-    "/es/attorneys",
-    "/es/accredited-representatives",
-    "/es/legal-aid",
-    "/es/dso",
-    "/es/community-orgs",
-    "/es/pro-bono-representation",
-  ];
+  // Round 99 — driven by the same registry the human site index and
+  // footer read from (src/lib/site/pages.ts), instead of its own
+  // hand-maintained copy of the same list. External pages (the marketing
+  // site, privacy/terms) never had `showInSitemapXml: true` and are
+  // filtered out here the same as before.
+  const staticPaths = PUBLIC_PAGES.filter((p) => p.showInSitemapXml && !p.external).flatMap((p) =>
+    p.hrefEs && p.hrefEs.startsWith("/") ? [p.href, p.hrefEs] : [p.href]
+  );
 
   const [attorneys, reps, legalAid, dsos, communityOrgs, proBono, updates] = await Promise.all([
     getAttorneyDirectory(),

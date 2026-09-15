@@ -14,6 +14,7 @@ import Link from "next/link";
 import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { ShareButton } from "@/components/ShareButton";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 // Round 83 — was a static `export const metadata`; converted to
 // generateMetadata() so a Spanish visitor gets a Spanish title/description
@@ -231,11 +232,7 @@ export default async function VisaBulletinPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <div className="mb-2 text-right text-sm">
-        <Link href={localeToggleHref("/visa-bulletin", {}, es)} className="text-brand-600 hover:underline dark:text-brand-400">
-          {es ? "English" : "Español"}
-        </Link>
-      </div>
+      <LanguageSwitcher es={es} href={localeToggleHref("/visa-bulletin", {}, es)} />
       <h1 className="text-2xl font-bold tracking-tight">{es ? "Boletín de visas" : "Visa bulletin"}</h1>
       <p className="mb-2 mt-2 text-muted">
         {es ? (

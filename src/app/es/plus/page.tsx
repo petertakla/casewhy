@@ -5,6 +5,7 @@ import { getSubscriptionDetails } from "@/lib/billing/tier";
 import { getAllEffectivePrices, type EffectivePrice, type PlanId } from "@/lib/billing/pricing";
 import { startCheckout, openBillingPortal } from "@/app/plus/actions";
 import { ShareButton } from "@/components/ShareButton";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 // Round 79 — Spanish translation of /plus. Reuses the real Stripe actions
 // and pricing/subscription logic from the English page as-is (business
@@ -190,11 +191,7 @@ export default async function PlusPageEs({
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-      <div className="mb-6 text-right text-sm">
-        <Link href="/plus" hrefLang="en" lang="en" className="text-brand-600 hover:underline dark:text-brand-400">
-          English
-        </Link>
-      </div>
+      <LanguageSwitcher es={true} href="/plus" />
 
       {checkout === "success" && (
         <div className="mb-6 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-700 dark:text-emerald-400">

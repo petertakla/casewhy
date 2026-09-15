@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 };
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 // Unlike /attorneys (a static in-source array), this reads a real DB table
 // that gets re-seeded periodically and grows via approved applications —
@@ -30,11 +31,7 @@ export default async function AccreditedRepresentativesPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-      <div className="mb-2 text-right text-sm">
-        <Link href="/es/accredited-representatives" hrefLang="es" lang="es" className="text-brand-600 hover:underline dark:text-brand-400">
-          Español
-        </Link>
-      </div>
+      <LanguageSwitcher es={false} href="/es/accredited-representatives" />
 
       <h1 className="text-2xl font-bold tracking-tight">Find an accredited representative</h1>
       <p className="mb-2 mt-2 text-muted">

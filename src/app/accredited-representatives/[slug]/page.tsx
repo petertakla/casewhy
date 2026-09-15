@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAccreditedRepresentativeBySlug } from "@/lib/accredited-representatives/directory";
 import { BackLink } from "@/components/BackLink";
@@ -7,7 +6,7 @@ import { ReportListingLink } from "@/components/ReportListingLink";
 import { ShareButton } from "@/components/ShareButton";
 import { VerificationLinks } from "@/components/VerificationLinks";
 import { isSpanishLocale } from "@/lib/i18n/locale";
-import { localeToggleHref } from "@/lib/i18n/locale-href";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 // Complete-check follow-up — see attorneys/[id]/page.tsx's identical fix.
 export async function generateMetadata({
@@ -53,9 +52,7 @@ export default async function AccreditedRepresentativeDetailPage({
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-10">
       <div className="mb-2 flex items-center justify-between">
         <BackLink href="/accredited-representatives" label={es ? "Todos los representantes acreditados" : "All accredited representatives"} />
-        <Link href={localeToggleHref(`/accredited-representatives/${rep.slug}`, {}, es)} className="text-sm text-brand-600 hover:underline dark:text-brand-400">
-          {es ? "English" : "Español"}
-        </Link>
+        <LanguageSwitcher es={es} basePath={`/accredited-representatives/${rep.slug}`} variant="inline" />
       </div>
 
       <h1 className="mt-4 text-2xl font-bold tracking-tight">{rep.representativeName}</h1>

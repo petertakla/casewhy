@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { useIsSpanish } from "@/lib/i18n/use-is-spanish";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 function EnvelopeIcon() {
   return (
@@ -25,11 +26,7 @@ function AuthCard({ children, es }: { children: React.ReactNode; es: boolean }) 
   return (
     <main className="flex min-h-[calc(100vh-73px)] items-center justify-center px-6 py-10">
       <div className="w-full max-w-sm">
-        <div className="mb-2 text-right text-sm">
-          <Link href={localeToggleHref("/auth/sign-in", {}, es)} className="text-brand-600 hover:underline dark:text-brand-400">
-            {es ? "English" : "Español"}
-          </Link>
-        </div>
+        <LanguageSwitcher es={es} href={localeToggleHref("/auth/sign-in", {}, es)} />
         <div className="mb-6 text-center">
           <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 to-brand-700 shadow-sm">
             <EnvelopeIcon />

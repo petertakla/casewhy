@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getCommunityOrgDirectory } from "@/lib/community-orgs/directory";
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const metadata: Metadata = {
   title: "Encuentra una Organización Comunitaria o Cultural | CaseWhy",
@@ -26,11 +27,7 @@ export default async function CommunityOrgsPageEs() {
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-      <div className="mb-2 text-right text-sm">
-        <Link href="/community-orgs" hrefLang="en" lang="en" className="text-brand-600 hover:underline dark:text-brand-400">
-          English
-        </Link>
-      </div>
+      <LanguageSwitcher es={true} href="/community-orgs" />
 
       <h1 className="text-2xl font-bold tracking-tight">Encuentra una organización comunitaria o cultural</h1>
       <p className="mb-2 mt-2 text-muted">

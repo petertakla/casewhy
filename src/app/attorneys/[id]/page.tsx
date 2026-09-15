@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAttorneyBySlug } from "@/lib/attorneys/directory";
 import { BackLink } from "@/components/BackLink";
@@ -7,7 +6,7 @@ import { ReportListingLink } from "@/components/ReportListingLink";
 import { ShareButton } from "@/components/ShareButton";
 import { VerificationLinks } from "@/components/VerificationLinks";
 import { isSpanishLocale } from "@/lib/i18n/locale";
-import { localeToggleHref } from "@/lib/i18n/locale-href";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 // Complete-check follow-up — this generateMetadata() had no searchParams
 // at all, so the <title>/description stayed English even after round 84
@@ -63,9 +62,7 @@ export default async function AttorneyDetailPage({
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-10">
       <div className="mb-2 flex items-center justify-between">
         <BackLink href="/attorneys" label={es ? "Todos los abogados" : "All attorneys"} />
-        <Link href={localeToggleHref(`/attorneys/${attorney.slug}`, {}, es)} className="text-sm text-brand-600 hover:underline dark:text-brand-400">
-          {es ? "English" : "Español"}
-        </Link>
+        <LanguageSwitcher es={es} basePath={`/attorneys/${attorney.slug}`} variant="inline" />
       </div>
 
       <h1 className="mt-4 text-2xl font-bold tracking-tight">{attorney.name}</h1>

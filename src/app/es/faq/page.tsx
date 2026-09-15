@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { PublicPage } from "@/components/PublicPage";
 
 // Round 97 item 3 — Spanish translation of /faq (round 73), which never
 // got one despite rounds 78-83 covering the landing page, /plus, Get
@@ -107,16 +108,11 @@ const faqJsonLd = {
 
 export default function FaqPageEs() {
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-6 py-10">
+    <PublicPage es={true} switcherHref="/faq">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <div className="mb-6 text-right text-sm">
-        <Link href="/faq" hrefLang="en" lang="en" className="text-brand-600 hover:underline dark:text-brand-400">
-          English
-        </Link>
-      </div>
 
       <h1 className="text-2xl font-bold tracking-tight">Preguntas frecuentes</h1>
       <p className="mb-8 mt-2 text-muted">
@@ -150,17 +146,6 @@ export default function FaqPageEs() {
         ))}
       </div>
 
-      <p className="mt-8 text-xs text-muted">
-        ¿Tiene una pregunta que esto no responde? Consulte el{" "}
-        <Link href="/sitemap" className="text-brand-600 hover:underline dark:text-brand-400">
-          índice del sitio
-        </Link>{" "}
-        o escriba a{" "}
-        <a href="mailto:hello@casewhy.com" className="text-brand-600 hover:underline dark:text-brand-400">
-          hello@casewhy.com
-        </a>
-        .
-      </p>
-    </main>
+    </PublicPage>
   );
 }

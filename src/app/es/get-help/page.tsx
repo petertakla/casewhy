@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ShareButton } from "@/components/ShareButton";
 import { GetHelpChooserEs } from "./GetHelpChooserEs";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const metadata: Metadata = {
   title: "Obtener Ayuda — Encuentra un Abogado de Inmigración o Asistencia Legal Gratuita | CaseWhy",
@@ -89,11 +90,7 @@ const ENTITY_TYPES_ES: EntityCardEs[] = [
 export default function GetHelpPageEs() {
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-      <div className="mb-2 text-right text-sm">
-        <Link href="/get-help" hrefLang="en" lang="en" className="text-brand-600 hover:underline dark:text-brand-400">
-          English
-        </Link>
-      </div>
+      <LanguageSwitcher es={true} href="/get-help" />
 
       <h1 className="text-2xl font-bold tracking-tight">Obtener ayuda</h1>
       <p className="mt-2 text-muted">

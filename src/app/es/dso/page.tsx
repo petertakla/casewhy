@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getDsoDirectory } from "@/lib/dso/directory";
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const metadata: Metadata = {
   title: "Encuentra la Oficina Internacional de tu Universidad (DSO) | CaseWhy",
@@ -26,11 +27,7 @@ export default async function DsoPageEs() {
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-      <div className="mb-2 text-right text-sm">
-        <Link href="/dso" hrefLang="en" lang="en" className="text-brand-600 hover:underline dark:text-brand-400">
-          English
-        </Link>
-      </div>
+      <LanguageSwitcher es={true} href="/dso" />
 
       <h1 className="text-2xl font-bold tracking-tight">Encuentra la oficina internacional de tu escuela</h1>
       <p className="mb-2 mt-2 text-muted">

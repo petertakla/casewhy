@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ShareButton } from "@/components/ShareButton";
 import { ENTITY_TYPES } from "@/lib/get-help/entity-types";
 import { GetHelpChooser } from "./GetHelpChooser";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const metadata: Metadata = {
   title: "Get Help — Find an Immigration Attorney or Free Legal Aid | CaseWhy",
@@ -43,11 +44,7 @@ export const metadata: Metadata = {
 export default function GetHelpPage() {
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-      <div className="mb-2 text-right text-sm">
-        <Link href="/es/get-help" hrefLang="es" lang="es" className="text-brand-600 hover:underline dark:text-brand-400">
-          Español
-        </Link>
-      </div>
+      <LanguageSwitcher es={false} href="/es/get-help" />
 
       <h1 className="text-2xl font-bold tracking-tight">Get help</h1>
       <p className="mt-2 text-muted">

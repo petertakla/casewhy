@@ -6,6 +6,7 @@ import { getCaseStatus, UscisApiError } from "@/lib/uscis/client";
 import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { CaseChat, type QuickAskKind } from "./CaseChat";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const dynamic = "force-dynamic";
 
@@ -41,11 +42,7 @@ export default async function AskPage({
   if (!session?.user) {
     return (
       <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-        <div className="mb-2 text-right text-sm">
-          <Link href={langHref} className="text-brand-600 hover:underline dark:text-brand-400">
-            {es ? "English" : "Español"}
-          </Link>
-        </div>
+        <LanguageSwitcher es={es} href={langHref} />
         <h1 className="text-2xl font-bold tracking-tight">{es ? "Hacer una pregunta" : "Ask a question"}</h1>
         <p className="mb-8 mt-2 text-muted">
           {es
@@ -77,11 +74,7 @@ export default async function AskPage({
   if (trackedCasesList.length === 0) {
     return (
       <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-        <div className="mb-2 text-right text-sm">
-          <Link href={langHref} className="text-brand-600 hover:underline dark:text-brand-400">
-            {es ? "English" : "Español"}
-          </Link>
-        </div>
+        <LanguageSwitcher es={es} href={langHref} />
         <h1 className="text-2xl font-bold tracking-tight">{es ? "Hacer una pregunta" : "Ask a question"}</h1>
         <p className="mb-8 mt-2 text-muted">
           {es
@@ -143,11 +136,7 @@ export default async function AskPage({
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-      <div className="mb-2 text-right text-sm">
-        <Link href={langHref} className="text-brand-600 hover:underline dark:text-brand-400">
-          {es ? "English" : "Español"}
-        </Link>
-      </div>
+      <LanguageSwitcher es={es} href={langHref} />
       <h1 className="text-2xl font-bold tracking-tight">{es ? "Hacer una pregunta" : "Ask a question"}</h1>
       <p className="mb-8 mt-2 text-muted">
         {es

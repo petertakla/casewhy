@@ -20,6 +20,7 @@ jobs:
       - run: npm run lint
       - run: npm run validate:jsonld
       - run: npm run check:language-switcher
+      - run: npm run check:processing-times-age
       - run: npm run build
         env:
           USCIS_ENV: sandbox

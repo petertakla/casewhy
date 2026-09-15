@@ -30,6 +30,9 @@ export interface PublicPageEntry {
   /** Round 101 — short label for the Resources menu; falls back to `label` (some entries' full `label` is too long for a compact dropdown). */
   menuLabel?: string;
   menuLabelEs?: string;
+  /** Round 105 — marks a page as deliberately English-only, so its absence from the round-105 CI switcher check reads as a decision, not a gap. Always paired with switcherExemptReason. */
+  switcherExempt?: boolean;
+  switcherExemptReason?: string;
 }
 
 // Round 101 — paths whose own shell already provides equivalent chrome
@@ -101,6 +104,7 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
   },
   {
     href: "/get-help/ask",
+    hrefEs: "/get-help/ask?lang=es",
     label: "Ask CaseWhy — free, no sign-in required",
     labelEs: "Pregúntele a CaseWhy — gratis, sin necesidad de iniciar sesión",
     section: "Get help",
@@ -118,7 +122,16 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
     showInFooter: false,
     showInSitemapXml: true,
   },
-  { href: "/attorneys/join", label: "Attorney directory — join", section: "Get help", showInIndex: false, showInFooter: false, showInSitemapXml: true },
+  {
+    href: "/attorneys/join",
+    label: "Attorney directory — join",
+    section: "Get help",
+    showInIndex: false,
+    showInFooter: false,
+    showInSitemapXml: true,
+    switcherExempt: true,
+    switcherExemptReason: "Application form for attorneys/organizations; English-only by design",
+  },
   {
     href: "/accredited-representatives",
     hrefEs: "/es/accredited-representatives",
@@ -136,6 +149,8 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
     showInIndex: false,
     showInFooter: false,
     showInSitemapXml: true,
+    switcherExempt: true,
+    switcherExemptReason: "Application form for attorneys/organizations; English-only by design",
   },
   {
     href: "/legal-aid",
@@ -147,7 +162,16 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
     showInFooter: false,
     showInSitemapXml: true,
   },
-  { href: "/legal-aid/join", label: "Legal aid directory — join", section: "Get help", showInIndex: false, showInFooter: false, showInSitemapXml: true },
+  {
+    href: "/legal-aid/join",
+    label: "Legal aid directory — join",
+    section: "Get help",
+    showInIndex: false,
+    showInFooter: false,
+    showInSitemapXml: true,
+    switcherExempt: true,
+    switcherExemptReason: "Application form for attorneys/organizations; English-only by design",
+  },
   {
     href: "/pro-bono-representation",
     hrefEs: "/es/pro-bono-representation",
@@ -165,6 +189,8 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
     showInIndex: false,
     showInFooter: false,
     showInSitemapXml: true,
+    switcherExempt: true,
+    switcherExemptReason: "Application form for attorneys/organizations; English-only by design",
   },
   {
     href: "/dso",
@@ -176,7 +202,16 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
     showInFooter: false,
     showInSitemapXml: true,
   },
-  { href: "/dso/join", label: "DSO directory — join", section: "Get help", showInIndex: false, showInFooter: false, showInSitemapXml: true },
+  {
+    href: "/dso/join",
+    label: "DSO directory — join",
+    section: "Get help",
+    showInIndex: false,
+    showInFooter: false,
+    showInSitemapXml: true,
+    switcherExempt: true,
+    switcherExemptReason: "Application form for attorneys/organizations; English-only by design",
+  },
   {
     href: "/community-orgs",
     hrefEs: "/es/community-orgs",
@@ -194,6 +229,8 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
     showInIndex: false,
     showInFooter: false,
     showInSitemapXml: true,
+    switcherExempt: true,
+    switcherExemptReason: "Application form for attorneys/organizations; English-only by design",
   },
 
   // -- Reference --
@@ -235,6 +272,7 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
   },
   {
     href: "/policy",
+    hrefEs: "/policy?lang=es",
     label: "USCIS policy memos, explained",
     labelEs: "Memorandos de política de USCIS, explicados",
     section: "Reference",
@@ -247,6 +285,7 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
   },
   {
     href: "/updates",
+    hrefEs: "/updates?lang=es",
     label: "Updates — the CaseWhy blog",
     labelEs: "Actualizaciones — el blog de CaseWhy",
     section: "Reference",

@@ -29,7 +29,20 @@ const LOCALE_COOKIE = "casewhy_locale";
 // isSpanishLocale()), so arriving with no explicit `?lang=` shouldn't
 // reset anything — the whole point of the cookie is to survive exactly
 // that kind of ordinary, param-less navigation.
-const LOCALE_AWARE_EN_PATHS = ["/dashboard", "/ask", "/settings", "/processing-times", "/visa-bulletin", "/news"];
+// Round 105 — /policy, /updates, and /get-help/ask join the round-82
+// same-route family (?lang=es on the same URL, no separate /es/* twin),
+// same reasoning as /news above.
+const LOCALE_AWARE_EN_PATHS = [
+  "/dashboard",
+  "/ask",
+  "/settings",
+  "/processing-times",
+  "/visa-bulletin",
+  "/news",
+  "/policy",
+  "/updates",
+  "/get-help/ask",
+];
 
 // Round 83 follow-up — the six entity-type detail pages (/attorneys/[id],
 // /legal-aid/[slug], etc.) became locale-aware too, reading the same
@@ -54,6 +67,12 @@ const LOCALE_AWARE_EN_PREFIXES = [
   "/community-orgs/",
   "/pro-bono-representation/",
   "/accredited-representatives/",
+  // Round 105 — /policy/[id] and /updates/[slug], the dynamic half of the
+  // same-route family added to LOCALE_AWARE_EN_PATHS above. No /join
+  // sub-route exists under either, so the shared `!endsWith("/join")`
+  // exclusion below is a no-op here, not a real carve-out.
+  "/policy/",
+  "/updates/",
 ];
 
 function isLocaleAwarePath(pathname: string): boolean {

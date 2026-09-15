@@ -1,6 +1,6 @@
 ---
 title: "How Get Help works, and why it's free"
-date: 2026-09-25
+date: 2026-09-15
 summary: "Six kinds of help exist for a USCIS case, most of them free, and most people only know about one. Here's what each is, who it's for, and how we verify the listings."
 pillar: "get-help"
 sources:

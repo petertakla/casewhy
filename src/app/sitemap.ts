@@ -50,14 +50,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const policyPaths = POLICY_MEMOS.map((memo) => `/policy/${memo.id}`);
-  const updatePaths = updates.map((post) => `/updates/${post.slug}`);
+  // Round 108 — each post's own lastmod is now its real publishedAt
+  // (America/New_York, set from the round-89 queue row's postedAt),
+  // not the blanket "now" every other path below gets -- these are the
+  // "sitemap.xml lastmod for the five URLs" the task doc's verify-live
+  // step checks directly.
+  const updateEntries = updates.map((post) => ({
+    url: `${BASE_URL}/updates/${post.slug}`,
+    lastModified: new Date(`${post.publishedAt}T00:00:00Z`),
+  }));
 
   // /news/[id] permalinks deliberately excluded — they resolve against a
   // live feed and age out within days/weeks (see news/[id]/page.tsx's own
   // comment), not stable enough for a sitemap entry.
   const lastModified = new Date();
-  return [...staticPaths, ...entityPaths, ...policyPaths, ...updatePaths].map((path) => ({
-    url: `${BASE_URL}${path}`,
-    lastModified,
-  }));
+  return [
+    ...[...staticPaths, ...entityPaths, ...policyPaths].map((path) => ({ url: `${BASE_URL}${path}`, lastModified })),
+    ...updateEntries,
+  ];
 }

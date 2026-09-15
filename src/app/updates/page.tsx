@@ -114,7 +114,7 @@ export default async function UpdatesIndexPage({
               className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
             >
               <p className="text-xs font-semibold uppercase tracking-widest text-muted">
-                {formatDate(post.date, es)}
+                {formatDate(post.publishedAt!, es)}
                 {es && post.lang !== "es" && <span> · (en inglés)</span>}
               </p>
               <p className="mt-1.5 font-semibold text-foreground">{post.title}</p>

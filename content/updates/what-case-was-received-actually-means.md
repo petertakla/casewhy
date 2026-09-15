@@ -1,6 +1,6 @@
 ---
 title: "What \"Case Was Received\" actually means (and what it doesn't)"
-date: 2026-09-16
+date: 2026-09-15
 summary: "The first status almost every USCIS case shows — what it confirms, what it doesn't, and the three things worth doing while it sits there."
 pillar: "status-explained"
 sources:

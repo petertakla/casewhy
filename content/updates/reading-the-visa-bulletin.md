@@ -1,6 +1,6 @@
 ---
 title: "Reading the Visa Bulletin without a decoder ring"
-date: 2026-09-23
+date: 2026-09-15
 summary: "Priority dates, Final Action Dates, Dates for Filing, and what \"Current\" really means — the four terms that make the monthly bulletin readable."
 pillar: "visa-bulletin"
 sources:

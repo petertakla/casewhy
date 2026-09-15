@@ -1,6 +1,6 @@
 ---
 title: "When your case goes silent: what's normal, and what you can actually do"
-date: 2026-09-18
+date: 2026-09-15
 summary: "A quiet case isn't automatically a stuck case. Here's how USCIS defines \"outside normal processing time,\" and the three formal channels that exist once you're past it."
 pillar: "delays-and-escalation"
 sources:

@@ -23,7 +23,7 @@ export async function GET() {
   const items = posts
     .map((post) => {
       const url = `https://app.casewhy.com/updates/${post.slug}`;
-      const pubDate = new Date(`${post.date}T00:00:00Z`).toUTCString();
+      const pubDate = new Date(`${post.publishedAt}T00:00:00Z`).toUTCString();
       return `
     <item>
       <title>${escapeXml(post.title)}</title>

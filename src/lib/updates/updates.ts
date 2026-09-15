@@ -29,7 +29,19 @@ export interface UpdateSource {
 export interface UpdatePost {
   slug: string;
   title: string;
-  date: string; // YYYY-MM-DD
+  // Round 108 — split from the old single `date` field after Peter published
+  // all five seed posts and /updates showed four of them dated in the
+  // future: the cloud session's seed doc had staggered each file's
+  // frontmatter `date` as a suggested writing cadence, and this module
+  // rendered that literally as the publish date. authoredAt is that
+  // frontmatter value, kept for reference only -- never displayed to a
+  // reader. publishedAt (YYYY-MM-DD, America/New_York) is the real date, set
+  // from the round-89 queue row's postedAt at the moment Publish was
+  // clicked -- every reader-facing date comes from this field instead. Null
+  // only on the disk-only merge path (admin preview/editor/queue-card
+  // reads), which by construction only ever reads an unpublished post.
+  authoredAt: string; // YYYY-MM-DD, frontmatter `date` -- reference only
+  publishedAt: string | null; // YYYY-MM-DD, America/New_York -- what every reader shows
   summary: string;
   pillar: string;
   sources: UpdateSource[];
@@ -109,10 +121,11 @@ async function readAllPostsMerged(): Promise<UpdatePost[]> {
 // before). Every post's frontmatter writes `date: 2026-09-15` unquoted --
 // valid YAML, but gray-matter's underlying js-yaml parser resolves an
 // unquoted YYYY-MM-DD scalar to a native JS Date, not the plain string
-// this module's own UpdatePost.date comment ("YYYY-MM-DD") assumes.
-// String(aDateObject) produces "Mon Sep 15 2026 00:00:00 GMT+0000 (...)",
-// which `${post.date}T00:00:00Z` then turns into "Invalid Date" wherever
-// it's parsed again -- would have shipped to the first real reader.
+// this field (authoredAt as of round 108; just `date` at the time) is
+// meant to hold. String(aDateObject) produces "Mon Sep 15 2026 00:00:00
+// GMT+0000 (...)", which `${...}T00:00:00Z` then turns into "Invalid
+// Date" wherever it's parsed again -- would have shipped to the first
+// real reader.
 function normalizeFrontmatterDate(value: unknown): string {
   if (value instanceof Date) return value.toISOString().slice(0, 10);
   return String(value ?? "");
@@ -129,7 +142,8 @@ function readAllPostsFromDisk(): UpdatePost[] {
     return {
       slug,
       title: String(data.title ?? slug),
-      date: normalizeFrontmatterDate(data.date),
+      authoredAt: normalizeFrontmatterDate(data.date),
+      publishedAt: null,
       summary: String(data.summary ?? ""),
       pillar: String(data.pillar ?? ""),
       sources: Array.isArray(data.sources) ? data.sources : [],
@@ -140,39 +154,65 @@ function readAllPostsFromDisk(): UpdatePost[] {
   });
 }
 
-/** Which /updates slugs are actually approved to show publicly, per the round 89 queue. */
-async function approvedSlugSet(): Promise<Set<string>> {
+// Round 108 — America/New_York, matching the round-100 precedent of using
+// Eastern dates for anything user-facing (that round's privacy.html "Last
+// updated" line hit the same UTC-vs-Eastern mismatch this round is really
+// a variant of). en-CA formats as YYYY-MM-DD directly, no manual padding.
+function toEasternDateString(d: Date): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(d);
+}
+
+// Round 108 — used to return just a Set of approved slugs; now returns
+// each approved slug's real postedAt timestamp too (the round-89 queue
+// row's own postedAt, set by approveForAutoPost/markPosted at the moment
+// of the Publish click), which is what publishedAt and sort order are
+// both actually built from below. A row can only be "posted"/
+// "edited_posted" with a null postedAt in a state this code never
+// produces (every write path sets it in the same update) -- guarded
+// anyway rather than assumed, since a post with no real postedAt has
+// nothing honest to show as a publish date.
+async function approvedSlugsWithPostedAt(): Promise<Map<string, Date>> {
   const db = getDb();
   const posts = readAllPostsFromDisk();
   const destinations = posts.map((p) => destinationFor(p.slug));
-  if (destinations.length === 0) return new Set();
+  if (destinations.length === 0) return new Map();
 
   const rows = await db
-    .select({ destination: marketingQueue.destination, status: marketingQueue.status })
+    .select({ destination: marketingQueue.destination, status: marketingQueue.status, postedAt: marketingQueue.postedAt })
     .from(marketingQueue)
     .where(inArray(marketingQueue.destination, destinations));
 
-  const approved = new Set<string>();
+  const approved = new Map<string, Date>();
   for (const row of rows) {
-    if (row.status === "posted" || row.status === "edited_posted") {
-      approved.add(row.destination.replace("/updates/", ""));
+    if ((row.status === "posted" || row.status === "edited_posted") && row.postedAt) {
+      approved.set(row.destination.replace("/updates/", ""), row.postedAt);
     }
   }
   return approved;
 }
 
-/** Every publicly-visible post, newest first, with any DB override applied. */
+/** Every publicly-visible post, newest published first, with any DB override applied. */
 export async function getPublishedUpdates(): Promise<UpdatePost[]> {
-  const [approved, posts] = await Promise.all([approvedSlugSet(), readAllPostsMerged()]);
-  return posts.filter((p) => approved.has(p.slug)).sort((a, b) => (a.date < b.date ? 1 : -1));
+  const [approved, posts] = await Promise.all([approvedSlugsWithPostedAt(), readAllPostsMerged()]);
+  return posts
+    .filter((p) => approved.has(p.slug))
+    .sort((a, b) => approved.get(b.slug)!.getTime() - approved.get(a.slug)!.getTime())
+    .map((p) => ({ ...p, publishedAt: toEasternDateString(approved.get(p.slug)!) }));
 }
 
 /** A single post, only if it's actually approved -- callers should notFound() on null. With any DB override applied. */
 export async function getPublishedUpdateBySlug(slug: string): Promise<UpdatePost | null> {
-  const approved = await approvedSlugSet();
-  if (!approved.has(slug)) return null;
+  const approved = await approvedSlugsWithPostedAt();
+  const postedAt = approved.get(slug);
+  if (!postedAt) return null;
   const posts = await readAllPostsMerged();
-  return posts.find((p) => p.slug === slug) ?? null;
+  const post = posts.find((p) => p.slug === slug);
+  return post ? { ...post, publishedAt: toEasternDateString(postedAt) } : null;
 }
 
 /** All post slugs that exist as files, regardless of approval -- for seeding the queue. Deliberately disk-only: overrides never add/remove slugs, only edit content. */
@@ -211,6 +251,13 @@ export function updateDestination(slug: string): string {
 export interface AdminUpdateRow {
   slug: string;
   title: string;
+  // Round 108 — deliberately the authored (frontmatter) date, not
+  // publishedAt: this list also shows never-queued/pending/rejected rows,
+  // which have no publish date at all, and an admin reference table
+  // benefits from "when was this written" regardless of publish state.
+  // Out of the round-108 task doc's own explicit consumer list (list page,
+  // permalink, RSS, JSON-LD, sitemap) -- this admin-only view was left as
+  // a deliberate scope choice, not an oversight.
   date: string;
   publishStatus: "posted" | "edited_posted" | "pending" | "approved" | "escalated" | "skipped" | "rejected" | "not_queued";
   edited: boolean;
@@ -236,7 +283,7 @@ export async function getUpdatesForAdmin(): Promise<AdminUpdateRow[]> {
       (p): AdminUpdateRow => ({
         slug: p.slug,
         title: p.title,
-        date: p.date,
+        date: p.authoredAt,
         publishStatus: statusBySlug.get(p.slug) ?? "not_queued",
         edited: overrides.has(p.slug),
       })

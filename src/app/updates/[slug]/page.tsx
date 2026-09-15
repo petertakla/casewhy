@@ -110,8 +110,8 @@ export default async function UpdatePostPage({
     "@type": "Article",
     headline: post.title,
     description: post.summary,
-    datePublished: post.date,
-    dateModified: post.date,
+    datePublished: post.publishedAt,
+    dateModified: post.publishedAt,
     inLanguage: post.lang,
     url,
     author: { "@type": "Organization", name: "CaseWhy", url: "https://app.casewhy.com" },
@@ -174,12 +174,16 @@ export default async function UpdatePostPage({
         <p className="mt-1 text-xs font-semibold uppercase tracking-widest text-muted">(en inglés)</p>
       )}
       <p className="mt-1 text-muted">
-        {new Date(`${post.date}T00:00:00Z`).toLocaleDateString(isSpanish ? "es" : "en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-          timeZone: "UTC",
-        })}
+        {isPreview || !post.publishedAt
+          ? isSpanish
+            ? "Aún no publicado"
+            : "Not yet published"
+          : new Date(`${post.publishedAt}T00:00:00Z`).toLocaleDateString(isSpanish ? "es" : "en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+              timeZone: "UTC",
+            })}
       </p>
 
       <p className="mt-4 rounded-lg border border-border-strong bg-surface-2 p-3 text-sm text-foreground/90">

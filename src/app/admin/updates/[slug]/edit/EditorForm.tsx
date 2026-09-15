@@ -94,17 +94,19 @@ export function EditorForm({
     setError(null);
     try {
       await revertOverride(slug);
-      setTitle(initialTitle);
-      setSummary(initialSummary);
-      setBodyMd(initialBodyMd);
-      setSources(initialSources.length > 0 ? initialSources : [{ title: "", url: "" }]);
-      setOgImage(initialOgImage);
-      setEdited(false);
-      setConfirmingRevert(false);
-      setSaved(false);
+      // A full reload, not a client-side reset to initialTitle/etc --
+      // those props reflect whatever was live when this page first
+      // mounted, which (if an override already existed at that point) is
+      // the very content just deleted, not the true repo file. Caught
+      // live: after a real revert, the form kept showing the overridden
+      // text until the page was manually reloaded, which would read as
+      // "revert didn't work" even though the DB row was genuinely gone.
+      // Reloading re-fetches the server component's props from scratch,
+      // which is what the merge point (getUpdateBySlugFromDisk) now
+      // resolves to -- the actual repo file.
+      window.location.reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
-    } finally {
       setPending(false);
     }
   }

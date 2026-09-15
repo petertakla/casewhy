@@ -92,52 +92,61 @@
 
 <main class="wrap">
   <h1>Privacy Policy</h1>
-  <p class="updated">Effective: September 6, 2026 — Last updated: September 11, 2026</p>
+  <p class="updated">Effective: September 6, 2026 — Last updated: September 15, 2026</p>
 
   <p>CaseWhy ("we," "us," "our") helps people track U.S. Citizenship and Immigration Services (USCIS) case status and understand what changes to their case mean. This policy explains what information we collect, why, and how it's protected. It works alongside our <a href="terms.html">Terms of Service</a>, which governs your use of CaseWhy more broadly.</p>
 
   <h2>1. Information We Collect</h2>
   <ul>
     <li><strong>Account information:</strong> the email address you sign up with, and a password (stored securely, never in plain text).</li>
-    <li><strong>Case information:</strong> the USCIS receipt number(s) you add, and the case status history and updates we retrieve on your behalf through USCIS's official Case Status API.</li>
+    <li><strong>Case information:</strong> the USCIS receipt number(s) you add, and the case status history and updates we retrieve on your behalf through USCIS's official Case Status API — see Section 2 for how receipt numbers are protected.</li>
     <li><strong>Usage information:</strong> basic technical data (such as browser type and pages visited) used to keep the service working and improve it — we do not use invasive tracking or sell this data.</li>
     <li><strong>Pre-launch notify-me email:</strong> if you join the waitlist on this site before CaseWhy is open for signups, we store only the email address you provide, so we can email you once at launch. It isn't linked to any account or case data unless you later sign up yourself.</li>
     <li><strong>Mailing address (CaseWhy Plus escalation toolkit only):</strong> if you use the representative-lookup or letter-drafting tools, we store the name and mailing address you provide — encrypted at rest with the same standard used for your receipt number — so we can identify your congressional district and pre-fill your own letters. We don't use it for anything else, and it's never shared beyond the U.S. Census Bureau's public geocoding lookup (used only to resolve your district, not stored by them on our behalf).</li>
   </ul>
 
-  <h2>2. How We Use Your Information</h2>
+  <h2>2. USCIS Receipt Numbers Are Personal Information</h2>
+  <p>A USCIS receipt number identifies a specific immigration case and the person it belongs to. USCIS treats receipt numbers as personally identifiable information (PII), and so do we. This section explains exactly what we do with them.</p>
+  <p><strong>What we collect.</strong> The receipt number(s) you enter to look up or track a case. We never obtain receipt numbers from anyone but you.</p>
+  <p><strong>How we use them.</strong> We use a receipt number to query USCIS's official Case Status API on your behalf and retrieve that case's status and history. For a case you have chosen to track, our automated status-check job re-queries USCIS with the receipt number once a day (or on demand if you use "Check now" on CaseWhy Plus) and compares the result to the last status we saw, so we can notify you of a change. The AI service that generates plain-language explanations of a status change receives the status text only — never your receipt number. If you use CaseWhy Plus's escalation-letter drafting tool, your receipt number is included in the drafted letter itself (since the letter identifies your case to USCIS, a congressional office, or the USCIS Ombudsman) and is sent to that same AI service solely to help draft that letter; the letter text is returned to you and is not separately stored. We do not use receipt numbers for advertising, analytics, profiling, or any other purpose.</p>
+  <p><strong>How we store them.</strong> For a tracked case, the receipt number is encrypted in our application using AES-256-GCM before it is written to the database, with the encryption key held separately from the database as a protected secret. The database itself is additionally encrypted at rest by our hosting provider, and every connection between your browser, our servers, our database, and USCIS is encrypted in transit (TLS). Our case-history records store only the three-letter USCIS service-center prefix of a receipt number, never the full number. A receipt number you look up without tracking it is used only to perform that lookup and is not stored in our database.</p>
+  <p><strong>Who can access them.</strong> Your receipt number is decrypted only to display your case to you when you are signed in and to run the status check for a case you track. No CaseWhy staff member can view your receipt number in plaintext through any administrative tool. We do not share receipt numbers with any third party other than USCIS itself, for the sole purpose of the status query described above, and Anthropic, solely to generate the explanations and letter drafts described above. If you generate an attorney-handoff report or store documents in your case's vault (CaseWhy Plus), your receipt number appears in that report and those files belong to you; we do not send them anywhere.</p>
+  <p><strong>How long we keep them.</strong> As long as the case is tracked in your account. When you stop tracking a case, its receipt number is deleted; when you delete your account, all receipt numbers and case data are permanently deleted within 30 days (see Section 6).</p>
+  <p><strong>Unauthorized access or disclosure.</strong> If we become aware of a security incident affecting your receipt number or case data, we will notify you without undue delay, as described in Section 6.</p>
+
+  <h2>3. How We Use Your Information</h2>
   <ul>
     <li>To check your case status on the schedule you've set and notify you when it changes.</li>
-    <li>To generate a plain-language explanation of what a status change means, using an AI service (see Section 4).</li>
+    <li>To generate a plain-language explanation of what a status change means, using an AI service (see Section 5).</li>
     <li>To provide general, informational guidance about common next steps — never a personalized legal conclusion about your specific case.</li>
     <li>To operate, maintain, and improve CaseWhy itself.</li>
     <li>De-identified or aggregated case status history may be used to build processing-time statistics or estimates in the future.</li>
   </ul>
 
-  <h2>3. What We Don't Do</h2>
+  <h2>4. What We Don't Do</h2>
   <ul>
     <li>We do not sell or rent your personal information to third parties.</li>
     <li>We do not use your case data for advertising.</li>
     <li>We do not provide legal advice, and nothing in the app should be treated as legal advice — see the disclaimer on our home page.</li>
     <li>CaseWhy runs no advertising of any kind, so we don't use advertising trackers, third-party ad SDKs, or advertising identifiers (like a Google Advertising ID) — there's no ad network for your information to reach in the first place.</li>
-    <li>We do not share de-identified, anonymized, or pseudonymized data with any third party beyond the service providers listed in Section 4, and never for advertising, marketing, or research purposes.</li>
+    <li>We do not share de-identified, anonymized, or pseudonymized data with any third party beyond the service providers listed in Section 5, and never for advertising, marketing, or research purposes.</li>
   </ul>
 
-  <h2>4. Third-Party Services We Use</h2>
+  <h2>5. Third-Party Services We Use</h2>
   <p>To provide the service, we share limited data with:</p>
   <ul>
     <li><strong>USCIS's official Case Status API</strong> — to retrieve your case's status using the receipt number you provide.</li>
-    <li><strong>An AI service (Claude, by Anthropic)</strong> — to turn raw status text into a plain-language explanation. Only the case status text needed to generate your explanation is sent; we do not send your full account or contact details.</li>
+    <li><strong>An AI service (Claude, by Anthropic)</strong> — to turn raw status text into a plain-language explanation, and, if you use CaseWhy Plus's escalation-letter drafting tool, to draft that letter from your case facts (including your receipt number) and the mailing address and reason you provide for it. Only the data needed for the specific feature you're using is sent.</li>
     <li><strong>An email delivery provider</strong> — to send account and status-change notifications.</li>
     <li><strong>The U.S. Census Bureau's Geocoding Services API</strong> (CaseWhy Plus only) — to resolve a mailing address you provide to a congressional district, if you use the representative-lookup tool.</li>
   </ul>
   <p>Each of these providers is contractually and/or technically limited to using your data only to provide the relevant part of the service.</p>
 
-  <h2>5. Data Retention &amp; Security</h2>
-  <p>Case and account data is encrypted both at rest and in transit. We retain your data for as long as your account is active — an inactive or dormant account doesn't trigger any different handling or earlier deletion; your data stays protected under this same policy until you request deletion. If you delete your account, your case data is permanently deleted within 30 days.</p>
+  <h2>6. Data Retention &amp; Security</h2>
+  <p>Case and account data is encrypted both at rest and in transit. Receipt numbers receive the additional application-level encryption described in Section 2. We retain your data for as long as your account is active — an inactive or dormant account doesn't trigger any different handling or earlier deletion; your data stays protected under this same policy until you request deletion. If you delete your account, your case data is permanently deleted within 30 days.</p>
   <p>If we ever experience a data breach affecting your personal information, we'll notify you without undue delay and provide instructions for any steps you should take in response.</p>
 
-  <h2>6. Your Rights</h2>
+  <h2>7. Your Rights</h2>
   <p>You can access, correct, or delete your data at any time from your account settings, or by emailing <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>. Depending on your state of residence, you may have additional rights under applicable state privacy laws, such as the California Consumer Privacy Act (CCPA) — including the right to know what personal information we hold, request its deletion, and opt out of its sale (we don't sell personal information, so there's nothing to opt out of). Contact us at the email above to exercise any of these rights.</p>
   <p><strong>State-specific privacy rights.</strong> Depending on where you live, you may have additional rights under state law, including:</p>
   <ul>
@@ -147,19 +156,19 @@
   </ul>
   <p>To exercise any of these rights, contact us at <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>. We'll respond within the time required by applicable law. You also have the right to lodge a complaint with your state attorney general or other applicable data protection authority.</p>
 
-  <h2>7. Children's Privacy</h2>
+  <h2>8. Children's Privacy</h2>
   <p>CaseWhy is not directed to children, and our Terms of Service require users to be at least 18 years old. We do not knowingly collect personal information from anyone under 18. If you're a parent or guardian and believe your child has provided us with personal information, contact us at <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a> and we'll delete it.</p>
 
-  <h2>8. Business Transfers</h2>
+  <h2>9. Business Transfers</h2>
   <p>If CaseWhy is ever acquired by, merged into, or transfers substantially all of its assets to another company, your information may be transferred as part of that transaction. Any new owner would be bound to handle it under this Privacy Policy, or one that is materially similar — and if the new owner's policy is materially different, we'll notify you before your information is transferred, and you'll be able to request deletion of your data instead.</p>
 
-  <h2>9. Not Legal Advice</h2>
+  <h2>10. Not Legal Advice</h2>
   <p>CaseWhy is not a law firm, is not affiliated with USCIS or DHS, and does not provide legal advice or representation. Information provided through CaseWhy is general and educational. For advice about your specific case, consult a licensed immigration attorney.</p>
 
-  <h2>10. Changes to This Policy</h2>
+  <h2>11. Changes to This Policy</h2>
   <p>We'll post any changes to this policy on this page and update the date at the top. For a material change — one that meaningfully affects how we collect, use, or share your information — we'll also email you a plain-language summary of what changed, and require you to actively acknowledge the update (for example, by confirming it the next time you sign in) before you can keep using features affected by that change.</p>
 
-  <h2>11. Contact</h2>
+  <h2>12. Contact</h2>
   <p>Questions about this policy: <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a></p>
   <p>CaseWhy LLC<br>7901 4th St N, Ste 300<br>St. Petersburg, FL 33702<br>US</p>
 </main>

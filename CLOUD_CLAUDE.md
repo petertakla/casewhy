@@ -2667,3 +2667,33 @@ Task doc: `claude_round107-edit-blog-post-in-browser-task` (Drive), from Peter's
 - tsc/lint clean, production build succeeds, deployed (four commits: schema/merge point, admin pages, queue-card fix, then the two live-caught bug fixes).
 
 Fold into CLOUD_CLAUDE.md referencing rounds 93, 98, 103, per the task doc's own instruction.
+
+## Round 106, DONE Sep 15 — processing-times refresh, five missing forms, staleness visible
+
+Task doc: `claude_round106-processing-times-refresh-and-expansion-task` (Drive). Peter chose Option 1 (hand-captured, broader, refreshed monthly) over a live scraper — CW-33's original finding (Cloudflare blocks a plain fetch; a real browser passes fine) still holds and wasn't re-tested.
+
+**Refresh — all 7 existing entries re-driven live against `egov.uscis.gov/processing-times`, none changed:** I-130 Immediate Relative 24mo, I-140 EB-1 31mo, I-140 EB-2 2.5mo, I-485 employment-based 40mo, I-765 (c)(9) 11mo, I-751 33.5mo, I-90 10-year renewal 10.5mo — all identical to the prior capture. `ProcessingTimeEntry` gained a per-entry `asOf`, replacing the single global `PROCESSING_TIMES_AS_OF` constant as the source of truth (that constant now derives as the max of the entries' own `asOf` values instead of being hand-set independently, so it can't drift out of sync).
+
+**Five new forms captured, two real corrections to the task doc's own assumed office along the way (confirmed directly against the tool, not assumed):**
+- **I-131** — the tool doesn't have one "Advance Parole" number the way the task doc implied; it splits into **Advance Parole** (24mo) and a combined **Re-entry Permit or Refugee Travel Document** category (16mo) — USCIS's own tool reports the latter two together, not separately. Both at Service Center Operations, **not National Benefits Center** as the task doc assumed — the tool only offers SCOPS for this form.
+- **N-600** — confirmed no national figure exists: the tool's office dropdown for N-600 lists ~90 individual field offices, no SCOPS/NBC option at all. Added to `FIELD_OFFICE_ONLY_FORMS` with the same honest treatment as N-400.
+- **I-129 (H-1B)** — 11 months, extension-of-stay-in-the-U.S. category (regular processing), Service Center Operations. Noted premium processing is 15 business days by statute for most classifications, linking USCIS's own premium-processing page rather than capturing a number, per the task doc's own instruction.
+- **I-589** — confirmed it isn't in the tool's Form dropdown **at all**, not even as a field-office-only entry — asylum interviews are scheduled by the individual asylum office on its own docket, genuinely untracked here at any level. Added to `FIELD_OFFICE_ONLY_FORMS` with a real, verified link to USCIS's Asylum Office Locator (`egov.uscis.gov/office-locator/#/asy` — found via USCIS's own Asylum landing page after an initial guessed URL 404'd; `FieldOfficeOnlyForm` gained an optional `locatorUrl`/`locatorLabel`/`locatorLabelEs` per-entry, since this is a third, distinct locator from the page's existing shared field-office/ASC links).
+- **I-821D** — DACA renewal, 6.5 months, Service Center Operations, **not National Benefits Center** as the task doc assumed (same pattern as I-131 — the tool only offers SCOPS here too).
+
+All five wired into `case-type-timeline.ts`'s case-add dropdown blurbs with their real figures (I-131, I-129, I-821D); N-600 and I-589's blurbs reworded from "no fixed timeline figure sourced yet" to state plainly *why* no figure exists, now that it's been confirmed rather than just not yet looked up. Every blurb's date reference switched from the old single `PROCESSING_TIMES_AS_OF` import to each cited entry's own `asOf`.
+
+**Staleness made visible, and the refresh made a routine:** `/processing-times` shows each entry's own as-of date now, not just one page-header line. A muted (non-alarming) banner reading "Some figures are more than a month old — check the USCIS tool for the latest" (Spanish equivalent, manifest) appears once any entry passes 45 days old (`hasStaleEntry()`). `scripts/check-processing-times-age.ts` (wired into CI as a warning, not a failure, per the task doc's explicit instruction) prints every entry past 35 days old — 10 days of advance notice before a real visitor would ever see the page's own banner. Both share the same `daysSince()` helper so the two thresholds can't silently disagree about what "old" means.
+
+**Monthly processing-times refresh procedure**, for whoever runs it next (Peter's calendar has a reminder on the 5th; the cloud session checks the page's as-of dates in its weekly review):
+1. Run `npm run check:processing-times-age` — it names every entry past 35 days, or confirms none are.
+2. For each entry it flags (or, on a full monthly pass, all of them): open `egov.uscis.gov/processing-times` in a real browser (Claude in Chrome — a plain fetch is Cloudflare-blocked, confirmed both by CW-33 and this round), select the same Form/Category/Office each entry already records, read the new figure.
+3. Update that entry's `percentile80Months` and `asOf` in `src/lib/kb/processing-times.ts`. If a figure genuinely changed, note the before/after in this file the way this round's own entry does.
+4. `npx tsc --noEmit`, `npm run lint`, `npm run build`, deploy, confirm `/processing-times` live shows the new `asOf` dates.
+
+**Verify live, all real:**
+- All 7 existing figures confirmed live against the real tool (none changed, reported above); all 5 new figures captured live the same way, including confirming N-600 and I-589 both genuinely have no national option before writing the "no figure" treatment for either — never assumed from the task doc's own framing.
+- `npm run check:processing-times-age` tested both states directly: passed clean against the real (all-today) data, then one entry's `asOf` was set to 2026-07-01 on a working copy — the script warned, named that exact entry, and still exited 0 — restored before committing anything.
+- tsc/lint/build clean. `validate:jsonld` and `check:language-switcher` both still pass (this round touched neither JSON-LD nor any switcher-bearing page's own markup). Deployed.
+
+Fold into CLOUD_CLAUDE.md; the standing "monthly refresh" procedure above lives here as the source of truth the cloud session's own weekly review checks against.

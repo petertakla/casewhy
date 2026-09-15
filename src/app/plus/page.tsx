@@ -6,6 +6,7 @@ import { getAllEffectivePrices, type EffectivePrice, type PlanId } from "@/lib/b
 import { startCheckout, openBillingPortal } from "./actions";
 import { ShareButton } from "@/components/ShareButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PlusBadge } from "@/components/PlusBadge";
 
 export const metadata: Metadata = {
   title: "CaseWhy Plus — Pricing & Features | CaseWhy",
@@ -198,7 +199,9 @@ export default async function PlusPage({
         </div>
       )}
 
-      <h1 className="text-3xl font-bold tracking-tight">CaseWhy Plus</h1>
+      <h1 className="text-3xl font-bold tracking-tight">
+        CaseWhy <PlusBadge size="lg" />
+      </h1>
       <p className="mb-2 mt-2 text-lg text-muted">
         Unlimited, cited AI chat about your case — plus the escalation toolkit for when it
         stalls. For you and your whole family.
@@ -297,7 +300,9 @@ export default async function PlusPage({
         <div className="grid grid-cols-[1fr_auto_auto] gap-4 border-b border-border-strong pb-3 text-xs font-semibold uppercase tracking-widest text-muted sm:grid-cols-[1fr_140px_140px]">
           <span></span>
           <span className="text-center">Free</span>
-          <span className="text-center text-brand-600 dark:text-brand-400">Plus</span>
+          <span className="text-center">
+            <PlusBadge size="sm" />
+          </span>
         </div>
         {PLUS_FEATURES.map((feature) => (
           <FeatureRow key={feature.id} id={feature.id} title={feature.title} free={feature.free} plus={feature.plus} />

@@ -8,6 +8,7 @@ import { useIsSpanish } from "@/lib/i18n/use-is-spanish";
 import { PUBLIC_PAGES } from "@/lib/site/pages";
 import { Logo } from "./Logo";
 import { ResourcesMenu } from "./ResourcesMenu";
+import { PlusBadge } from "./PlusBadge";
 
 // Round 101 — Processing times, Visa bulletin, and News moved out of here
 // into the registry-driven Resources menu (see ResourcesMenu.tsx); this
@@ -17,6 +18,10 @@ import { ResourcesMenu } from "./ResourcesMenu";
 const NAV_LINKS = [
   { href: "/dashboard", label: "Dashboard", labelEs: "Panel" },
   { href: "/ask", label: "Ask a question", labelEs: "Hacer una pregunta" },
+  // Round 109 — label kept as plain "CaseWhy Plus" for anything reading
+  // this list as data (e.g. a screen reader with CSS disabled); the badge
+  // treatment is applied in renderNavLink() below, which special-cases
+  // this one href instead of rendering link.label literally.
   { href: "/plus", label: "CaseWhy Plus" },
   { href: "/get-help", label: "Get Help", labelEs: "Obtener ayuda" },
   { href: "/settings", label: "Settings", labelEs: "Configuración" },
@@ -39,14 +44,21 @@ function renderNavLink(
 ) {
   const href = localizeHref(link.href);
   const active = pathname.startsWith(href);
+  const className = `whitespace-nowrap pb-0.5 ${
+    active ? "border-b-2 border-brand-500 font-semibold text-foreground" : "text-muted hover:text-foreground"
+  }`;
+  // Round 109 — the one nav item that gets the Plus badge instead of its
+  // plain label text. The active-underline (border-b-2, above) is on the
+  // Link itself, so it spans both "CaseWhy" and the badge automatically.
+  if (link.href === "/plus") {
+    return (
+      <Link key={link.href} href={href} className={className}>
+        CaseWhy <PlusBadge size="sm" />
+      </Link>
+    );
+  }
   return (
-    <Link
-      key={link.href}
-      href={href}
-      className={`whitespace-nowrap pb-0.5 ${
-        active ? "border-b-2 border-brand-500 font-semibold text-foreground" : "text-muted hover:text-foreground"
-      }`}
-    >
+    <Link key={link.href} href={href} className={className}>
       {isSpanish && link.labelEs ? link.labelEs : link.label}
     </Link>
   );

@@ -6,6 +6,7 @@ import { getAllEffectivePrices, type EffectivePrice, type PlanId } from "@/lib/b
 import { startCheckout, openBillingPortal } from "@/app/plus/actions";
 import { ShareButton } from "@/components/ShareButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PlusBadge } from "@/components/PlusBadge";
 
 // Round 79 — Spanish translation of /plus. Reuses the real Stripe actions
 // and pricing/subscription logic from the English page as-is (business
@@ -204,7 +205,9 @@ export default async function PlusPageEs({
         </div>
       )}
 
-      <h1 className="text-3xl font-bold tracking-tight">CaseWhy Plus</h1>
+      <h1 className="text-3xl font-bold tracking-tight">
+        CaseWhy <PlusBadge size="lg" />
+      </h1>
       <p className="mb-2 mt-2 text-lg text-muted">
         Chat de IA ilimitado y con citas sobre tu caso — más el kit de herramientas de
         escalamiento para cuando se estanca. Para ti y toda tu familia.
@@ -305,7 +308,9 @@ export default async function PlusPageEs({
         <div className="grid grid-cols-[1fr_auto_auto] gap-4 border-b border-border-strong pb-3 text-xs font-semibold uppercase tracking-widest text-muted sm:grid-cols-[1fr_140px_140px]">
           <span></span>
           <span className="text-center">Gratis</span>
-          <span className="text-center text-brand-600 dark:text-brand-400">Plus</span>
+          <span className="text-center">
+            <PlusBadge size="sm" />
+          </span>
         </div>
         {PLUS_FEATURES.map((feature) => (
           <FeatureRow key={feature.id} id={feature.id} title={feature.title} free={feature.free} plus={feature.plus} />

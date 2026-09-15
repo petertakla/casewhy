@@ -626,3 +626,59 @@ export async function sendLegalAidApplicationNotification({
     throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
   }
 }
+
+// Round 100 — the material-change notice Section 11 (was 10) of
+// privacy.html promises: sent once per recipient (never a multi-recipient
+// To/Cc, which would leak every account holder's email to every other
+// recipient) by scripts/send-policy-update-notice.ts, which is the only
+// caller. One email at a time, not the To-address of a bulk send, since
+// this reuses the existing single-recipient Postmark call shape everywhere
+// else in this file rather than standing up a batch-send path for one
+// occasional notice.
+export async function sendPolicyUpdateSummaryEmail({
+  to,
+  policyLabel,
+  summaryLines,
+  policyUrl,
+}: {
+  to: string;
+  policyLabel: string;
+  summaryLines: string[];
+  policyUrl: string;
+}): Promise<void> {
+  const token = process.env.POSTMARK_API_TOKEN;
+  if (!token) {
+    console.warn(`[postmark] POSTMARK_API_TOKEN not set — skipping policy update notice to ${to}`);
+    return;
+  }
+
+  const res = await fetch("https://api.postmarkapp.com/email", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Postmark-Server-Token": token,
+    },
+    body: JSON.stringify({
+      From: FROM_ADDRESS,
+      To: to,
+      Subject: `CaseWhy — we've updated our ${policyLabel}`,
+      TextBody: [
+        `We've made a change to our ${policyLabel} that we want you to know about:`,
+        "",
+        ...summaryLines.map((line) => `- ${line}`),
+        "",
+        `Read the full ${policyLabel}: ${policyUrl}`,
+        "",
+        "You'll be asked to acknowledge this the next time you sign in — no action is needed before then.",
+        "",
+        "Questions? Reply to this email or write to privacy@casewhy.com.",
+      ].join("\n"),
+      MessageStream: "outbound",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
+  }
+}

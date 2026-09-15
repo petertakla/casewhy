@@ -770,8 +770,9 @@ export const listingReports = pgTable("listing_reports", {
 export const policyTypeEnum = pgEnum("policy_type", ["tos", "privacy"]);
 
 // Round 69, Part 1 — closes the "active consent" gap in USCIS's Developer
-// Portal Affidavit privacy/ToS checklist (privacy.html Section 10 / terms.html
-// Section 15 previously only promised an email on material changes, which
+// Portal Affidavit privacy/ToS checklist (privacy.html Section 11 — was
+// Section 10 before round 100's renumbering — / terms.html Section 15
+// previously only promised an email on material changes, which
 // satisfies "notify," not "active consent"). One row per explicit
 // acknowledgment click — src/lib/policy/acknowledgments.ts is the only
 // writer. `version` is the literal "Last updated" date string from the

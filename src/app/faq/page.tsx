@@ -7,8 +7,9 @@ import { PublicPage } from "@/components/PublicPage";
 // actually asks, previously scattered across the ToS, privacy policy, and
 // inline disclaimers with no single page answering them directly.
 // Answers below are pulled verbatim-in-substance from already-approved
-// language (terms.html §2-3, privacy.html §3/§5, the Get Help hub's "free,
-// no ads, ever" line) — this is a compilation task, not new policy-writing.
+// language (terms.html §2-3, privacy.html §4/§6 as of round 100's
+// renumbering — was §3/§5, the Get Help hub's "free, no ads, ever" line) —
+// this is a compilation task, not new policy-writing.
 // See round73-seo-geo-foundation-task.md item 8.
 
 export const metadata: Metadata = {

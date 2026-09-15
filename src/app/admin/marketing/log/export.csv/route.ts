@@ -23,11 +23,12 @@ export async function GET() {
   const db = getDb();
   const rows = await db.select().from(marketingQueue).orderBy(desc(marketingQueue.createdAt));
 
-  const header = "channel,mode,destination,status,posted_at,posted_url,created_at,guardrail_notes";
+  const header = "channel,mode,locale,destination,status,posted_at,posted_url,created_at,guardrail_notes";
   const lines = rows.map((r) =>
     [
       r.channel,
       r.mode,
+      r.locale,
       csvEscape(r.destination),
       r.status,
       r.postedAt?.toISOString() ?? "",

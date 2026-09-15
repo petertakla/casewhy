@@ -1183,6 +1183,13 @@ export const marketingQueue = pgTable(
     // checked, any borderline note, and (for escalated rows) the specific
     // Section 3 reason this didn't get a normal draft.
     guardrailNotes: text("guardrail_notes"),
+    // Round 90 — "en" until marketingSettings.spanishSocialEnabled flips
+    // on (Peter's decision: English social pages launch first, Spanish
+    // second — see the round 90 task doc's Section 4). Not scoped to the
+    // watcher's own channels specifically; any channel could in principle
+    // carry a locale-specific draft later, so this lives on the shared
+    // table rather than a news-item-only field.
+    locale: text("locale").notNull().default("en"),
     status: marketingQueueStatusEnum("status").notNull().default("pending"),
     postedAt: timestamp("posted_at", { withTimezone: true }),
     postedUrl: text("posted_url"),
@@ -1196,10 +1203,14 @@ export const marketingQueue = pgTable(
   },
   (table) => [
     // A destination can recur across channels in principle (unlikely, but
-    // not impossible), so uniqueness is scoped to (channel, destination)
-    // rather than destination alone — same dedupe intent as round 85's
-    // threadUrl-alone constraint, generalized for a multi-channel table.
-    unique("marketing_queue_channel_destination_unique").on(table.channel, table.destination),
+    // not impossible), so uniqueness is scoped to (channel, destination,
+    // locale) rather than (channel, destination) alone as of round 90 —
+    // a news item drafted into both an English and (once
+    // marketingSettings.spanishSocialEnabled flips on) a Spanish X/Threads
+    // draft shares the same channel AND destination (the source URL),
+    // differing only in locale, so locale has to be part of the uniqueness
+    // key or the second insert would collide with the first.
+    unique("marketing_queue_channel_destination_locale_unique").on(table.channel, table.destination, table.locale),
     index("marketing_queue_status_idx").on(table.status),
     index("marketing_queue_channel_idx").on(table.channel),
   ]
@@ -1277,8 +1288,54 @@ export const marketingLandingCounts = pgTable(
 export const marketingSettings = pgTable("marketing_settings", {
   id: text("id").primaryKey().default("singleton"),
   dailyDraftCap: integer("daily_draft_cap").notNull().default(5),
+  // Round 90 — Peter's decision (Sep 15): English social accounts (X,
+  // Threads) launch first; Spanish accounts come second, once the English
+  // ones have posted for at least two weeks and Peter says go. Default
+  // false. When flipped on, the poll-policy-news watcher generates a
+  // second, independently-composed (not machine-translated) Spanish draft
+  // per news item, targeted at separate Spanish accounts Peter creates at
+  // that time — see the round 90 task doc's Section 4.
+  spanishSocialEnabled: boolean("spanish_social_enabled").notNull().default(false),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// Round 90 — one row per news/policy item the poll-policy-news watcher has
+// ever seen, across every source in src/lib/marketing/news-watcher/sources.ts.
+// Dedupe key is the source URL itself (unique below); titleHash is a second,
+// looser dedupe signal (per the task doc's explicit "dedupe by URL + title
+// hash" instruction) for the rare case where the same underlying item shows
+// up at two different URLs (e.g. a Federal Register document re-published
+// under a corrected docket number) — checked against on insert by the
+// watcher route itself, not a DB constraint, since a false-positive title
+// collision blocking a real second item would be worse than an occasional
+// near-duplicate slipping through for Peter to catch in the queue.
+// processedAt is set once the watcher has attempted drafting for this item
+// (whether that produced a draft or an escalation) so a later poll doesn't
+// redo the work.
+export const newsItems = pgTable(
+  "news_items",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    sourceId: text("source_id").notNull(),
+    sourceName: text("source_name").notNull(),
+    url: text("url").notNull(),
+    title: text("title").notNull(),
+    titleHash: text("title_hash").notNull(),
+    rawSummary: text("raw_summary"),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    // Delimited list of kb/policy-memos.ts ids this item plausibly relates
+    // to (simple keyword match — see news-watcher/kb-match.ts), same plain-
+    // text-column convention as marketingQueue.sourceCitations. Not surfaced
+    // in any draft yet (links are off, LINKS_ENABLED = false), but ready for
+    // a future round to link CaseWhy's own /policy permalink once they are.
+    kbRelatedMemoIds: text("kb_related_memo_ids"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    processedAt: timestamp("processed_at", { withTimezone: true }),
+  },
+  (table) => [unique("news_items_url_unique").on(table.url), index("news_items_title_hash_idx").on(table.titleHash)]
+);
 
 // Round 107 — an admin edit of a /updates post, keyed by the slug it
 // overrides. content/updates/<slug>.md stays the seed; a row here wins

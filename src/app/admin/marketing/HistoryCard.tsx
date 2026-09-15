@@ -26,6 +26,7 @@ export function HistoryCard({
   status,
   postedUrl,
   reviewedAt,
+  locale,
 }: {
   channel: string;
   destination: string;
@@ -33,11 +34,20 @@ export function HistoryCard({
   status: string;
   postedUrl: string | null;
   reviewedAt: Date | null;
+  /** Round 90 — "en" | "es", shown as a chip. */
+  locale?: string;
 }) {
   return (
     <div className="rounded-2xl border border-border bg-surface p-6 opacity-80">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="font-mono text-xs uppercase tracking-widest text-muted">{CHANNEL_LABELS[channel] ?? channel}</p>
+        <p className="font-mono text-xs uppercase tracking-widest text-muted">
+          {CHANNEL_LABELS[channel] ?? channel}
+          {locale === "es" && (
+            <span className="ml-2 rounded-full bg-brand-500/15 px-2 py-0.5 text-brand-600 normal-case tracking-normal dark:text-brand-400">
+              ES
+            </span>
+          )}
+        </p>
         <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[status] ?? "bg-border-strong text-muted"}`}>
           {STATUS_LABELS[status] ?? status}
         </span>

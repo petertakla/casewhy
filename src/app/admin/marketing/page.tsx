@@ -109,9 +109,10 @@ export default async function MarketingQueueAdminPage({
       <h1 className="text-2xl font-bold tracking-tight">Marketing queue</h1>
       <p className="mb-2 mt-2 text-muted">
         Community/forum channels never post automatically — you copy the text and post it yourself, then mark it
-        here. Blog can already auto-post (a real click publishes to /updates); other owned channels will auto-post
-        once a future round wires up that platform&apos;s API — but only after a real approval click on that
-        specific item.
+        here. Blog, X, and Threads can auto-post (a real approval click actually posts) — X/Threads need their API
+        credentials set first (see the round 90 checklist in CLOUD_CLAUDE.md) or the click will surface a clear
+        error instead of posting. Every other owned channel still auto-posts only once a future round wires up
+        that platform&apos;s API.
       </p>
       <p className="mb-6 text-xs text-muted">
         Amber-highlighted cards were flagged by the classifier instead of drafted — a legal-advice request, hostile
@@ -188,6 +189,7 @@ export default async function MarketingQueueAdminPage({
                       status={row.status}
                       postedUrl={row.postedUrl}
                       reviewedAt={row.reviewedAt}
+                      locale={row.locale}
                     />
                   ) : (
                     <MarketingQueueCard
@@ -199,6 +201,7 @@ export default async function MarketingQueueAdminPage({
                       draftText={row.draftText}
                       sourceCitations={row.sourceCitations}
                       guardrailNotes={row.guardrailNotes}
+                      locale={row.locale}
                       blogPost={
                         row.channel === "blog"
                           ? blogPostBySlug.get(row.destination.replace(/^\/updates\//, "")) ?? null

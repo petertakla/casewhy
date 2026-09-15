@@ -7,7 +7,7 @@ import { auth } from "@/lib/auth/server";
 import { isAdminEmail } from "@/lib/auth/admin";
 import { getDb } from "@/lib/db/client";
 import { communitySourceConfigs } from "@/lib/db/schema";
-import { setDailyDraftCap } from "@/lib/marketing/config";
+import { setDailyDraftCap, setSpanishSocialEnabled } from "@/lib/marketing/config";
 
 async function requireAdmin() {
   const { data: session } = await auth.getSession();
@@ -51,5 +51,15 @@ export async function updateDailyCap(cap: number) {
   await requireAdmin();
   if (!Number.isInteger(cap) || cap < 1 || cap > 100) return;
   await setDailyDraftCap(cap);
+  revalidatePath("/admin/marketing/settings");
+}
+
+// Round 90 — Peter's own switch for the round 90 task doc's Section 4
+// English-first sequencing. Toggling this on is the ONLY thing that makes
+// poll-policy-news start drafting Spanish variants -- see that route's
+// own comment.
+export async function toggleSpanishSocial(enabled: boolean) {
+  await requireAdmin();
+  await setSpanishSocialEnabled(enabled);
   revalidatePath("/admin/marketing/settings");
 }

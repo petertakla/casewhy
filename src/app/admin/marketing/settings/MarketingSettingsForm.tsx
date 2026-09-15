@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { addSubreddit, toggleSubredditEnabled, removeSubreddit, updateDailyCap } from "./actions";
+import { addSubreddit, toggleSubredditEnabled, removeSubreddit, updateDailyCap, toggleSpanishSocial } from "./actions";
 
 interface SubredditRow {
   id: string;
@@ -13,9 +13,11 @@ interface SubredditRow {
 export function MarketingSettingsForm({
   subreddits,
   dailyCap,
+  spanishSocialEnabled,
 }: {
   subreddits: SubredditRow[];
   dailyCap: number;
+  spanishSocialEnabled: boolean;
 }) {
   const [pending, startTransition] = useTransition();
   const [newSubreddit, setNewSubreddit] = useState("");
@@ -118,6 +120,29 @@ export function MarketingSettingsForm({
             Save
           </button>
         </form>
+      </section>
+
+      <section>
+        <h2 className="mb-1 text-base font-semibold text-foreground">Spanish social accounts</h2>
+        <p className="mb-4 text-sm text-muted">
+          Round 90 — English X/Threads accounts launch first; Spanish accounts come second, once the English ones
+          have posted for at least two weeks and you say go. Off by default. Turning this on makes{" "}
+          <code>poll-policy-news</code> start drafting a second, independently-written (not machine-translated)
+          formal-<em>usted</em> Spanish draft per item, targeted at separate Spanish accounts you&apos;ll need to
+          create at that time (see the round 90 checklist in <code>CLOUD_CLAUDE.md</code>).
+        </p>
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() => startTransition(() => toggleSpanishSocial(!spanishSocialEnabled))}
+          className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+            spanishSocialEnabled
+              ? "bg-brand-500 text-white hover:bg-brand-600"
+              : "border border-border-strong text-foreground/80 hover:border-brand-500/50"
+          }`}
+        >
+          {spanishSocialEnabled ? "Enabled — turn off" : "Disabled — turn on"}
+        </button>
       </section>
 
       <section>

@@ -47,3 +47,25 @@ export async function setDailyDraftCap(cap: number): Promise<void> {
     .values({ id: SETTINGS_ID, dailyDraftCap: cap })
     .onConflictDoUpdate({ target: marketingSettings.id, set: { dailyDraftCap: cap, updatedAt: new Date() } });
 }
+
+// Round 90 — Peter's decision, Sep 15 (task doc Section 4): English social
+// accounts launch first, Spanish second. Default false; getSpanishSocialEnabled
+// is read by /api/cron/poll-policy-news every run to decide whether to also
+// draft a Spanish variant.
+export async function getSpanishSocialEnabled(): Promise<boolean> {
+  const db = getDb();
+  const [row] = await db
+    .select({ enabled: marketingSettings.spanishSocialEnabled })
+    .from(marketingSettings)
+    .where(eq(marketingSettings.id, SETTINGS_ID))
+    .limit(1);
+  return row?.enabled ?? false;
+}
+
+export async function setSpanishSocialEnabled(enabled: boolean): Promise<void> {
+  const db = getDb();
+  await db
+    .insert(marketingSettings)
+    .values({ id: SETTINGS_ID, spanishSocialEnabled: enabled })
+    .onConflictDoUpdate({ target: marketingSettings.id, set: { spanishSocialEnabled: enabled, updatedAt: new Date() } });
+}

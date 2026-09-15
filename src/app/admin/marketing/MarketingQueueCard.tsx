@@ -14,6 +14,7 @@ export function MarketingQueueCard({
   draftText,
   sourceCitations,
   guardrailNotes,
+  locale,
   blogPost,
 }: {
   id: string;
@@ -23,6 +24,8 @@ export function MarketingQueueCard({
   draftText: string | null;
   sourceCitations: string | null;
   guardrailNotes: string | null;
+  /** Round 90 — "en" | "es". Only ever "es" once marketingSettings.spanishSocialEnabled is on; shown as a chip next to the channel label. */
+  locale?: string;
   /** Round 107 — the merged post (repo file + any DB override) for blog rows, fetched by the parent page. undefined for non-blog channels; null if somehow no matching post exists on disk. */
   blogPost?: UpdatePost | null;
 }) {
@@ -110,6 +113,11 @@ export function MarketingQueueCard({
           {CHANNEL_LABELS[channel] ?? channel} ·{" "}
           {effectiveMode === "auto_post" ? "auto-post (will post on approval)" : "manual — you post this yourself"}
         </p>
+        {locale === "es" && (
+          <span className="rounded-full bg-brand-500/15 px-2 py-0.5 text-xs font-semibold text-brand-600 dark:text-brand-400">
+            ES
+          </span>
+        )}
         {isEscalationOnly && (
           <span className="rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:text-amber-400">
             Flagged — no draft
@@ -172,6 +180,12 @@ export function MarketingQueueCard({
               <label className="mt-3 block text-xs font-semibold uppercase tracking-widest text-muted">
                 Draft (edit before marking posted, if needed)
               </label>
+              {channel === "x" && (
+                <p className="mb-1.5 text-xs text-muted">
+                  A line containing only <code>---</code> separates thread posts — keep them if you keep the thread
+                  structure.
+                </p>
+              )}
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}

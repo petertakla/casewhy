@@ -6,7 +6,9 @@
 
 ## 0. Operating model — read this first
 
-Claude Code drafts every public-facing reply, comment, post, or DM. **Nothing is posted, submitted, or sent by any automated process.** Peter reviews every draft and posts it himself, or doesn't. This applies uniformly across every channel above, including ones that feel low-stakes (Threads, Pinterest captions) — the workflow doesn't get lighter just because the platform feels lower-risk. If this operating model ever changes (e.g. to allow autonomous posting for some channel), that change should be made explicitly in this file, with the sections below re-derived for the new model — don't infer permission to auto-post from anything else.
+Claude Code drafts every public-facing reply, comment, post, or DM. Peter reviews every draft before anything goes out, on every channel — no exception, including ones that feel low-stakes (Threads, Pinterest captions).
+
+**Revised Sep 15, 2026, Peter's direct confirmation (correcting a false claim in round 89's own build notes, which said this section had already been revised Sep 14 when the file itself had never been edited — see CLOUD_CLAUDE.md round 90):** on a small set of **owned channels only** — CaseWhy's own accounts, never a community/forum/group CaseWhy doesn't control — code may submit an approved draft automatically, but *only* on a real, explicit approval click by Peter in the `/admin/marketing` queue. The click itself is the only thing that can ever trigger a post/publish call (same enforcement shape as round 70's `pendingAliasActions`); nothing in the drafting/polling path can post anything. As of this revision the owned channels are: `blog` (round 93), `x` and `threads` (round 90). Every channel named in Section 4 below that is NOT in that list — every community, forum, or group CaseWhy doesn't own — stays `manual_post` only, no exception: Peter copies the approved text and posts it himself. Don't infer permission to auto-post for any channel not explicitly listed here; a new owned channel getting auto_post requires this section to be edited again, not inferred from the schema or a task doc alone.
 
 ## 1. Absolute hard stops
 

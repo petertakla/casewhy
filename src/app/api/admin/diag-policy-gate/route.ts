@@ -36,3 +36,45 @@ export async function GET(request: Request) {
 
   return Response.json({ userCount: result.rows.length, rows });
 }
+
+// POST — disposable fixture test: insert → exercise → delete, same pattern
+// this session has used against other tables all round. neon_auth.user has
+// zero real rows in production right now (confirmed by GET above, matching
+// round 69's own note that this was true then too), so this is the only
+// way to exercise getStalePolicies() against a genuinely pre-existing
+// account without a real signed-up user to test with.
+export async function POST(request: Request) {
+  const expected = process.env.ADMIN_DIAG_SECRET;
+  const authHeader = request.headers.get("authorization");
+  if (!expected || authHeader !== `Bearer ${expected}`) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const db = getDb();
+  const fixtureEmail = `round100-fixture-${Date.now()}@casewhy.com`;
+  const oldCreatedAt = new Date("2026-01-01T00:00:00Z");
+
+  const inserted = await db.execute<{ id: string }>(
+    sql`INSERT INTO neon_auth."user" (name, email, "emailVerified", "createdAt", "updatedAt")
+        VALUES ('Round 100 Fixture', ${fixtureEmail}, true, ${oldCreatedAt.toISOString()}, ${oldCreatedAt.toISOString()})
+        RETURNING id`
+  );
+  const userId = inserted.rows[0].id;
+
+  let stale;
+  let error: string | null = null;
+  try {
+    stale = await getStalePolicies(userId, oldCreatedAt);
+  } catch (err) {
+    error = err instanceof Error ? err.message : String(err);
+  } finally {
+    await db.execute(sql`DELETE FROM neon_auth."user" WHERE id = ${userId}`);
+  }
+
+  return Response.json({
+    fixtureAccountCreatedAt: oldCreatedAt.toISOString(),
+    stalePolicies: stale?.map((s) => ({ type: s.type, version: s.version })) ?? null,
+    error,
+    cleanedUp: true,
+  });
+}

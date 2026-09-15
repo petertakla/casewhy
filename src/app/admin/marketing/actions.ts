@@ -87,8 +87,21 @@ export async function approveForAutoPost(id: string, finalText: string, channel:
         .set({ status: "posted", postedAt: new Date(), postedUrl: result.url })
         .where(eq(marketingQueue.id, id));
     } catch (err) {
-      // Stays "approved" -- Peter can see it didn't post and retry or
-      // handle manually. Not silently swallowed: the caller gets the error.
+      // Round 90 finding: this comment used to say "stays 'approved' --
+      // Peter can see it didn't post and retry" -- that was never actually
+      // true. "approved" isn't in NEEDS_ACTION_STATUSES (pending,
+      // escalated) or HISTORY_STATUSES (posted, edited_posted, rejected)
+      // on the queue page, so the row became genuinely invisible -- a real
+      // bug that sat dormant since round 89 because no real poster existed
+      // to ever throw until this round's X/Threads posters did. Reverted
+      // to "pending" (and reviewedAt/reviewedBy cleared, since the
+      // approval didn't actually stick) so the row reappears in Needs
+      // action for Peter to retry once the missing credentials are set.
+      // The thrown error still reaches the client's catch block either way.
+      await db
+        .update(marketingQueue)
+        .set({ status: "pending", reviewedAt: null, reviewedBy: null })
+        .where(eq(marketingQueue.id, id));
       revalidatePath("/admin/marketing");
       revalidatePath("/admin/marketing/log");
       throw err;

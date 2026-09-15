@@ -42,6 +42,21 @@ function destinationFor(slug: string): string {
   return `/updates/${slug}`;
 }
 
+// Round 103, real bug found while building the admin preview (the first
+// time any of these posts' [slug]/page.tsx had ever actually rendered --
+// all five have sat unapproved since round 93, so this never fired
+// before). Every post's frontmatter writes `date: 2026-09-15` unquoted --
+// valid YAML, but gray-matter's underlying js-yaml parser resolves an
+// unquoted YYYY-MM-DD scalar to a native JS Date, not the plain string
+// this module's own UpdatePost.date comment ("YYYY-MM-DD") assumes.
+// String(aDateObject) produces "Mon Sep 15 2026 00:00:00 GMT+0000 (...)",
+// which `${post.date}T00:00:00Z` then turns into "Invalid Date" wherever
+// it's parsed again -- would have shipped to the first real reader.
+function normalizeFrontmatterDate(value: unknown): string {
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+  return String(value ?? "");
+}
+
 function readAllPostsFromDisk(): UpdatePost[] {
   if (!fs.existsSync(CONTENT_DIR)) return [];
   const files = fs.readdirSync(CONTENT_DIR).filter((f) => f.endsWith(".md"));
@@ -53,7 +68,7 @@ function readAllPostsFromDisk(): UpdatePost[] {
     return {
       slug,
       title: String(data.title ?? slug),
-      date: String(data.date ?? ""),
+      date: normalizeFrontmatterDate(data.date),
       summary: String(data.summary ?? ""),
       pillar: String(data.pillar ?? ""),
       sources: Array.isArray(data.sources) ? data.sources : [],

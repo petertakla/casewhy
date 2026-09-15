@@ -48,6 +48,15 @@ const LOCALE_AWARE_EN_PATHS = ["/dashboard", "/ask", "/settings", "/processing-t
 // no Spanish version at all, so it should still reset to English like any
 // other English-only page.
 const LOCALE_AWARE_EN_PREFIXES = [
+  // Round 98 — the admin shell has no /es/admin route (out of that
+  // round's scope), but its own chrome (sidebar, breadcrumb, this
+  // header's own "Admin" link) does honor the sticky preference, per
+  // that round's "Spanish labels render throughout the shell" ask.
+  // Without this, landing on /admin cleared the cookie via the
+  // non-locale-aware-path branch below before AdminShellClient's own
+  // one-time cookie read even ran -- caught live: header stayed English
+  // while the shell's sidebar showed Spanish, disagreeing with itself.
+  "/admin",
   "/attorneys/",
   "/legal-aid/",
   "/dso/",

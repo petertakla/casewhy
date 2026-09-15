@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { findPolicyMemoById } from "@/lib/kb/policy-memos";
 import { BackLink } from "@/components/BackLink";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { isSpanishLocale } from "@/lib/i18n/locale";
 
 // Round 63 — a real internal permalink for a policy memo, so
 // relatedPolicies links (CaseChat, the dashboard explanation) and the new
@@ -15,6 +17,14 @@ import { BackLink } from "@/components/BackLink";
 // it). Added generateMetadata, a one-line direct-answer callout, and
 // FAQPage schema (the summary/current-status pair genuinely already reads
 // as Q&A) — see round73-seo-geo-foundation-task.md item 5.
+//
+// Round 105 — locale-aware, same round-82 same-route pattern as the list
+// page. A memo without titleEs/summaryEs/currentStatusEs yet (added in a
+// hurry, translation pending review) falls back to its English fields
+// under Spanish chrome with an "(en inglés)" tag — never a silently
+// half-translated page.
+
+type SearchParams = { lang?: string };
 
 function firstSentence(text: string): string {
   const match = text.match(/^.*?[.!?](?:\s|$)/);
@@ -23,22 +33,47 @@ function firstSentence(text: string): string {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
   const { id } = await params;
   const memo = findPolicyMemoById(id);
   if (!memo) return { title: "Policy memo not found | CaseWhy" };
+  const { lang } = await searchParams;
+  const es = await isSpanishLocale(lang);
+  const title = es && memo.titleEs ? memo.titleEs : memo.title;
+  const summary = es && memo.summaryEs ? memo.summaryEs : memo.summary;
   return {
-    title: `${memo.title}, Explained | CaseWhy`,
-    description: firstSentence(memo.summary),
+    title: es ? `${title}, Explicado | CaseWhy` : `${title}, Explained | CaseWhy`,
+    description: firstSentence(summary),
+    alternates: {
+      languages: {
+        en: `https://app.casewhy.com/policy/${id}`,
+        es: `https://app.casewhy.com/policy/${id}?lang=es`,
+      },
+    },
   };
 }
 
-export default async function PolicyMemoPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function PolicyMemoPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<SearchParams>;
+}) {
   const { id } = await params;
   const memo = findPolicyMemoById(id);
   if (!memo) notFound();
+  const { lang } = await searchParams;
+  const es = await isSpanishLocale(lang);
+
+  const title = es && memo.titleEs ? memo.titleEs : memo.title;
+  const summary = es && memo.summaryEs ? memo.summaryEs : memo.summary;
+  const currentStatus = es && memo.currentStatusEs ? memo.currentStatusEs : memo.currentStatus;
+  const untranslated = es && !memo.titleEs;
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -46,13 +81,13 @@ export default async function PolicyMemoPage({ params }: { params: Promise<{ id:
     mainEntity: [
       {
         "@type": "Question",
-        name: `What is ${memo.title}?`,
-        acceptedAnswer: { "@type": "Answer", text: memo.summary },
+        name: es ? `¿Qué es ${title}?` : `What is ${title}?`,
+        acceptedAnswer: { "@type": "Answer", text: summary },
       },
       {
         "@type": "Question",
-        name: `What is the current status of ${memo.title}?`,
-        acceptedAnswer: { "@type": "Answer", text: memo.currentStatus },
+        name: es ? `¿Cuál es el estado actual de ${title}?` : `What is the current status of ${title}?`,
+        acceptedAnswer: { "@type": "Answer", text: currentStatus },
       },
     ],
   };
@@ -63,8 +98,18 @@ export default async function PolicyMemoPage({ params }: { params: Promise<{ id:
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Policy memos", item: "https://app.casewhy.com/policy" },
-      { "@type": "ListItem", position: 2, name: memo.title, item: `https://app.casewhy.com/policy/${memo.id}` },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: es ? "Memorandos de política" : "Policy memos",
+        item: es ? "https://app.casewhy.com/policy?lang=es" : "https://app.casewhy.com/policy",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: title,
+        item: es ? `https://app.casewhy.com/policy/${memo.id}?lang=es` : `https://app.casewhy.com/policy/${memo.id}`,
+      },
     ],
   };
 
@@ -78,27 +123,39 @@ export default async function PolicyMemoPage({ params }: { params: Promise<{ id:
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <BackLink href="/policy" label="All policy memos" />
+      <div className="flex items-center justify-between">
+        <BackLink href="/policy" label={es ? "Todos los memorandos de política" : "All policy memos"} />
+        <LanguageSwitcher es={es} basePath={`/policy/${memo.id}`} variant="inline" />
+      </div>
 
-      <h1 className="mt-4 text-2xl font-bold tracking-tight">{memo.title}</h1>
+      <h1 className="mt-4 text-2xl font-bold tracking-tight">
+        {title}
+        {untranslated && <span className="ml-2 text-sm font-normal text-muted">(en inglés)</span>}
+      </h1>
       {memo.memoNumber && <p className="mt-1 text-muted">{memo.memoNumber}</p>}
 
       <p className="mt-4 rounded-lg border border-border-strong bg-surface-2 p-3 text-sm text-foreground/90">
-        {firstSentence(memo.summary)}
+        {firstSentence(summary)}
       </p>
 
       <div className="mt-6 space-y-4 rounded-xl border border-border bg-surface p-5 text-sm">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted">Published</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+            {es ? "Publicado" : "Published"}
+          </p>
           <p className="mt-1">{memo.datePublished}</p>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted">Summary</p>
-          <p className="mt-1">{memo.summary}</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+            {es ? "Resumen" : "Summary"}
+          </p>
+          <p className="mt-1">{summary}</p>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted">Current status</p>
-          <p className="mt-1">{memo.currentStatus}</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+            {es ? "Estado actual" : "Current status"}
+          </p>
+          <p className="mt-1">{currentStatus}</p>
         </div>
       </div>
 
@@ -108,14 +165,28 @@ export default async function PolicyMemoPage({ params }: { params: Promise<{ id:
         rel="noopener noreferrer"
         className="mt-6 inline-block text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
       >
-        Read the primary source ↗
+        {es ? "Leer la fuente primaria ↗" : "Read the primary source ↗"}
       </a>
-      <p className="mt-2 text-xs text-muted">Source: {memo.sourceTitle}</p>
+      <p className="mt-2 text-xs text-muted">
+        {es ? "Fuente: " : "Source: "}
+        {memo.sourceTitle}
+      </p>
 
       <p className="mt-6 text-xs text-muted">
-        General policy background, not a diagnosis of any specific case — CaseWhy&apos;s own case
-        status API never confirms why a case is delayed. For guidance specific to your case, talk
-        to a licensed immigration attorney.
+        {es ? (
+          <>
+            Información general de política, no un diagnóstico de ningún caso específico — la
+            propia API de estado de casos de CaseWhy nunca confirma por qué un caso está
+            retrasado. Para orientación específica sobre su caso, consulte a un abogado de
+            inmigración con licencia.
+          </>
+        ) : (
+          <>
+            General policy background, not a diagnosis of any specific case — CaseWhy&apos;s own
+            case status API never confirms why a case is delayed. For guidance specific to your
+            case, talk to a licensed immigration attorney.
+          </>
+        )}
       </p>
     </main>
   );

@@ -43,6 +43,20 @@ export interface PolicyMemo {
   currentStatus: string;
   sourceTitle: string;
   sourceUrl: string;
+  // Round 105 — Spanish content for the public /policy pages, AI-drafted
+  // in formal usted register from the English fields above and each
+  // entry's own cited USCIS source, sent to the round 81 manifest for
+  // native-speaker review, same discipline as every other translated
+  // string in this project. Every caveat/hedge phrase in the English
+  // summary/currentStatus (e.g. i131's abandonment warning, i589/i821d's
+  // "never predict/imply" instructions) is preserved in the Spanish, not
+  // softened or summarized away — this is the same public-facing content,
+  // not a paraphrase. Optional so a future memo added without Spanish yet
+  // still renders (English body under Spanish chrome, "(en inglés)"
+  // tagged) rather than breaking the page.
+  titleEs?: string;
+  summaryEs?: string;
+  currentStatusEs?: string;
 }
 
 export const POLICY_MEMOS: PolicyMemo[] = [
@@ -66,6 +80,11 @@ export const POLICY_MEMOS: PolicyMemo[] = [
     sourceTitle: "USCIS Policy Alert PM-602-0194 (Jan 1, 2026)",
     sourceUrl:
       "https://www.uscis.gov/sites/default/files/document/policy-alerts/PM-602-0194-PendingApplicationsAdditionalHighRiskCountries-20260101.pdf",
+    titleEs: "Retención y revisión de solicitudes de beneficios de países adicionales de alto riesgo",
+    summaryEs:
+      "A partir del 1 de enero de 2026, USCIS impuso una retención automática sobre las decisiones finales de solicitudes de beneficios pendientes — incluidas naturalización, peticiones familiares y de empleo, ajuste de estatus y permisos de trabajo — presentadas por nacionales de aproximadamente 39 países designados de \"alto riesgo\" (vinculados a las Proclamaciones Presidenciales 10949 y 10998). También ordenó la re-revisión de ciertas aprobaciones otorgadas a partir del 20 de enero de 2021 a nacionales de esos países. USCIS no dio un plazo para levantar las retenciones individuales, por lo que un caso afectado podría no mostrar ningún cambio visible de estado durante un período prolongado, sin ninguna explicación en el texto del estado mismo.",
+    currentStatusEs:
+      "Tribunales federales en Massachusetts y Rhode Island determinaron en la primavera de 2026 que las políticas de retención probablemente eran ilegales bajo la Ley de Procedimiento Administrativo, y un tribunal de Rhode Island las anuló por completo el 5 de junio de 2026; un tribunal de Texas emitió una orden colectiva relacionada el 24 de agosto de 2026, ordenando a USCIS reanudar el procesamiento normal para los solicitantes afectados. El alivio generalmente se ha aplicado a clases certificadas o demandantes específicos, no automáticamente a todos los casos a nivel nacional, por lo que esta aplicación no puede confirmar, solo a partir de la API de estado, si un caso en particular efectivamente ha reanudado su procesamiento normal.",
   },
   {
     id: "public-charge-2026",
@@ -81,6 +100,11 @@ export const POLICY_MEMOS: PolicyMemo[] = [
     sourceTitle: "USCIS: Guidance on Making a Public Charge Inadmissibility Determination",
     sourceUrl:
       "https://www.uscis.gov/newsroom/alerts/uscis-issues-guidance-on-making-public-charge-inadmissibility-determination",
+    titleEs: "Orientación de 2026 sobre la inadmisibilidad por motivo de carga pública",
+    summaryEs:
+      "DHS finalizó una regla (publicada el 20 de julio de 2026, vigente desde el 18 de septiembre de 2026) que deroga las regulaciones de carga pública de 2022. Bajo la nueva orientación, los oficiales de USCIS pueden considerar la recepción de prácticamente cualquier beneficio público sujeto a evaluación de recursos económicos (no solo asistencia en efectivo o internamiento institucional a largo plazo, como bajo la regla anterior) al decidir si un solicitante de ajuste de estatus probablemente se convertirá en una carga pública, junto con los cinco factores legales (edad, salud, estado familiar, activos/recursos/situación financiera, educación/habilidades) y la declaración jurada de patrocinio del Formulario I-864. La nueva orientación también introduce las fianzas de carga pública — una garantía financiera que un solicitante puede depositar para superar una determinación de inadmisibilidad que de otro modo aplicaría.",
+    currentStatusEs:
+      "Vigente desde el 18 de septiembre de 2026. Las solicitudes con matasellos postales o presentadas electrónicamente antes de esa fecha todavía se evalúan bajo el marco anterior, más limitado.",
   },
   {
     id: "rfe-noid-adjudicative-principles",
@@ -99,6 +123,11 @@ export const POLICY_MEMOS: PolicyMemo[] = [
       "This is the current operative standard — USCIS issuing an RFE or NOID generally means the officer believes the case could still be approved with more evidence, not that the case is in jeopardy.",
     sourceTitle: "USCIS Notice to Appear Policy Memorandum history (archived)",
     sourceUrl: "https://www.uscis.gov/archive/notice-to-appear-policy-memorandum",
+    titleEs: "Cuándo USCIS emite una Solicitud de Evidencia en lugar de denegar directamente",
+    summaryEs:
+      "Una política de 2018 (PM-602-0050.1) le dio a los oficiales la discreción de denegar una solicitud directamente, sin emitir primero una Solicitud de Evidencia (RFE) o un Aviso de Intención de Denegar (NOID), cuando faltaba evidencia inicial requerida — un endurecimiento real, aunque temporal, de cuándo los solicitantes tenían la oportunidad de responder antes de una denegación. Esa política fue derogada el 20 de enero de 2021, y el 9 de junio de 2021 USCIS volvió al principio adjudicativo de más larga data (que se remonta a junio de 2013): los oficiales deben emitir una RFE o un NOID, dándole al solicitante la oportunidad de presentar más evidencia, siempre que evidencia adicional pudiera razonablemente establecer la elegibilidad, en lugar de denegar directamente.",
+    currentStatusEs:
+      "Este es el estándar vigente actualmente — que USCIS emita una RFE o un NOID generalmente significa que el oficial considera que el caso todavía podría aprobarse con más evidencia, no que el caso esté en riesgo.",
   },
   // Round 21 — form-specific reference entries for the 4 newly-supported
   // case types. Each always applies to its own formType (statusKeywords: []
@@ -118,6 +147,11 @@ export const POLICY_MEMOS: PolicyMemo[] = [
     sourceTitle: "USCIS: Extension of Green Card Validity to 36 Months for Renewals",
     sourceUrl:
       "https://www.uscis.gov/newsroom/alerts/uscis-extends-green-card-validity-extension-to-36-months-for-green-card-renewals",
+    titleEs: "Renovación o reemplazo de la tarjeta verde (I-90) — qué cambia y qué no",
+    summaryEs:
+      "El Formulario I-90 renueva una tarjeta próxima a vencer o ya vencida, reemplaza una tarjeta perdida, robada o dañada, o actualiza una tarjeta tras un cambio de nombre u otro dato. USCIS recomienda presentar la solicitud hasta 6 meses antes del vencimiento. Al momento de escribir esto, USCIS extiende la validez de una tarjeta vencida por 36 meses (antes eran 24 meses) para fines de verificación de empleo (I-9) cuando la tarjeta vencida se presenta junto con el aviso de recibo de la solicitud I-90.",
+    currentStatusEs:
+      "El I-90 es una renovación, no una nueva adjudicación de la elegibilidad como residente permanente — el estatus no cambia mientras está pendiente, siempre que la persona siga siendo residente permanente legal en regla. No es el formulario correcto para alguien con una preocupación real de abandono de residencia (por ejemplo, tiempo prolongado fuera de Estados Unidos) — esa es una pregunta distinta y más seria que una renovación de rutina, y debe consultarse con un abogado.",
   },
   {
     id: "i131-travel-document-abandonment",
@@ -131,6 +165,11 @@ export const POLICY_MEMOS: PolicyMemo[] = [
       "The single highest-stakes fact, from USCIS's own I-131 page: filing to request an advance parole document and departing the U.S. without that document valid for the entire trip means USCIS considers the I-131 abandoned — and for a pending I-485 applicant specifically, an unauthorized departure risks the underlying adjustment application too, not just the travel document. Any explanation touching a pending advance-parole case must carry this caveat explicitly, never softened, and must never suggest travel is safe before an advance parole document is approved and physically in hand.",
     sourceTitle: "USCIS: I-131, Application for Travel Document",
     sourceUrl: "https://www.uscis.gov/i-131",
+    titleEs: "Documentos de viaje I-131 — el riesgo de abandono del permiso adelantado (Advance Parole)",
+    summaryEs:
+      "El Formulario I-131 cubre tres propósitos distintos: el Permiso Adelantado o Advance Parole (para solicitantes con el Formulario I-485 pendiente u otras categorías que necesitan permiso para viajar y regresar), un Permiso de Reingreso (Re-entry Permit, para residentes permanentes legales que planean un viaje de un año o más), y un Documento de Viaje para Refugiados (Refugee Travel Document, para refugiados/asilados) — estos nunca deben confundirse entre sí.",
+    currentStatusEs:
+      "El dato de mayor riesgo, según la propia página de USCIS sobre el Formulario I-131: presentar una solicitud de documento de permiso adelantado (advance parole) y salir de Estados Unidos sin ese documento válido para todo el viaje significa que USCIS considera abandonada la solicitud I-131 — y para un solicitante con el I-485 pendiente específicamente, una salida no autorizada pone en riesgo también la solicitud de ajuste de estatus subyacente, no solo el documento de viaje. Cualquier explicación relacionada con un caso de permiso adelantado pendiente debe incluir esta advertencia explícitamente, sin suavizarla, y nunca debe sugerir que viajar es seguro antes de que el documento de permiso adelantado esté aprobado y físicamente en mano.",
   },
   {
     id: "n600-certificate-of-citizenship",
@@ -144,6 +183,11 @@ export const POLICY_MEMOS: PolicyMemo[] = [
       "N-600 doesn't confer citizenship — someone who qualifies is already a citizen by operation of law; the form only requests the government's proof document. It is not the right form for an LPR intending to naturalize (that's N-400), someone born in the U.S. (a birth certificate suffices), or someone already naturalized as an adult (a Certificate of Naturalization, not N-600). Processing time varies widely by service center.",
     sourceTitle: "USCIS: N-600, Application for Certificate of Citizenship",
     sourceUrl: "https://www.uscis.gov/n-600",
+    titleEs: "Certificado de Ciudadanía N-600 — adquisición frente a derivación",
+    summaryEs:
+      "El Formulario N-600 cubre dos vías distintas: adquisición (la persona fue ciudadana estadounidense automáticamente al nacer en el extranjero por tener un padre o madre ciudadano — sin límite de edad para solicitar la prueba) y derivación (la persona se volvió ciudadana automáticamente siendo menor de edad bajo la Ley de Ciudadanía Infantil de 2000, lo cual generalmente requiere que el menor tuviera menos de 18 años, fuera residente permanente legal, y estuviera bajo la custodia legal y física de un padre o madre ciudadano estadounidense en el momento en que ese padre o madre se naturalizó).",
+    currentStatusEs:
+      "El N-600 no otorga la ciudadanía — quien califica ya es ciudadano por efecto de la ley; el formulario solo solicita el documento oficial que lo demuestra. No es el formulario correcto para un residente permanente legal que desea naturalizarse (eso es el N-400), para alguien nacido en Estados Unidos (basta con el acta de nacimiento), ni para alguien ya naturalizado como adulto (eso requiere un Certificado de Naturalización, no un N-600). El tiempo de procesamiento varía ampliamente según el centro de servicio.",
   },
   {
     id: "i765-employment-authorization",
@@ -157,6 +201,11 @@ export const POLICY_MEMOS: PolicyMemo[] = [
       "Never guess or assume a specific eligibility category from the form alone — if the underlying basis isn't known from the case's own facts, keep any explanation general rather than asserting a category that may be wrong.",
     sourceTitle: "USCIS: Employment Authorization Document",
     sourceUrl: "https://www.uscis.gov/employment-authorization",
+    titleEs: "Autorización de empleo I-765 — la categoría de elegibilidad importa",
+    summaryEs:
+      "La categoría de elegibilidad subyacente — un código como (c)(9) ajuste pendiente, (c)(8) asilo pendiente, (a)(5) asilo otorgado, (c)(33) DACA, (c)(3)(B)/(c)(3)(C) OPT/STEM de F-1, (a)(3)/(a)(4) refugiado con permiso de ingreso/refugiado, etc. — importa más que la etiqueta genérica \"I-765\", ya que refleja por qué la persona puede trabajar, y está ligada a un estatus o solicitud subyacente distinto según la categoría. El vocabulario de estado (recibido, biometría, aprobado, tarjeta producida) es genérico entre categorías, pero lo que significa una aprobación, y cuánto tiempo es válido el permiso de trabajo (EAD) resultante, depende de la categoría.",
+    currentStatusEs:
+      "Nunca se debe suponer ni adivinar una categoría de elegibilidad específica solo a partir del formulario — si la base subyacente no se conoce a partir de los hechos propios del caso, cualquier explicación debe mantenerse general en lugar de afirmar una categoría que podría ser incorrecta.",
   },
   // Round 22 — I-129 (a genuinely new user population: nonimmigrant/temporary
   // workers, not the green-card/citizenship track) and I-751 (deferred from
@@ -174,6 +223,11 @@ export const POLICY_MEMOS: PolicyMemo[] = [
       "If the new petition is later denied, work authorization under it ends immediately — this is a real, high-stakes fact that should never be softened or left implied when portability comes up.",
     sourceTitle: "H-1B Transfer and Portability Under AC21",
     sourceUrl: "https://www.lighthousehq.com/blog/h1b-transfer",
+    titleEs: "Peticiones de trabajador no inmigrante I-129 — la portabilidad H-1B y sus límites",
+    summaryEs:
+      "El Formulario I-129 cubre muchas clasificaciones distintas de trabajador no inmigrante — H-1B, L-1, O-1, TN, E-1/E-2, R-1, P-1, entre otras — que funcionan de manera diferente por dentro; nunca se debe suponer cuál es la clasificación de un caso sin que esté confirmada de forma independiente. Para el H-1B específicamente, la portabilidad bajo la ley AC21 significa que, por lo general, una persona puede comenzar a trabajar para un nuevo empleador tan pronto como se presenta correctamente y se recibe una nueva petición I-129 (o de transferencia) — no al momento de la aprobación — siempre que la persona mantenga un estatus H-1B válido (o esté dentro del período de gracia de 60 días tras finalizar el empleo anterior), el nuevo empleador tenga una Solicitud de Condición Laboral (LCA) certificada y pague el salario prevaleciente, y no exista un historial de trabajo no autorizado.",
+    currentStatusEs:
+      "Si la nueva petición es denegada posteriormente, la autorización de empleo bajo esa petición termina de inmediato — este es un hecho real y de alto riesgo que nunca debe suavizarse ni darse por sobreentendido cuando surge el tema de la portabilidad.",
   },
   {
     id: "i751-removing-conditions-deadline",
@@ -187,6 +241,11 @@ export const POLICY_MEMOS: PolicyMemo[] = [
       "Missing the 90-day window is a real, serious consequence, not a soft deadline: conditional resident status automatically terminates, and USCIS can initiate removal (deportation) proceedings. Late filing is only possible with a written good-cause explanation, and approval isn't guaranteed — state this plainly, never softened, whenever a case is approaching that window. The fraud-suspicion/interview branch and the abuse-waiver branch both carry real emotional and legal stakes — keep any guidance procedural and general (how the waiver process generally works), never an assessment of a specific person's own eligibility or likelihood of success.",
     sourceTitle: "I-751, Petition to Remove Conditions on Residence",
     sourceUrl: "https://duevisa.com/blog/i751-removal-of-conditions",
+    titleEs: "I-751 — el plazo de presentación de 90 días y qué sucede si se pierde",
+    summaryEs:
+      "Una petición conjunta I-751 generalmente debe presentarse dentro de los 90 días inmediatamente anteriores a la fecha de vencimiento de la tarjeta de residente permanente condicional de 2 años. Existen categorías de exención (waiver) para presentar la solicitud sin el otro cónyuge y sin la restricción de esa ventana de 90 días: divorcio, fallecimiento del cónyuge, abuso durante el matrimonio, o dificultad extrema (extreme hardship).",
+    currentStatusEs:
+      "Perder la ventana de 90 días tiene una consecuencia real y seria, no es un plazo flexible: el estatus de residente condicional termina automáticamente, y USCIS puede iniciar un proceso de expulsión (deportación). Presentar la solicitud tarde solo es posible con una explicación escrita de causa justificada, y la aprobación no está garantizada — esto debe indicarse con claridad, sin suavizarlo, siempre que un caso se acerque a esa ventana. Tanto la vía de sospecha de fraude/entrevista como la vía de exención por abuso conllevan un peso emocional y legal real — cualquier orientación debe mantenerse procedimental y general (cómo funciona generalmente el proceso de exención), nunca una evaluación de la elegibilidad o probabilidad de éxito de una persona en particular.",
   },
   // Round 23 — I-589 (asylum) and I-821D (DACA), the two highest-stakes
   // case types added so far. Built per Peter's explicit Sep 8 direction to
@@ -209,6 +268,11 @@ export const POLICY_MEMOS: PolicyMemo[] = [
       "As of September 2026, the standing rule is roughly a 150-day wait after filing before applying for an initial Employment Authorization Document (some sources describe it as 180 days, depending on which point in the process is measured — present this as approximate, not exact). A DHS rule proposed February 23, 2026 would extend this wait to 365 days, add a biometrics requirement, add new eligibility bars, and let USCIS pause new EAD applications entirely once asylum processing exceeds 180 days — re-confirmed September 8, 2026 directly against the Federal Register's own record: this remains a proposed rule, not finalized (comment period closed April 24, 2026, has not cleared OMB review). Never state the 365-day figure as current. This population is also exactly who the EO 14161 social-media-vetting policy targets — keep guidance strictly procedural and factual, never speculative about an individual's outcome or risk.",
     sourceTitle: "USCIS — I-589, Application for Asylum and for Withholding of Removal",
     sourceUrl: "https://www.uscis.gov/i-589",
+    titleEs: "Asilo I-589 — plazo de presentación, afirmativo frente a defensivo, y el momento de la autorización de empleo",
+    summaryEs:
+      "Por lo general, la solicitud debe presentarse dentro de un año desde la llegada a Estados Unidos, con excepciones por circunstancias cambiantes que afecten materialmente la elegibilidad, o circunstancias extraordinarias que hayan causado el retraso en la presentación — excepciones reales y específicas de cada caso, no una regla fija, y que nunca deben evaluarse sin un abogado. El asilo afirmativo (presentado directamente ante una oficina de asilo de USCIS) y el asilo defensivo (planteado como defensa en un proceso de expulsión ante un juez de inmigración, bajo EOIR — que no es USCIS en absoluto) siguen procesos y plazos completamente distintos. Estos nunca deben confundirse entre sí.",
+    currentStatusEs:
+      "Al mes de septiembre de 2026, la regla vigente es una espera de aproximadamente 150 días después de presentar la solicitud antes de poder solicitar un Documento de Autorización de Empleo (EAD) inicial (algunas fuentes lo describen como 180 días, según qué punto del proceso se mida — esto debe presentarse como aproximado, no exacto). Una regla propuesta por DHS el 23 de febrero de 2026 extendería esta espera a 365 días, añadiría un requisito de biometría, agregaría nuevas barreras de elegibilidad, y permitiría a USCIS pausar por completo las nuevas solicitudes de EAD una vez que el procesamiento de asilo supere los 180 días — reconfirmado el 8 de septiembre de 2026 directamente contra el registro del Federal Register: esto sigue siendo una regla propuesta, no finalizada (el período de comentarios cerró el 24 de abril de 2026 y no ha superado la revisión de la Oficina de Administración y Presupuesto, OMB). Nunca debe presentarse la cifra de 365 días como vigente. Esta población es también exactamente a quien apunta la política de verificación de redes sociales de la Orden Ejecutiva 14161 — la orientación debe mantenerse estrictamente procedimental y factual, nunca especulativa sobre el resultado o riesgo de una persona en particular.",
   },
   {
     id: "i821d-daca-current-status",
@@ -222,6 +286,11 @@ export const POLICY_MEMOS: PolicyMemo[] = [
       "DACA's legal status is actively contested. The Fifth Circuit ruled January 17, 2025 (Texas v. United States) that deferred action itself — protection from deportation — is constitutional and can apply nationwide, but that DACA's work-authorization component may be unlawful and severable from the rest of the program. The case was remanded to the district court (Judge Hanen) to issue a modified order; as of this writing no modified order has been issued — the work-authorization question is genuinely still open, not settled either way. The narrowed injunction from the ruling applies only to Texas. Roughly 120,000 DACA renewal applications were pending as of mid-2026, the highest number on record — real risk of a recipient's protection or work authorization lapsing between renewal cycles, through no fault of their own. Never predict how or when the litigation will resolve.",
     sourceTitle: "National Immigration Forum — Current Status of DACA: Explainer",
     sourceUrl: "https://forumtogether.org/article/current-status-of-daca-explainer/",
+    titleEs: "DACA I-821D — solo renovaciones, estado del litigio genuinamente sin resolver",
+    summaryEs:
+      "Al momento de escribir esto (reconfirmado el 8 de septiembre de 2026), USCIS está procesando únicamente renovaciones para personas que ya cuentan con DACA — no está aceptando ni procesando ninguna solicitud inicial nueva. Alguien que no tenga DACA actualmente no puede obtenerlo en este momento — nunca debe insinuarse lo contrario ni sugerirse una vía para una solicitud por primera vez.",
+    currentStatusEs:
+      "El estatus legal de DACA está siendo activamente disputado. El Quinto Circuito dictaminó el 17 de enero de 2025 (Texas v. United States) que la acción diferida en sí misma — la protección contra la deportación — es constitucional y puede aplicarse a nivel nacional, pero que el componente de autorización de empleo de DACA podría ser ilegal y separable del resto del programa. El caso fue devuelto al tribunal de distrito (juez Hanen) para que emita una orden modificada; al momento de escribir esto, no se ha emitido ninguna orden modificada — la cuestión de la autorización de empleo sigue genuinamente sin resolverse, no está decidida en ningún sentido. La medida cautelar reducida de ese fallo se aplica únicamente a Texas. Aproximadamente 120,000 solicitudes de renovación de DACA estaban pendientes a mediados de 2026, la cifra más alta registrada — existe un riesgo real de que la protección o autorización de empleo de un beneficiario venza entre ciclos de renovación, sin que sea culpa suya. Nunca debe predecirse cómo o cuándo se resolverá el litigio.",
   },
 ];
 

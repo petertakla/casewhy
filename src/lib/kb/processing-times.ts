@@ -49,6 +49,12 @@ export interface ProcessingTimeEntry {
   office: string;
   percentile80Months: number;
   note?: string;
+  // Round 106 — per-entry, replacing the single global constant below
+  // (kept, but now derived as the max of these rather than hand-set
+  // independently, so it can't quietly drift from what each entry
+  // actually says). Set to the date each figure was actually re-driven
+  // from the live USCIS tool, not just "whenever this file last changed."
+  asOf: string;
 }
 
 export const PROCESSING_TIMES: ProcessingTimeEntry[] = [
@@ -58,6 +64,7 @@ export const PROCESSING_TIMES: ProcessingTimeEntry[] = [
     categoryLabel: "U.S. citizen filing for a spouse, parent, or child under 21 (Immediate Relative)",
     office: "Service Center Operations (SCOPS)",
     percentile80Months: 24,
+    asOf: "2026-09-15",
   },
   {
     id: "i140-e11",
@@ -65,6 +72,7 @@ export const PROCESSING_TIMES: ProcessingTimeEntry[] = [
     categoryLabel: "Extraordinary ability (EB-1)",
     office: "Service Center Operations (SCOPS)",
     percentile80Months: 31,
+    asOf: "2026-09-15",
   },
   {
     id: "i140-e21",
@@ -73,6 +81,7 @@ export const PROCESSING_TIMES: ProcessingTimeEntry[] = [
     office: "Service Center Operations (SCOPS)",
     percentile80Months: 2.5,
     note: "SCOPS prioritizes I-140s when the Visa Bulletin shows a visa currently available for that category/date; doesn't apply to premium-processed petitions, which follow the premium processing timeframe instead.",
+    asOf: "2026-09-15",
   },
   {
     id: "i485-employment-based",
@@ -81,6 +90,7 @@ export const PROCESSING_TIMES: ProcessingTimeEntry[] = [
     office: "Service Center Operations (SCOPS)",
     percentile80Months: 40,
     note: "This SCOPS figure only covers EB-4 and EB-5 cases. EB-1/EB-2/EB-3 employment-based I-485s are adjudicated by field offices instead, and USCIS doesn't publish a single aggregate for those — check the official tool with your specific field office.",
+    asOf: "2026-09-15",
   },
   {
     id: "i765-pending-i485",
@@ -88,6 +98,7 @@ export const PROCESSING_TIMES: ProcessingTimeEntry[] = [
     categoryLabel: "Based on a pending I-485 adjustment application, (c)(9)",
     office: "National Benefits Center",
     percentile80Months: 11,
+    asOf: "2026-09-15",
   },
   {
     id: "i751-removing-conditions",
@@ -95,6 +106,7 @@ export const PROCESSING_TIMES: ProcessingTimeEntry[] = [
     categoryLabel: "Removal of lawful permanent resident conditions (spouses of U.S. citizens/LPRs)",
     office: "Service Center Operations (SCOPS)",
     percentile80Months: 33.5,
+    asOf: "2026-09-15",
   },
   {
     id: "i90-10-year-renewal",
@@ -102,11 +114,87 @@ export const PROCESSING_TIMES: ProcessingTimeEntry[] = [
     categoryLabel: "10-year renewal",
     office: "Service Center Operations (SCOPS)",
     percentile80Months: 10.5,
+    asOf: "2026-09-15",
+  },
+  // Round 106 — the five forms the case-add dropdown (case-type-timeline.ts)
+  // already offered but this page never sourced a figure for.
+  {
+    id: "i131-advance-parole",
+    formType: "I-131",
+    categoryLabel: "Advance Parole, for a pending I-485 adjustment applicant",
+    office: "Service Center Operations (SCOPS)",
+    percentile80Months: 24,
+    note: "The tool combines Re-entry Permits and Refugee Travel Documents into one separate category — see the next entry — rather than breaking them out individually.",
+    asOf: "2026-09-15",
+  },
+  {
+    id: "i131-reentry-refugee-travel",
+    formType: "I-131",
+    categoryLabel: "Re-entry Permit or Refugee Travel Document",
+    office: "Service Center Operations (SCOPS)",
+    percentile80Months: 16,
+    note: "USCIS's own tool reports these two together as a single category, not separately.",
+    asOf: "2026-09-15",
+  },
+  {
+    id: "i129-h1b",
+    formType: "I-129",
+    categoryLabel: "H-1B specialty occupation, extension of stay in the U.S. (regular processing)",
+    office: "Service Center Operations (SCOPS)",
+    percentile80Months: 11,
+    note: "I-129 covers many other classifications (H-2A/B, L, O, P, Q, R, TN, etc.) and H-1B itself has separate categories for a visa issued abroad and a change of status, which can run differently — this is one representative figure, not the only I-129 timeline. Premium processing is 15 business days by statute for most classifications (30 for I-765, 45 for I-140 E13/E21 NIW) — see USCIS's own premium processing page rather than a captured figure here, since it's a fixed statutory number, not a variable one this tool tracks.",
+    asOf: "2026-09-15",
+  },
+  {
+    id: "i821d-daca-renewal",
+    formType: "I-821D",
+    categoryLabel: "DACA renewal",
+    office: "Service Center Operations (SCOPS)",
+    percentile80Months: 6.5,
+    note: "Renewals only — USCIS is not accepting or processing new initial DACA applications as of this writing (see the I-821D case-type note).",
+    asOf: "2026-09-15",
   },
 ];
 
-export const PROCESSING_TIMES_AS_OF = "2026-09-05";
+// Round 106 — derived from the entries above (the max asOf) rather than
+// hand-set as its own independent value, so this can't quietly drift out
+// of sync with what the entries themselves actually say.
+export const PROCESSING_TIMES_AS_OF = PROCESSING_TIMES.reduce(
+  (max, e) => (e.asOf > max ? e.asOf : max),
+  PROCESSING_TIMES[0].asOf
+);
 export const PROCESSING_TIMES_SOURCE_URL = "https://egov.uscis.gov/processing-times/";
+export const PREMIUM_PROCESSING_URL = "https://www.uscis.gov/forms/all-forms/how-do-i-request-premium-processing";
+
+// Round 106 — an entry is stale once any single figure is more than this
+// many days past its own asOf; the page shows one muted factual line
+// (not a red warning) once that's true for any entry. The CI age script
+// warns earlier (35 days) so staleness shows up in every build log well
+// before it's visible to a real visitor.
+export const STALENESS_THRESHOLD_DAYS = 45;
+
+export function daysSince(isoDate: string): number {
+  const then = new Date(`${isoDate}T00:00:00Z`).getTime();
+  const now = Date.now();
+  return Math.floor((now - then) / (1000 * 60 * 60 * 24));
+}
+
+export function hasStaleEntry(): boolean {
+  return PROCESSING_TIMES.some((e) => daysSince(e.asOf) > STALENESS_THRESHOLD_DAYS);
+}
+
+export interface FieldOfficeOnlyForm {
+  formType: string;
+  categoryLabel?: string;
+  note: string;
+  // Round 106 — N-400/family I-485 rely on the page's shared field-office/
+  // ASC locator links below; I-589 needs a third, different locator (the
+  // asylum office locator isn't a field office or an ASC), so this is
+  // per-entry rather than another shared constant only some entries use.
+  locatorUrl?: string;
+  locatorLabel?: string;
+  locatorLabelEs?: string;
+}
 
 /**
  * Cases USCIS reports only by field office (varies by the applicant's local
@@ -114,9 +202,28 @@ export const PROCESSING_TIMES_SOURCE_URL = "https://egov.uscis.gov/processing-ti
  * family-based I-485 chief among them. Surfaced so the UI can explain the
  * gap honestly instead of silently omitting those form types.
  */
-export const FIELD_OFFICE_ONLY_FORMS = [
+export const FIELD_OFFICE_ONLY_FORMS: FieldOfficeOnlyForm[] = [
   { formType: "N-400", note: "Every N-400 is adjudicated by the applicant's local field office, so there's no single national number — USCIS's tool requires picking your specific field office." },
   { formType: "I-485", categoryLabel: "Family-based adjustment", note: "Family-based I-485s are field-office adjudicated, same as N-400 — no SCOPS aggregate exists for this category." },
+  // Round 106 — confirmed directly: N-600 isn't a SCOPS/NBC form in the
+  // tool at all, only ~90 individual field offices to choose from (same
+  // shape as N-400, just a longer office list).
+  {
+    formType: "N-600",
+    note: "N-600 is adjudicated by the applicant's local field office, same as N-400 — the tool has no national aggregate for it, only individual field offices to pick from.",
+  },
+  // Round 106 — confirmed directly: I-589 isn't in the Case Processing
+  // Times tool's own Form list at all, not even as a field-office-only
+  // entry. Affirmative asylum cases are scheduled by individual asylum
+  // offices on their own docket, not tracked in this tool at any level —
+  // never invent a figure for it.
+  {
+    formType: "I-589",
+    note: "I-589 isn't in USCIS's Case Processing Times tool at all as of this writing — affirmative asylum interviews are scheduled by the individual asylum office handling the case, on that office's own docket, not tracked here at any level. Use the Asylum Office Locator to find and contact the office with jurisdiction.",
+    locatorUrl: "https://egov.uscis.gov/office-locator/#/asy",
+    locatorLabel: "Asylum Office Locator",
+    locatorLabelEs: "Buscador de Oficinas de Asilo",
+  },
 ];
 
 /**

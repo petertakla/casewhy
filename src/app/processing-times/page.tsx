@@ -7,6 +7,7 @@ import {
   VISA_BULLETIN_TIED_NOTE,
   OFFICE_LOCATOR_URL,
   ASC_LOCATOR_URL,
+  hasStaleEntry,
 } from "@/lib/kb/processing-times";
 import Link from "next/link";
 import { isSpanishLocale } from "@/lib/i18n/locale";
@@ -123,7 +124,7 @@ export default async function ProcessingTimesPage({
           ? `Las propias estimaciones publicadas por USCIS para los tipos de caso que CaseWhy rastrea actualmente van de ${minMonths} a ${maxMonths} meses para que el 80% de los casos se completen, dependiendo del formulario y la oficina.`
           : `USCIS's own published estimates for the case types CaseWhy tracks currently range from ${minMonths} to ${maxMonths} months for 80% of cases to complete, depending on form and office.`}
       </p>
-      <p className="mb-8 text-xs text-muted">
+      <p className={`text-xs text-muted ${hasStaleEntry() ? "mb-2" : "mb-8"}`}>
         {es ? "Al " : "As of "}
         {PROCESSING_TIMES_AS_OF} —{" "}
         <a
@@ -135,6 +136,14 @@ export default async function ProcessingTimesPage({
           {es ? "consulta la herramienta oficial para tu formulario y oficina exactos" : "check the official tool for your exact form and office"}
         </a>
       </p>
+
+      {hasStaleEntry() && (
+        <p className="mb-8 text-xs text-muted">
+          {es
+            ? "Algunas cifras tienen más de un mes — consulta la herramienta de USCIS para lo más reciente."
+            : "Some figures are more than a month old — check the USCIS tool for the latest."}
+        </p>
+      )}
 
       <div className="mb-8">
         <ShareButton
@@ -164,6 +173,10 @@ export default async function ProcessingTimesPage({
               </span>
             </p>
             {entry.note && <p className="mt-2 text-xs text-muted">{entry.note}</p>}
+            <p className="mt-2 text-xs text-muted">
+              {es ? "Al " : "As of "}
+              {entry.asOf}
+            </p>
           </div>
         ))}
       </div>
@@ -178,6 +191,16 @@ export default async function ProcessingTimesPage({
               <span className="font-semibold">{f.formType}</span>
               {f.categoryLabel && <span className="text-muted"> — {f.categoryLabel}</span>}
               <p className="mt-0.5 text-muted">{f.note}</p>
+              {f.locatorUrl && (
+                <a
+                  href={f.locatorUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 inline-block font-semibold text-brand-600 hover:underline dark:text-brand-400"
+                >
+                  {(es ? f.locatorLabelEs : f.locatorLabel) ?? f.locatorLabel} →
+                </a>
+              )}
             </li>
           ))}
         </ul>

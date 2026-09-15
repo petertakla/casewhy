@@ -345,3 +345,16 @@ R97 — Site Index,Tag suffix on English-only links,(en inglés),(en inglés),n/
 R97 — Site Index,Footer line,"Looking for the machine-readable version? See sitemap.xml, which also lists every individual directory listing and policy-memo permalink.","¿Busca la versión legible por máquina? Vea sitemap.xml, que también enumera cada listado de directorio y permalink de memorando de política individual.",usted,Closing line,
 R97 — Site Index,"Language switcher label (on /sitemap, pointing to /es/sitemap)",Español,Español,n/a,"Single-word link label, same as round 82's switcher elsewhere",
 R97 — Site Index,"Language switcher label (on /es/sitemap, pointing to /sitemap)",English,English,n/a,"Single-word link label, same as round 82's switcher elsewhere",
+R98 — AuthHeader (global nav),Signed-in nav: Admin label,Admin,Administración,neutral,"Single-line nav item, rendered only for admin@casewhy.com","New nav entry, admin-only, links to /admin."
+R98 — Admin shell (sidebar + breadcrumb),Group: Marketing,Marketing,Marketing,n/a,Sidebar group heading,"Brand/loanword, unchanged."
+R98 — Admin shell,Group: Mail,Mail,Correo,n/a,Sidebar group heading,
+R98 — Admin shell,Group: Outreach,Outreach,Contacto,n/a,Sidebar group heading,
+R98 — Admin shell,Entry: Queue,Queue,Cola de marketing,n/a,Sidebar/breadcrumb label for /admin/marketing,Per the task doc's own specified string.
+R98 — Admin shell,Entry: Log,Log,Registro,n/a,Sidebar/breadcrumb label for /admin/marketing/log,
+R98 — Admin shell,Entry: Attribution,Attribution,Atribución,n/a,Sidebar/breadcrumb label for /admin/marketing/attribution,
+R98 — Admin shell,Entry: Settings,Settings,Configuración,n/a,Sidebar/breadcrumb label for /admin/marketing/settings,
+R98 — Admin shell,Entry: Replies,Replies,Respuestas de correo,n/a,Sidebar/breadcrumb label for /admin/inbox,
+R98 — Admin shell,Entry: Alias config,Alias config,Configuración de alias,n/a,Sidebar/breadcrumb label for /admin/aliases,
+R98 — Admin shell,Entry: Backlink drafts,Backlink drafts,Borradores de enlaces,n/a,Sidebar/breadcrumb label for /admin/backlink-outreach,
+R98 — Admin shell,Breadcrumb root: Admin,Admin,Administración,n/a,"Breadcrumb crumb, same as the header nav label",
+R98 — Admin shell,Back-to-dashboard link,Back to dashboard,Volver al panel,usted,"Top-of-shell link, above the breadcrumb",

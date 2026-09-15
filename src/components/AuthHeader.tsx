@@ -17,6 +17,12 @@ const NAV_LINKS = [
   { href: "/settings", label: "Settings", labelEs: "Configuración" },
 ];
 
+// Round 98 — appended separately (not just pushed into NAV_LINKS above)
+// because it's the one nav entry gated on more than "signed in": it only
+// renders for admin@casewhy.com, checked via /api/admin/is-admin since
+// ADMIN_EMAIL itself can never ship to this client component's bundle.
+const ADMIN_LINK = { href: "/admin", label: "Admin", labelEs: "Administración" };
+
 // Round 83 — replaces the original narrower TRANSLATED_EN_PATHS allowlist
 // (just /plus, /get-help, and the six round-79 entity-list pages). That
 // list only cleared the cookie on pages known to have a real /es/*
@@ -69,6 +75,25 @@ function AuthHeaderInner() {
   // one of those must never see the signed-in-only links (Dashboard,
   // Settings, etc.), regardless of which page they're on.
   const isSignedIn = !isPending && !!session?.user;
+
+  // Round 98 — one fetch per sign-in, not polled: this is a single-admin
+  // internal tool, not a multi-user product where the badge/visibility
+  // needs to stay live-fresh across a long-open tab. The pending-count
+  // badge itself lives only inside the admin shell (AdminShellClient),
+  // not here -- computing it would mean every signed-in page load, for
+  // every visitor, doing an extra DB round-trip just to decide whether a
+  // number badge shows on a link 99% of visitors can't even see.
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    if (!isSignedIn) {
+      setIsAdmin(false);
+      return;
+    }
+    fetch("/api/admin/is-admin")
+      .then((r) => r.json())
+      .then((data) => setIsAdmin(Boolean(data.isAdmin)))
+      .catch(() => setIsAdmin(false));
+  }, [isSignedIn]);
 
   // Round 79 follow-up — this header renders on every page via the root
   // layout, including the /es/* pages round 79 added, but it was never made
@@ -177,7 +202,7 @@ function AuthHeaderInner() {
               ref={navScrollRef}
               className="flex gap-x-5 gap-y-1 overflow-x-auto text-sm"
             >
-              {NAV_LINKS.map((link) => {
+              {(isAdmin ? [...NAV_LINKS, ADMIN_LINK] : NAV_LINKS).map((link) => {
                 const href = localizeHref(link.href);
                 const active = pathname.startsWith(href);
                 return (

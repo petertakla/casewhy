@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { desc } from "drizzle-orm";
-import Link from "next/link";
 import { auth } from "@/lib/auth/server";
 import { isAdminEmail } from "@/lib/auth/admin";
 import { getDb } from "@/lib/db/client";
@@ -36,13 +35,8 @@ export default async function MarketingLogPage() {
   const statuses = ["pending", "approved", "posted", "edited_posted", "rejected", "escalated", "skipped"] as const;
 
   return (
-    <main className="mx-auto min-h-screen max-w-4xl px-6 py-10">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Marketing log</h1>
-        <Link href="/admin/marketing" className="text-sm text-brand-600 hover:underline dark:text-brand-400">
-          ← Back to queue
-        </Link>
-      </div>
+    <div>
+      <h1 className="text-2xl font-bold tracking-tight">Marketing log</h1>
       <p className="mb-6 mt-2 text-muted">
         Per-channel counts across every item ever queued. <a href="/admin/marketing/log/export.csv" className="text-brand-600 hover:underline dark:text-brand-400">Download CSV</a>.
       </p>
@@ -85,6 +79,6 @@ export default async function MarketingLogPage() {
           </tbody>
         </table>
       </div>
-    </main>
+    </div>
   );
 }

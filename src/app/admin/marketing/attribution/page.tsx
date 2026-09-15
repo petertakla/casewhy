@@ -23,7 +23,7 @@ export default async function AttributionPage() {
   const rows = await getAttributionRows();
 
   return (
-    <main className="mx-auto min-h-screen max-w-4xl px-6 py-10">
+    <div>
       <h1 className="text-2xl font-bold tracking-tight">Marketing attribution</h1>
       <p className="mb-8 mt-2 text-muted">
         Per source/campaign: landings (visits carrying a utm-tagged link), sign-ups whose first touch was that
@@ -62,6 +62,6 @@ export default async function AttributionPage() {
           </table>
         </div>
       )}
-    </main>
+    </div>
   );
 }

@@ -18,7 +18,7 @@ export default async function AdminAliasesPage() {
   const configs = await db.select().from(emailAliasConfigs).orderBy(asc(emailAliasConfigs.alias));
 
   return (
-    <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+    <div>
       <h1 className="text-2xl font-bold tracking-tight">Alias monitoring config</h1>
       <p className="mb-8 mt-2 text-muted">
         Per-alias poll interval and action level — edits apply on the next poll, no code change needed.
@@ -29,6 +29,6 @@ export default async function AdminAliasesPage() {
           <AliasConfigRow key={config.id} {...config} />
         ))}
       </div>
-    </main>
+    </div>
   );
 }

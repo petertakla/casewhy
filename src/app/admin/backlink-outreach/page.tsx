@@ -33,7 +33,7 @@ export default async function BacklinkOutreachAdminPage() {
     .orderBy(desc(pendingBacklinkOutreach.createdAt));
 
   return (
-    <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+    <div>
       <h1 className="text-2xl font-bold tracking-tight">Backlink outreach — draft queue</h1>
       <p className="mb-2 mt-2 text-muted">
         Nothing here has been sent, and nothing here <em>can</em> be sent yet — there&apos;s no send capability
@@ -66,6 +66,6 @@ export default async function BacklinkOutreachAdminPage() {
           ))}
         </div>
       )}
-    </main>
+    </div>
   );
 }

@@ -34,7 +34,7 @@ export default async function AdminInboxPage() {
     .orderBy(desc(pendingAliasActions.urgent), desc(pendingAliasActions.receivedAt));
 
   return (
-    <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+    <div>
       <h1 className="text-2xl font-bold tracking-tight">Alias inbox — pending approval</h1>
       <p className="mb-8 mt-2 text-muted">
         Nothing here has been sent. Review, edit if needed, then approve or reject each one.
@@ -51,6 +51,6 @@ export default async function AdminInboxPage() {
           ))}
         </div>
       )}
-    </main>
+    </div>
   );
 }

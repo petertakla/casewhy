@@ -26,7 +26,7 @@ import { classifyThread } from "@/lib/community/classify-thread";
 import { draftMarketingReply } from "@/lib/marketing/draft-marketing-reply";
 import { selfPromoNoteFor } from "@/lib/community/self-promo-notes";
 import { isNearDuplicateDraft } from "@/lib/marketing/dedup";
-import { LINKS_ENABLED, DAILY_DRAFT_CAP } from "@/lib/marketing/config";
+import { LINKS_ENABLED, getDailyDraftCap } from "@/lib/marketing/config";
 
 export const maxDuration = 60;
 const TIME_BUDGET_MS = 45_000;
@@ -102,12 +102,14 @@ export async function POST(request: Request) {
     .from(marketingQueue)
     .where(and(gte(marketingQueue.createdAt, todayStart), eq(marketingQueue.status, "pending")));
 
+  const dailyDraftCap = await getDailyDraftCap();
+
   let drafted = 0;
   let escalated = 0;
   let skipped = 0;
   let alreadyQueued = 0;
   let dedupBlocked = 0;
-  let capReached = draftedToday >= DAILY_DRAFT_CAP;
+  let capReached = draftedToday >= dailyDraftCap;
   let stoppedEarly = false;
   const classifyErrors: Array<{ destination: string; message: string }> = [];
 
@@ -244,7 +246,7 @@ export async function POST(request: Request) {
         })
         .onConflictDoNothing({ target: [marketingQueue.channel, marketingQueue.destination] });
       drafted++;
-      if (draftedToday + drafted >= DAILY_DRAFT_CAP) capReached = true;
+      if (draftedToday + drafted >= dailyDraftCap) capReached = true;
     } catch (err) {
       classifyErrors.push({ destination: candidate.destination, message: err instanceof Error ? err.message : String(err) });
     }

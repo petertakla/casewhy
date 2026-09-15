@@ -1262,3 +1262,19 @@ export const marketingLandingCounts = pgTable(
   },
   (table) => [unique("marketing_landing_counts_source_medium_campaign_unique").on(table.source, table.medium, table.campaign)]
 );
+
+// Round 98 — a real settings row for the marketing daily draft cap, which
+// round 89's own retrospective (and round 98's audit) found was only ever
+// a hardcoded src/lib/marketing/config.ts constant, not the DB-editable
+// value the round 89 task doc originally asked for. Single-row table
+// (the "singleton" id is always the row operated on -- no multi-tenant
+// need here) rather than a key-value table, since there's exactly one
+// setting that needs to be admin-editable; links_enabled deliberately
+// stays a code constant, never added here -- round 98's own spec says
+// it must render as read-only, not a toggle, until the round 96
+// production gate flips it.
+export const marketingSettings = pgTable("marketing_settings", {
+  id: text("id").primaryKey().default("singleton"),
+  dailyDraftCap: integer("daily_draft_cap").notNull().default(5),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});

@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { inArray, desc } from "drizzle-orm";
-import Link from "next/link";
 import { auth } from "@/lib/auth/server";
 import { isAdminEmail } from "@/lib/auth/admin";
 import { getDb } from "@/lib/db/client";
@@ -31,18 +30,8 @@ export default async function MarketingQueueAdminPage() {
     .orderBy(desc(marketingQueue.createdAt));
 
   return (
-    <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Marketing queue</h1>
-        <div className="flex gap-4">
-          <Link href="/admin/marketing/attribution" className="text-sm text-brand-600 hover:underline dark:text-brand-400">
-            Attribution →
-          </Link>
-          <Link href="/admin/marketing/log" className="text-sm text-brand-600 hover:underline dark:text-brand-400">
-            View log →
-          </Link>
-        </div>
-      </div>
+    <div>
+      <h1 className="text-2xl font-bold tracking-tight">Marketing queue</h1>
       <p className="mb-2 mt-2 text-muted">
         Community/forum channels never post automatically — you copy the text and post it yourself, then mark it
         here. Owned channels can auto-post once a future round wires up that platform&apos;s API, but only after a
@@ -74,6 +63,6 @@ export default async function MarketingQueueAdminPage() {
           ))}
         </div>
       )}
-    </main>
+    </div>
   );
 }

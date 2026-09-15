@@ -1348,6 +1348,58 @@ export const newsItems = pgTable(
 // publication date are deliberately NOT overridable here (round 103's
 // normalizeFrontmatterDate fix and the file's own lang frontmatter stay
 // the source of truth for both, per the task doc's explicit scope).
+// Round 94 — leads from casewhyhub.com/employers, a lead-capture form
+// (not a directory -- round 64's own richer "For Employers" in-app page
+// remains ON HOLD, never built; per this round's task doc, this lighter
+// static-site form is what exists instead, with its own single lead
+// table). No public/approved-listing split like the six directory
+// entity types (attorney_applications -> attorney_directory, etc.) --
+// every submission here is a private sales/product-research lead, never
+// published anywhere.
+export const employerLeads = pgTable("employer_leads", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  company: text("company").notNull(),
+  teamSize: text("team_size").notNull(),
+  contactName: text("contact_name").notNull(),
+  email: text("email").notNull(),
+  needs: text("needs"),
+  utmSource: text("utm_source"),
+  utmMedium: text("utm_medium"),
+  utmCampaign: text("utm_campaign"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Round 94 — sourced list for the attorney cold-outreach campaign
+// (casewhyhub.com/attorneys' companion sending effort). Table exists so
+// the app side is ready the moment Peter picks a sending tool (Apollo.io
+// or another, per the task doc's own Peter-gate) -- populating it (the
+// actual Apollo export) and everything downstream (SPF/DKIM/DMARC,
+// warm-up, the sequence sends themselves) stays gated on that choice,
+// not built this round. suppressed honors an unsubscribe forever, even
+// across a future re-import of the same list. applied is set when a real
+// /attorneys/join submission's email domain matches this row, so a
+// contact who converts organically doesn't also get cold-emailed.
+export const attorneyOutreach = pgTable(
+  "attorney_outreach",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    source: text("source").notNull(),
+    firm: text("firm").notNull(),
+    contactName: text("contact_name"),
+    email: text("email").notNull(),
+    barState: text("bar_state"),
+    status: text("status").notNull().default("not_contacted"),
+    suppressed: boolean("suppressed").notNull().default(false),
+    applied: boolean("applied").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [unique("attorney_outreach_email_unique").on(table.email)]
+);
+
 // Round 110 — site-wide search measurement. Deliberately no user id, no
 // IP (the task doc's own explicit instruction) -- just enough to answer
 // "what do people look for and not find" in a weekly review: the query

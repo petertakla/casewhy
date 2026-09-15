@@ -148,10 +148,17 @@ export function MarketingQueueCard({
           </a>
           <span className="font-mono text-xs text-muted">{blogSlug}</span>
         </div>
-      ) : (
+      ) : destination.startsWith("http") || destination.startsWith("/") ? (
         <a href={destination} target="_blank" rel="noopener noreferrer" className="mt-2 block text-xs text-brand-600 hover:underline dark:text-brand-400">
           {destination}
         </a>
+      ) : (
+        // Round 94 — the "outreach" channel's own destination isn't a
+        // clickable URL or "new post" (it's a synthetic identifier for a
+        // recipient-less sequence email, e.g. "attorney-campaign-email-
+        // 1-intro") -- linking it would 404 against this admin page's own
+        // path. Shown as plain text instead of a broken link.
+        <span className="mt-2 block font-mono text-xs text-muted">{destination}</span>
       )}
 
       {isEscalationOnly ? (

@@ -682,3 +682,55 @@ export async function sendPolicyUpdateSummaryEmail({
     throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
   }
 }
+
+// Round 94 — notifies Peter of a new casewhyhub.com/employers lead. Same
+// "email is enough, no admin dashboard needed at this volume" call as
+// round 28's attorney applications; this is a private sales/product-
+// research lead (round 64's richer in-app team feature remains ON HOLD),
+// never a public listing, so there's no approve/publish step to build a
+// dashboard around either.
+export async function sendEmployerLeadNotification({
+  company,
+  teamSize,
+  contactName,
+  email,
+  needs,
+}: {
+  company: string;
+  teamSize: string;
+  contactName: string;
+  email: string;
+  needs?: string;
+}): Promise<void> {
+  const token = process.env.POSTMARK_API_TOKEN;
+  if (!token) {
+    console.warn(`[postmark] POSTMARK_API_TOKEN not set — skipping employer-lead notification for ${company}`);
+    return;
+  }
+
+  const res = await fetch("https://api.postmarkapp.com/email", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Postmark-Server-Token": token,
+    },
+    body: JSON.stringify({
+      From: FROM_ADDRESS,
+      To: ADMIN_NOTIFICATION_ADDRESS,
+      Subject: `New employer lead: ${company}`,
+      TextBody: [
+        `Company: ${company}`,
+        `Sponsored employees: ${teamSize}`,
+        `Contact: ${contactName}`,
+        `Email: ${email}`,
+        `What they need: ${needs || "(not provided)"}`,
+      ].join("\n"),
+      MessageStream: "outbound",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
+  }
+}

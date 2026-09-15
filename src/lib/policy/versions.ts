@@ -26,8 +26,8 @@ export const POLICY_VERSIONS: Record<PolicyType, PolicyVersionInfo> = {
     ],
   },
   privacy: {
-    version: "September 15, 2026",
-    effectiveDate: new Date("2026-09-15T00:00:00Z"),
+    version: "September 14, 2026",
+    effectiveDate: new Date("2026-09-14T00:00:00Z"),
     summary: [
       "Added a new section explaining how your USCIS receipt number is protected — what we collect, how we use and store it, who can access it, and how long we keep it. Nothing about how we actually handle your receipt number has changed; this makes the existing practice explicit.",
       "Added a data-breach notification commitment — if a breach ever affects your data, we'll notify you and explain what to do next.",

@@ -3,25 +3,7 @@
 import { useState } from "react";
 import { markPosted, rejectItem, approveForAutoPost } from "./actions";
 import { REGISTERED_POSTER_CHANNELS } from "@/lib/marketing/posters/registry";
-
-const CHANNEL_LABELS: Record<string, string> = {
-  reddit: "Reddit",
-  facebook: "Facebook",
-  visajourney: "VisaJourney",
-  trackitt: "Trackitt",
-  immigration_com: "Immigration.com",
-  quora: "Quora",
-  x: "X",
-  threads: "Threads",
-  linkedin: "LinkedIn",
-  pinterest: "Pinterest",
-  youtube: "YouTube",
-  tiktok: "TikTok",
-  instagram: "Instagram",
-  email: "Email",
-  outreach: "Outreach",
-  blog: "Blog",
-};
+import { CHANNEL_LABELS } from "@/lib/marketing/channel-labels";
 
 export function MarketingQueueCard({
   id,

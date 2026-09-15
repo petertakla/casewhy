@@ -18,6 +18,10 @@ import { useIsSpanish } from "@/lib/i18n/use-is-spanish";
 // and the admin shell did in round 98 (a child component's one-time
 // cookie read racing the parent's own clearing effect). Renders nothing
 // on paths with their own equivalent chrome (showSiteFooter()).
+//
+// Round 102's first draft proposed short menuLabel-based footer text;
+// withdrawn same day (Peter reviewed the round-101 footer live and wants
+// it kept exactly as is) — do not reintroduce without a new instruction.
 
 function SiteFooterInner() {
   const pathname = usePathname();

@@ -75,20 +75,22 @@ export default function SiteIndexPage() {
                     </li>
                   )
                 )}
-                {section === "Reference" && (
-                  <li>
-                    Looking for the machine-readable version? See{" "}
-                    <a href="/sitemap.xml" className="text-brand-600 hover:underline dark:text-brand-400">
-                      sitemap.xml
-                    </a>
-                    , which also lists every individual directory listing and policy-memo permalink.
-                  </li>
-                )}
               </ul>
             </div>
           );
         })}
       </div>
+
+      {/* Round 102 — moved out of the Reference section (where it read as
+          a broken seventh list item, body-sized, right under FAQ) to the
+          end of <main>, small and muted, same as a real footnote. */}
+      <p className="mt-8 text-xs text-muted">
+        Looking for the machine-readable version? See{" "}
+        <a href="/sitemap.xml" className="text-brand-600 hover:underline dark:text-brand-400">
+          sitemap.xml
+        </a>
+        , which also lists every individual directory listing and policy-memo permalink.
+      </p>
     </PublicPage>
   );
 }

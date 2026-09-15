@@ -69,20 +69,21 @@ export default function SiteIndexPageEs() {
                     </li>
                   );
                 })}
-                {section === "Reference" && (
-                  <li>
-                    ¿Busca la versión legible por máquina? Vea{" "}
-                    <a href="/sitemap.xml" className="text-brand-600 hover:underline dark:text-brand-400">
-                      sitemap.xml
-                    </a>
-                    , que también enumera cada listado de directorio y permalink de memorando de política individual.
-                  </li>
-                )}
               </ul>
             </div>
           );
         })}
       </div>
+
+      {/* Round 102 — moved out of the Reference section, same fix as the
+          English page. */}
+      <p className="mt-8 text-xs text-muted">
+        ¿Busca la versión legible por máquina? Consulte{" "}
+        <a href="/sitemap.xml" className="text-brand-600 hover:underline dark:text-brand-400">
+          sitemap.xml
+        </a>
+        , que también incluye cada listado del directorio y cada permalink de memorando.
+      </p>
     </PublicPage>
   );
 }

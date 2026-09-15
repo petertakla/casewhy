@@ -281,7 +281,10 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
     showInIndex: false,
     showInFooter: true,
     showInSitemapXml: true,
-    showInHeaderMenu: true,
+    // Round 102 — dropped from the Resources menu ("little value in a
+    // pull-down," Peter's call); the footer already links it. Stays
+    // showInIndex: false / showInFooter: true, unchanged.
+    showInHeaderMenu: false,
     menuLabel: "Site index",
     menuLabelEs: "Índice del sitio",
   },

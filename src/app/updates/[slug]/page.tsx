@@ -29,7 +29,7 @@ async function resolvePost(slug: string, searchParams: SearchParams): Promise<{ 
   const { data: session } = await auth.getSession();
   if (!isAdminEmail(session?.user?.email)) return null;
 
-  const disk = getUpdateBySlugFromDisk(slug);
+  const disk = await getUpdateBySlugFromDisk(slug);
   if (!disk) return null;
   return { post: disk, isPreview: true };
 }

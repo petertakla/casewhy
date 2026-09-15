@@ -1279,3 +1279,25 @@ export const marketingSettings = pgTable("marketing_settings", {
   dailyDraftCap: integer("daily_draft_cap").notNull().default(5),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// Round 107 — an admin edit of a /updates post, keyed by the slug it
+// overrides. content/updates/<slug>.md stays the seed; a row here wins
+// over it at read time (src/lib/updates/updates.ts's applyOverrides()).
+// No row for a slug means "use the repo file as-is." sourcesJson is a
+// JSON-encoded string, not a native jsonb column -- this codebase's
+// established convention (see marketingQueue.sourceCitations above) is
+// plain text columns, not postgres arrays/jsonb; kept consistent rather
+// than introducing a new column-type pattern for one table. lang and the
+// publication date are deliberately NOT overridable here (round 103's
+// normalizeFrontmatterDate fix and the file's own lang frontmatter stay
+// the source of truth for both, per the task doc's explicit scope).
+export const updatesOverrides = pgTable("updates_overrides", {
+  slug: text("slug").primaryKey(),
+  title: text("title").notNull(),
+  summary: text("summary").notNull(),
+  bodyMd: text("body_md").notNull(),
+  sourcesJson: text("sources_json").notNull(),
+  ogImage: text("og_image"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedBy: text("updated_by").notNull(),
+});

@@ -15,9 +15,9 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import { inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { getDb } from "../db/client";
-import { marketingQueue } from "../db/schema";
+import { marketingQueue, updatesOverrides } from "../db/schema";
 
 const CONTENT_DIR = path.join(process.cwd(), "content", "updates");
 
@@ -40,6 +40,67 @@ export interface UpdatePost {
 
 function destinationFor(slug: string): string {
   return `/updates/${slug}`;
+}
+
+// Round 107 — an admin edit of a post, DB-backed (updates_overrides),
+// keyed by slug. The raw shape a row actually holds, distinct from
+// UpdatePost (which is the merged, rendered-ready shape every public
+// reader gets) -- the editor form works with this shape directly.
+export interface UpdateOverride {
+  slug: string;
+  title: string;
+  summary: string;
+  bodyMd: string;
+  sources: UpdateSource[];
+  ogImage: string | null;
+  updatedAt: Date;
+  updatedBy: string;
+}
+
+function parseOverrideRow(row: typeof updatesOverrides.$inferSelect): UpdateOverride {
+  return {
+    slug: row.slug,
+    title: row.title,
+    summary: row.summary,
+    bodyMd: row.bodyMd,
+    sources: JSON.parse(row.sourcesJson) as UpdateSource[],
+    ogImage: row.ogImage,
+    updatedAt: row.updatedAt,
+    updatedBy: row.updatedBy,
+  };
+}
+
+/** Every override row, one query, keyed by slug. Used both to merge posts for public readers and to compute the admin list's "Edited" chips. */
+export async function getOverridesMap(): Promise<Map<string, UpdateOverride>> {
+  const db = getDb();
+  const rows = await db.select().from(updatesOverrides);
+  return new Map(rows.map((row) => [row.slug, parseOverrideRow(row)]));
+}
+
+/** A single slug's override row, or null if the post is unedited (still exactly the repo file). */
+export async function getOverrideForSlug(slug: string): Promise<UpdateOverride | null> {
+  const db = getDb();
+  const [row] = await db.select().from(updatesOverrides).where(eq(updatesOverrides.slug, slug));
+  return row ? parseOverrideRow(row) : null;
+}
+
+function mergeOverride(post: UpdatePost, override: UpdateOverride | undefined): UpdatePost {
+  if (!override) return post;
+  return {
+    ...post,
+    title: override.title,
+    summary: override.summary,
+    content: override.bodyMd,
+    sources: override.sources,
+    ogImage: override.ogImage ?? post.ogImage,
+  };
+}
+
+/** Every post on disk, with any DB override applied. The single merge point every public/admin reader below goes through -- nothing else reads readAllPostsFromDisk() directly. */
+async function readAllPostsMerged(): Promise<UpdatePost[]> {
+  const posts = readAllPostsFromDisk();
+  const overrides = await getOverridesMap();
+  return posts.map((p) => mergeOverride(p, overrides.get(p.slug)));
 }
 
 // Round 103, real bug found while building the admin preview (the first
@@ -100,22 +161,21 @@ async function approvedSlugSet(): Promise<Set<string>> {
   return approved;
 }
 
-/** Every publicly-visible post, newest first. */
+/** Every publicly-visible post, newest first, with any DB override applied. */
 export async function getPublishedUpdates(): Promise<UpdatePost[]> {
-  const approved = await approvedSlugSet();
-  return readAllPostsFromDisk()
-    .filter((p) => approved.has(p.slug))
-    .sort((a, b) => (a.date < b.date ? 1 : -1));
+  const [approved, posts] = await Promise.all([approvedSlugSet(), readAllPostsMerged()]);
+  return posts.filter((p) => approved.has(p.slug)).sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
-/** A single post, only if it's actually approved -- callers should notFound() on null. */
+/** A single post, only if it's actually approved -- callers should notFound() on null. With any DB override applied. */
 export async function getPublishedUpdateBySlug(slug: string): Promise<UpdatePost | null> {
   const approved = await approvedSlugSet();
   if (!approved.has(slug)) return null;
-  return readAllPostsFromDisk().find((p) => p.slug === slug) ?? null;
+  const posts = await readAllPostsMerged();
+  return posts.find((p) => p.slug === slug) ?? null;
 }
 
-/** All post slugs that exist as files, regardless of approval -- for seeding the queue. */
+/** All post slugs that exist as files, regardless of approval -- for seeding the queue. Deliberately disk-only: overrides never add/remove slugs, only edit content. */
 export function getAllUpdateSlugsFromDisk(): string[] {
   return readAllPostsFromDisk().map((p) => p.slug);
 }
@@ -126,10 +186,60 @@ export function getAllUpdateSlugsFromDisk(): string[] {
 // queue card previously showed. Callers must gate this behind their own
 // isAdminEmail check (src/app/updates/[slug]/page.tsx's ?preview=1 path)
 // -- this function itself does no auth, same as readAllPostsFromDisk.
-export function getUpdateBySlugFromDisk(slug: string): UpdatePost | null {
-  return readAllPostsFromDisk().find((p) => p.slug === slug) ?? null;
+//
+// Round 107 — now also applies the DB override for this slug, if one
+// exists (async as of this round for that reason). The admin preview
+// route, the editor's own prefill, and the marketing queue card's Blog
+// title/summary all read through this one function, so none of them can
+// ever disagree about what "the current post" actually is.
+export async function getUpdateBySlugFromDisk(slug: string): Promise<UpdatePost | null> {
+  const post = readAllPostsFromDisk().find((p) => p.slug === slug);
+  if (!post) return null;
+  const override = await getOverrideForSlug(slug);
+  return mergeOverride(post, override ?? undefined);
 }
 
 export function updateDestination(slug: string): string {
   return destinationFor(slug);
+}
+
+// Round 107 — /admin/updates' list page. Every post on disk, merged,
+// with its round-89 queue status and whether it has an override -- the
+// "Edited" chip's source of truth is the same overrides map the merge
+// point above uses, so the chip and the actual merged content can never
+// disagree.
+export interface AdminUpdateRow {
+  slug: string;
+  title: string;
+  date: string;
+  publishStatus: "posted" | "edited_posted" | "pending" | "approved" | "escalated" | "skipped" | "rejected" | "not_queued";
+  edited: boolean;
+}
+
+export async function getUpdatesForAdmin(): Promise<AdminUpdateRow[]> {
+  const db = getDb();
+  const [posts, overrides] = await Promise.all([readAllPostsMerged(), getOverridesMap()]);
+  const destinations = posts.map((p) => destinationFor(p.slug));
+
+  const rows = destinations.length
+    ? await db
+        .select({ destination: marketingQueue.destination, status: marketingQueue.status })
+        .from(marketingQueue)
+        .where(inArray(marketingQueue.destination, destinations))
+    : [];
+  const statusBySlug = new Map<string, AdminUpdateRow["publishStatus"]>(
+    rows.map((r) => [r.destination.replace("/updates/", ""), r.status])
+  );
+
+  return posts
+    .map(
+      (p): AdminUpdateRow => ({
+        slug: p.slug,
+        title: p.title,
+        date: p.date,
+        publishStatus: statusBySlug.get(p.slug) ?? "not_queued",
+        edited: overrides.has(p.slug),
+      })
+    )
+    .sort((a, b) => (a.date < b.date ? 1 : -1));
 }

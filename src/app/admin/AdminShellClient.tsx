@@ -14,6 +14,7 @@ const GROUP_LABELS_ES: Record<(typeof ADMIN_NAV_GROUPS)[number], string> = {
   Marketing: "Marketing",
   Mail: "Correo",
   Outreach: "Contacto",
+  Billing: "Facturación",
 };
 
 function useIsSpanish(): boolean {
@@ -59,14 +60,30 @@ function NavLink({
   isSpanish: boolean;
   count: number | undefined;
 }) {
+  const className = `flex items-center justify-between gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm transition-colors ${
+    active ? "bg-brand-500/10 font-semibold text-brand-600 dark:text-brand-400" : "text-muted hover:bg-surface-2 hover:text-foreground"
+  }`;
+  const label = (
+    <span>
+      {isSpanish ? entry.labelEs : entry.label}
+      {entry.external && <span aria-hidden="true"> ↗</span>}
+    </span>
+  );
+
+  // Round 101 — external (Stripe) entries are never "the current page",
+  // so they're a plain new-tab link, not a Next <Link>, and never get the
+  // active-highlight treatment.
+  if (entry.external) {
+    return (
+      <a href={entry.href} target="_blank" rel="noopener noreferrer" className={className}>
+        {label}
+      </a>
+    );
+  }
+
   return (
-    <Link
-      href={entry.href}
-      className={`flex items-center justify-between gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm transition-colors ${
-        active ? "bg-brand-500/10 font-semibold text-brand-600 dark:text-brand-400" : "text-muted hover:bg-surface-2 hover:text-foreground"
-      }`}
-    >
-      <span>{isSpanish ? entry.labelEs : entry.label}</span>
+    <Link href={entry.href} className={className}>
+      {label}
       {!!count && count > 0 && (
         <span className="rounded-full bg-brand-500 px-1.5 py-0.5 text-[0.7rem] font-bold text-white">{count}</span>
       )}

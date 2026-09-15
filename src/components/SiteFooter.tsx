@@ -1,4 +1,9 @@
-import { PUBLIC_PAGES } from "@/lib/site/pages";
+"use client";
+
+import { Suspense } from "react";
+import { usePathname } from "next/navigation";
+import { PUBLIC_PAGES, showSiteFooter } from "@/lib/site/pages";
+import { useIsSpanish } from "@/lib/i18n/use-is-spanish";
 
 // Round 99 — the footer FAQ and the site index never had (they each
 // ended in a one-off closing paragraph instead). Renders from the same
@@ -6,21 +11,24 @@ import { PUBLIC_PAGES } from "@/lib/site/pages";
 // footer-worthy is declared once (showInFooter: true), not copy-pasted
 // into a fourth hand-maintained list.
 //
-// Mounted only on the pages the round-99 task doc actually scoped this
-// round to (/faq, /sitemap, and their Spanish twins, via PublicPage) --
-// not the root layout. There's no existing "public page" route group to
-// hook a global mount into without restructuring every public route's
-// folder, which the task doc explicitly said not to sweep in this round
-// ("note which other public pages still set their own width for a later
-// sweep — don't sweep them in this round"). The same reasoning applies
-// to the footer: mounting it app-wide today would put it on /dashboard,
-// /admin/*, and /auth/* too, none of which asked for one.
+// Round 101 — mounted once in src/app/layout.tsx (no longer passed an
+// `es` prop or scoped to PublicPage.tsx's four pages). It now computes
+// its own pathname/locale via useIsSpanish() — the same hook AuthHeader
+// uses — so the header and footer can never disagree the way the header
+// and the admin shell did in round 98 (a child component's one-time
+// cookie read racing the parent's own clearing effect). Renders nothing
+// on paths with their own equivalent chrome (showSiteFooter()).
 
-export function SiteFooter({ es }: { es: boolean }) {
+function SiteFooterInner() {
+  const pathname = usePathname();
+  const es = useIsSpanish();
+
+  if (!showSiteFooter(pathname)) return null;
+
   const entries = PUBLIC_PAGES.filter((p) => p.showInFooter);
 
   return (
-    <footer className="mt-16 border-t border-border pt-6 text-sm text-muted">
+    <footer className="mx-auto mt-16 max-w-3xl border-t border-border px-6 pt-6 text-sm text-muted">
       <nav className="flex flex-wrap gap-x-5 gap-y-2" aria-label={es ? "Pie de página" : "Footer"}>
         {entries.map((entry) => {
           const href = es && entry.hrefEs ? entry.hrefEs : entry.href;
@@ -39,7 +47,19 @@ export function SiteFooter({ es }: { es: boolean }) {
           );
         })}
       </nav>
-      <p className="mt-4 text-xs">&copy; 2026 CaseWhy. {es ? "No afiliado ni respaldado por USCIS o DHS." : "Not affiliated with or endorsed by USCIS or DHS."}</p>
+      <p className="mt-4 pb-6 text-xs">&copy; 2026 CaseWhy. {es ? "No afiliado ni respaldado por USCIS o DHS." : "Not affiliated with or endorsed by USCIS or DHS."}</p>
     </footer>
+  );
+}
+
+// useSearchParams() (inside useIsSpanish) requires a Suspense boundary for
+// any page that's part of static generation — same reason AuthHeader.tsx
+// wraps itself, and for the same reason: this renders on every page via
+// the root layout, including statically-prerendered pages.
+export function SiteFooter() {
+  return (
+    <Suspense fallback={null}>
+      <SiteFooterInner />
+    </Suspense>
   );
 }

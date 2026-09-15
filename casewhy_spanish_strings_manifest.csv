@@ -358,3 +358,14 @@ R98 — Admin shell,Entry: Alias config,Alias config,Configuración de alias,n/a
 R98 — Admin shell,Entry: Backlink drafts,Backlink drafts,Borradores de enlaces,n/a,Sidebar/breadcrumb label for /admin/backlink-outreach,
 R98 — Admin shell,Breadcrumb root: Admin,Admin,Administración,n/a,"Breadcrumb crumb, same as the header nav label",
 R98 — Admin shell,Back-to-dashboard link,Back to dashboard,Volver al panel,usted,"Top-of-shell link, above the breadcrumb",
+"R101 — AuthHeader (global nav, every page)",Resources menu trigger label,Resources,Recursos,neutral,"Button label + dropdown aria-label, both signed-in and signed-out header",Menu title per the task doc's own instruction.
+R101 — AuthHeader Resources menu,Menu item: Processing times,Processing times,Tiempos de procesamiento,neutral,"Short dropdown label; round 79 follow-up had left this nav item deliberately English-only (no destination existed then) — now has a real Spanish label for the first time",Full page label unchanged (USCIS processing times by form / Tiempos de procesamiento de USCIS por formulario); this is the shorter header-menu-only form.
+R101 — AuthHeader Resources menu,Menu item: Visa bulletin,Visa bulletin,Boletín de visas,neutral,"Short dropdown label, same round-79-gap reasoning as above",
+R101 — AuthHeader Resources menu,Menu item: Immigration news,Immigration news,Noticias de inmigración,neutral,"Short dropdown label, same round-79-gap reasoning as above",Matches the existing PUBLIC_PAGES label/labelEs exactly — no separate menuLabel override needed in code.
+R101 — AuthHeader Resources menu,Menu item: Policy memos,"USCIS policy memos, explained",Memorandos de política,neutral,Short dropdown label; full page label unchanged,
+R101 — AuthHeader Resources menu,Menu item: Updates,Updates — the CaseWhy blog,Actualizaciones,neutral,Short dropdown label; full page label unchanged,
+R101 — AuthHeader Resources menu,Menu item: FAQ,Frequently asked questions,FAQ,neutral,Short dropdown label; full page label unchanged (Preguntas frecuentes) still used on the FAQ page itself and the footer,
+R101 — AuthHeader Resources menu,Menu item: Site index,Site index,Índice del sitio,neutral,"Matches the existing PUBLIC_PAGES label/labelEs exactly, listed for completeness",
+R101 — Admin shell (sidebar + /admin cards),Group: Billing,Billing,Facturación,n/a,Sidebar group heading,New group; Stripe-hosted screens only — no CaseWhy UI behind these two entries.
+R101 — Admin shell,Entry: Coupons & promo codes (Stripe),Coupons & promo codes (Stripe),Cupones y códigos promocionales (Stripe),n/a,"Sidebar/admin-index label, external link to dashboard.stripe.com/coupons (opens new tab)",
+R101 — Admin shell,Entry: Subscriptions (Stripe),Subscriptions (Stripe),Suscripciones (Stripe),n/a,"Sidebar/admin-index label, external link to dashboard.stripe.com/subscriptions (opens new tab)",

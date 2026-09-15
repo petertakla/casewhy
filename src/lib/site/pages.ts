@@ -25,6 +25,21 @@ export interface PublicPageEntry {
   showInFooter: boolean;
   /** Included in sitemap.ts's static-path list. */
   showInSitemapXml: boolean;
+  /** Round 101 — included as an item in AuthHeader's "Resources" menu. */
+  showInHeaderMenu?: boolean;
+  /** Round 101 — short label for the Resources menu; falls back to `label` (some entries' full `label` is too long for a compact dropdown). */
+  menuLabel?: string;
+  menuLabelEs?: string;
+}
+
+// Round 101 — paths whose own shell already provides equivalent chrome
+// (the round-98 admin sidebar, the chrome-free /auth/* sign-in flow), so
+// mounting SiteFooter there too would be a second, redundant footer.
+// Prefix match. Client-safe, same split as admin/nav.ts.
+export const NO_SITE_FOOTER_PREFIXES = ["/admin", "/auth"];
+
+export function showSiteFooter(pathname: string): boolean {
+  return !NO_SITE_FOOTER_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
 export const PUBLIC_PAGES: PublicPageEntry[] = [
@@ -190,6 +205,9 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
     showInIndex: true,
     showInFooter: true,
     showInSitemapXml: true,
+    showInHeaderMenu: true,
+    menuLabel: "Processing times",
+    menuLabelEs: "Tiempos de procesamiento",
   },
   {
     href: "/visa-bulletin",
@@ -199,24 +217,9 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
     showInIndex: true,
     showInFooter: true,
     showInSitemapXml: true,
-  },
-  {
-    href: "/policy",
-    label: "USCIS policy memos, explained",
-    labelEs: "Memorandos de política de USCIS, explicados",
-    section: "Reference",
-    showInIndex: true,
-    showInFooter: true,
-    showInSitemapXml: true,
-  },
-  {
-    href: "/updates",
-    label: "Updates — the CaseWhy blog",
-    labelEs: "Actualizaciones — el blog de CaseWhy",
-    section: "Reference",
-    showInIndex: true,
-    showInFooter: true,
-    showInSitemapXml: true,
+    showInHeaderMenu: true,
+    menuLabel: "Visa bulletin",
+    menuLabelEs: "Boletín de visas",
   },
   {
     href: "/news",
@@ -226,6 +229,33 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
     showInIndex: true,
     showInFooter: false,
     showInSitemapXml: true,
+    showInHeaderMenu: true,
+    menuLabel: "Immigration news",
+    menuLabelEs: "Noticias de inmigración",
+  },
+  {
+    href: "/policy",
+    label: "USCIS policy memos, explained",
+    labelEs: "Memorandos de política de USCIS, explicados",
+    section: "Reference",
+    showInIndex: true,
+    showInFooter: true,
+    showInSitemapXml: true,
+    showInHeaderMenu: true,
+    menuLabel: "Policy memos",
+    menuLabelEs: "Memorandos de política",
+  },
+  {
+    href: "/updates",
+    label: "Updates — the CaseWhy blog",
+    labelEs: "Actualizaciones — el blog de CaseWhy",
+    section: "Reference",
+    showInIndex: true,
+    showInFooter: true,
+    showInSitemapXml: true,
+    showInHeaderMenu: true,
+    menuLabel: "Updates",
+    menuLabelEs: "Actualizaciones",
   },
   {
     href: "/faq",
@@ -236,6 +266,9 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
     showInIndex: true,
     showInFooter: true,
     showInSitemapXml: true,
+    showInHeaderMenu: true,
+    menuLabel: "FAQ",
+    menuLabelEs: "Preguntas frecuentes",
   },
   // Not shown on the index itself (no self-link), but it IS one of the
   // footer's 10 links per the task doc's explicit list.
@@ -248,6 +281,9 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
     showInIndex: false,
     showInFooter: true,
     showInSitemapXml: true,
+    showInHeaderMenu: true,
+    menuLabel: "Site index",
+    menuLabelEs: "Índice del sitio",
   },
 
   // -- Legal --

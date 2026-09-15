@@ -37,19 +37,31 @@ export default async function AdminIndexPage() {
             <div className="grid gap-3 sm:grid-cols-2">
               {ADMIN_NAV.filter((e) => e.group === group).map((entry) => {
                 const count = countsByHref[entry.href];
-                return (
-                  <Link
-                    key={entry.href}
-                    href={entry.href}
-                    className="rounded-xl border border-border bg-surface p-4 transition-colors hover:border-border-strong"
-                  >
+                const cardClassName = "rounded-xl border border-border bg-surface p-4 transition-colors hover:border-border-strong";
+                const cardBody = (
+                  <>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-foreground">{entry.label}</span>
+                      <span className="font-semibold text-foreground">
+                        {entry.label}
+                        {entry.external && <span aria-hidden="true"> ↗</span>}
+                      </span>
                       {!!count && count > 0 && (
                         <span className="rounded-full bg-brand-500 px-2 py-0.5 text-xs font-bold text-white">{count}</span>
                       )}
                     </div>
                     <p className="mt-1 text-sm text-muted">{entry.description}</p>
+                  </>
+                );
+                // Round 101 — Billing's entries point at Stripe's own
+                // dashboard, so they're a plain new-tab link, not a Next
+                // <Link> (which would try to client-navigate to it).
+                return entry.external ? (
+                  <a key={entry.href} href={entry.href} target="_blank" rel="noopener noreferrer" className={cardClassName}>
+                    {cardBody}
+                  </a>
+                ) : (
+                  <Link key={entry.href} href={entry.href} className={cardClassName}>
+                    {cardBody}
                   </Link>
                 );
               })}

@@ -18,10 +18,16 @@ export interface AdminNavEntry {
   href: string;
   label: string;
   labelEs: string;
-  group: "Marketing" | "Mail" | "Outreach";
+  group: "Marketing" | "Mail" | "Outreach" | "Billing";
   description: string;
   /** True for entries nav-counts.ts's getAdminPendingCounts() computes a live number for. */
   hasPendingCount?: boolean;
+  /** Round 101 — opens in a new tab (rel="noopener noreferrer") with an
+   * external-link glyph after the label. The shell never treats an
+   * external entry as "the current page" and findAdminNavEntry() ignores
+   * these entirely, since a full external URL can't match a pathname
+   * anyway and shouldn't be considered for the breadcrumb. */
+  external?: boolean;
 }
 
 // Order here is display order — grouped by the same key, group headers
@@ -79,12 +85,38 @@ export const ADMIN_NAV: AdminNavEntry[] = [
     description: "Draft partner-outreach emails, attorney directory only, awaiting review.",
     hasPendingCount: true,
   },
+  // Round 101 — round 50 deliberately has no CaseWhy coupon UI (Stripe's
+  // dashboard is the UI); these two entries just make that reachable from
+  // the admin shell instead of Peter having to remember it lives there.
+  {
+    href: "https://dashboard.stripe.com/coupons",
+    label: "Coupons & promo codes (Stripe)",
+    labelEs: "Cupones y códigos promocionales (Stripe)",
+    group: "Billing",
+    description: "100%-off codes for internal testers and partner comps; created in Stripe, redeemed at checkout (round 50).",
+    external: true,
+  },
+  {
+    href: "https://dashboard.stripe.com/subscriptions",
+    label: "Subscriptions (Stripe)",
+    labelEs: "Suscripciones (Stripe)",
+    group: "Billing",
+    description: "Every Plus subscription, its status, and the customer portal history.",
+    external: true,
+  },
 ];
 
-export const ADMIN_NAV_GROUPS = ["Marketing", "Mail", "Outreach"] as const;
+export const ADMIN_NAV_GROUPS = ["Marketing", "Mail", "Outreach", "Billing"] as const;
 
 export function findAdminNavEntry(pathname: string): AdminNavEntry | undefined {
   // Longest-href-first so a child route (e.g. /admin/marketing/log)
-  // matches its own entry rather than the parent queue page's.
-  return [...ADMIN_NAV].sort((a, b) => b.href.length - a.href.length).find((entry) => pathname.startsWith(entry.href));
+  // matches its own entry rather than the parent queue page's. External
+  // entries are excluded outright — a full URL can never match a
+  // same-origin pathname anyway, but excluding them here (rather than
+  // relying on that) keeps the breadcrumb from ever being able to land on
+  // one, which is the actual requirement.
+  return [...ADMIN_NAV]
+    .filter((entry) => !entry.external)
+    .sort((a, b) => b.href.length - a.href.length)
+    .find((entry) => pathname.startsWith(entry.href));
 }

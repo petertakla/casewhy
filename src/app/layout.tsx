@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { AuthHeader } from "@/components/AuthHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -44,6 +45,10 @@ export default function RootLayout({
           <ServiceWorkerRegister />
           <AuthHeader />
           {children}
+          {/* Round 101 — mounted once here (no longer per-page via
+              PublicPage.tsx); SiteFooter reads the current path itself and
+              renders nothing on /admin/* or /auth/* (showSiteFooter()). */}
+          <SiteFooter />
         </ThemeProvider>
       </body>
     </html>

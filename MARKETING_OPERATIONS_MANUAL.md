@@ -1,6 +1,6 @@
 # CaseWhy Marketing Operations — Operator Manual
 
-**Version 1, Sep 14, 2026. Audience: anyone working the marketing queues** — Peter today, a part-time helper or VA later. Written by the cloud Claude session from the round 85/89 specs and Claude Code's build reports; **Claude Code verified every screen label against the live UI before publishing this version.** Sections marked *(coming — round NN)* describe behavior that is specified but not yet built; they will be unmarked as each round ships.
+**Version 2, Sep 15, 2026 (v1 Sep 14). Audience: anyone working the marketing queues** — Peter today, a part-time helper or VA later. Written by the cloud Claude session from the round 85/89 specs and Claude Code's build reports; **Claude Code verified every screen label against the live UI before publishing this version.** Sections marked *(coming — round NN)* describe behavior that is specified but not yet built; they will be unmarked as each round ships.
 
 **Companion documents:** `SOCIAL_MEDIA_GUARDRAILS.md` (the rules every draft is checked against — read it once in full before your first shift), `marketing-ownership-and-peter-checklist.md` (who does what), `CaseWhy Free Marketing Playbook` (why each channel exists).
 
@@ -25,19 +25,22 @@ If a channel's posting integration isn't set up yet, an owned-channel item behav
 
 Admin pages need you to be signed in as the admin account — **`admin@casewhy.com`** (a dedicated admin credential, separate from the public `info@casewhy.com` inbox, since round 85). Anything else gets redirected away.
 
+Since round 98 you never type an admin URL: sign in, and an **Admin** entry appears in the header (only for the admin account). It opens the **admin home** (`/admin`) — cards for every admin page with a pending-count badge — and every admin page carries the same left sidebar (top tabs on a phone) and a breadcrumb (`Dashboard › Admin › Marketing › Queue`). The sidebar groups: **Marketing** (Queue · Log · Attribution · Settings), **Mail** (Replies · Alias config), **Outreach** (Backlink drafts).
+
 | Page | What it holds | Round |
 |---|---|---|
-| `app.casewhy.com/admin/marketing` | **The marketing queue** — every Pending and Escalated item, newest first. This is the page you open every day. (No channel/status filter controls exist — the page is always scoped to just these two statuses; see Section 3.) | 89 |
-| `app.casewhy.com/admin/marketing/log` | Per-channel counts across every status, all-time, plus a **Download CSV** link. You don't work this page; the cloud session reads it weekly. | 89 |
-| `app.casewhy.com/admin/marketing/attribution` | Which channel brought which sign-ups (landings / sign-ups / tracked a case / went Plus). Read-only. **Live**, not upcoming. | 93 |
+| Admin › Marketing › **Queue** (`/admin/marketing`) | **The marketing queue.** Grouped by channel, one collapsible section per channel that has items (community channels first), escalated cards pinned to the top of their section. A channel-filter chip row and a **Needs action** / **Recent history** toggle (posted, edited, rejected — last 30 days, read-only). Filter and view live in the URL so a view can be bookmarked. | 89, 98 |
+| Admin › Marketing › **Settings** (`/admin/marketing/settings`) | The subreddit reference list, the daily draft cap (editable, default 5), and `links_enabled` shown read-only. | 98 |
+| Admin › Marketing › **Log** (`/admin/marketing/log`) | Per-channel counts across every status, all-time, plus a **Download CSV** link. You don't work this page; the cloud session reads it weekly. | 89 |
+| Admin › Marketing › **Attribution** (`/admin/marketing/attribution`) | Which channel brought which sign-ups (landings / sign-ups / tracked a case / went Plus). Read-only. **Live**, not upcoming. | 93 |
 | `app.casewhy.com/admin/community-replies` | The original community-only queue from round 85. **Removed.** Round 89 replaced it with `/admin/marketing`; this URL now returns a plain 404, it does not redirect. | 85 (retired) |
-| `app.casewhy.com/admin/inbox` | Replies to mail sent to `privacy@`, `help@`, `corrections@`, etc. **Separate system, deliberately** — business correspondence, not marketing. Not covered by this manual. | 70 |
+| Admin › Mail › **Replies** (`/admin/inbox`) | Replies to mail sent to `privacy@`, `help@`, `corrections@`, etc. **Separate system, deliberately** — business correspondence, not marketing. Not covered by this manual. | 70 |
 
 ---
 
 ## 3. Your daily routine (target: five minutes)
 
-1. Open `/admin/marketing`. It's always scoped to Pending and Escalated items only — there's no filter to set.
+1. Sign in, click **Admin** in the header, then **Queue** (or open the Queue card on the admin home). The default **Needs action** view shows only Pending and Escalated items, grouped by channel; the badge on the sidebar entry is the count. Use the channel chips if you only want one channel today.
 2. For each card, read what it shows (Section 4). Decide: **mark it posted after you post it yourself** (community/manual channels), **Approve** (owned channels with a real poster), or **Reject**.
 3. For `manual_post` items you've posted: copy the final text, open the destination link, post it from your own account, come back, click **Mark posted (as-is)** (or **Mark posted (edited)** if you changed the text first).
 4. Look at anything marked **Escalated** (Section 6). Those need a human read and either **Acknowledge / dismiss** once you've decided.
@@ -45,7 +48,7 @@ Admin pages need you to be signed in as the admin account — **`admin@casewhy.c
 
 If you approve nothing on a given day, nothing goes out. The system is safe to ignore for a day; it just accumulates.
 
-Note: **Skipped** items (the classifier decided a thread wasn't a real fit and never drafted) never appear on this page — they're pending/escalated only. Skipped counts only show up on the log page (Section 9), for the cloud session to review.
+Note: **Skipped** items (the classifier decided a thread wasn't a real fit and never drafted) never appear in the queue. Skipped counts only show up on the log page (Section 9), for the cloud session to review. To see what you already posted or rejected, flip the toggle to **Recent history**.
 
 ---
 
@@ -100,7 +103,7 @@ What to do: read the thread, decide whether to answer as yourself (without CaseW
 
 ## 7. Channel-specific notes
 
-**Reddit.** Post from the Reddit account tied to `peter@casewhy.com`. Check the subreddit's self-promo rule (folded into the card's guardrail notes, not a separate field — see Section 4). No links until launch. If a moderator removes a post, screenshot it and tell the cloud session — the guardrails doc gets tightened, not just the one post.
+**Reddit — manual, like Facebook and Quora.** Reddit denied CaseWhy's API application (Sep 15) and blocks feed reads from our servers, so nothing monitors Reddit automatically; the cloud session finds threads and drafts replies by hand, and they land in the queue as `manual_post` cards. Post from the Reddit account tied to `peter@casewhy.com`. Check the subreddit's self-promo rule (folded into the card's guardrail notes — see Section 4). No links until launch. If a moderator removes a post, screenshot it and tell the cloud session — the guardrails doc gets tightened, not just the one post. The subreddit list under Settings is a reference list, not a monitor.
 
 **immigration.com and other forums.** Same rules as Reddit. The immigration.com feed is mostly firm announcements, so expect few drafts from it.
 
@@ -121,8 +124,7 @@ What to do: read the thread, decide whether to answer as yourself (without CaseW
 ## 8. Things you cannot change from the queue (and who can)
 
 - **Product links are off** (`links_enabled = false`) until the paid tier and USCIS production access are both live. Drafts won't contain a CaseWhy URL and you shouldn't add one. Round 96 flips this; only Peter authorizes it.
-- **The daily cap** (default 5 community drafts/day) is a value in the code (`src/lib/marketing/config.ts`), not something editable from any page — ask the cloud session to change it.
-- **The subreddit list** *is* stored in an editable database table (`community_source_configs`), but there is currently **no admin page** to view or edit it — nobody can see or change it without a direct database script. Ask the cloud session to change it, same as the cap, until a page exists.
+- **The daily cap** (default 5 community drafts/day) and the **subreddit reference list** are editable under Admin › Marketing › **Settings** (round 98). Change the cap there if the queue feels too heavy or too quiet; tell the cloud session when you do.
 - **The guardrails** are a document, not a setting. Nobody edits them casually — every change is dated and explained in the file.
 
 ---
@@ -137,8 +139,8 @@ Every Monday the cloud session reads `/admin/marketing/log` and the attribution 
 
 | You see | It means | Do |
 |---|---|---|
-| Redirected away from `/admin/marketing` | Not signed in as the admin account | Sign in as `admin@casewhy.com` |
-| Queue empty for days | Reddit is manual-only (Reddit denied the API application Sep 15 and blocks the RSS fallback too — see round 85 in `CLOUD_CLAUDE.md`), immigration.com's feed just hasn't had a matching post, or the cap was hit early | Nothing automated to fix — Reddit needs a manually-sourced draft if you want one queued; check the log page's "skipped" count for the other channels, and tell the cloud session if it's high |
+| No **Admin** entry in the header, or redirected away from an admin page | Not signed in as the admin account | Sign in as `admin@casewhy.com` |
+| Queue empty for days | Normal pre-launch: Reddit/Facebook/Quora are manual (the cloud session hands you candidates), and the only automated source is a quiet RSS feed | Nothing — ask the cloud session for a batch of candidates if you want something to post |
 | `auto_post` item stuck in "approved" without moving to "posted" | The channel's poster errored | Copy the text and post/publish manually; mark it accordingly; tell the cloud session which channel |
 | A draft cites a figure you can't find at the source link | Sourcing failed | Reject; report it — this is the one failure that must never reach a post |
 | Two near-identical drafts for different threads | Dedup missed | Approve/post one, reject the other, report it |
@@ -158,7 +160,7 @@ The draft delivered from Drive got several real things wrong about the live prod
 7. **`/admin/community-replies` is gone entirely (404), not redirecting.**
 8. **Round 93 had already shipped by the time this manual was written** — `/admin/marketing/attribution` and the Blog channel are both live, not "(coming — round 93)." Updated both sections.
 9. **The alias approval queue's real path is `/admin/inbox`** — the original draft left it unspecified.
-10. **The subreddit-list/daily-cap shot (#7 in the original shot list) doesn't exist as a page.** No admin UI was ever built for `community_source_configs` or the cap constant — noted plainly in Section 8 instead of screenshotting something that isn't there.
+10. **The subreddit-list/daily-cap shot (#7 in the original shot list) didn't exist as a page at v1.** Round 98 built it the same day (Admin › Marketing › Settings) — see Section 8; screenshot still to be added.
 
 Two small real bugs were found and fixed in the app itself while doing this verification, not just written around: the log page's per-channel table was missing a "Skipped" column (so channel totals silently didn't match the visible columns), and the channel-label map was missing entries for "Outreach" and "Blog" (falling back to the raw enum string). Both fixed, deployed, and confirmed live before the screenshots below were taken.
 
@@ -190,6 +192,6 @@ All captured live against `/admin/marketing` on Sep 14, 2026, signed in as `admi
 
 ![Log page with per-channel counts](docs/marketing-manual-screenshots/05-log-page.jpg)
 
-**7. The admin config for the subreddit list and daily cap.** No screenshot — this page doesn't exist. Neither `community_source_configs` (the subreddit list) nor `DAILY_DRAFT_CAP` (the cap, which isn't even a database value) has any admin UI today. See Section 8.
+**7. The admin config for the subreddit list and daily cap.** Now exists: Admin › Marketing › Settings (round 98). Screenshot to be added with the next verification pass, along with the admin home, sidebar, and the grouped queue.
 
 **8. One card each for X, a pin, an email issue, and a blog post.** Only Blog is real as of this version — shown in #3 above. X/Threads/LinkedIn (round 90), Pinterest/YouTube/TikTok/Instagram (round 91), and email issues (round 92) don't exist in the live queue yet; add their screenshots to this section once those rounds ship.

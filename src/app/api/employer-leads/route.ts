@@ -35,24 +35,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Invalid request body." }, { status: 400, headers });
   }
 
-  const { company, teamSize, contactName, email, needs, utmSource, utmMedium, utmCampaign, website } = body as Record<string, unknown>;
+  const { kind, company, teamSize, contactName, email, needs, utmSource, utmMedium, utmCampaign, website } =
+    body as Record<string, unknown>;
 
-  if (
-    typeof company !== "string" ||
-    typeof teamSize !== "string" ||
-    typeof contactName !== "string" ||
-    typeof email !== "string"
-  ) {
-    return NextResponse.json(
-      { ok: false, error: "company, teamSize, contactName, and email are required." },
-      { status: 400, headers }
-    );
+  if (typeof email !== "string") {
+    return NextResponse.json({ ok: false, error: "email is required." }, { status: 400, headers });
   }
 
   const result = await submitEmployerLead({
-    company,
-    teamSize,
-    contactName,
+    kind: kind === "caseworker" ? "caseworker" : "employer",
+    company: typeof company === "string" ? company : undefined,
+    teamSize: typeof teamSize === "string" ? teamSize : undefined,
+    contactName: typeof contactName === "string" ? contactName : undefined,
     email,
     needs: typeof needs === "string" ? needs : undefined,
     utmSource: typeof utmSource === "string" ? utmSource : undefined,

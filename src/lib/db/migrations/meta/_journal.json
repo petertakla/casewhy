@@ -267,6 +267,13 @@
       "when": 1789506649682,
       "tag": "0037_lonely_king_cobra",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1789511408481,
+      "tag": "0038_lucky_vampiro",
+      "breakpoints": true
     }
   ]
 }

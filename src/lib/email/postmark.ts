@@ -734,3 +734,51 @@ export async function sendEmployerLeadNotification({
     throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
   }
 }
+
+// Round 111 — casewhyhub.com/caseworkers' "Tell us what would help your
+// office" form. Same notification shape as sendEmployerLeadNotification
+// above; kept as its own function (not a branch inside that one) since the
+// field set genuinely differs (no company/teamSize, an office name instead,
+// a required message rather than an optional one).
+export async function sendCaseworkerLeadNotification({
+  contactName,
+  office,
+  email,
+  message,
+}: {
+  contactName?: string;
+  office?: string;
+  email: string;
+  message: string;
+}): Promise<void> {
+  const token = process.env.POSTMARK_API_TOKEN;
+  if (!token) {
+    console.warn(`[postmark] POSTMARK_API_TOKEN not set — skipping caseworker-lead notification for ${email}`);
+    return;
+  }
+
+  const res = await fetch("https://api.postmarkapp.com/email", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Postmark-Server-Token": token,
+    },
+    body: JSON.stringify({
+      From: FROM_ADDRESS,
+      To: ADMIN_NOTIFICATION_ADDRESS,
+      Subject: `New caseworker message${office ? `: ${office}` : ""}`,
+      TextBody: [
+        `Name: ${contactName || "(not provided)"}`,
+        `Office: ${office || "(not provided)"}`,
+        `Email: ${email}`,
+        `Message: ${message}`,
+      ].join("\n"),
+      MessageStream: "outbound",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Postmark send failed: ${res.status} ${await res.text()}`);
+  }
+}

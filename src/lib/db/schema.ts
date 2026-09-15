@@ -1360,11 +1360,21 @@ export const employerLeads = pgTable("employer_leads", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  company: text("company").notNull(),
-  teamSize: text("team_size").notNull(),
-  contactName: text("contact_name").notNull(),
+  // Round 111 — company/teamSize made nullable: a "caseworker" kind row
+  // (casewhyhub.com/caseworkers) doesn't collect either field, since its
+  // form only asks for a name, office, email, and a message. Every
+  // "employer" kind row (the default, round 94's original shape) still
+  // requires both at the application layer via EmployerLeadInput below.
+  company: text("company"),
+  teamSize: text("team_size"),
+  contactName: text("contact_name"),
   email: text("email").notNull(),
   needs: text("needs"),
+  // Round 111 — casewhyhub.com/caseworkers reuses this same table (task
+  // doc's own explicit "one lead table, don't add a second" instruction)
+  // rather than a parallel caseworker_leads table. "employer" is the
+  // default so every existing/round-94 row keeps its real meaning.
+  kind: text("kind").notNull().default("employer"),
   utmSource: text("utm_source"),
   utmMedium: text("utm_medium"),
   utmCampaign: text("utm_campaign"),

@@ -1,18 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>For Legal Aid & Community Organizations | CaseWhy Hub</title>
-<meta name="description" content="Claim or correct your free listing in CaseWhy's directories for legal aid, accredited representatives, pro bono programs, and community organizations.">
-<link rel="canonical" href="https://casewhyhub.com/organizations">
-<link rel="icon" href="/brand/icon-192.png">
-<link rel="icon" href="/brand/icon-512.png" sizes="512x512">
-<link rel="apple-touch-icon" href="/brand/apple-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-<style>
+#!/usr/bin/env node
+// Round 111 — regenerates every casewhyhub.com page from scripts/pages.json
+// (the registry) + scripts/content/<id>.html (per-page body) so the shared
+// header/footer/nav/CSS live in exactly one place instead of being hand-
+// copied across 7+ files. No runtime build step exists on this static
+// site (Vercel serves the committed HTML directly), so this script is run
+// manually — the same reason build-search-index.ts (round 110) exists as
+// a script rather than a framework build hook, just without a framework
+// here to hook into. Run: node scripts/generate.mjs from the repo root.
+
+import { readFileSync, writeFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(__dirname, "..");
+
+const { pages } = JSON.parse(readFileSync(join(__dirname, "pages.json"), "utf8"));
+const partnerKit = readFileSync(join(__dirname, "content", "_partner-kit.html"), "utf8");
+
+const CSS = `
   :root{
     --background:#f7f5f0; --surface:#ffffff; --surface-2:#efece4; --foreground:#1c2024;
     --muted:#6b7280; --border:#e4e0d6; --border-strong:#d1cbba;
@@ -111,14 +117,17 @@
   footer .links a{margin-right:16px;}
   footer .app-line{font-weight:600;color:var(--foreground);}
   footer .coming{margin-top:10px;font-size:0.8rem;font-style:italic;}
-</style>
-  <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebPage","name":"For Legal Aid & Community Organizations | CaseWhy Hub","url":"https://casewhyhub.com/organizations","isPartOf":{"@type":"WebSite","name":"CaseWhy Hub","url":"https://casewhyhub.com"}}
-  </script>
-</head>
-<body>
+`;
 
-<header>
+function header(currentId) {
+  const navItems = pages
+    .filter((p) => p.inNav)
+    .map(
+      (p) =>
+        `      <a href="${p.path}"${p.id === currentId ? ' aria-current="page"' : ""}>${p.navLabel}</a>`
+    )
+    .join("\n");
+  return `<header>
   <div class="wrap">
     <a class="logo" href="https://www.casewhy.com?utm_source=hub&utm_medium=header">
       <img src="/brand/mark.svg" alt="">
@@ -129,54 +138,15 @@
     </a>
     <nav class="main">
       <a href="/">Hub</a>
-      <a href="/attorneys">Attorneys</a>
-      <a href="/organizations" aria-current="page">Organizations</a>
-      <a href="/employers">Employers</a>
-      <a href="/caseworkers">Caseworkers</a>
-      <a href="/schools">Schools</a>
-      <a href="/press">Press</a>
+${navItems}
       <a class="site-link" href="https://www.casewhy.com?utm_source=hub&utm_medium=header">casewhy.com ↗</a>
     </nav>
   </div>
-</header>
+</header>`;
+}
 
-<main class="wrap">
-  <p class="eyebrow">For legal aid, accredited representatives, and community organizations</p>
-  <h1>Claim or correct your listing</h1>
-  <p class="sub">CaseWhy directs users to free help directories for legal aid providers, BIA-accredited representatives, pro bono representation programs, and community organizations. Most listings are sourced from official federal or state records; if yours is missing, out of date, or you'd like it added, apply below. <em>International student office? See the <a href="/schools">Schools page</a> instead.</em></p>
-  <p class="free-line">Free, always. No fee to be listed.</p>
-
-  <div class="disclaimer">These directories are for informational purposes only. They do not constitute a referral service, and listing does not imply an endorsement or recommendation by this platform.</div>
-
-  <div class="types">
-    <div class="type-card">
-      <h2>Legal aid organizations</h2>
-      <p class="meta">865 organizations listed, 49 states + DC</p>
-      <p>Nonprofit organizations offering free or low-cost immigration legal help.</p>
-      <a class="link" href="https://app.casewhy.com/legal-aid/join?utm_source=casewhyhub&utm_medium=referral&utm_campaign=organization-recruitment">Apply or request a correction →</a>
-    </div>
-    <div class="type-card">
-      <h2>BIA-accredited representatives</h2>
-      <p class="meta">2,586 representatives listed, 49 states + DC</p>
-      <p>Non-attorney, DOJ-authorized representatives, typically at nonprofits.</p>
-      <a class="link" href="https://app.casewhy.com/accredited-representatives/join?utm_source=casewhyhub&utm_medium=referral&utm_campaign=organization-recruitment">Apply or request a correction →</a>
-    </div>
-    <div class="type-card">
-      <h2>Pro bono representation programs</h2>
-      <p>Organizations providing free representation in immigration court.</p>
-      <a class="link" href="https://app.casewhy.com/pro-bono-representation/join?utm_source=casewhyhub&utm_medium=referral&utm_campaign=organization-recruitment">Apply or request a correction →</a>
-    </div>
-    <div class="type-card">
-      <h2>Community organizations</h2>
-      <p class="meta">159 organizations listed, from USCIS grant records</p>
-      <p>Community groups, cultural organizations, and congregations serving immigrant communities.</p>
-      <a class="link" href="https://app.casewhy.com/community-orgs/join?utm_source=casewhyhub&utm_medium=referral&utm_campaign=organization-recruitment">Apply or request a correction →</a>
-    </div>
-  </div>
-
-</main>
-
-<footer>
+function footer() {
+  return `<footer>
   <div class="wrap">
     <p class="app-line">CaseWhy — the app: <a href="https://www.casewhy.com?utm_source=hub&utm_medium=footer">casewhy.com</a> · Get Help: <a href="https://app.casewhy.com/get-help?utm_source=hub&utm_medium=footer">app.casewhy.com/get-help</a></p>
     <p>CaseWhy LLC, 7901 4th St N, Ste 300, St. Petersburg, FL 33702, US</p>
@@ -187,9 +157,10 @@
     </div>
     <p class="coming">Coming: creators, libraries, Español.</p>
   </div>
-</footer>
+</footer>`;
+}
 
-<script>
+const COPY_SCRIPT = `<script>
   document.querySelectorAll('.copy-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const target = document.getElementById(btn.dataset.copyTarget);
@@ -200,6 +171,119 @@
       });
     });
   });
-</script>
+</script>`;
+
+function page(p) {
+  let body = readFileSync(join(__dirname, "content", `${p.id}.html`), "utf8");
+  if (body.includes("{{PARTNER_KIT}}")) {
+    body = body.replace("{{PARTNER_KIT}}", partnerKit.replaceAll("{{PAGE_ID}}", p.id));
+  }
+  const needsCopyScript = body.includes("copy-btn") || partnerKit.includes("copy-btn");
+  const jsonLd =
+    p.id === "press"
+      ? "" // Organization JSON-LD is inline in content/press.html itself
+      : `  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebPage","name":${JSON.stringify(p.titleTag)},"url":"https://casewhyhub.com${p.path}","isPartOf":{"@type":"WebSite","name":"CaseWhy Hub","url":"https://casewhyhub.com"}}
+  </script>\n`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${p.titleTag}</title>
+<meta name="description" content="${p.description}">
+<link rel="canonical" href="https://casewhyhub.com${p.path}">
+<link rel="icon" href="/brand/icon-192.png">
+<link rel="icon" href="/brand/icon-512.png" sizes="512x512">
+<link rel="apple-touch-icon" href="/brand/apple-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>${CSS}</style>
+${jsonLd}</head>
+<body>
+
+${header(p.id)}
+
+<main class="wrap">
+${body}
+</main>
+
+${footer()}
+${needsCopyScript ? "\n" + COPY_SCRIPT : ""}
 </body>
 </html>
+`;
+}
+
+function homePage() {
+  const cards = pages
+    .filter((p) => p.inNav)
+    .map(
+      (p) => `    <a class="card" href="${p.path}">
+      <h2>${p.cardTitle}</h2>
+      <p>${p.cardDesc}</p>
+      <p class="arrow">Learn more →</p>
+    </a>`
+    )
+    .join("\n");
+  const body = `  <p class="eyebrow">CaseWhy Hub</p>
+  <h1>Partner with CaseWhy</h1>
+  <p class="sub">CaseWhy is a free USCIS case-status tracker used by immigrants and their families to understand what's actually happening with their case. This is where attorneys, legal aid organizations, schools, congressional offices, journalists, and employers connect with CaseWhy — as a free founding-partner listing, or as a partner in what we build next.</p>
+  <p class="free-line">Every listing described here is free — no fees, no ads, ever.</p>
+
+  <div class="cards">
+${cards}
+  </div>`;
+  const jsonLd = `  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebPage","name":"CaseWhy Hub — Partner with CaseWhy","url":"https://casewhyhub.com/","isPartOf":{"@type":"WebSite","name":"CaseWhy Hub","url":"https://casewhyhub.com"}}
+  </script>
+`;
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CaseWhy Hub — Partner with CaseWhy</title>
+<meta name="description" content="Free listings and partnership programs for immigration attorneys, legal aid organizations, schools, congressional offices, press, and employers — from CaseWhy, the free USCIS case-status tracker.">
+<link rel="canonical" href="https://casewhyhub.com/">
+<link rel="icon" href="/brand/icon-192.png">
+<link rel="icon" href="/brand/icon-512.png" sizes="512x512">
+<link rel="apple-touch-icon" href="/brand/apple-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>${CSS}</style>
+${jsonLd}</head>
+<body>
+
+${header(null)}
+
+<main class="wrap">
+${body}
+</main>
+
+${footer()}
+
+</body>
+</html>
+`;
+}
+
+for (const p of pages) {
+  const dir = join(ROOT, p.id);
+  writeFileSync(join(dir, "index.html"), page(p));
+  console.log("wrote", p.path);
+}
+writeFileSync(join(ROOT, "index.html"), homePage());
+console.log("wrote /");
+
+const sitemapUrls = ["/", ...pages.map((p) => p.path)]
+  .map((u) => `  <url><loc>https://casewhyhub.com${u === "/" ? "/" : u}</loc></url>`)
+  .join("\n");
+writeFileSync(
+  join(ROOT, "sitemap.xml"),
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls}\n</urlset>\n`
+);
+console.log("wrote sitemap.xml");

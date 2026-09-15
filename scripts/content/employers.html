@@ -1,0 +1,48 @@
+  <p class="eyebrow">For HR and global mobility teams</p>
+  <h1>Help us build CaseWhy for your sponsored employees</h1>
+  <p class="sub">CaseWhy already helps individuals track and understand their own USCIS case, free. We're exploring a team feature for employers sponsoring visas or green cards — a way for HR or mobility teams to see aggregate status across sponsored employees, without ever seeing an individual case unless that employee explicitly consents.</p>
+
+  <h2>What we're considering</h2>
+  <ul class="checklist">
+    <li>A consent-based team dashboard — an employer never sees a sponsored employee's case unless that employee opts in.</li>
+    <li>A shared deadline calendar across sponsored cases.</li>
+    <li>Stalled-case alerts surfaced to the team, not just the individual.</li>
+    <li>Visa bulletin movement tracked across your whole sponsored population.</li>
+    <li>A plain-language digest your HR team can actually read.</li>
+  </ul>
+  <p class="planned-note">None of this exists yet — these are planned capabilities we're validating, not live features.</p>
+
+  <h2>Tell us what you need</h2>
+  <p>Nothing here costs anything, and submitting this form doesn't commit you to anything either — it's how we decide what to build first.</p>
+
+  <form id="employer-lead-form">
+    <input type="text" name="website" class="honeypot" tabindex="-1" autocomplete="off">
+    <div>
+      <label for="company">Company name</label>
+      <input type="text" id="company" name="company" required>
+    </div>
+    <div>
+      <label for="teamSize">Roughly how many sponsored employees?</label>
+      <select id="teamSize" name="teamSize" required>
+        <option value="">Select one</option>
+        <option value="1-10">1–10</option>
+        <option value="11-50">11–50</option>
+        <option value="51-200">51–200</option>
+        <option value="200+">200+</option>
+      </select>
+    </div>
+    <div>
+      <label for="contactName">Your name</label>
+      <input type="text" id="contactName" name="contactName" required>
+    </div>
+    <div>
+      <label for="email">Work email</label>
+      <input type="email" id="email" name="email" required>
+    </div>
+    <div>
+      <label for="needs">What would actually help your team? (optional)</label>
+      <textarea id="needs" name="needs"></textarea>
+    </div>
+    <button type="submit" class="submit">Send</button>
+    <p id="form-status" class="status" role="status"></p>
+  </form>

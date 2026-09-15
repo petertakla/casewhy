@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <rect width="1920" height="1080" fill="#f7f5f0"/>
+  <rect x="0" y="0" width="1920" height="14" fill="#1baf7a"/>
+  <g transform="translate(140,150)">
+    <rect x="0" y="0" width="120" height="120" rx="26" fill="#1baf7a"/>
+    <path d="M36 62 L53 78 L86 41" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="150" y="80" font-family="Inter, 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="64" letter-spacing="-1" fill="#111827">Case<tspan fill="#1baf7a">Why</tspan></text>
+  </g>
+  <text x="140" y="430" font-family="Inter, 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="88" letter-spacing="-2" fill="#111827">
+    <tspan x="140" dy="0">Confused by your</tspan>
+    <tspan x="140" dy="100">USCIS status?</tspan>
+  </text>
+  <text x="140" y="640" font-family="Inter, 'Helvetica Neue', Arial, sans-serif" font-weight="600" font-size="44" fill="#2a78d6">casewhy.com explains it, free.</text>
+  <text x="140" y="710" font-family="Inter, 'Helvetica Neue', Arial, sans-serif" font-weight="500" font-size="32" fill="#6b7280">Not a law firm — for advice, see your DSO or an attorney.</text>
+  <rect x="140" y="860" width="900" height="2" fill="#d1cbba"/>
+  <text x="140" y="940" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="30" letter-spacing="0.02em" fill="#1baf7a">CASEWHY.COM</text>
+  <text x="140" y="985" font-family="Inter, sans-serif" font-weight="500" font-size="26" fill="#6b7280">Free · No ads, ever · English y español</text>
+</svg>

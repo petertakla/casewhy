@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Founding Partner Attorney Listing — CaseWhy Hub</title>
-<meta name="description" content="A free, non-exclusive founding-partner listing in CaseWhy's immigration attorney directory — no fees, no referral commission, ever.">
+<title>For Immigration Attorneys — Free Directory Listing | CaseWhy Hub</title>
+<meta name="description" content="Join 272 board-certified immigration attorneys already listed free in CaseWhy's directory. No fee, no exclusivity, ever.">
+<link rel="canonical" href="https://casewhyhub.com/attorneys">
 <link rel="icon" href="/brand/icon-192.png">
 <link rel="icon" href="/brand/icon-512.png" sizes="512x512">
 <link rel="apple-touch-icon" href="/brand/apple-icon.png">
@@ -37,7 +38,7 @@
   }
   a{color:var(--brand-600);}
   @media (prefers-color-scheme: dark){ a{color:var(--brand-400);} }
-  .wrap{max-width:720px;margin:0 auto;padding:0 24px;}
+  .wrap{max-width:820px;margin:0 auto;padding:0 24px;}
   header{position:sticky;top:0;z-index:10;padding:18px 0;border-bottom:1px solid var(--border);background:color-mix(in srgb, var(--surface) 80%, transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
   header .wrap{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
   .logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;}
@@ -46,42 +47,80 @@
   .logo .name{font-weight:700;font-size:1.15rem;letter-spacing:-0.02em;color:var(--foreground);}
   .logo .name span{color:var(--logo-green);}
   .logo .tagline{font-size:0.72rem;color:var(--muted);font-weight:500;}
-  nav.main{display:flex;gap:20px;font-size:0.92rem;font-weight:600;}
+  nav.main{display:flex;align-items:center;gap:16px;font-size:0.88rem;font-weight:600;flex-wrap:wrap;}
   nav.main a{color:var(--muted);text-decoration:none;}
-  nav.main a.active{color:var(--foreground);border-bottom:2px solid var(--brand-500);}
   nav.main a:hover{color:var(--foreground);}
+  nav.main a.site-link{color:var(--brand-600);border-left:1px solid var(--border);padding-left:16px;}
+  @media (prefers-color-scheme: dark){ nav.main a.site-link{color:var(--brand-400);} }
   main{padding:56px 0 80px;}
   .eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--brand-600);}
   @media (prefers-color-scheme: dark){ .eyebrow{color:var(--brand-400);} }
-  h1{font-size:2.1rem;margin:10px 0 14px;letter-spacing:-0.02em;line-height:1.2;}
-  h2{font-size:1.3rem;margin:44px 0 10px;letter-spacing:-0.01em;}
-  .sub{color:var(--muted);font-size:1.05rem;max-width:600px;}
-  p{margin:0 0 14px;}
-  .free-line{margin-top:16px;font-size:0.92rem;font-weight:600;}
+  h1{font-size:2.2rem;margin:10px 0 14px;letter-spacing:-0.02em;line-height:1.15;}
+  h2{font-size:1.3rem;margin:36px 0 12px;letter-spacing:-0.01em;}
+  .sub{color:var(--muted);font-size:1.05rem;max-width:680px;}
+  .free-line{margin-top:18px;font-size:0.92rem;font-weight:600;color:var(--foreground);}
   .disclaimer{margin-top:20px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);padding:16px 18px;font-size:0.88rem;color:var(--foreground);}
-  .cta{display:inline-block;margin-top:8px;padding:13px 26px;border-radius:10px;background:var(--brand-500);color:#fff;font-weight:700;text-decoration:none;}
-  .cta:hover{background:var(--brand-600);}
-  .preview-card{margin-top:16px;border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:20px;max-width:400px;}
-  .preview-card .name{font-weight:700;font-size:1.02rem;}
-  .preview-card .state{float:right;font-size:0.8rem;color:var(--muted);font-family:'JetBrains Mono',monospace;}
-  .preview-card .firm{color:var(--muted);font-size:0.92rem;margin-top:2px;}
-  .preview-card .focus{margin-top:8px;font-size:0.82rem;color:var(--muted);}
-  ul.checklist{list-style:none;padding:0;margin:0;}
-  ul.checklist li{padding-left:26px;position:relative;margin-bottom:10px;}
-  ul.checklist li::before{content:"✓";position:absolute;left:0;color:var(--logo-green);font-weight:700;}
-  footer{border-top:1px solid var(--border);padding:32px 0;font-size:0.85rem;color:var(--muted);margin-top:40px;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:48px;}
+  .card{border:1px solid var(--border);background:var(--surface);border-radius:16px;padding:24px;text-decoration:none;color:inherit;transition:border-color .15s;}
+  .card:hover{border-color:var(--border-strong);}
+  .card h2{margin:0 0 8px;font-size:1.1rem;}
+  .card p{margin:0;color:var(--muted);font-size:0.9rem;}
+  .card .arrow{margin-top:14px;font-weight:700;color:var(--brand-600);font-size:0.88rem;}
+  @media (prefers-color-scheme: dark){ .card .arrow{color:var(--brand-400);} }
+  ul.checklist{list-style:none;padding:0;margin:0 0 14px;}
+  ul.checklist li{padding-left:26px;position:relative;margin-bottom:10px;color:var(--muted);font-size:0.95rem;}
+  ul.checklist li::before{content:"—";position:absolute;left:0;color:var(--brand-500);}
+  ul.checklist li strong{color:var(--foreground);}
+  .planned-note{font-size:0.82rem;color:var(--muted);font-style:italic;margin-top:-4px;margin-bottom:20px;}
+  .types{margin-top:24px;display:grid;gap:16px;}
+  .type-card{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:22px;}
+  .type-card h2{margin:0 0 6px;font-size:1.1rem;}
+  .type-card p{margin:0 0 12px;color:var(--muted);font-size:0.92rem;}
+  .type-card .meta{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted);margin-bottom:10px;}
+  .type-card a.link{font-weight:700;font-size:0.9rem;text-decoration:none;}
+  .type-card a.link:hover{text-decoration:underline;}
+  form{margin-top:8px;display:grid;gap:14px;max-width:480px;}
+  label{font-size:0.85rem;font-weight:600;display:block;margin-bottom:5px;}
+  input,select,textarea{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border-strong);background:var(--surface);color:var(--foreground);font-family:inherit;font-size:0.95rem;}
+  textarea{resize:vertical;min-height:80px;}
+  .honeypot{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;}
+  button.submit{padding:13px 26px;border-radius:10px;background:var(--brand-500);color:#fff;font-weight:700;border:none;font-size:0.98rem;cursor:pointer;justify-self:start;}
+  button.submit:hover{background:var(--brand-600);}
+  button.submit:disabled{opacity:0.6;cursor:not-allowed;}
+  .status{margin-top:-6px;font-size:0.9rem;}
+  .status.success{color:var(--logo-green);}
+  .status.error{color:#e05252;}
+  .form-note{font-size:0.8rem;color:var(--muted);margin:-4px 0 0;}
+  .kit{margin-top:32px;border:1px solid var(--border);background:var(--surface);border-radius:16px;padding:24px;}
+  .kit h2{margin-top:0;}
+  .kit-intro{color:var(--muted);font-size:0.9rem;margin-top:-6px;}
+  .kit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-top:16px;}
+  .kit-item h3{margin:0 0 6px;font-size:0.98rem;}
+  .kit-item p{margin:0 0 8px;color:var(--muted);font-size:0.88rem;}
+  .kit-note{font-size:0.78rem;color:var(--muted);font-style:italic;}
+  .copy-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border-strong);background:var(--surface-2);color:var(--foreground);font-size:0.85rem;font-weight:600;cursor:pointer;}
+  .copy-btn:hover{border-color:var(--brand-500);}
+  .kit-snippet{position:absolute;left:-9999px;opacity:0;}
+  .kit-disclaimer{margin-top:20px;font-size:0.8rem;color:var(--muted);}
+  footer{border-top:1px solid var(--border);padding:32px 0;font-size:0.85rem;color:var(--muted);}
   footer .wrap{display:flex;flex-direction:column;gap:6px;}
   footer a{color:var(--muted);}
   footer a:hover{color:var(--brand-600);}
   @media (prefers-color-scheme: dark){ footer a:hover{color:var(--brand-400);} }
+  footer .links{margin-top:6px;}
   footer .links a{margin-right:16px;}
+  footer .app-line{font-weight:600;color:var(--foreground);}
+  footer .coming{margin-top:10px;font-size:0.8rem;font-style:italic;}
 </style>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebPage","name":"For Immigration Attorneys — Free Directory Listing | CaseWhy Hub","url":"https://casewhyhub.com/attorneys","isPartOf":{"@type":"WebSite","name":"CaseWhy Hub","url":"https://casewhyhub.com"}}
+  </script>
 </head>
 <body>
 
 <header>
   <div class="wrap">
-    <a class="logo" href="/">
+    <a class="logo" href="https://www.casewhy.com?utm_source=hub&utm_medium=header">
       <img src="/brand/mark.svg" alt="">
       <span class="lockup">
         <span class="name">Case<span>Why</span> Hub</span>
@@ -89,9 +128,14 @@
       </span>
     </a>
     <nav class="main">
-      <a href="/attorneys" class="active">Attorneys</a>
+      <a href="/">Hub</a>
+      <a href="/attorneys" aria-current="page">Attorneys</a>
       <a href="/organizations">Organizations</a>
       <a href="/employers">Employers</a>
+      <a href="/caseworkers">Caseworkers</a>
+      <a href="/schools">Schools</a>
+      <a href="/press">Press</a>
+      <a class="site-link" href="https://www.casewhy.com?utm_source=hub&utm_medium=header">casewhy.com ↗</a>
     </nav>
   </div>
 </header>
@@ -126,18 +170,33 @@
   <h2>Apply</h2>
   <p>Applying takes about two minutes. Every application is reviewed by hand before anything goes live.</p>
   <a class="cta" href="https://app.casewhy.com/attorneys/join?utm_source=casewhyhub&utm_medium=referral&utm_campaign=attorney-recruitment">Apply for a founding-partner listing →</a>
+
 </main>
 
 <footer>
   <div class="wrap">
+    <p class="app-line">CaseWhy — the app: <a href="https://www.casewhy.com?utm_source=hub&utm_medium=footer">casewhy.com</a> · Get Help: <a href="https://app.casewhy.com/get-help?utm_source=hub&utm_medium=footer">app.casewhy.com/get-help</a></p>
     <p>CaseWhy LLC, 7901 4th St N, Ste 300, St. Petersburg, FL 33702, US</p>
     <div class="links">
-      <a href="https://www.casewhy.com">casewhy.com</a>
+      <a href="/resources">Resources</a>
       <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>
       <a href="mailto:terms@casewhy.com">terms@casewhy.com</a>
     </div>
+    <p class="coming">Coming: creators, libraries, Español.</p>
   </div>
 </footer>
 
+<script>
+  document.querySelectorAll('.copy-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.copyTarget);
+      navigator.clipboard.writeText(target.value).then(() => {
+        const original = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = original; }, 1800);
+      });
+    });
+  });
+</script>
 </body>
 </html>

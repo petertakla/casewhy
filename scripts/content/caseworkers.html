@@ -1,0 +1,88 @@
+  <p class="eyebrow">CaseWhy Hub · For constituent-services staff</p>
+  <h1>For congressional caseworkers</h1>
+  <p class="sub">CaseWhy is a free, plain-language explainer of USCIS case status, built by a founder whose family's naturalization case went quiet after the interview. When a constituent calls about an immigration case, they usually need two things first: to understand what their status actually means, and to know whether their case is genuinely outside USCIS's published processing time. CaseWhy answers both, for free, without an account, in English and Spanish.</p>
+
+  <h2>What constituents get</h2>
+  <ul class="checklist">
+    <li><strong>Their status, explained.</strong> Every USCIS status in plain language: what it confirms, what it doesn't, and what usually happens next. No account is needed to read the explanations.</li>
+    <li><strong>Processing times and the Visa Bulletin, side by side.</strong> USCIS's own published figures for the common forms, with the date they were captured, and the current Visa Bulletin cutoffs — the two numbers most calls are really about.</li>
+    <li><strong>The escalation path, as USCIS defines it.</strong> CaseWhy flags a tracked case that has waited longer than the published processing time and lays out the formal channels in order: the USCIS e-Request for a case outside normal processing time, a congressional inquiry through your office, and the CIS Ombudsman's case-assistance request. It explains what each channel needs and what it can and can't do — so constituents arrive at your office with the receipt notice, the e-Request confirmation, and the dates already in hand.</li>
+    <li><strong>Free help directories.</strong> DOJ-accredited representatives, legal aid, pro bono court representation, and attorneys, searchable by state. Free to everyone, with the source of each listing shown.</li>
+  </ul>
+
+  <h2>What your office gets</h2>
+  <ul class="checklist">
+    <li>The same reference pages your staff can use directly: <a href="https://app.casewhy.com/processing-times">processing times</a> · <a href="https://app.casewhy.com/visa-bulletin">Visa Bulletin</a> · <a href="https://app.casewhy.com/policy">policy memos</a>.</li>
+    <li>A printable one-pager for the front desk and a snippet for your website's resources page (below).</li>
+    <li>A commitment: CaseWhy is non-partisan and takes no position on immigration policy — it explains procedure and cites USCIS. It never sells or shares personal data, and receipt numbers are encrypted and treated as personal information (<a href="https://www.casewhy.com/privacy.html#section-2">see Section 2</a>).</li>
+  </ul>
+
+  <h2>What CaseWhy is not</h2>
+  <p>CaseWhy is not a law firm and does not give legal advice; it is not affiliated with or endorsed by USCIS or any government agency; and it never advises on an individual case. When a question depends on someone's own facts, it points them to a licensed attorney or an accredited representative — and to you.</p>
+
+  {{PARTNER_KIT}}
+
+  <h2>Tell us what would help your office</h2>
+  <p>Nothing here costs anything, and submitting this form doesn't commit you to anything.</p>
+  <form id="caseworker-lead-form">
+    <input type="text" name="website" class="honeypot" tabindex="-1" autocomplete="off">
+    <div>
+      <label for="cw-contactName">Your name (optional)</label>
+      <input type="text" id="cw-contactName" name="contactName">
+    </div>
+    <div>
+      <label for="cw-office">Your office (optional)</label>
+      <input type="text" id="cw-office" name="office">
+    </div>
+    <div>
+      <label for="cw-email">Email</label>
+      <input type="email" id="cw-email" name="email" required>
+    </div>
+    <div>
+      <label for="cw-needs">What would make CaseWhy more useful to your constituents?</label>
+      <textarea id="cw-needs" name="needs" required></textarea>
+    </div>
+    <button type="submit" class="submit">Send</button>
+    <p class="form-note">We read every message. We won't add you to any list.</p>
+    <p id="cw-form-status" class="status" role="status"></p>
+  </form>
+
+<script>
+  const cwForm = document.getElementById('caseworker-lead-form');
+  const cwStatus = document.getElementById('cw-form-status');
+  cwForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = cwForm.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    cwStatus.textContent = '';
+    cwStatus.className = 'status';
+    const params = new URLSearchParams(window.location.search);
+    const data = {
+      kind: 'caseworker',
+      website: cwForm.website.value, // honeypot
+      contactName: cwForm.contactName.value,
+      company: cwForm.office.value,
+      email: cwForm.email.value,
+      needs: cwForm.needs.value,
+      utmSource: params.get('utm_source') || '',
+      utmMedium: params.get('utm_medium') || '',
+      utmCampaign: params.get('utm_campaign') || '',
+    };
+    try {
+      const res = await fetch('https://app.casewhy.com/api/employer-leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error('request failed');
+      cwForm.reset();
+      cwStatus.textContent = "Thanks — we read every message.";
+      cwStatus.classList.add('success');
+    } catch (err) {
+      cwStatus.textContent = 'Something went wrong. Please try again or email hello@casewhy.com.';
+      cwStatus.classList.add('error');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+</script>

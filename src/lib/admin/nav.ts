@@ -62,6 +62,13 @@ export const ADMIN_NAV: AdminNavEntry[] = [
     group: "Marketing",
     description: "The subreddit list, the daily draft cap, and the links_enabled gate.",
   },
+  {
+    href: "/admin/search",
+    label: "Search",
+    labelEs: "Búsqueda",
+    group: "Marketing",
+    description: "Top searches and zero-result queries, last 30 days.",
+  },
   // Round 107 — a new group, placed right after Marketing per the task
   // doc's own instruction, since editing a post is a natural next step
   // from reviewing it in the Marketing queue (round 103), not a separate

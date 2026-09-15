@@ -4,6 +4,7 @@ import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import { PUBLIC_PAGES } from "@/lib/site/pages";
+import { openSiteSearch } from "@/lib/search/open-search-event";
 
 // Round 101 — the header's reference-links dropdown, built from the
 // registry (showInHeaderMenu), never a second hand list.
@@ -112,6 +113,22 @@ export function ResourcesMenu({ isSpanish, pathname }: { isSpanish: boolean; pat
             style={{ position: "fixed", top: coords.top, left: coords.left }}
             className="z-30 w-56 rounded-lg border border-border bg-surface p-1 shadow-lg"
           >
+            <input
+              type="text"
+              placeholder={isSpanish ? "Buscar…" : "Search…"}
+              aria-label={isSpanish ? "Buscar en CaseWhy" : "Search CaseWhy"}
+              // Round 110 — typing here opens the full overlay pre-filled
+              // rather than duplicating a second search UI inside this
+              // dropdown, per the task doc's own "Peter's original ask is
+              // satisfied without a second search UI" framing.
+              onChange={(e) => {
+                if (e.target.value.trim()) {
+                  setOpen(false);
+                  openSiteSearch(e.target.value);
+                }
+              }}
+              className="mb-1 w-full rounded-md border border-border-strong bg-background px-2.5 py-1.5 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+            />
             {RESOURCES_ITEMS.map((item, i) => {
               const href = isSpanish && item.hrefEs ? item.hrefEs : item.href;
               const label = isSpanish ? item.menuLabelEs ?? item.labelEs ?? item.label : item.menuLabel ?? item.label;

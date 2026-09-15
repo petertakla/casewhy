@@ -107,7 +107,7 @@ function BulletinTable({ rows, previousRows, es }: { rows: BulletinRow[]; previo
           {rows.map((row) => {
             const prev = previousFor(row.category);
             return (
-              <tr key={row.category} className="border-b border-border last:border-0">
+              <tr key={row.category} id={row.category.toLowerCase()} className="scroll-mt-20 border-b border-border last:border-0">
                 <td className="px-4 py-3">
                   <span className="font-semibold">{row.category}</span>
                   <span className="ml-2 text-muted">{row.label}</span>

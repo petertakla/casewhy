@@ -51,9 +51,9 @@ export async function generateMetadata({
 export default async function GetHelpAskPage({
   searchParams,
 }: {
-  searchParams: Promise<{ lang?: string }>;
+  searchParams: Promise<{ lang?: string; q?: string }>;
 }) {
-  const { lang } = await searchParams;
+  const { lang, q } = await searchParams;
   const es = await isSpanishLocale(lang);
 
   return (
@@ -98,7 +98,7 @@ export default async function GetHelpAskPage({
       </p>
 
       <div className="mt-6">
-        <AnonymousChat es={es} />
+        <AnonymousChat es={es} initialQuery={q} />
       </div>
     </main>
   );

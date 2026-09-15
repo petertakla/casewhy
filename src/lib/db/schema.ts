@@ -1348,6 +1348,30 @@ export const newsItems = pgTable(
 // publication date are deliberately NOT overridable here (round 103's
 // normalizeFrontmatterDate fix and the file's own lang frontmatter stay
 // the source of truth for both, per the task doc's explicit scope).
+// Round 110 — site-wide search measurement. Deliberately no user id, no
+// IP (the task doc's own explicit instruction) -- just enough to answer
+// "what do people look for and not find" in a weekly review: the query
+// text, which locale, how many results landed in each group, and whether
+// the searcher clicked a result or fell through to the "Ask CaseWhy"
+// fallback. resultCounts is a single delimited string ("answers:3,
+// reference:1, ...") -- this codebase's established plain-text-column
+// convention (see marketingQueue.sourceCitations), not a new jsonb column
+// for one small table.
+export const searchEvents = pgTable(
+  "search_events",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    query: text("query").notNull(),
+    locale: text("locale").notNull(),
+    resultCounts: text("result_counts").notNull(),
+    outcome: text("outcome").notNull(), // "clicked_result" | "asked_casewhy" | "abandoned"
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("search_events_created_at_idx").on(table.createdAt)]
+);
+
 export const updatesOverrides = pgTable("updates_overrides", {
   slug: text("slug").primaryKey(),
   title: text("title").notNull(),

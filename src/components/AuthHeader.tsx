@@ -9,6 +9,7 @@ import { PUBLIC_PAGES } from "@/lib/site/pages";
 import { Logo } from "./Logo";
 import { ResourcesMenu } from "./ResourcesMenu";
 import { PlusBadge } from "./PlusBadge";
+import { SiteSearch } from "./SiteSearch";
 
 // Round 101 — Processing times, Visa bulletin, and News moved out of here
 // into the registry-driven Resources menu (see ResourcesMenu.tsx); this
@@ -144,9 +145,12 @@ function AuthHeaderInner() {
   return (
     <header className="sticky top-0 z-10 border-b border-border bg-surface/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-4 text-sm">
-        <Link href={isSpanish ? "/?lang=es" : "/"}>
-          <Logo />
-        </Link>
+        <div className="flex items-center gap-1">
+          <Link href={isSpanish ? "/?lang=es" : "/"}>
+            <Logo />
+          </Link>
+          <SiteSearch />
+        </div>
 
         {isSignedIn && (
           <div className="relative order-3 w-full sm:order-none sm:w-auto">

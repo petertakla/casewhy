@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { PublicPage } from "@/components/PublicPage";
+import { FaqPageSearch } from "@/components/FaqPageSearch";
+import { slugify } from "@/lib/search/slugify";
 
 // Round 73 item 8 — the common trust/product questions this audience
 // actually asks, previously scattered across the ToS, privacy policy, and
@@ -324,13 +326,15 @@ export default function FaqPage() {
         .
       </p>
 
+      <FaqPageSearch isSpanish={false} />
+
       <div className="space-y-10">
         {GROUPS.map((group) => (
           <div key={group.heading}>
             <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-muted">{group.heading}</h2>
             <div className="space-y-6">
               {group.faqs.map((faq) => (
-                <div key={faq.question}>
+                <div key={faq.question} id={slugify(faq.question)} className="scroll-mt-20">
                   <h3 className="text-base font-semibold text-foreground">{faq.question}</h3>
                   <p className="mt-2 text-sm text-muted">{faq.answer}</p>
                 </div>

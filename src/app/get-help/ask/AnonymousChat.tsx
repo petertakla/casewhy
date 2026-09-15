@@ -25,9 +25,12 @@ const SUGGESTED_QUESTIONS_ES = [
   "¿Qué pasa después de la biometría?",
 ];
 
-export function AnonymousChat({ es }: { es: boolean }) {
+export function AnonymousChat({ es, initialQuery }: { es: boolean; initialQuery?: string }) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
+  // Round 110 — search's "Didn't find it? Ask CaseWhy" row carries the
+  // query into ?q=, pre-filled here but never auto-submitted (round 71's
+  // lifetime cap means spending a question is the visitor's own choice).
+  const [input, setInput] = useState(initialQuery ?? "");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [limitReached, setLimitReached] = useState(false);

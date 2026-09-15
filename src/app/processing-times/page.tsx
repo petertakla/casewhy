@@ -156,7 +156,7 @@ export default async function ProcessingTimesPage({
 
       <div className="space-y-4">
         {PROCESSING_TIMES.map((entry) => (
-          <div key={entry.id} className="rounded-xl border border-border bg-surface p-5">
+          <div key={entry.id} id={entry.id} className="scroll-mt-20 rounded-xl border border-border bg-surface p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <p className="font-semibold">
                 {entry.formType} <span className="font-normal text-muted">— {entry.categoryLabel}</span>
@@ -181,7 +181,7 @@ export default async function ProcessingTimesPage({
         ))}
       </div>
 
-      <div className="mt-8 rounded-xl border border-dashed border-border-strong p-5">
+      <div id="field-office-only" className="mt-8 scroll-mt-20 rounded-xl border border-dashed border-border-strong p-5">
         <p className="text-xs font-semibold uppercase tracking-widest text-muted">
           {es ? "No mostrado arriba — específico a la oficina, sin cifra nacional" : "Not shown above — office-specific, no national figure"}
         </p>

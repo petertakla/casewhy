@@ -72,7 +72,7 @@ export function EditorForm({
     setError(null);
     setSaved(false);
     try {
-      await saveOverride({
+      const result = await saveOverride({
         slug,
         title,
         summary,
@@ -80,10 +80,18 @@ export function EditorForm({
         sources: sources.filter((s) => s.title.trim() || s.url.trim()),
         ogImage,
       });
-      setEdited(true);
-      setSaved(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      if (result.ok) {
+        setEdited(true);
+        setSaved(true);
+      } else {
+        setError(result.error);
+      }
+    } catch {
+      // A genuinely unexpected failure (DB down, etc.) -- there's nothing
+      // more specific to say, unlike the validation failures above, which
+      // come back as normal return data specifically so their message
+      // survives (see saveOverride's own comment on why).
+      setError("Something went wrong.");
     } finally {
       setPending(false);
     }

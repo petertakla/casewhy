@@ -45,11 +45,23 @@ function validate(input: SaveOverrideInput): string | null {
   return null;
 }
 
-/** Save (upsert) an override. Throws with a readable message on validation failure -- never saves a partial row. */
-export async function saveOverride(input: SaveOverrideInput): Promise<void> {
+export type SaveOverrideResult = { ok: true } | { ok: false; error: string };
+
+// Round 107, real bug caught by a live test (not in the task doc): Next.js
+// redacts a Server Action's thrown Error message in production by default
+// ("An error occurred in the Server Components render..." is all the
+// client ever sees) -- confirmed via Vercel's function logs, which showed
+// the real "Every source URL must start with https://" error landing
+// server-side exactly as designed, never reaching the browser. A thrown
+// Error is fine for a genuinely unexpected failure (there's nothing more
+// specific to say), but the validation failures this function is
+// *designed* to report readably have to come back as normal return data,
+// not a throw, or "reject with a readable message" silently doesn't work
+// in production at all. Save (upsert) an override -- never saves a partial row.
+export async function saveOverride(input: SaveOverrideInput): Promise<SaveOverrideResult> {
   const adminEmail = await requireAdmin();
   const error = validate(input);
-  if (error) throw new Error(error);
+  if (error) return { ok: false, error };
 
   const db = getDb();
   await db
@@ -82,6 +94,7 @@ export async function saveOverride(input: SaveOverrideInput): Promise<void> {
   revalidatePath("/admin/updates");
   revalidatePath(`/admin/updates/${input.slug}/edit`);
   revalidatePath("/admin/marketing");
+  return { ok: true };
 }
 
 /** Deletes the override row -- the post reverts to exactly the repo file. */

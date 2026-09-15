@@ -15,7 +15,17 @@ const SUGGESTED_QUESTIONS = [
   "What happens after biometrics?",
 ];
 
-export function AnonymousChat() {
+// Round 105 — same four topics, asked the way a Spanish-speaking visitor
+// actually would, not a literal word-for-word translation of the English
+// list above.
+const SUGGESTED_QUESTIONS_ES = [
+  "¿Qué significa RFE?",
+  "¿Qué es el boletín de visas?",
+  "¿Cómo funciona el ajuste de estatus?",
+  "¿Qué pasa después de la biometría?",
+];
+
+export function AnonymousChat({ es }: { es: boolean }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
@@ -36,19 +46,19 @@ export function AnonymousChat() {
       const res = await fetch("/api/get-help/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMessages }),
+        body: JSON.stringify({ messages: nextMessages, lang: es ? "es" : "en" }),
       });
       const data = await res.json();
 
       if (!res.ok) {
         if (data.limitReached) setLimitReached(true);
-        setError(typeof data.error === "string" ? data.error : "Something went wrong.");
+        setError(typeof data.error === "string" ? data.error : es ? "Algo salió mal." : "Something went wrong.");
         return;
       }
 
       setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(es ? "Algo salió mal. Inténtelo de nuevo." : "Something went wrong. Please try again.");
     } finally {
       setPending(false);
     }
@@ -59,7 +69,7 @@ export function AnonymousChat() {
       <div className="max-h-96 space-y-4 overflow-y-auto p-5">
         {messages.length === 0 && (
           <div className="flex flex-wrap gap-2">
-            {SUGGESTED_QUESTIONS.map((q) => (
+            {(es ? SUGGESTED_QUESTIONS_ES : SUGGESTED_QUESTIONS).map((q) => (
               <button
                 key={q}
                 type="button"
@@ -83,19 +93,24 @@ export function AnonymousChat() {
             </div>
           </div>
         ))}
-        {pending && <p className="text-sm text-muted">Thinking…</p>}
+        {pending && <p className="text-sm text-muted">{es ? "Pensando…" : "Thinking…"}</p>}
         {error && <p className="text-sm text-red-500">{error}</p>}
       </div>
 
       <div className="border-t border-border p-4">
         {limitReached && (
           <div className="mb-3 rounded-lg border border-brand-500/30 bg-brand-500/5 p-3 text-sm">
-            <p className="font-medium text-foreground">You&apos;ve used all 3 free questions.</p>
+            <p className="font-medium text-foreground">
+              {es ? "Ha usado sus 3 preguntas gratis." : "You've used all 3 free questions."}
+            </p>
             <p className="mt-1 text-muted">
-              <Link href="/auth/sign-up" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
-                Sign in and track a case
+              <Link
+                href={es ? "/auth/sign-up?lang=es" : "/auth/sign-up"}
+                className="font-medium text-brand-600 hover:underline dark:text-brand-400"
+              >
+                {es ? "Inicie sesión y rastree un caso" : "Sign in and track a case"}
               </Link>{" "}
-              for unlimited questions about it.
+              {es ? "para preguntas ilimitadas sobre él." : "for unlimited questions about it."}
             </p>
           </div>
         )}
@@ -110,8 +125,16 @@ export function AnonymousChat() {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={limitReached ? "Free question limit reached" : "Ask a general USCIS process question…"}
-            aria-label="Your question"
+            placeholder={
+              limitReached
+                ? es
+                  ? "Límite de preguntas gratis alcanzado"
+                  : "Free question limit reached"
+                : es
+                  ? "Haga una pregunta general sobre procesos de USCIS…"
+                  : "Ask a general USCIS process question…"
+            }
+            aria-label={es ? "Su pregunta" : "Your question"}
             disabled={pending || limitReached}
             className="flex-1 rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500 disabled:opacity-60"
           />
@@ -120,16 +143,29 @@ export function AnonymousChat() {
             disabled={pending || limitReached || !input.trim()}
             className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Send
+            {es ? "Enviar" : "Send"}
           </button>
         </form>
         <p className="mt-3 text-xs text-muted">
-          General USCIS process information, not legal advice, and not grounded in any specific
-          case.{" "}
-          <Link href="/auth/sign-up" className="text-brand-600 hover:underline dark:text-brand-400">
-            Sign in and track a case
-          </Link>{" "}
-          to ask about your own case specifically.
+          {es ? (
+            <>
+              Información general sobre procesos de USCIS, no asesoría legal, y no basada en
+              ningún caso específico.{" "}
+              <Link href="/auth/sign-up?lang=es" className="text-brand-600 hover:underline dark:text-brand-400">
+                Inicie sesión y rastree un caso
+              </Link>{" "}
+              para preguntar específicamente sobre el suyo.
+            </>
+          ) : (
+            <>
+              General USCIS process information, not legal advice, and not grounded in any specific
+              case.{" "}
+              <Link href="/auth/sign-up" className="text-brand-600 hover:underline dark:text-brand-400">
+                Sign in and track a case
+              </Link>{" "}
+              to ask about your own case specifically.
+            </>
+          )}
         </p>
       </div>
     </div>

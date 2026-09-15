@@ -36,8 +36,29 @@ const COURT_REMOVAL_KEYWORDS = [
 export const COURT_REMOVAL_REDIRECT =
   "This sounds like it involves immigration court or removal (deportation) proceedings — that genuinely needs a licensed human, not an AI chat. Please see Attorneys or Pro bono immigration-court representation on the Get Help page.";
 
+// Round 105 — this page became locale-aware; the deterministic
+// court/removal redirect is the one hardcoded string in this file that
+// bypasses the model entirely (see needsHumanRedirect below), so it needs
+// its own Spanish variant rather than relying on the model to translate
+// it. Detected from the visitor's own message, not the page chrome's
+// locale, since the anonymous chat has no session/cookie of its own.
+export const COURT_REMOVAL_REDIRECT_ES =
+  "Esto parece involucrar la corte de inmigración o un proceso de expulsión (deportación) — eso realmente necesita a un profesional con licencia, no un chat de IA. Por favor consulte Abogados o Representación pro bono en la corte de inmigración en la página Obtener ayuda.";
+
 export const CASE_SPECIFIC_REDIRECT =
   "I can't answer what's happening with your specific case from here — I don't have access to it. Sign in and track your case (free) to ask about it directly, grounded in your case's real status.";
+
+// Round 105 — a lightweight heuristic, same deterministic-check style as
+// COURT_REMOVAL_KEYWORDS below: Spanish-specific accented characters or
+// punctuation, or a short list of unambiguous common Spanish words. Good
+// enough to pick the right redirect string; not a general-purpose
+// language detector, and not meant to be one.
+const SPANISH_SIGNAL =
+  /[¿¡áéíóúñÁÉÍÓÚÑ]|\b(?:que|como|cuando|donde|cual|porque|estoy|tengo|puedo|mi caso|inmigracion)\b/i;
+
+function looksSpanish(text: string): boolean {
+  return SPANISH_SIGNAL.test(text);
+}
 
 const MAX_HISTORY_MESSAGES = 10;
 
@@ -58,7 +79,8 @@ Hard rules:
 - Never give legal advice or strategic guidance. For a question like this, give the general public informational concept if there is one, then say plainly that their specific situation needs a licensed immigration attorney.
 - Never claim or imply CaseWhy is affiliated with, endorsed by, or able to act on behalf of USCIS or DHS.
 - Stay on general USCIS process/policy topics. If asked something unrelated, say briefly that this is for general USCIS process questions and redirect.
-- Keep answers conversational and reasonably short.`;
+- Keep answers conversational and reasonably short.
+- Always answer in the same language the visitor wrote their question in — Spanish question, Spanish answer; English question, English answer. Match their language even if this reference background is in English.`;
 
 /** Deterministic court/removal check — runs before the model, same discipline as route-query.ts's hard-route. Never depends on the model alone to catch this. */
 export function needsHumanRedirect(text: string): boolean {
@@ -72,7 +94,7 @@ export async function askAnonymousQuestion(messages: AnonymousChatMessage[]): Pr
 
   const lastMessage = messages[messages.length - 1].content;
   if (needsHumanRedirect(lastMessage)) {
-    return COURT_REMOVAL_REDIRECT;
+    return looksSpanish(lastMessage) ? COURT_REMOVAL_REDIRECT_ES : COURT_REMOVAL_REDIRECT;
   }
 
   const recentMessages = messages.slice(-MAX_HISTORY_MESSAGES);

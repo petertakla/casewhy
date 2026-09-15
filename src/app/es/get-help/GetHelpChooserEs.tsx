@@ -20,8 +20,13 @@ import { routeVisitorQuery, type RouteResult } from "@/app/get-help/actions";
 // this box, so it doesn't carry the same translation-quality risk a real
 // chat response would. The "I don't understand something..." choice (and
 // the "ask_ai" outcome this box can also route to) still points to
-// /get-help/ask, the real AI Q&A page — that page itself stays English
-// (genuine Track 2), same as every other AI-chat surface in this project.
+// /get-help/ask, the real AI Q&A page.
+//
+// Round 105 — /get-help/ask is now locale-aware (chrome + AI answer
+// language), so the link below goes to its Spanish variant
+// (?lang=es) instead of resetting the visitor to an English-only page,
+// and the OutcomeCard's old "(this tool answers in English)" caveat is
+// gone since it's no longer true.
 
 type OutcomeId = EntityTypeId | "ask_ai" | "not_sure";
 type Step = "q1" | "q2" | "q3" | "result";
@@ -121,10 +126,9 @@ function OutcomeCard({ id }: { id: OutcomeId }) {
         <p className="mt-1 text-sm text-muted">
           Haz una pregunta general gratis ahora mismo — no necesitas iniciar sesión. Basado en la
           propia base de conocimiento de políticas de USCIS de CaseWhy, no en tu caso específico.
-          (Esta herramienta responde en inglés.)
         </p>
         <Link
-          href="/get-help/ask"
+          href="/get-help/ask?lang=es"
           className="mt-2 inline-block text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
         >
           Hacer una pregunta →

@@ -33,24 +33,36 @@ function isValidMessages(value: unknown): value is AnonymousChatMessage[] {
   );
 }
 
-export async function POST(request: NextRequest) {
-  const clientKey = clientKeyFromHeaders(request.headers);
-  const usage = await getAnonymousQuestionUsage(clientKey);
-  if (!usage.allowed) {
-    return NextResponse.json(
-      {
-        error: `You've used all ${LIFETIME_CAP_PER_IP} free questions. Sign in and track a case for unlimited questions about it.`,
-        limitReached: true,
-      },
-      { status: 429 }
-    );
-  }
+// Round 105 — the client now sends its own chrome locale (page.tsx's `es`
+// prop) alongside the message, purely so these three server-owned error
+// strings can match it. This is a UI nicety, not a security/validation
+// signal, so an absent or bogus `lang` just falls back to English rather
+// than being treated as untrusted input that needs rejecting.
+function isSpanishLang(body: unknown): boolean {
+  return typeof body === "object" && body !== null && (body as { lang?: unknown }).lang === "es";
+}
 
+export async function POST(request: NextRequest) {
   let body: unknown;
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+  }
+  const es = isSpanishLang(body);
+
+  const clientKey = clientKeyFromHeaders(request.headers);
+  const usage = await getAnonymousQuestionUsage(clientKey);
+  if (!usage.allowed) {
+    return NextResponse.json(
+      {
+        error: es
+          ? `Ha usado sus ${LIFETIME_CAP_PER_IP} preguntas gratis. Inicie sesión y rastree un caso para preguntas ilimitadas sobre él.`
+          : `You've used all ${LIFETIME_CAP_PER_IP} free questions. Sign in and track a case for unlimited questions about it.`,
+        limitReached: true,
+      },
+      { status: 429 }
+    );
   }
 
   const { messages } = body as { messages?: unknown };
@@ -70,7 +82,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ reply, remaining: usage.remaining - 1 });
   } catch {
     return NextResponse.json(
-      { error: "The assistant is temporarily unavailable. Please try again shortly." },
+      {
+        error: es
+          ? "El asistente no está disponible temporalmente. Inténtelo de nuevo en breve."
+          : "The assistant is temporarily unavailable. Please try again shortly.",
+      },
       { status: 502 }
     );
   }

@@ -2718,3 +2718,13 @@ Task doc: `claude_round109-plus-badge-task` (Drive). Peter approved the design f
 - tsc/lint/build clean on both branches, deployed.
 
 Fold into CLOUD_CLAUDE.md.
+
+### Follow-up, DONE Sep 15 — bigger, filled on light theme
+
+Task doc: `claude_round109-followup-plus-badge-size-and-light-fill` (Drive, no new round number). Peter's feedback after seeing round 109 live on his own light-theme desktop: the 10px `sm` badge was hard to read, the thin outline was weak against the light background, and the `/plus` hero badge wanted to be bigger than the 16px he'd seen mocked (shipped at 14px).
+
+`PlusBadge.tsx` changes: `sm` 10px → **13px** (padding 2px 9px), `lg` 14px → **20px** (padding 4px 14px), both weight 700. **Light theme switches from outlined to filled** — `#137e58` background, white text, border the same color (measured **5.06:1** against white, clears AA with room to spare). Dark theme unchanged in color, just bigger — outlined `#1baf7a`. Text rendering switched from `font-variant: small-caps` to `text-transform: uppercase` — small-caps rendered unevenly ("PLus") once the size changed in Peter's mockup review; uppercase is even at every size, and the underlying DOM text is still the literal word "Plus," so the accessible-text behavior from round 109 is unchanged (confirmed live again: `document.querySelector('a[href="/plus"]').textContent.trim()` → `"CaseWhy Plus"`). Vertical alignment re-tuned for the larger sizes (1px sm, 4px lg).
+
+Static site (`main`): the same two changes (size, light-mode fill) as one CSS rule, byte-identical across `index.html`/`es/index.html`, applied to the pricing-section `<h3>` badge — confirmed live via curl (`grep -A14 '\.plus-badge{'` on `www.casewhy.com`).
+
+**Verify live:** light theme (header, `/plus` hero, pricing column) all render filled green/white at the new sizes, screenshotted; dark theme unchanged colors at the new sizes, screenshotted; 390px-wide header confirmed "Get Help" stays fully visible on the first screen of the scrolling nav (no need to drop `sm` to 12px); accessibility text re-confirmed; tsc/lint/build clean on both branches, deployed. No tracker line change per the task doc (folded into round 109's own entry).

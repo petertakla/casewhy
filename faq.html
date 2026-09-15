@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Frequently Asked Questions — CaseWhy</title>
-<meta name="description" content="Answers to common questions about CaseWhy — affiliation with USCIS, pricing, legal advice, and how your case data is protected.">
+<meta name="description" content="Answers to common questions about CaseWhy — tracking a case, AI explanations, Plus pricing, privacy, and how your case data is protected.">
 <link rel="alternate" hreflang="en" href="https://casewhy.com/faq.html">
 <link rel="alternate" hreflang="es" href="https://casewhy.com/es/faq.html">
 <link rel="alternate" hreflang="x-default" href="https://casewhy.com/faq.html">
@@ -76,8 +76,10 @@
   main{padding:48px 0 80px;}
   h1{font-size:1.9rem;margin-bottom:6px;letter-spacing:-0.02em;}
   .updated{color:var(--muted);font-size:0.9rem;margin-bottom:32px;}
-  .faq-item{margin-top:32px;}
-  .faq-item h2{font-size:1.05rem;margin-bottom:8px;color:var(--foreground);}
+  .faq-group{margin-top:40px;}
+  .faq-group h2{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:4px;}
+  .faq-item{margin-top:24px;}
+  .faq-item h3{font-size:1.05rem;margin-bottom:8px;color:var(--foreground);}
   p, li{color:var(--muted);font-size:0.98rem;}
   strong{color:var(--foreground);}
   footer{border-top:1px solid var(--border);padding:32px 0;font-size:0.85rem;color:var(--muted);}
@@ -94,42 +96,82 @@
     {
       "@type": "Question",
       "name": "Is CaseWhy affiliated with USCIS?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "No. CaseWhy is not affiliated with, endorsed by, or operated by USCIS, the Department of Homeland Security, or any other government agency. CaseWhy displays information sourced from public government systems, but doesn't control that data and can't guarantee its accuracy, completeness, or timeliness."
-      }
+      "acceptedAnswer": { "@type": "Answer", "text": "No. CaseWhy is not affiliated with, endorsed by, or operated by USCIS, the Department of Homeland Security, or any other government agency. CaseWhy displays information sourced from public government systems, but doesn't control that data and can't guarantee its accuracy, completeness, or timeliness." }
     },
     {
       "@type": "Question",
-      "name": "Is CaseWhy really free?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "CaseWhy has a free tier — up to three tracked cases, a status timeline, AI-generated plain-language explanations, and three AI questions about your case each month — plus an optional paid Plus tier for tracking more cases, unlimited questions, and other add-ons. Get Help — CaseWhy's directories of free legal aid, accredited representatives, attorneys, and other resources — is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost."
-      }
+      "name": "Who built CaseWhy, and why?",
+      "acceptedAnswer": { "@type": "Answer", "text": "CaseWhy is built by CaseWhy LLC, a small company in Florida, by a founder who spent fifteen years as a solution architect and then watched a family naturalization case stall at the last step. There's no venture funding and no ad network behind it. The founder's own account of why it exists is on the Updates page." }
     },
     {
       "@type": "Question",
       "name": "Is anything CaseWhy tells me legal advice?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "No. CaseWhy is not a law firm, does not provide legal advice, and using it does not create an attorney-client relationship of any kind. Explanations of your case status, AI chat answers, processing-time estimates, visa bulletin information, and escalation-toolkit drafting assistance are all general, informational content drawn from public USCIS materials. For asylum (I-589) and DACA (I-821D) cases in particular, CaseWhy will never tell you whether you're eligible for relief or predict your case's outcome — only a licensed immigration attorney or accredited representative can do that."
-      }
+      "acceptedAnswer": { "@type": "Answer", "text": "No. CaseWhy is not a law firm, does not provide legal advice, and using it does not create an attorney-client relationship of any kind. Explanations of your case status, AI chat answers, processing-time estimates, visa bulletin information, and escalation-toolkit drafting assistance are all general, informational content drawn from public USCIS materials — describing what a status or process generally means, never a conclusion about what you, specifically, should do about your case. For asylum (I-589) and DACA (I-821D) cases in particular, CaseWhy will never tell you whether you're eligible for relief or predict your case's outcome — only a licensed immigration attorney or accredited representative can do that, and CaseWhy will direct you to one whenever a question depends on your individual facts." }
+    },
+    {
+      "@type": "Question",
+      "name": "Which USCIS cases can I track?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Any case that has a USCIS receipt number — the 13-character number on your I-797 notice, three letters followed by ten digits (for example IOE, MSC, EAC, WAC, LIN, SRC, NBC, YSC; CaseWhy accepts any valid receipt-number format, not only these examples). That covers family petitions (I-130), green card applications (I-485), naturalization (N-400), work permits (I-765), travel documents (I-131), removal of conditions (I-751), employer petitions (I-129, I-140), asylum (I-589), and DACA (I-821D), among others. If USCIS Case Status Online shows it, CaseWhy can track it." }
+    },
+    {
+      "@type": "Question",
+      "name": "How often does CaseWhy check my case?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Every tracked case is checked automatically once a day. CaseWhy Plus adds a \"Check now\" button for an on-demand check whenever you want one." }
+    },
+    {
+      "@type": "Question",
+      "name": "How will I know when my status changes?",
+      "acceptedAnswer": { "@type": "Answer", "text": "You get an email the day a status changes, and a push notification if you've turned notifications on for CaseWhy in your browser or phone. On iPhone, push requires adding CaseWhy to your home screen first — the Settings page walks you through it. Every change is also kept in the case's history timeline." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I track a family member's case?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — the free tier tracks up to three cases, and Plus tracks up to ten (with more available on request). You'll need the receipt number from their notice. Track only cases you're entitled to see; CaseWhy shows the same public status USCIS would show anyone with that number." }
+    },
+    {
+      "@type": "Question",
+      "name": "What does \"Case Was Received\" mean, and what's a stalled case?",
+      "acceptedAnswer": { "@type": "Answer", "text": "\"Case Was Received\" is the first status almost every case shows; it confirms USCIS has your filing and fee, and nothing more. A case becomes \"outside normal processing time\" when it has waited longer than the time USCIS itself publishes for that form and office — CaseWhy flags this automatically on every tier, and shows the formal channels that open up at that point (a USCIS e-Request, a congressional inquiry, the CIS Ombudsman). Plus can draft those letters for you." }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need an account to ask a question?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. Ask CaseWhy on the Get Help page answers three questions without any sign-in; after that, a free account gives you three AI questions about your own case each month, and Plus makes them unlimited." }
+    },
+    {
+      "@type": "Question",
+      "name": "How accurate are the AI explanations?",
+      "acceptedAnswer": { "@type": "Answer", "text": "The explanations describe what a status or process generally means, drawn from USCIS's own published materials, and every answer shows the source it was built from. They can be wrong or out of date, and they never know facts about your case that USCIS hasn't published. If something looks off, email corrections@casewhy.com — a person reads every message." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is CaseWhy available in Spanish?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes — the site, the app, Get Help (including its free-text question box), and the FAQ are available in Spanish; use the Español link at the top of any page. Some reference pages are still English-only and marked \"(en inglés)\" where they're linked. The AI-generated case explanations and the signed-in \"Ask a question\" chat currently reply in English only, even on a Spanish-language page — a gap we're aware of." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is CaseWhy really free?",
+      "acceptedAnswer": { "@type": "Answer", "text": "CaseWhy has a free tier — up to three tracked cases, a status timeline, AI-generated plain-language explanations, and three AI questions about your case each month — plus an optional paid Plus tier for tracking more cases, unlimited questions, and other add-ons (see the Plus page for current pricing). Get Help — CaseWhy's directories of free legal aid, accredited representatives, attorneys, and other resources — is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost." }
+    },
+    {
+      "@type": "Question",
+      "name": "What does Plus cost, and how do I cancel?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Plus is $9.99 a month, $22.99 a quarter, or $66.99 a year, billed through Stripe. Cancel any time from the Manage subscription link on the Plus page; you keep Plus until the end of the period you've paid for. There are no refunds or proration for partial periods." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I share my case with my attorney?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Plus includes an attorney-handoff PDF: your case timeline, status history, and the explanations in one document you can send to your lawyer or accredited representative. If you don't have one yet, Get Help lists free legal aid, accredited representatives, and attorneys, free to everyone." }
     },
     {
       "@type": "Question",
       "name": "How is my case data protected?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Case and account data is encrypted both at rest and in transit. CaseWhy doesn't sell or rent personal information to third parties, doesn't use case data for advertising, and runs no advertising of any kind. Data is retained for as long as an account is active; a dormant account doesn't get different handling or earlier deletion."
-      }
+      "acceptedAnswer": { "@type": "Answer", "text": "Case and account data is encrypted both at rest and in transit. CaseWhy doesn't sell or rent personal information to third parties, doesn't use case data for advertising, and runs no advertising of any kind — there's no ad network for data to reach in the first place. Data is retained for as long as an account is active; a dormant account doesn't get different handling or earlier deletion. USCIS treats receipt numbers as personally identifiable information, and so does CaseWhy: receipt numbers get additional application-level encryption before they're stored, are used only to check your case status with USCIS (and, on Plus, to draft escalation letters that have to state them), and no CaseWhy staff member can view them in plaintext through any administrative tool." }
     },
     {
       "@type": "Question",
       "name": "What happens to my data if I cancel or delete my account?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "If you delete your account, your case data is permanently deleted within 30 days. You can access, correct, or delete your data at any time from account settings, or by emailing privacy@casewhy.com."
-      }
+      "acceptedAnswer": { "@type": "Answer", "text": "If you delete your account, your case data is permanently deleted within 30 days. You can access, correct, or delete your data at any time from account settings, or by emailing privacy@casewhy.com." }
     }
   ]
 }
@@ -156,29 +198,88 @@
   <h1>Frequently Asked Questions</h1>
   <p class="updated">The most common questions about CaseWhy. For full detail, see the <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.</p>
 
-  <div class="faq-item">
-    <h2>Is CaseWhy affiliated with USCIS?</h2>
-    <p>No. CaseWhy is not affiliated with, endorsed by, or operated by USCIS, the Department of Homeland Security, or any other government agency. CaseWhy displays information sourced from public government systems, but doesn't control that data and can't guarantee its accuracy, completeness, or timeliness.</p>
+  <div class="faq-group">
+    <h2>About CaseWhy</h2>
+    <div class="faq-item">
+      <h3>Is CaseWhy affiliated with USCIS?</h3>
+      <p>No. CaseWhy is not affiliated with, endorsed by, or operated by USCIS, the Department of Homeland Security, or any other government agency. CaseWhy displays information sourced from public government systems, but doesn't control that data and can't guarantee its accuracy, completeness, or timeliness.</p>
+    </div>
+    <div class="faq-item">
+      <h3>Who built CaseWhy, and why?</h3>
+      <p>CaseWhy is built by CaseWhy LLC, a small company in Florida, by a founder who spent fifteen years as a solution architect and then watched a family naturalization case stall at the last step. There's no venture funding and no ad network behind it. The founder's own account of why it exists is on the <a href="https://app.casewhy.com/updates/a-note-from-the-founder">Updates page</a>.</p>
+    </div>
+    <div class="faq-item">
+      <h3>Is anything CaseWhy tells me legal advice?</h3>
+      <p>No. CaseWhy is not a law firm, does not provide legal advice, and using it does not create an attorney-client relationship of any kind. Explanations of your case status, AI chat answers, <a href="https://app.casewhy.com/processing-times">processing-time estimates</a>, <a href="https://app.casewhy.com/visa-bulletin">visa bulletin information</a>, and escalation-toolkit drafting assistance are all general, informational content drawn from public USCIS materials — describing what a status or process generally means, never a conclusion about what you, specifically, should do about your case. For asylum (I-589) and DACA (I-821D) cases in particular, CaseWhy will never tell you whether you're eligible for relief or predict your case's outcome — only a licensed immigration attorney or accredited representative can do that, and CaseWhy will direct you to one whenever a question depends on your individual facts.</p>
+    </div>
   </div>
 
-  <div class="faq-item">
-    <h2>Is CaseWhy really free?</h2>
-    <p>CaseWhy has a free tier — up to three tracked cases, a status timeline, AI-generated plain-language explanations, and three AI questions about your case each month — plus an optional paid Plus tier for tracking more cases, unlimited questions, and other add-ons (see <a href="https://app.casewhy.com/plus">Plus pricing</a>). <a href="https://app.casewhy.com/get-help"><strong>Get Help</strong></a> — CaseWhy's directories of free legal aid, accredited representatives, attorneys, and other resources — is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost.</p>
+  <div class="faq-group">
+    <h2>Tracking a case</h2>
+    <div class="faq-item">
+      <h3>Which USCIS cases can I track?</h3>
+      <p>Any case that has a USCIS receipt number — the 13-character number on your I-797 notice, three letters followed by ten digits (for example IOE, MSC, EAC, WAC, LIN, SRC, NBC, YSC; CaseWhy accepts any valid receipt-number format, not only these examples). That covers family petitions (I-130), green card applications (I-485), naturalization (N-400), work permits (I-765), travel documents (I-131), removal of conditions (I-751), employer petitions (I-129, I-140), asylum (I-589), and DACA (I-821D), among others. If USCIS Case Status Online shows it, CaseWhy can track it.</p>
+    </div>
+    <div class="faq-item">
+      <h3>How often does CaseWhy check my case?</h3>
+      <p>Every tracked case is checked automatically once a day. CaseWhy Plus adds a "Check now" button for an on-demand check whenever you want one.</p>
+    </div>
+    <div class="faq-item">
+      <h3>How will I know when my status changes?</h3>
+      <p>You get an email the day a status changes, and a push notification if you've turned notifications on for CaseWhy in your browser or phone. On iPhone, push requires adding CaseWhy to your home screen first — the Settings page walks you through it. Every change is also kept in the case's history timeline.</p>
+    </div>
+    <div class="faq-item">
+      <h3>Can I track a family member's case?</h3>
+      <p>Yes — the free tier tracks up to three cases, and Plus tracks up to ten (with more available on request). You'll need the receipt number from their notice. Track only cases you're entitled to see; CaseWhy shows the same public status USCIS would show anyone with that number.</p>
+    </div>
+    <div class="faq-item">
+      <h3>What does "Case Was Received" mean, and what's a stalled case?</h3>
+      <p>"Case Was Received" is the first status almost every case shows; it confirms USCIS has your filing and fee, and nothing more. A case becomes <a href="https://app.casewhy.com/updates/when-your-case-goes-silent">"outside normal processing time"</a> when it has waited longer than the time USCIS itself publishes for that form and office — CaseWhy flags this automatically on every tier, and shows the formal channels that open up at that point (a USCIS e-Request, a congressional inquiry, the CIS Ombudsman). Plus can draft those letters for you. See also <a href="https://app.casewhy.com/updates/what-case-was-received-actually-means">what "Case Was Received" actually means</a>.</p>
+    </div>
   </div>
 
-  <div class="faq-item">
-    <h2>Is anything CaseWhy tells me legal advice?</h2>
-    <p>No. CaseWhy is not a law firm, does not provide legal advice, and using it does not create an attorney-client relationship of any kind. Explanations of your case status, AI chat answers, <a href="https://app.casewhy.com/processing-times">processing-time estimates</a>, <a href="https://app.casewhy.com/visa-bulletin">visa bulletin information</a>, and escalation-toolkit drafting assistance are all general, informational content drawn from public USCIS materials — describing what a status or process generally means, never a conclusion about what you, specifically, should do about your case. For asylum (I-589) and DACA (I-821D) cases in particular, CaseWhy will never tell you whether you're eligible for relief or predict your case's outcome — only a licensed immigration attorney or accredited representative can do that, and CaseWhy will direct you to one whenever a question depends on your individual facts.</p>
+  <div class="faq-group">
+    <h2>Ask CaseWhy and AI explanations</h2>
+    <div class="faq-item">
+      <h3>Do I need an account to ask a question?</h3>
+      <p>No. Ask CaseWhy on the <a href="https://app.casewhy.com/get-help">Get Help</a> page answers three questions without any sign-in; after that, a free account gives you three AI questions about your own case each month, and Plus makes them unlimited.</p>
+    </div>
+    <div class="faq-item">
+      <h3>How accurate are the AI explanations?</h3>
+      <p>The explanations describe what a status or process generally means, drawn from USCIS's own published materials, and every answer shows the source it was built from. They can be wrong or out of date, and they never know facts about your case that USCIS hasn't published. If something looks off, email <a href="mailto:corrections@casewhy.com">corrections@casewhy.com</a> — a person reads every message.</p>
+    </div>
+    <div class="faq-item">
+      <h3>Is CaseWhy available in Spanish?</h3>
+      <p>Yes — the site, the app, <a href="https://app.casewhy.com/get-help">Get Help</a> (including its free-text question box), and the FAQ are available in Spanish; use the Español link at the top of any page. Some reference pages are still English-only and marked "(en inglés)" where they're linked. The AI-generated case explanations and the signed-in "Ask a question" chat currently reply in English only, even on a Spanish-language page — a gap we're aware of.</p>
+    </div>
   </div>
 
-  <div class="faq-item">
-    <h2>How is my case data protected?</h2>
-    <p>Case and account data is encrypted both at rest and in transit. CaseWhy doesn't sell or rent personal information to third parties, doesn't use case data for advertising, and runs no advertising of any kind — there's no ad network for data to reach in the first place. Data is retained for as long as an account is active; a dormant account doesn't get different handling or earlier deletion.</p>
+  <div class="faq-group">
+    <h2>CaseWhy Plus</h2>
+    <div class="faq-item">
+      <h3>Is CaseWhy really free?</h3>
+      <p>CaseWhy has a free tier — up to three tracked cases, a status timeline, AI-generated plain-language explanations, and three AI questions about your case each month — plus an optional paid Plus tier for tracking more cases, unlimited questions, and other add-ons (see <a href="https://app.casewhy.com/plus">Plus pricing</a>). <a href="https://app.casewhy.com/get-help"><strong>Get Help</strong></a> — CaseWhy's directories of free legal aid, accredited representatives, attorneys, and other resources — is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost.</p>
+    </div>
+    <div class="faq-item">
+      <h3>What does Plus cost, and how do I cancel?</h3>
+      <p>Plus is $9.99 a month, $22.99 a quarter, or $66.99 a year, billed through Stripe. Cancel any time from the "Manage subscription" link on the <a href="https://app.casewhy.com/plus">Plus page</a>; you keep Plus until the end of the period you've paid for. There are no refunds or proration for partial periods.</p>
+    </div>
+    <div class="faq-item">
+      <h3>Can I share my case with my attorney?</h3>
+      <p>Plus includes an attorney-handoff PDF: your case timeline, status history, and the explanations in one document you can send to your lawyer or accredited representative. If you don't have one yet, <a href="https://app.casewhy.com/get-help">Get Help</a> lists free legal aid, accredited representatives, and attorneys, free to everyone.</p>
+    </div>
   </div>
 
-  <div class="faq-item">
-    <h2>What happens to my data if I cancel or delete my account?</h2>
-    <p>If you delete your account, your case data is permanently deleted within 30 days. You can access, correct, or delete your data at any time from account settings, or by emailing <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>.</p>
+  <div class="faq-group">
+    <h2>Privacy and your data</h2>
+    <div class="faq-item">
+      <h3>How is my case data protected?</h3>
+      <p>Case and account data is encrypted both at rest and in transit. CaseWhy doesn't sell or rent personal information to third parties, doesn't use case data for advertising, and runs no advertising of any kind — there's no ad network for data to reach in the first place. Data is retained for as long as an account is active; a dormant account doesn't get different handling or earlier deletion. USCIS treats receipt numbers as personally identifiable information, and so does CaseWhy: receipt numbers get additional application-level encryption before they're stored, are used only to check your case status with USCIS (and, on Plus, to draft escalation letters that have to state them), and no CaseWhy staff member can view them in plaintext through any administrative tool.</p>
+    </div>
+    <div class="faq-item">
+      <h3>What happens to my data if I cancel or delete my account?</h3>
+      <p>If you delete your account, your case data is permanently deleted within 30 days. You can access, correct, or delete your data at any time from account settings, or by emailing <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>.</p>
+    </div>
   </div>
 
   <p style="margin-top:40px;font-size:0.85rem;">Have a question this doesn't answer? See the <a href="https://app.casewhy.com/sitemap">site index</a> or email <a href="mailto:hello@casewhy.com">hello@casewhy.com</a>.</p>

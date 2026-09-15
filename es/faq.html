@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Preguntas Frecuentes — CaseWhy</title>
-<meta name="description" content="Respuestas a las preguntas más comunes sobre CaseWhy — afiliación con USCIS, precios, asesoría legal y cómo se protegen los datos de su caso.">
+<meta name="description" content="Respuestas a las preguntas más comunes sobre CaseWhy — cómo rastrear un caso, explicaciones de IA, precios de Plus, privacidad y cómo se protegen sus datos.">
 <link rel="alternate" hreflang="en" href="https://casewhy.com/faq.html">
 <link rel="alternate" hreflang="es" href="https://casewhy.com/es/faq.html">
 <link rel="alternate" hreflang="x-default" href="https://casewhy.com/faq.html">
@@ -76,8 +76,10 @@
   main{padding:48px 0 80px;}
   h1{font-size:1.9rem;margin-bottom:6px;letter-spacing:-0.02em;}
   .updated{color:var(--muted);font-size:0.9rem;margin-bottom:32px;}
-  .faq-item{margin-top:32px;}
-  .faq-item h2{font-size:1.05rem;margin-bottom:8px;color:var(--foreground);}
+  .faq-group{margin-top:40px;}
+  .faq-group h2{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:4px;}
+  .faq-item{margin-top:24px;}
+  .faq-item h3{font-size:1.05rem;margin-bottom:8px;color:var(--foreground);}
   p, li{color:var(--muted);font-size:0.98rem;}
   strong{color:var(--foreground);}
   footer{border-top:1px solid var(--border);padding:32px 0;font-size:0.85rem;color:var(--muted);}
@@ -94,42 +96,82 @@
     {
       "@type": "Question",
       "name": "¿CaseWhy está afiliado a USCIS?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "No. CaseWhy no está afiliado con USCIS, el Departamento de Seguridad Nacional (DHS) ni ninguna otra agencia gubernamental, y no cuenta con su respaldo ni es operado por ellos. CaseWhy muestra información obtenida de sistemas gubernamentales públicos, pero no controla esos datos y no puede garantizar su exactitud, integridad ni actualidad."
-      }
+      "acceptedAnswer": { "@type": "Answer", "text": "No. CaseWhy no está afiliado con USCIS, el Departamento de Seguridad Nacional (DHS) ni ninguna otra agencia gubernamental, y no cuenta con su respaldo ni es operado por ellos. CaseWhy muestra información obtenida de sistemas gubernamentales públicos, pero no controla esos datos y no puede garantizar su exactitud, integridad ni actualidad." }
     },
     {
       "@type": "Question",
-      "name": "¿CaseWhy es realmente gratis?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "CaseWhy tiene un nivel gratuito — hasta tres casos rastreados, una línea de tiempo de estado, explicaciones en lenguaje sencillo generadas por IA, y tres preguntas de IA sobre su caso cada mes — además de un nivel Plus opcional y de pago para rastrear más casos, preguntas ilimitadas y otras funciones adicionales. Obtener ayuda — los directorios de CaseWhy de asistencia legal gratuita, representantes acreditados, abogados y otros recursos — es gratis para todos, siempre, sin importar la suscripción: sin tarifas, sin anuncios, sin costos ocultos."
-      }
+      "name": "¿Quién creó CaseWhy, y por qué?",
+      "acceptedAnswer": { "@type": "Answer", "text": "CaseWhy fue creado por CaseWhy LLC, una pequeña empresa en Florida, por un fundador que pasó quince años como arquitecto de soluciones y luego vio cómo el caso de naturalización de su familia se estancó en el último paso. No hay financiamiento de capital de riesgo ni red publicitaria detrás de la empresa. El propio relato del fundador sobre por qué existe CaseWhy está en la página de Actualizaciones." }
     },
     {
       "@type": "Question",
       "name": "¿Algo de lo que CaseWhy me dice es asesoría legal?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "No. CaseWhy no es un despacho de abogados, no ofrece asesoría legal, y su uso no crea ningún tipo de relación abogado-cliente. Las explicaciones sobre el estado de su caso, las respuestas del chat de IA, las estimaciones de tiempos de procesamiento, la información del boletín de visas y la ayuda para redactar cartas de escalamiento son todo contenido general e informativo obtenido de materiales públicos de USCIS. Para los casos de asilo (I-589) y DACA (I-821D) en particular, CaseWhy nunca le dirá si usted califica para algún alivio ni predecirá el resultado de su caso — solo un abogado de inmigración con licencia o un representante acreditado puede hacerlo."
-      }
+      "acceptedAnswer": { "@type": "Answer", "text": "No. CaseWhy no es un despacho de abogados, no ofrece asesoría legal, y su uso no crea ningún tipo de relación abogado-cliente. Las explicaciones sobre el estado de su caso, las respuestas del chat de IA, las estimaciones de tiempos de procesamiento, la información del boletín de visas y la ayuda para redactar cartas de escalamiento son todo contenido general e informativo obtenido de materiales públicos de USCIS — que describen lo que un estado o proceso generalmente significa, nunca una conclusión sobre lo que usted, específicamente, debería hacer con su caso. Para los casos de asilo (I-589) y DACA (I-821D) en particular, CaseWhy nunca le dirá si usted califica para algún alivio ni predecirá el resultado de su caso — solo un abogado de inmigración con licencia o un representante acreditado puede hacerlo, y CaseWhy lo referirá a uno cada vez que una pregunta dependa de los hechos específicos de su caso." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué casos de USCIS puedo rastrear?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Cualquier caso que tenga un número de recibo de USCIS — el número de 13 caracteres en su aviso I-797, tres letras seguidas de diez dígitos (por ejemplo IOE, MSC, EAC, WAC, LIN, SRC, NBC, YSC; CaseWhy acepta cualquier número de recibo con formato válido, no solo estos ejemplos). Eso incluye peticiones familiares (I-130), solicitudes de residencia permanente (I-485), naturalización (N-400), permisos de trabajo (I-765), documentos de viaje (I-131), remoción de condiciones (I-751), peticiones de empleador (I-129, I-140), asilo (I-589) y DACA (I-821D), entre otros. Si USCIS Case Status Online lo muestra, CaseWhy puede rastrearlo." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Con qué frecuencia revisa CaseWhy mi caso?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Cada caso rastreado se revisa automáticamente una vez al día. CaseWhy Plus agrega un botón de \"Revisar ahora\" para una revisión a solicitud cuando usted lo desee." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo sabré cuándo cambia mi estado?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Recibirá un correo electrónico el día que cambie un estado, y una notificación push si ha activado las notificaciones de CaseWhy en su navegador o teléfono. En iPhone, las notificaciones push requieren primero agregar CaseWhy a la pantalla de inicio — la página de Configuración le explica cómo hacerlo. Cada cambio también queda registrado en la línea de tiempo del historial del caso." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo rastrear el caso de un familiar?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Sí — el nivel gratuito rastrea hasta tres casos, y Plus rastrea hasta diez (con más disponibles a solicitud). Necesitará el número de recibo de su aviso. Rastree únicamente casos que tiene derecho a ver; CaseWhy muestra el mismo estado público que USCIS le mostraría a cualquier persona con ese número." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué significa \"Case Was Received\", y qué es un caso estancado?",
+      "acceptedAnswer": { "@type": "Answer", "text": "\"Case Was Received\" (\"Su caso fue recibido\") es el primer estado que muestra casi todo caso; confirma que USCIS tiene su solicitud y el pago, y nada más. Un caso pasa a estar \"fuera del tiempo de procesamiento normal\" cuando ha esperado más tiempo del que USCIS mismo publica para ese formulario y oficina — CaseWhy marca esto automáticamente en todos los niveles, y muestra los canales formales que se abren en ese momento (una USCIS e-Request, una consulta al Congreso, el Ombudsman de USCIS). Plus puede redactar esas cartas por usted." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Necesito una cuenta para hacer una pregunta?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. Ask CaseWhy en la página de Obtener ayuda responde tres preguntas sin necesidad de iniciar sesión; después de eso, una cuenta gratuita le da tres preguntas de IA sobre su propio caso cada mes, y Plus las hace ilimitadas." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué tan precisas son las explicaciones de IA?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Las explicaciones describen lo que un estado o proceso generalmente significa, basadas en materiales publicados por USCIS, y cada respuesta muestra la fuente de la que se elaboró. Pueden estar equivocadas o desactualizadas, y nunca conocen datos sobre su caso que USCIS no haya publicado. Si algo no le parece correcto, escriba a corrections@casewhy.com — una persona lee cada mensaje." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿CaseWhy está disponible en español?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Sí — el sitio, la aplicación, Obtener ayuda (incluido su cuadro de pregunta de texto libre) y las Preguntas Frecuentes están disponibles en español; use el enlace English en la parte superior de cualquier página. Algunas páginas de referencia todavía están solo en inglés y se marcan \"(en inglés)\" donde se enlazan. Las explicaciones de caso generadas por IA y el chat de \"Ask a question\" con sesión iniciada actualmente responden solo en inglés, incluso en una página en español — una limitación de la que estamos conscientes." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿CaseWhy es realmente gratis?",
+      "acceptedAnswer": { "@type": "Answer", "text": "CaseWhy tiene un nivel gratuito — hasta tres casos rastreados, una línea de tiempo de estado, explicaciones en lenguaje sencillo generadas por IA, y tres preguntas de IA sobre su caso cada mes — además de un nivel Plus opcional y de pago para rastrear más casos, preguntas ilimitadas y otras funciones adicionales (consulte la página de Plus para ver los precios actuales). Obtener ayuda — los directorios de CaseWhy de asistencia legal gratuita, representantes acreditados, abogados y otros recursos — es gratis para todos, siempre, sin importar la suscripción: sin tarifas, sin anuncios, sin costos ocultos." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto cuesta Plus, y cómo lo cancelo?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Plus cuesta $9.99 al mes, $22.99 al trimestre, o $66.99 al año, facturado a través de Stripe. Puede cancelar en cualquier momento desde el enlace \"Administrar suscripción\" en la página de Plus; conservará Plus hasta el final del período que ya pagó. No hay reembolsos ni prorrateo por períodos parciales." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo compartir mi caso con mi abogado?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Plus incluye un informe en PDF para su abogado: la línea de tiempo de su caso, el historial de estado y las explicaciones en un solo documento que puede enviar a su abogado o representante acreditado. Si todavía no tiene uno, Obtener ayuda enumera asistencia legal gratuita, representantes acreditados y abogados, gratis para todos." }
     },
     {
       "@type": "Question",
       "name": "¿Cómo se protegen los datos de mi caso?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Los datos de su caso y de su cuenta están cifrados tanto en reposo como en tránsito. CaseWhy no vende ni alquila información personal a terceros, no utiliza los datos de su caso con fines publicitarios, y no muestra ningún tipo de publicidad. Los datos se conservan mientras la cuenta esté activa; una cuenta inactiva no recibe un manejo distinto ni una eliminación anticipada."
-      }
+      "acceptedAnswer": { "@type": "Answer", "text": "Los datos de su caso y de su cuenta están cifrados tanto en reposo como en tránsito. CaseWhy no vende ni alquila información personal a terceros, no utiliza los datos de su caso con fines publicitarios, y no muestra ningún tipo de publicidad — no existe ninguna red publicitaria a la que esos datos puedan llegar. Los datos se conservan mientras la cuenta esté activa; una cuenta inactiva no recibe un manejo distinto ni una eliminación anticipada. USCIS trata los números de recibo como información de identificación personal, y CaseWhy también: los números de recibo reciben cifrado adicional a nivel de aplicación antes de almacenarse, se usan únicamente para verificar el estado de su caso con USCIS (y, en Plus, para redactar cartas de escalamiento que deben incluirlos), y ningún miembro del personal de CaseWhy puede verlos en texto plano a través de ninguna herramienta administrativa." }
     },
     {
       "@type": "Question",
       "name": "¿Qué pasa con mis datos si cancelo o elimino mi cuenta?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Si elimina su cuenta, los datos de su caso se eliminan de forma permanente dentro de 30 días. Usted puede acceder, corregir o eliminar sus datos en cualquier momento desde la configuración de la cuenta, o escribiendo a privacy@casewhy.com."
-      }
+      "acceptedAnswer": { "@type": "Answer", "text": "Si elimina su cuenta, los datos de su caso se eliminan de forma permanente dentro de 30 días. Usted puede acceder, corregir o eliminar sus datos en cualquier momento desde la configuración de la cuenta, o escribiendo a privacy@casewhy.com." }
     }
   ]
 }
@@ -156,29 +198,88 @@
   <h1>Preguntas Frecuentes</h1>
   <p class="updated">Las preguntas más comunes sobre CaseWhy. Para más detalles, consulte los <a href="../terms.html">Términos de Servicio</a> y la <a href="../privacy.html">Política de Privacidad</a> (en inglés).</p>
 
-  <div class="faq-item">
-    <h2>¿CaseWhy está afiliado a USCIS?</h2>
-    <p>No. CaseWhy no está afiliado con USCIS, el Departamento de Seguridad Nacional (DHS) ni ninguna otra agencia gubernamental, y no cuenta con su respaldo ni es operado por ellos. CaseWhy muestra información obtenida de sistemas gubernamentales públicos, pero no controla esos datos y no puede garantizar su exactitud, integridad ni actualidad.</p>
+  <div class="faq-group">
+    <h2>Sobre CaseWhy</h2>
+    <div class="faq-item">
+      <h3>¿CaseWhy está afiliado a USCIS?</h3>
+      <p>No. CaseWhy no está afiliado con USCIS, el Departamento de Seguridad Nacional (DHS) ni ninguna otra agencia gubernamental, y no cuenta con su respaldo ni es operado por ellos. CaseWhy muestra información obtenida de sistemas gubernamentales públicos, pero no controla esos datos y no puede garantizar su exactitud, integridad ni actualidad.</p>
+    </div>
+    <div class="faq-item">
+      <h3>¿Quién creó CaseWhy, y por qué?</h3>
+      <p>CaseWhy fue creado por CaseWhy LLC, una pequeña empresa en Florida, por un fundador que pasó quince años como arquitecto de soluciones y luego vio cómo el caso de naturalización de su familia se estancó en el último paso. No hay financiamiento de capital de riesgo ni red publicitaria detrás de la empresa. El propio relato del fundador sobre por qué existe CaseWhy está en la <a href="https://app.casewhy.com/updates/a-note-from-the-founder?lang=es">página de Actualizaciones</a>.</p>
+    </div>
+    <div class="faq-item">
+      <h3>¿Algo de lo que CaseWhy me dice es asesoría legal?</h3>
+      <p>No. CaseWhy no es un despacho de abogados, no ofrece asesoría legal, y su uso no crea ningún tipo de relación abogado-cliente. Las explicaciones sobre el estado de su caso, las respuestas del chat de IA, <a href="https://app.casewhy.com/processing-times">las estimaciones de tiempos de procesamiento</a>, <a href="https://app.casewhy.com/visa-bulletin">la información del boletín de visas</a> y la ayuda para redactar cartas de escalamiento son todo contenido general e informativo obtenido de materiales públicos de USCIS — que describen lo que un estado o proceso generalmente significa, nunca una conclusión sobre lo que usted, específicamente, debería hacer con su caso. Para los casos de asilo (I-589) y DACA (I-821D) en particular, CaseWhy nunca le dirá si usted califica para algún alivio ni predecirá el resultado de su caso — solo un abogado de inmigración con licencia o un representante acreditado puede hacerlo, y CaseWhy lo referirá a uno cada vez que una pregunta dependa de los hechos específicos de su caso.</p>
+    </div>
   </div>
 
-  <div class="faq-item">
-    <h2>¿CaseWhy es realmente gratis?</h2>
-    <p>CaseWhy tiene un nivel gratuito — hasta tres casos rastreados, una línea de tiempo de estado, explicaciones en lenguaje sencillo generadas por IA, y tres preguntas de IA sobre su caso cada mes — además de un nivel Plus opcional y de pago para rastrear más casos, preguntas ilimitadas y otras funciones adicionales (consulte los <a href="https://app.casewhy.com/es/plus">precios de Plus</a>). <a href="https://app.casewhy.com/es/get-help"><strong>Obtener ayuda</strong></a> — los directorios de CaseWhy de asistencia legal gratuita, representantes acreditados, abogados y otros recursos — es gratis para todos, siempre, sin importar la suscripción: sin tarifas, sin anuncios, sin costos ocultos.</p>
+  <div class="faq-group">
+    <h2>Rastrear un caso</h2>
+    <div class="faq-item">
+      <h3>¿Qué casos de USCIS puedo rastrear?</h3>
+      <p>Cualquier caso que tenga un número de recibo de USCIS — el número de 13 caracteres en su aviso I-797, tres letras seguidas de diez dígitos (por ejemplo IOE, MSC, EAC, WAC, LIN, SRC, NBC, YSC; CaseWhy acepta cualquier número de recibo con formato válido, no solo estos ejemplos). Eso incluye peticiones familiares (I-130), solicitudes de residencia permanente (I-485), naturalización (N-400), permisos de trabajo (I-765), documentos de viaje (I-131), remoción de condiciones (I-751), peticiones de empleador (I-129, I-140), asilo (I-589) y DACA (I-821D), entre otros. Si USCIS Case Status Online lo muestra, CaseWhy puede rastrearlo.</p>
+    </div>
+    <div class="faq-item">
+      <h3>¿Con qué frecuencia revisa CaseWhy mi caso?</h3>
+      <p>Cada caso rastreado se revisa automáticamente una vez al día. CaseWhy Plus agrega un botón de "Revisar ahora" para una revisión a solicitud cuando usted lo desee.</p>
+    </div>
+    <div class="faq-item">
+      <h3>¿Cómo sabré cuándo cambia mi estado?</h3>
+      <p>Recibirá un correo electrónico el día que cambie un estado, y una notificación push si ha activado las notificaciones de CaseWhy en su navegador o teléfono. En iPhone, las notificaciones push requieren primero agregar CaseWhy a la pantalla de inicio — la página de Configuración le explica cómo hacerlo. Cada cambio también queda registrado en la línea de tiempo del historial del caso.</p>
+    </div>
+    <div class="faq-item">
+      <h3>¿Puedo rastrear el caso de un familiar?</h3>
+      <p>Sí — el nivel gratuito rastrea hasta tres casos, y Plus rastrea hasta diez (con más disponibles a solicitud). Necesitará el número de recibo de su aviso. Rastree únicamente casos que tiene derecho a ver; CaseWhy muestra el mismo estado público que USCIS le mostraría a cualquier persona con ese número.</p>
+    </div>
+    <div class="faq-item">
+      <h3>¿Qué significa "Case Was Received", y qué es un caso estancado?</h3>
+      <p>"Case Was Received" ("Su caso fue recibido") es el primer estado que muestra casi todo caso; confirma que USCIS tiene su solicitud y el pago, y nada más. Un caso pasa a estar <a href="https://app.casewhy.com/updates/when-your-case-goes-silent?lang=es">"fuera del tiempo de procesamiento normal"</a> cuando ha esperado más tiempo del que USCIS mismo publica para ese formulario y oficina — CaseWhy marca esto automáticamente en todos los niveles, y muestra los canales formales que se abren en ese momento (una USCIS e-Request, una consulta al Congreso, el Ombudsman de USCIS). Plus puede redactar esas cartas por usted. Vea también <a href="https://app.casewhy.com/updates/what-case-was-received-actually-means?lang=es">qué significa realmente "Case Was Received"</a>.</p>
+    </div>
   </div>
 
-  <div class="faq-item">
-    <h2>¿Algo de lo que CaseWhy me dice es asesoría legal?</h2>
-    <p>No. CaseWhy no es un despacho de abogados, no ofrece asesoría legal, y su uso no crea ningún tipo de relación abogado-cliente. Las explicaciones sobre el estado de su caso, las respuestas del chat de IA, <a href="https://app.casewhy.com/processing-times">las estimaciones de tiempos de procesamiento</a>, <a href="https://app.casewhy.com/visa-bulletin">la información del boletín de visas</a> y la ayuda para redactar cartas de escalamiento son todo contenido general e informativo obtenido de materiales públicos de USCIS — que describen lo que un estado o proceso generalmente significa, nunca una conclusión sobre lo que usted, específicamente, debería hacer con su caso. Para los casos de asilo (I-589) y DACA (I-821D) en particular, CaseWhy nunca le dirá si usted califica para algún alivio ni predecirá el resultado de su caso — solo un abogado de inmigración con licencia o un representante acreditado puede hacerlo, y CaseWhy lo referirá a uno cada vez que una pregunta dependa de los hechos específicos de su caso.</p>
+  <div class="faq-group">
+    <h2>Ask CaseWhy y las explicaciones de IA</h2>
+    <div class="faq-item">
+      <h3>¿Necesito una cuenta para hacer una pregunta?</h3>
+      <p>No. Ask CaseWhy en la página de <a href="https://app.casewhy.com/es/get-help">Obtener ayuda</a> responde tres preguntas sin necesidad de iniciar sesión; después de eso, una cuenta gratuita le da tres preguntas de IA sobre su propio caso cada mes, y Plus las hace ilimitadas.</p>
+    </div>
+    <div class="faq-item">
+      <h3>¿Qué tan precisas son las explicaciones de IA?</h3>
+      <p>Las explicaciones describen lo que un estado o proceso generalmente significa, basadas en materiales publicados por USCIS, y cada respuesta muestra la fuente de la que se elaboró. Pueden estar equivocadas o desactualizadas, y nunca conocen datos sobre su caso que USCIS no haya publicado. Si algo no le parece correcto, escriba a <a href="mailto:corrections@casewhy.com">corrections@casewhy.com</a> — una persona lee cada mensaje.</p>
+    </div>
+    <div class="faq-item">
+      <h3>¿CaseWhy está disponible en español?</h3>
+      <p>Sí — el sitio, la aplicación, <a href="https://app.casewhy.com/es/get-help">Obtener ayuda</a> (incluido su cuadro de pregunta de texto libre) y las Preguntas Frecuentes están disponibles en español; use el enlace English en la parte superior de cualquier página. Algunas páginas de referencia todavía están solo en inglés y se marcan "(en inglés)" donde se enlazan. Las explicaciones de caso generadas por IA y el chat de "Ask a question" con sesión iniciada actualmente responden solo en inglés, incluso en una página en español — una limitación de la que estamos conscientes.</p>
+    </div>
   </div>
 
-  <div class="faq-item">
-    <h2>¿Cómo se protegen los datos de mi caso?</h2>
-    <p>Los datos de su caso y de su cuenta están cifrados tanto en reposo como en tránsito. CaseWhy no vende ni alquila información personal a terceros, no utiliza los datos de su caso con fines publicitarios, y no muestra ningún tipo de publicidad — no existe ninguna red publicitaria a la que esos datos puedan llegar. Los datos se conservan mientras la cuenta esté activa; una cuenta inactiva no recibe un manejo distinto ni una eliminación anticipada.</p>
+  <div class="faq-group">
+    <h2>CaseWhy Plus</h2>
+    <div class="faq-item">
+      <h3>¿CaseWhy es realmente gratis?</h3>
+      <p>CaseWhy tiene un nivel gratuito — hasta tres casos rastreados, una línea de tiempo de estado, explicaciones en lenguaje sencillo generadas por IA, y tres preguntas de IA sobre su caso cada mes — además de un nivel Plus opcional y de pago para rastrear más casos, preguntas ilimitadas y otras funciones adicionales (consulte los <a href="https://app.casewhy.com/es/plus">precios de Plus</a>). <a href="https://app.casewhy.com/es/get-help"><strong>Obtener ayuda</strong></a> — los directorios de CaseWhy de asistencia legal gratuita, representantes acreditados, abogados y otros recursos — es gratis para todos, siempre, sin importar la suscripción: sin tarifas, sin anuncios, sin costos ocultos.</p>
+    </div>
+    <div class="faq-item">
+      <h3>¿Cuánto cuesta Plus, y cómo lo cancelo?</h3>
+      <p>Plus cuesta $9.99 al mes, $22.99 al trimestre, o $66.99 al año, facturado a través de Stripe. Puede cancelar en cualquier momento desde el enlace "Administrar suscripción" en la <a href="https://app.casewhy.com/es/plus">página de Plus</a>; conservará Plus hasta el final del período que ya pagó. No hay reembolsos ni prorrateo por períodos parciales.</p>
+    </div>
+    <div class="faq-item">
+      <h3>¿Puedo compartir mi caso con mi abogado?</h3>
+      <p>Plus incluye un informe en PDF para su abogado: la línea de tiempo de su caso, el historial de estado y las explicaciones en un solo documento que puede enviar a su abogado o representante acreditado. Si todavía no tiene uno, <a href="https://app.casewhy.com/es/get-help">Obtener ayuda</a> enumera asistencia legal gratuita, representantes acreditados y abogados, gratis para todos.</p>
+    </div>
   </div>
 
-  <div class="faq-item">
-    <h2>¿Qué pasa con mis datos si cancelo o elimino mi cuenta?</h2>
-    <p>Si elimina su cuenta, los datos de su caso se eliminan de forma permanente dentro de 30 días. Usted puede acceder, corregir o eliminar sus datos en cualquier momento desde la configuración de la cuenta, o escribiendo a <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>.</p>
+  <div class="faq-group">
+    <h2>Privacidad y sus datos</h2>
+    <div class="faq-item">
+      <h3>¿Cómo se protegen los datos de mi caso?</h3>
+      <p>Los datos de su caso y de su cuenta están cifrados tanto en reposo como en tránsito. CaseWhy no vende ni alquila información personal a terceros, no utiliza los datos de su caso con fines publicitarios, y no muestra ningún tipo de publicidad — no existe ninguna red publicitaria a la que esos datos puedan llegar. Los datos se conservan mientras la cuenta esté activa; una cuenta inactiva no recibe un manejo distinto ni una eliminación anticipada. USCIS trata los números de recibo como información de identificación personal, y CaseWhy también: los números de recibo reciben cifrado adicional a nivel de aplicación antes de almacenarse, se usan únicamente para verificar el estado de su caso con USCIS (y, en Plus, para redactar cartas de escalamiento que deben incluirlos), y ningún miembro del personal de CaseWhy puede verlos en texto plano a través de ninguna herramienta administrativa.</p>
+    </div>
+    <div class="faq-item">
+      <h3>¿Qué pasa con mis datos si cancelo o elimino mi cuenta?</h3>
+      <p>Si elimina su cuenta, los datos de su caso se eliminan de forma permanente dentro de 30 días. Usted puede acceder, corregir o eliminar sus datos en cualquier momento desde la configuración de la cuenta, o escribiendo a <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>.</p>
+    </div>
   </div>
 
   <p style="margin-top:40px;font-size:0.85rem;">¿Tiene una pregunta que esto no responde? Consulte el <a href="https://app.casewhy.com/es/sitemap">índice del sitio</a> o escriba a <a href="mailto:hello@casewhy.com">hello@casewhy.com</a>.</p>

@@ -98,8 +98,9 @@ export default async function MarketingQueueAdminPage({
       <h1 className="text-2xl font-bold tracking-tight">Marketing queue</h1>
       <p className="mb-2 mt-2 text-muted">
         Community/forum channels never post automatically — you copy the text and post it yourself, then mark it
-        here. Owned channels can auto-post once a future round wires up that platform&apos;s API, but only after a
-        real approval click on that specific item.
+        here. Blog can already auto-post (a real click publishes to /updates); other owned channels will auto-post
+        once a future round wires up that platform&apos;s API — but only after a real approval click on that
+        specific item.
       </p>
       <p className="mb-6 text-xs text-muted">
         Amber-highlighted cards were flagged by the classifier instead of drafted — a legal-advice request, hostile

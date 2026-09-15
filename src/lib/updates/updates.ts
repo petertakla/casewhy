@@ -105,6 +105,16 @@ export function getAllUpdateSlugsFromDisk(): string[] {
   return readAllPostsFromDisk().map((p) => p.slug);
 }
 
+// Round 103 — server-only, reads a post regardless of the round-89 queue
+// gate above. Exists so an admin can read the actual 500-700 word article
+// before approving it, not just the title + one-sentence summary the
+// queue card previously showed. Callers must gate this behind their own
+// isAdminEmail check (src/app/updates/[slug]/page.tsx's ?preview=1 path)
+// -- this function itself does no auth, same as readAllPostsFromDisk.
+export function getUpdateBySlugFromDisk(slug: string): UpdatePost | null {
+  return readAllPostsFromDisk().find((p) => p.slug === slug) ?? null;
+}
+
 export function updateDestination(slug: string): string {
   return destinationFor(slug);
 }

@@ -28,6 +28,13 @@ export function MarketingQueueCard({
   const [done, setDone] = useState<string | null>(null);
 
   const isEscalationOnly = !draftText;
+  const isBlog = channel === "blog";
+  // Round 103 — scripts/seed-updates-marketing-queue.ts's own format:
+  // `${title}\n\n${summary}`. Read-only for Blog cards (there's nothing
+  // to edit here -- the real article lives in content/updates/<slug>.md).
+  const [blogTitle, ...blogSummaryParts] = (draftText ?? "").split("\n\n");
+  const blogSummary = blogSummaryParts.join("\n\n").trim();
+  const blogSlug = destination.replace(/^\/updates\//, "");
   // Round 89's own instruction: if a channel's poster isn't configured,
   // the queue UI shows the item as manual_post (text ready to copy)
   // instead of offering an "auto-post" action that would just no-op.
@@ -74,7 +81,13 @@ export function MarketingQueueCard({
     return (
       <div className="rounded-2xl border border-border bg-surface p-6 opacity-60">
         <p className="text-sm text-muted">
-          {CHANNEL_LABELS[channel] ?? channel} — marked <strong>{done}</strong>.
+          {isBlog && done === "posted" ? (
+            <>Blog — published.</>
+          ) : (
+            <>
+              {CHANNEL_LABELS[channel] ?? channel} — marked <strong>{done}</strong>.
+            </>
+          )}
         </p>
       </div>
     );
@@ -98,9 +111,23 @@ export function MarketingQueueCard({
         )}
       </div>
 
-      <a href={destination} target="_blank" rel="noopener noreferrer" className="mt-2 block text-xs text-brand-600 hover:underline dark:text-brand-400">
-        {destination}
-      </a>
+      {isBlog && !isEscalationOnly ? (
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <a
+            href={`/updates/${blogSlug}?preview=1`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
+          >
+            Preview post ↗
+          </a>
+          <span className="font-mono text-xs text-muted">{blogSlug}</span>
+        </div>
+      ) : (
+        <a href={destination} target="_blank" rel="noopener noreferrer" className="mt-2 block text-xs text-brand-600 hover:underline dark:text-brand-400">
+          {destination}
+        </a>
+      )}
 
       {isEscalationOnly ? (
         <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3">
@@ -118,16 +145,30 @@ export function MarketingQueueCard({
             </p>
           )}
 
-          <label className="mt-3 block text-xs font-semibold uppercase tracking-widest text-muted">
-            Draft (edit before marking posted, if needed)
-          </label>
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            rows={8}
-            disabled={pending}
-            className="mt-1.5 w-full rounded-lg border border-border-strong bg-background p-3 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500 disabled:opacity-60"
-          />
+          {isBlog ? (
+            <div className="mt-3">
+              <p className="font-semibold text-foreground">{blogTitle}</p>
+              <p className="mt-1 text-sm text-muted">{blogSummary}</p>
+              <p className="mt-2 text-xs text-muted">
+                Read the full post with <strong>Preview post</strong> above before deciding — this card doesn&apos;t
+                show the article itself. To change the text, edit{" "}
+                <code className="font-mono">content/updates/{blogSlug}.md</code> in the repo.
+              </p>
+            </div>
+          ) : (
+            <>
+              <label className="mt-3 block text-xs font-semibold uppercase tracking-widest text-muted">
+                Draft (edit before marking posted, if needed)
+              </label>
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                rows={8}
+                disabled={pending}
+                className="mt-1.5 w-full rounded-lg border border-border-strong bg-background p-3 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500 disabled:opacity-60"
+              />
+            </>
+          )}
         </>
       )}
 
@@ -161,7 +202,7 @@ export function MarketingQueueCard({
             onClick={handleApproveAutoPost}
             className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Approve (queue for auto-post)
+            {isBlog ? "Publish to /updates" : "Approve (queue for auto-post)"}
           </button>
         )}
         <button

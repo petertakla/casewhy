@@ -1,10 +1,37 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
-import { getPublishedUpdateBySlug } from "@/lib/updates/updates";
+import { getPublishedUpdateBySlug, getUpdateBySlugFromDisk, type UpdatePost } from "@/lib/updates/updates";
 import { POLICY_MEMOS } from "@/lib/kb/policy-memos";
 import { BackLink } from "@/components/BackLink";
 import { ShareButton } from "@/components/ShareButton";
+import { auth } from "@/lib/auth/server";
+import { isAdminEmail } from "@/lib/auth/admin";
+import { isSpanishLocale } from "@/lib/i18n/locale";
+
+type SearchParams = { preview?: string; lang?: string };
+
+// Round 103 — the queue card previously showed only a title + one-
+// sentence summary; the real 500-700 word article had no in-app way to
+// read before approving. ?preview=1, admin-only, renders the unpublished
+// post exactly as the public will see it once approved (round 93's own
+// gate on getPublishedUpdateBySlug stays untouched) — same auth check
+// src/app/admin/layout.tsx uses, not duplicated logic. Both `post` and
+// `isPreview` are resolved once here and reused by both generateMetadata
+// and the page component below, so the admin check only runs once per
+// request despite Next.js calling both independently.
+async function resolvePost(slug: string, searchParams: SearchParams): Promise<{ post: UpdatePost; isPreview: boolean } | null> {
+  const published = await getPublishedUpdateBySlug(slug);
+  if (published) return { post: published, isPreview: false };
+
+  if (searchParams.preview !== "1") return null;
+  const { data: session } = await auth.getSession();
+  if (!isAdminEmail(session?.user?.email)) return null;
+
+  const disk = getUpdateBySlugFromDisk(slug);
+  if (!disk) return null;
+  return { post: disk, isPreview: true };
+}
 
 // Round 93 task doc, Part A — "Sourcing block on every post — same
 // two-link pattern as the app's policy citations (official source +
@@ -31,12 +58,21 @@ function firstSentence(text: string): string {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPublishedUpdateBySlug(slug);
-  if (!post) return { title: "Update not found | CaseWhy" };
+  const resolved = await resolvePost(slug, await searchParams);
+  if (!resolved) return { title: "Update not found | CaseWhy" };
+  const { post, isPreview } = resolved;
+
+  if (isPreview) {
+    // No canonical, no description crafted for indexing — this page
+    // should never rank or get crawled while unpublished.
+    return { title: `${post.title} | CaseWhy`, robots: { index: false, follow: false } };
+  }
   return {
     title: `${post.title} | CaseWhy`,
     description: post.summary,
@@ -44,10 +80,19 @@ export async function generateMetadata({
   };
 }
 
-export default async function UpdatePostPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function UpdatePostPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<SearchParams>;
+}) {
   const { slug } = await params;
-  const post = await getPublishedUpdateBySlug(slug);
-  if (!post) notFound();
+  const sp = await searchParams;
+  const resolved = await resolvePost(slug, sp);
+  if (!resolved) notFound();
+  const { post, isPreview } = resolved;
+  const isSpanish = isPreview && (await isSpanishLocale(sp.lang));
 
   const url = `https://app.casewhy.com/updates/${slug}`;
 
@@ -75,14 +120,41 @@ export default async function UpdatePostPage({ params }: { params: Promise<{ slu
 
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-10">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+      {!isPreview && (
+        <>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+          />
+        </>
+      )}
+
+      {isPreview && (
+        <div className="mb-4 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-400">
+          {isSpanish ? (
+            <>
+              Vista previa — no publicado.{" "}
+              <a href="/admin/marketing?channel=blog" className="font-semibold underline">
+                Apruébelo en Administración › Marketing
+              </a>{" "}
+              para hacerlo público.
+            </>
+          ) : (
+            <>
+              Preview — not published.{" "}
+              <a href="/admin/marketing?channel=blog" className="font-semibold underline">
+                Approve it in Admin › Marketing
+              </a>{" "}
+              to make it public.
+            </>
+          )}
+        </div>
+      )}
+
       <BackLink href="/updates" label="All updates" />
 
       <h1 className="mt-4 text-2xl font-bold tracking-tight">{post.title}</h1>
@@ -155,9 +227,11 @@ export default async function UpdatePostPage({ params }: { params: Promise<{ slu
         </div>
       )}
 
-      <div className="mt-8">
-        <ShareButton url={url} title={post.title} text={post.summary} />
-      </div>
+      {!isPreview && (
+        <div className="mt-8">
+          <ShareButton url={url} title={post.title} text={post.summary} />
+        </div>
+      )}
     </main>
   );
 }

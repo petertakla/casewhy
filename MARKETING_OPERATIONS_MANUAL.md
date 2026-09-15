@@ -1,6 +1,6 @@
 # CaseWhy Marketing Operations — Operator Manual
 
-**Version 2, Sep 15, 2026 (v1 Sep 14). Audience: anyone working the marketing queues** — Peter today, a part-time helper or VA later. Written by the cloud Claude session from the round 85/89 specs and Claude Code's build reports; **Claude Code verified every screen label against the live UI before publishing this version.** Sections marked *(coming — round NN)* describe behavior that is specified but not yet built; they will be unmarked as each round ships.
+**Version 3, Sep 15, 2026 (v2 same day, v1 Sep 14). Audience: anyone working the marketing queues** — Peter today, a part-time helper or VA later. Written by the cloud Claude session from the round 85/89 specs and Claude Code's build reports; **Claude Code verified every screen label against the live UI before publishing this version.** v3's Blog-section update and its two new screenshots (#9, #10) are Claude Code's own round-103 pass — the cloud session's fuller rounds-101/102 navigation/chrome reconciliation is still owed separately. Sections marked *(coming — round NN)* describe behavior that is specified but not yet built; they will be unmarked as each round ships.
 
 **Companion documents:** `SOCIAL_MEDIA_GUARDRAILS.md` (the rules every draft is checked against — read it once in full before your first shift), `marketing-ownership-and-peter-checklist.md` (who does what), `CaseWhy Free Marketing Playbook` (why each channel exists).
 
@@ -78,7 +78,7 @@ The live UI doesn't have a generic "Approve" / "Edit" / "Leave it pending" set o
 
 **`manual_post` cards** (every community/forum channel, and any owned channel without a real poster yet): **Mark posted (as-is)**, **Mark posted (edited)** (only enabled once you've actually changed the text), and **Reject**. There's no separate approve step — posting is something you do yourself outside the app, then you come back and mark it.
 
-**`auto_post` cards with a real poster** (currently: Blog only): **Approve (queue for auto-post)** and **Reject**. Approve is the one and only thing that makes the post go live — nothing else does.
+**`auto_post` cards with a real poster** (currently: Blog only): **Approve (queue for auto-post)** and **Reject** — except Blog, whose button reads **Publish to /updates** instead (same action, real-post-specific label, round 103). Approve/Publish is the one and only thing that makes the post go live — nothing else does.
 
 **Reject** on any card is permanent; rejected items aren't retried. If you reject several drafts for the same reason, tell the cloud session — that's a prompt fix, not something you should keep doing by hand.
 
@@ -115,7 +115,7 @@ What to do: read the thread, decide whether to answer as yourself (without CaseW
 
 **Email issues** *(coming — round 92)*. One card per weekly issue, with subject, preview text, and full body. Approve = send to the whole list on the next Tuesday run. This is the one channel where a typo reaches every subscriber at once, so read the whole thing.
 
-**Blog posts.** **Live (round 93), not upcoming.** One card per `/updates` post, channel label "Blog," `auto_post` mode with a real poster registered — **Approve genuinely publishes it**: the post's file already exists in the repo, and clicking Approve is the one thing that flips it from invisible to live at `/updates/<slug>`. There is no undo button; if you need to unpublish, tell the cloud session.
+**Blog posts.** **Live (round 93), not upcoming.** One card per `/updates` post, channel label "Blog," `auto_post` mode with a real poster registered. Round 103 changed how you actually review one, because the card used to show only the post's title and a one-sentence summary — not enough to approve a 500–700 word article. Now: open the card → click **Preview post** (opens `/updates/<slug>?preview=1` in a new tab — a "Preview — not published" banner up top is the only difference from what a reader will see) → read the whole thing → back to the queue tab → **Publish to /updates** or **Reject**. The card itself has no textarea anymore; there's nothing to edit there. If the post's *text* needs a change, that happens in the repo (`content/updates/<slug>.md`) — ask the cloud session or Code to make the edit, then come back and preview again before publishing. Publish is the one thing that flips a post from invisible to live at `/updates/<slug>`. There is no undo button; if you need to unpublish, tell the cloud session.
 
 **Attorney outreach** *(coming — round 94)*. The three sequence emails appear once for approval; after that, sends happen from the outreach tool and only replies come back through the round 70 alias queue (`/admin/inbox`). Complaint or bounce rates above the thresholds pause the sequence automatically.
 
@@ -178,9 +178,9 @@ All captured live against `/admin/marketing` on Sep 14, 2026, signed in as `admi
 
 ![Escalated card](docs/marketing-manual-screenshots/02-escalated-card.jpg)
 
-**3. An `auto_post` card with a real poster (Blog).** Same destination/notes/sources/draft layout, but the action button is **Approve (queue for auto-post)** instead of Mark posted — this is the one click that actually publishes a post.
+**3. An `auto_post` card with a real poster (Blog).** **Stale as of round 103 — kept for history, not what you'll actually see.** This screenshot shows the pre-round-103 Blog card (destination link + editable draft textarea + "Approve (queue for auto-post)"). The real, current Blog card is #9 below.
 
-![auto_post card — Approve button](docs/marketing-manual-screenshots/03-auto-post-approve-button.jpg)
+![auto_post card — Approve button (superseded, see #9)](docs/marketing-manual-screenshots/03-auto-post-approve-button.jpg)
 
 **4. After clicking Mark posted on the fixture card.** It doesn't linger with a "posted" confirmation — it simply disappears from this view, because the page only ever shows Pending/Escalated items and a posted row no longer matches. The log page (next) is where a posted item is actually visible.
 
@@ -194,4 +194,12 @@ All captured live against `/admin/marketing` on Sep 14, 2026, signed in as `admi
 
 **7. The admin config for the subreddit list and daily cap.** Now exists: Admin › Marketing › Settings (round 98). Screenshot to be added with the next verification pass, along with the admin home, sidebar, and the grouped queue.
 
-**8. One card each for X, a pin, an email issue, and a blog post.** Only Blog is real as of this version — shown in #3 above. X/Threads/LinkedIn (round 90), Pinterest/YouTube/TikTok/Instagram (round 91), and email issues (round 92) don't exist in the live queue yet; add their screenshots to this section once those rounds ship.
+**8. One card each for X, a pin, an email issue, and a blog post.** Only Blog is real as of this version — shown in #9 below. X/Threads/LinkedIn (round 90), Pinterest/YouTube/TikTok/Instagram (round 91), and email issues (round 92) don't exist in the live queue yet; add their screenshots to this section once those rounds ship.
+
+**9. The current Blog card (round 103).** No textarea — read-only title and summary, a **Preview post ↗** link (opens the real article in a new tab, admin-only), the slug in small mono text, and **Publish to /updates** / **Reject** buttons. Captured live against a real, still-pending seed post — nothing was published or rejected while taking this.
+
+![Blog card, round 103](docs/marketing-manual-screenshots/06-blog-card.jpg)
+
+**10. The `?preview=1` banner on the post itself.** What clicking **Preview post** opens — the full article exactly as it will read once published, with one addition: an amber "Preview — not published" banner linking back to the queue. No share button, no JSON-LD, `noindex, nofollow` — none of that is visible in a screenshot, but confirmed via the page's own meta tags and source before this was taken.
+
+![Preview banner on an unpublished post](docs/marketing-manual-screenshots/07-blog-preview-banner.jpg)

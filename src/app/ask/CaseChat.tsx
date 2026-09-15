@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { PlusBadge } from "@/components/PlusBadge";
 import { suggestedQuestions } from "@/lib/ai/suggested-questions";
 import { linkifyExplanation } from "@/lib/kb/linkify";
 
@@ -276,7 +277,7 @@ export function CaseChat({
                 <>
                   Obtén preguntas ilimitadas con{" "}
                   <Link href="/plus#ai-chat" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
-                    CaseWhy Plus
+                    CaseWhy <PlusBadge size="sm" />
                   </Link>{" "}
                   — cada respuesta sigue fundamentada en la política real de USCIS, con citas.
                 </>
@@ -284,7 +285,7 @@ export function CaseChat({
                 <>
                   Get unlimited questions with{" "}
                   <Link href="/plus#ai-chat" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
-                    CaseWhy Plus
+                    CaseWhy <PlusBadge size="sm" />
                   </Link>{" "}
                   — every answer still grounded in real USCIS policy, with citations.
                 </>

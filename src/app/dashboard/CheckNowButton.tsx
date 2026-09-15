@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { checkCaseNow } from "./actions";
+import { PlusBadge } from "@/components/PlusBadge";
 
 function formatCheckedAt(date: Date | null, es: boolean): string {
   if (!date) return es ? "Nunca revisado" : "Never checked";
@@ -41,7 +42,15 @@ export function CheckNowButton({
       <p className="mt-1.5 text-xs text-muted">
         {formatCheckedAt(checkedAt, es)} ·{" "}
         <Link href="/plus" className="text-brand-600 hover:underline dark:text-brand-400">
-          {es ? "Actualiza a CaseWhy Plus" : "Upgrade to CaseWhy Plus"}
+          {es ? (
+            <>
+              Actualiza a CaseWhy <PlusBadge size="sm" />
+            </>
+          ) : (
+            <>
+              Upgrade to CaseWhy <PlusBadge size="sm" />
+            </>
+          )}
         </Link>{" "}
         {es ? "para revisar bajo demanda" : "to check on demand"}
       </p>

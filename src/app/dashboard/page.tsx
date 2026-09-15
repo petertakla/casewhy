@@ -12,6 +12,7 @@ import { CheckNowButton } from "./CheckNowButton";
 import { DownloadReportLink } from "./DownloadReportLink";
 import { CaseSwitcher } from "./CaseSwitcher";
 import { DocumentVault } from "./DocumentVault";
+import { PlusBadge } from "@/components/PlusBadge";
 import { detectStalledCase } from "@/lib/escalation/stall-detector";
 import { EscalationToolkit } from "./EscalationToolkit";
 import { ReceiptNumberInput } from "./ReceiptNumberInput";
@@ -139,7 +140,7 @@ function StalledCaseCard({
                 Han pasado {daysSinceLastUpdate} días desde &quot;{milestoneText}&quot; sin ninguna actualización más —
                 más tiempo de lo típico para esta etapa. Inicia sesión y{" "}
                 <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
-                  actualiza a CaseWhy Plus
+                  actualiza a CaseWhy <PlusBadge size="sm" />
                 </Link>{" "}
                 para encontrar a tu representante y redactar una carta de seguimiento, o{" "}
                 <Link href="/get-help" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
@@ -152,7 +153,7 @@ function StalledCaseCard({
                 It&apos;s been {daysSinceLastUpdate} days since &quot;{milestoneText}&quot; with no further update —
                 longer than typical for this stage. Sign in and{" "}
                 <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
-                  upgrade to CaseWhy Plus
+                  upgrade to CaseWhy <PlusBadge size="sm" />
                 </Link>{" "}
                 to find your representative and draft a follow-up letter, or{" "}
                 <Link href="/get-help" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">

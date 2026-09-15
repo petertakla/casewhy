@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { PlusBadge } from "@/components/PlusBadge";
 import {
   saveMyMailingAddress,
   getMySavedAddress,
@@ -70,7 +71,15 @@ export function EscalationToolkit({
         </p>
         <p className="text-sm text-muted">
           <Link href="/plus" className="text-brand-600 hover:underline dark:text-brand-400">
-            {es ? "Actualiza a CaseWhy Plus" : "Upgrade to CaseWhy Plus"}
+            {es ? (
+              <>
+                Actualiza a CaseWhy <PlusBadge size="sm" />
+              </>
+            ) : (
+              <>
+                Upgrade to CaseWhy <PlusBadge size="sm" />
+              </>
+            )}
           </Link>{" "}
           {es ? "para encontrar a tu representante y redactar una carta de seguimiento." : "to find your representative and draft a follow-up letter."}
         </p>

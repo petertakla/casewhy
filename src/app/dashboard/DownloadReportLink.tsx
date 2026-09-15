@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PlusBadge } from "@/components/PlusBadge";
 
 /**
  * CW-40 — attorney-handoff PDF report, CaseWhy Plus only (see round-4 in
@@ -20,7 +21,15 @@ export function DownloadReportLink({
     return (
       <p className="mt-1.5 text-xs text-muted">
         <Link href="/plus" className="text-brand-600 hover:underline dark:text-brand-400">
-          {es ? "Actualiza a CaseWhy Plus" : "Upgrade to CaseWhy Plus"}
+          {es ? (
+            <>
+              Actualiza a CaseWhy <PlusBadge size="sm" />
+            </>
+          ) : (
+            <>
+              Upgrade to CaseWhy <PlusBadge size="sm" />
+            </>
+          )}
         </Link>{" "}
         {es ? "para un reporte PDF descargable para el abogado" : "for a downloadable attorney-handoff PDF report"}
       </p>

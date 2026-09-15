@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { trackCase, untrackCase } from "./actions";
+import { PlusBadge } from "@/components/PlusBadge";
 import { CASE_TYPES } from "@/lib/kb/case-type-timeline";
 
 export function TrackCaseButton({
@@ -113,7 +114,7 @@ export function TrackCaseButton({
             Estás rastreando el máximo de {maxCases} caso{maxCases === 1 ? "" : "s"} de tu
             plan. Deja de rastrear uno para agregar este, o{" "}
             <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
-              actualiza a CaseWhy Plus
+              actualiza a CaseWhy <PlusBadge size="sm" />
             </Link>{" "}
             para hasta {plusMaxCases} casos.
           </>
@@ -122,7 +123,7 @@ export function TrackCaseButton({
             You&apos;re tracking the maximum of {maxCases} case{maxCases === 1 ? "" : "s"} on your
             plan. Untrack one to add this, or{" "}
             <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
-              upgrade to CaseWhy Plus
+              upgrade to CaseWhy <PlusBadge size="sm" />
             </Link>{" "}
             for up to {plusMaxCases} cases.
           </>

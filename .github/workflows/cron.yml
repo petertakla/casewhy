@@ -44,40 +44,47 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 13 * * *'
     runs-on: ubuntu-latest
     steps:
-      - run: curl -sf -X POST https://app.casewhy.com/api/cron/check-status -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
+      - run: |
+          curl -sf -X POST https://app.casewhy.com/api/cron/check-status -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
 
   poll-aliases:
     if: github.event_name == 'workflow_dispatch' || github.event.schedule == '*/5 * * * *'
     runs-on: ubuntu-latest
     steps:
-      - run: curl -sf -X POST https://app.casewhy.com/api/cron/poll-aliases -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
+      - run: |
+          curl -sf -X POST https://app.casewhy.com/api/cron/poll-aliases -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
 
   poll-marketing-sources:
     if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 * * * *'
     runs-on: ubuntu-latest
     steps:
-      - run: curl -sf -X POST https://app.casewhy.com/api/cron/poll-marketing-sources -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
+      - run: |
+          curl -sf -X POST https://app.casewhy.com/api/cron/poll-marketing-sources -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
 
   poll-policy-news:
     if: github.event_name == 'workflow_dispatch' || github.event.schedule == '*/30 * * * *'
     runs-on: ubuntu-latest
     steps:
-      - run: curl -sf -X POST https://app.casewhy.com/api/cron/poll-policy-news -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
+      - run: |
+          curl -sf -X POST https://app.casewhy.com/api/cron/poll-policy-news -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
 
   render-content-briefs:
     if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 12 * * 1'
     runs-on: ubuntu-latest
     steps:
-      - run: curl -sf -X POST https://app.casewhy.com/api/cron/render-content-briefs -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
+      - run: |
+          curl -sf -X POST https://app.casewhy.com/api/cron/render-content-briefs -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
 
   weekly-attribution-digest:
     if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 13 * * 1'
     runs-on: ubuntu-latest
     steps:
-      - run: curl -sf -X POST https://app.casewhy.com/api/cron/weekly-attribution-digest -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
+      - run: |
+          curl -sf -X POST https://app.casewhy.com/api/cron/weekly-attribution-digest -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
 
   generate-ops-tasks:
     if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 12 1 * *'
     runs-on: ubuntu-latest
     steps:
-      - run: curl -sf -X POST https://app.casewhy.com/api/cron/generate-ops-tasks -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
+      - run: |
+          curl -sf -X POST https://app.casewhy.com/api/cron/generate-ops-tasks -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"

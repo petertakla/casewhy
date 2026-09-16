@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "validate:jsonld": "tsx scripts/validate-jsonld.ts",
     "check:language-switcher": "tsx scripts/check-language-switcher.ts",
-    "check:processing-times-age": "tsx scripts/check-processing-times-age.ts"
+    "check:processing-times-age": "tsx scripts/check-processing-times-age.ts",
+    "check:founder-name": "tsx scripts/check-founder-name.ts"
   },
   "dependencies": {
     "@neondatabase/auth": "^0.5.0-beta",

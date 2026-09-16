@@ -27,24 +27,28 @@ export async function POST() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const labelResults: Record<string, string> = {};
-  for (const label of SOCIAL_LABELS) {
-    labelResults[label] = await createLabelIfMissing(label);
-  }
+  try {
+    const labelResults: Record<string, string> = {};
+    for (const label of SOCIAL_LABELS) {
+      labelResults[label] = await createLabelIfMissing(label);
+    }
 
-  const otherLabelId = await getLabelId("Social/Other");
-  if (!otherLabelId) {
-    return NextResponse.json({ error: "Social/Other label id not found right after creating it." }, { status: 500 });
-  }
+    const otherLabelId = await getLabelId("Social/Other");
+    if (!otherLabelId) {
+      return NextResponse.json({ error: "Social/Other label id not found right after creating it." }, { status: 500 });
+    }
 
-  const toAddress = "social@casewhy.com";
-  let filterResult: "created" | "already_existed";
-  if (await filterExists({ to: toAddress, labelId: otherLabelId })) {
-    filterResult = "already_existed";
-  } else {
-    await createFilter({ toAddress, labelId: otherLabelId });
-    filterResult = "created";
-  }
+    const toAddress = "social@casewhy.com";
+    let filterResult: "created" | "already_existed";
+    if (await filterExists({ to: toAddress, labelId: otherLabelId })) {
+      filterResult = "already_existed";
+    } else {
+      await createFilter({ toAddress, labelId: otherLabelId });
+      filterResult = "created";
+    }
 
-  return NextResponse.json({ labels: labelResults, catchAllFilter: filterResult });
+    return NextResponse.json({ labels: labelResults, catchAllFilter: filterResult });
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : String(err) }, { status: 500 });
+  }
 }

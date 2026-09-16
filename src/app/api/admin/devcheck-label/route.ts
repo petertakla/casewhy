@@ -11,6 +11,27 @@ export async function GET(request: NextRequest) {
   if (!isAdminEmail(session?.user?.email)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const q = request.nextUrl.searchParams.get("q");
+  if (q) {
+    try {
+      const gmail = getGmailClientForDebug();
+      const res = await gmail.users.messages.list({ userId: "me", q, maxResults: 10 });
+      const messages = await Promise.all(
+        (res.data.messages ?? []).map(async (m) => {
+          const full = await gmail.users.messages.get({ userId: "me", id: m.id!, format: "metadata", metadataHeaders: ["Subject", "To", "From"] });
+          return {
+            id: m.id,
+            labelIds: full.data.labelIds,
+            headers: full.data.payload?.headers?.map((h) => `${h.name}: ${h.value}`),
+          };
+        })
+      );
+      return NextResponse.json({ q, resultSizeEstimate: res.data.resultSizeEstimate, messages });
+    } catch (err) {
+      return NextResponse.json({ error: err instanceof Error ? err.message : String(err) }, { status: 500 });
+    }
+  }
+
   if (request.nextUrl.searchParams.get("list") === "1") {
     try {
       const gmail = getGmailClientForDebug();

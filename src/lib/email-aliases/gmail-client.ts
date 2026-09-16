@@ -181,7 +181,11 @@ export async function createLabelIfMissing(labelName: string): Promise<"created"
 // against production, not just reason about scopes from documentation.
 export async function createFilter(params: {
   toAddress: string;
-  fromDomain: string;
+  // Round 113 — optional: a catch-all filter (no sender restriction,
+  // just "everything to this address") needs to omit `from` entirely,
+  // not pass an empty string (Gmail's own filter syntax treats "" as a
+  // literal, near-impossible-to-match search term, not "any sender").
+  fromDomain?: string;
   labelId: string;
 }): Promise<{ id?: string | null }> {
   const gmail = getGmailClient();
@@ -200,6 +204,23 @@ export async function getLabelId(labelName: string): Promise<string | null> {
   const gmail = getGmailClient();
   const existing = await gmail.users.labels.list({ userId: "me" });
   return existing.data.labels?.find((l) => l.name === labelName)?.id ?? null;
+}
+
+// Round 113 — idempotency check for createFilter: the Gmail API has no
+// "create if missing" filter call, so a caller that wants to be safe to
+// re-run (this project's own established convention -- every other
+// alias/label/config function in this codebase is idempotent) lists
+// existing filters first and skips if one with the same criteria+label
+// already exists.
+export async function filterExists(params: { to?: string; from?: string; labelId: string }): Promise<boolean> {
+  const gmail = getGmailClient();
+  const res = await gmail.users.settings.filters.list({ userId: "me" });
+  return (res.data.filter ?? []).some(
+    (f) =>
+      f.criteria?.to === params.to &&
+      f.criteria?.from === params.from &&
+      f.action?.addLabelIds?.includes(params.labelId)
+  );
 }
 
 /**

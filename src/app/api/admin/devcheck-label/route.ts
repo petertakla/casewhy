@@ -11,6 +11,20 @@ export async function GET(request: NextRequest) {
   if (!isAdminEmail(session?.user?.email)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (request.nextUrl.searchParams.get("list") === "1") {
+    try {
+      const gmail = getGmailClientForDebug();
+      const res = await gmail.users.labels.list({ userId: "me" });
+      const labels = (res.data.labels ?? [])
+        .filter((l) => l.type === "user")
+        .map((l) => ({ id: l.id, name: l.name }))
+        .sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
+      return NextResponse.json({ labels });
+    } catch (err) {
+      return NextResponse.json({ error: err instanceof Error ? err.message : String(err) }, { status: 500 });
+    }
+  }
+
   const label = request.nextUrl.searchParams.get("label") || "Alias/Press";
   try {
     const labelId = await getLabelId(label);

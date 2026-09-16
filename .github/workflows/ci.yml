@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [casewhyhub]
+  pull_request:
+    branches: [casewhyhub]
+
+jobs:
+  founder-name-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Round 111 follow-up — the founder is "Peter" everywhere CaseWhy
+      # publishes, never the last name. Fails the build if it appears
+      # anywhere in the committed site (source templates or generated
+      # output), same standing rule as the main app's check:founder-name.
+      - name: Check for founder last name
+        run: |
+          if grep -rn "Takla" --exclude-dir=.git --exclude-dir=.github .; then
+            echo "Founder-name check failed -- last name found above. The founder is \"Peter\" everywhere CaseWhy publishes."
+            exit 1
+          fi
+          echo "Founder-name check passed."

@@ -52,7 +52,7 @@ Shows USCIS's five real Case Status API criteria, in order: (1) data entry usabi
 ### Step 4 — Error handling, success and failure, both visible (4 min)
 
 **Click:** Track a malformed number first: type `AB12345` in the field (do not submit — just show the client-side feedback), then correct it. Then, in a **separate** case-add attempt, use `EAC0000099999` (well-formed, not a real case) and let it actually submit and fail.
-**Say:** "USCIS's own API returns a real 422 for a malformed number and a 404 for one it doesn't recognize — both show up as USCIS's actual message here, not a generic error. We found and fixed a bug during our own testing where this was being swallowed behind a vague string — it's now the real message, every time."
+**Say:** "USCIS's own API returns a real 422 for a malformed number and a 404 for one it doesn't recognize — both show up as USCIS's actual message here, not a generic error."
 **Reviewer sees:** the client-side red/green format feedback for the malformed number; then a real, specific USCIS error message on-screen for the unknown one.
 **Criterion:** #4, HTTPS response handling (both success — Step 2 — and error, this step).
 **If it fails live:** if `EAC0000099999` unexpectedly returns a real hit (a sandbox pool quirk), say so honestly and try a different well-formed-but-unlikely number rather than force it.

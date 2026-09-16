@@ -22,7 +22,7 @@ Results by email within 2 business days. A fail routes to a 15-minute "Re-Demo O
 ## Architecture and hosting
 
 **What is CaseWhy, and who built and operates it?**
-CaseWhy is a free web app that tracks a USCIS case by receipt number and explains its status in plain language. It's built and operated by one person — Peter, founder of CaseWhy LLC, a Florida company. Development is AI-assisted (Claude Code); every technical claim in our written materials was checked against the actual code before submission, not written from memory. *Shown in demo: introduction.*
+CaseWhy is a free web app that tracks a USCIS case by receipt number and explains its status in plain language. It's built and operated by one person — Peter, founder of CaseWhy LLC, a Florida company. Development is AI-assisted (Claude Code). *Shown in demo: introduction.*
 
 **What's the stack, and where does the API call actually happen?**
 Next.js on Vercel, Postgres on Neon, Postmark for email, Stripe for billing. Every call to USCIS's API happens entirely server-side — the browser never sees a credential or a token. Technically: `src/lib/uscis/client.ts` runs only on Vercel's Node.js runtime (never the browser, never an Edge function), so USCIS credentials never leave our server. *Shown in demo: step 2 (a live status check, watched in server logs).*
@@ -41,7 +41,7 @@ Client Credentials, exactly as USCIS documents it. We cache the access token in 
 The next call simply re-authenticates — our cache check runs on every call, so an expired token is caught and refreshed automatically, not retried in a loop.
 
 **Where are the client ID and secret stored?**
-As encrypted environment variables in Vercel, never in our source code or version control — `.gitignore` excludes every environment file, and we verified there are zero hardcoded secrets anywhere in the codebase before this demo.
+As encrypted environment variables in Vercel, never in our source code or version control — `.gitignore` excludes every environment file, and there are zero hardcoded secrets anywhere in the codebase.
 
 ---
 
@@ -67,7 +67,7 @@ Yes — the on-demand check button has a "Show technical details" toggle that re
 The format (3 letters + 10 digits) gets real-time client-side feedback as you type — a visual hint, not a hard block, since a well-formed number still might not be real. We confirmed the real API responses directly against your sandbox: a malformed number returns a real `422` with a message explaining the format requirement, and a well-formed but unknown number returns a real `404` with a message saying the case isn't recognized. Both get surfaced to the user as a clear, USCIS-worded error message. *Shown in demo: step 4, deliberately entering a malformed number and an unknown one.*
 
 **Does the error message actually reach the screen, or just the logs?**
-It reaches the screen. We found and fixed a real gap while preparing this demo: our on-demand check button was replacing USCIS's real error text with a generic "couldn't reach USCIS" message. It now shows USCIS's actual message directly. We'd rather tell you we found and fixed it than have you find it first.
+It reaches the screen — the on-demand check button shows USCIS's actual message directly, not a generic substitute.
 
 **Do you retry on failure?**
 No automatic retries in the API client — a failed call is reported as an error for that specific check, so we're not compounding load on USCIS's API with a retry storm. The next scheduled check will naturally try again.
@@ -129,16 +129,16 @@ Under two minutes — no account required to browse reference material (processi
 Encrypted with AES-256-GCM before it's ever written to our database — an authenticated encryption mode, so tampering is detected, not silently accepted. The encryption key lives only as a protected environment variable, separate from the database itself. No CaseWhy staff member can view a receipt number in plaintext through any administrative tool, ever.
 
 **What exactly gets sent to your AI provider?**
-Form type, processing center, dates, status text, history, and general policy background — never the raw receipt number. That's not a policy promise; it's how the prompt-building code is actually written, and we checked it line by line before this demo. The one exception: our paid-tier letter-drafting tool includes the receipt number in the letter itself, since the letter has to name the case to USCIS or a congressional office — sent to the same AI provider solely to help draft that letter.
+Form type, processing center, dates, status text, history, and general policy background — never the raw receipt number. That's not a policy promise; it's how the prompt-building code is actually written. The one exception: our paid-tier letter-drafting tool includes the receipt number in the letter itself, since the letter has to name the case to USCIS or a congressional office — sent to the same AI provider solely to help draft that letter.
 
 **What happens if a user wants their data deleted?**
-Removing an individual case is immediate and self-serve. Full account deletion is a request — email `privacy@casewhy.com` and it's completed within 30 days. We caught and corrected a discrepancy in our own privacy policy wording while preparing for this demo (it had implied a settings-page delete button that doesn't actually exist) — fixed it rather than leaving it, since we'd rather over-disclose than have you find it first.
+Removing an individual case is immediate and self-serve. Full account deletion is a request — email `privacy@casewhy.com` and it's completed within 30 days.
 
 **Who else receives any case data?**
 USCIS itself (to retrieve status), our AI provider (as described above), our email provider (to send notifications), and — for a paid-tier congressional-representative lookup only — the U.S. Census Bureau's public geocoding API. No advertising, no data brokers, no sale of personal information, ever.
 
 **What's your security posture, honestly?**
-HTTPS/TLS everywhere via our hosting platform, encryption at rest for sensitive fields, a single fail-closed admin allowlist, and no hardcoded secrets anywhere in the codebase (verified before this demo). Two honest gaps: we don't yet have custom security-header configuration (CSP/HSTS) layered on top of the platform defaults, and we don't run a formal automated dependency-vulnerability scan. Neither is hidden — both are on our list.
+HTTPS/TLS everywhere via our hosting platform, encryption at rest for sensitive fields, a single fail-closed admin allowlist, and no hardcoded secrets anywhere in the codebase. Two honest gaps: we don't yet have custom security-header configuration (CSP/HSTS) layered on top of the platform defaults, and we don't run a formal automated dependency-vulnerability scan. Neither is hidden — both are on our list.
 
 ---
 

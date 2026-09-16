@@ -1,0 +1,83 @@
+name: Cron
+
+# Round 112 Part B — replaces cron-job.org, which every prior round
+# (70/85/89/90/91/93) needed as a real Peter login-gated step just to
+# register a job. GitHub Actions' own `schedule` trigger only ever reads
+# the workflow file from the repo's DEFAULT branch (currently `main`, not
+# `nextjs-app` where the actual app lives) -- this exact file must also be
+# committed to `main` or none of these will ever fire, a real GitHub
+# behavior easy to miss. Keeping a copy here on `nextjs-app` too so future
+# Code sessions edit it in the branch they actually work in; if this file
+# changes, push the same change to `main` as well.
+#
+# Auth: every job hits its route with `Authorization: Bearer
+# ${{ secrets.ADMIN_DIAG_SECRET }}` -- isAuthorizedCronRequest() (see
+# src/lib/auth/cron-auth.ts) accepts this as an alternate to CRON_SECRET
+# on every route below (check-status/poll-aliases were extended to use it
+# in this same round, specifically so this migration wouldn't need
+# Peter to look up CRON_SECRET's real value, which this session has never
+# been able to read back out of Vercel).
+#
+# Schedules below are this round's own real design decisions, not
+# guessed-and-hoped: poll-aliases at 5 min (GitHub Actions' finest cron
+# granularity) to keep round 70's security@/legal@/abuse@ 5-min internal
+# cadence actually tight; poll-marketing-sources hourly (no prior
+# documented cadence existed -- its own daily-cap logic already bounds
+# volume, so hourly polling is just "notice new items promptly," not a
+# volume control); poll-policy-news at 30 min (the low end of round 90's
+# documented "every 30-60 min"); the rest match their own round's already-
+# documented cadence exactly.
+
+on:
+  schedule:
+    - cron: "0 13 * * *"    # check-status — daily 9:00 AM ET
+    - cron: "*/5 * * * *"   # poll-aliases — every 5 min
+    - cron: "0 * * * *"     # poll-marketing-sources — hourly
+    - cron: "*/30 * * * *"  # poll-policy-news — every 30 min
+    - cron: "0 12 * * 1"    # render-content-briefs — weekly, Monday 8:00 AM ET
+    - cron: "0 13 * * 1"    # weekly-attribution-digest — weekly, Monday 9:00 AM ET
+    - cron: "0 12 1 * *"    # generate-ops-tasks — monthly, 1st at 8:00 AM ET
+  workflow_dispatch: {} # manual run of every job at once, for testing — every route below is idempotent/safe to re-trigger
+
+jobs:
+  check-status:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 13 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sf -X POST https://app.casewhy.com/api/cron/check-status -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
+
+  poll-aliases:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '*/5 * * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sf -X POST https://app.casewhy.com/api/cron/poll-aliases -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
+
+  poll-marketing-sources:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 * * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sf -X POST https://app.casewhy.com/api/cron/poll-marketing-sources -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
+
+  poll-policy-news:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '*/30 * * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sf -X POST https://app.casewhy.com/api/cron/poll-policy-news -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
+
+  render-content-briefs:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 12 * * 1'
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sf -X POST https://app.casewhy.com/api/cron/render-content-briefs -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
+
+  weekly-attribution-digest:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 13 * * 1'
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sf -X POST https://app.casewhy.com/api/cron/weekly-attribution-digest -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
+
+  generate-ops-tasks:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 12 1 * *'
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sf -X POST https://app.casewhy.com/api/cron/generate-ops-tasks -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"

@@ -53,6 +53,10 @@ function getGmailClient() {
   return google.gmail({ version: "v1", auth: getAuthClient() });
 }
 
+// TEMPORARY — exported only for the devcheck-label diagnostic route;
+// remove this export when that route is deleted.
+export const getGmailClientForDebug = getGmailClient;
+
 export interface GmailAliasMessage {
   id: string;
   from: string;

@@ -36,7 +36,15 @@ const PETER_ADDRESS = "peter@casewhy.com";
 // round 86, still unanswered as of this round) — so this map stays empty
 // on purpose until a real email exists to check. Fill it in per-platform
 // only once verified.
-const LABELS = ["Peter/Reddit", "Peter/Facebook", "Peter/Quora"];
+//
+// Round 113 — renamed to match Peter's own live label reorganization
+// (confirmed via a real label-list dump the same day): flat "Peter/*"
+// labels no longer exist; he moved them under "Social Media/Peter/*"
+// alongside the rest of the social-mail hierarchy. createLabelIfMissing
+// is idempotent either way, but the old flat names would have created
+// stale duplicates instead of recognizing the real, already-existing
+// labels.
+const LABELS = ["Social Media/Peter/Reddit", "Social Media/Peter/Facebook", "Social Media/Peter/Quora"];
 const CONFIRMED_PLATFORM_DOMAINS: Record<string, string> = {};
 
 export async function POST(request: Request) {

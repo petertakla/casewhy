@@ -30,6 +30,7 @@
 
 import { createHmac, randomBytes } from "crypto";
 import type { Poster } from "./types";
+import { assertXWriteBudget } from "./x-rate-limit";
 
 const X_API_BASE = "https://api.x.com/2/tweets";
 
@@ -108,6 +109,12 @@ export const postToX: Poster = async (item) => {
     .map((p) => p.trim())
     .filter(Boolean);
   if (posts.length === 0) throw new Error("X poster: empty draft, nothing to post.");
+
+  // Round 112 Part B — checked before any real API call, not after a
+  // partial failure mid-thread. See x-rate-limit.ts's own comment for why
+  // this counts real posted writes from marketing_queue rather than
+  // calling X's own usage endpoint.
+  await assertXWriteBudget(posts.length);
 
   let previousId: string | null = null;
   let firstId: string | null = null;

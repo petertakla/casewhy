@@ -5,6 +5,7 @@ import { isAdminEmail } from "@/lib/auth/admin";
 import { getDb } from "@/lib/db/client";
 import { communitySourceConfigs } from "@/lib/db/schema";
 import { getDailyDraftCap, getSpanishSocialEnabled, getGeminiVideoMonthlyCap } from "@/lib/marketing/config";
+import { getMonthlyXWriteCount, X_FREE_TIER_MONTHLY_WRITE_LIMIT } from "@/lib/marketing/posters/x-rate-limit";
 import { MarketingSettingsForm } from "./MarketingSettingsForm";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +23,7 @@ export default async function MarketingSettingsPage() {
   }
 
   const db = getDb();
-  const [subreddits, dailyCap, spanishSocialEnabled, geminiVideoCap] = await Promise.all([
+  const [subreddits, dailyCap, spanishSocialEnabled, geminiVideoCap, xWriteCount] = await Promise.all([
     db
       .select({
         id: communitySourceConfigs.id,
@@ -35,14 +36,22 @@ export default async function MarketingSettingsPage() {
     getDailyDraftCap(),
     getSpanishSocialEnabled(),
     getGeminiVideoMonthlyCap(),
+    getMonthlyXWriteCount(),
   ]);
 
   return (
     <div>
       <h1 className="text-2xl font-bold tracking-tight">Marketing settings</h1>
-      <p className="mb-8 mt-2 text-muted">
+      <p className="mb-2 mt-2 text-muted">
         The subreddit reference list and the daily draft cap, live-editable. Guardrails and channel-specific rules
         are still a document, not a setting — see <code>SOCIAL_MEDIA_GUARDRAILS.md</code>.
+      </p>
+      <p className="mb-8 text-sm text-muted">
+        X free-tier writes this calendar month:{" "}
+        <strong className={xWriteCount >= X_FREE_TIER_MONTHLY_WRITE_LIMIT * 0.9 ? "text-red-500" : "text-foreground"}>
+          {xWriteCount} / {X_FREE_TIER_MONTHLY_WRITE_LIMIT}
+        </strong>{" "}
+        (each tweet in a thread counts separately; posting refuses once this would go over).
       </p>
       <MarketingSettingsForm
         subreddits={subreddits}

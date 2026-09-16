@@ -253,7 +253,7 @@ const GROUPS: FaqGroup[] = [
       {
         question: "¿Qué pasa con mis datos si cancelo o elimino mi cuenta?",
         answer:
-          "Si elimina su cuenta, los datos de su caso se eliminan de forma permanente dentro de 30 días. Usted puede acceder, corregir o eliminar sus datos en cualquier momento desde la configuración de la cuenta, o escribiendo a privacy@casewhy.com.",
+          "Puede eliminar un caso rastreado individual en cualquier momento desde su panel — se borra de inmediato. La eliminación completa de la cuenta es una solicitud, no un botón de autoservicio: escriba a privacy@casewhy.com y su cuenta y los datos de su caso se eliminan permanentemente dentro de 30 días.",
       },
     ],
   },

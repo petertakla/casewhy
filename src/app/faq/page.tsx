@@ -280,7 +280,7 @@ const GROUPS: FaqGroup[] = [
       {
         question: "What happens to my data if I cancel or delete my account?",
         answer:
-          "If you delete your account, your case data is permanently deleted within 30 days. You can access, correct, or delete your data at any time from account settings, or by emailing privacy@casewhy.com.",
+          "You can remove an individual tracked case at any time from your dashboard — that deletes it immediately. Full account deletion is a request, not a self-serve button: email privacy@casewhy.com and your account and case data are permanently deleted within 30 days.",
       },
     ],
   },

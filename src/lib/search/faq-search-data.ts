@@ -145,7 +145,7 @@ export const FAQ_SEARCH_ENTRIES: FaqSearchEntry[] = [
     groupEs: "Privacidad y sus datos",
     question: "What happens to my data if I cancel or delete my account?",
     questionEs: "¿Qué pasa con mis datos si cancelo o elimino mi cuenta?",
-    snippet: "If you delete your account, your case data is permanently deleted within 30 days.",
-    snippetEs: "Si elimina su cuenta, los datos de su caso se eliminan de forma permanente dentro de 30 días.",
+    snippet: "Remove a case anytime from your dashboard; full account deletion is a request to privacy@casewhy.com, done within 30 days.",
+    snippetEs: "Elimine un caso en cualquier momento desde su panel; la eliminación completa de la cuenta es una solicitud a privacy@casewhy.com, en un plazo de 30 días.",
   },
 ];

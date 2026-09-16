@@ -281,6 +281,13 @@
       "when": 1789516074966,
       "tag": "0039_dear_abomination",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1789578743033,
+      "tag": "0040_add_ops_tasks",
+      "breakpoints": true
     }
   ]
 }

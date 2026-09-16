@@ -25,6 +25,7 @@ import { getDb } from "@/lib/db/client";
 import { trackedCases } from "@/lib/db/schema";
 import { UscisApiError } from "@/lib/uscis/client";
 import { checkTrackedCaseNow } from "@/lib/uscis/check-status";
+import { isAuthorizedCronRequest } from "@/lib/auth/cron-auth";
 
 export const maxDuration = 60;
 // Leaves real margin under maxDuration for the in-flight row and the
@@ -32,9 +33,13 @@ export const maxDuration = 60;
 const TIME_BUDGET_MS = 45_000;
 
 export async function POST(request: Request) {
-  const expected = process.env.CRON_SECRET;
-  const authHeader = request.headers.get("authorization");
-  if (!expected || authHeader !== `Bearer ${expected}`) {
+  // Round 112 Part B — switched from a raw CRON_SECRET-only check to the
+  // shared isAuthorizedCronRequest() helper (same as every other cron
+  // route) so the GitHub Actions cron migration can authenticate with
+  // ADMIN_DIAG_SECRET without needing the real CRON_SECRET value, which
+  // this session has never been able to read back out of Vercel. Purely
+  // additive: CRON_SECRET still works exactly as before.
+  if (!isAuthorizedCronRequest(request)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 

@@ -21,6 +21,7 @@ import {
 } from "@/lib/email-aliases/gmail-client";
 import { draftAliasResponse } from "@/lib/email-aliases/draft-response";
 import { sendUrgentAliasAlert } from "@/lib/email/postmark";
+import { isAuthorizedCronRequest } from "@/lib/auth/cron-auth";
 
 export const maxDuration = 60;
 const TIME_BUDGET_MS = 45_000;
@@ -32,9 +33,10 @@ function isDue(config: { lastPolledAt: Date | null; pollIntervalMinutes: number 
 }
 
 export async function POST(request: Request) {
-  const expected = process.env.CRON_SECRET;
-  const authHeader = request.headers.get("authorization");
-  if (!expected || authHeader !== `Bearer ${expected}`) {
+  // Round 112 Part B — switched to the shared isAuthorizedCronRequest()
+  // helper (same as every other cron route); see check-status/route.ts's
+  // identical comment for why.
+  if (!isAuthorizedCronRequest(request)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 

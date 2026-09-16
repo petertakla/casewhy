@@ -5,7 +5,7 @@
 
 import { count, eq, inArray } from "drizzle-orm";
 import { getDb } from "../db/client";
-import { marketingQueue, pendingAliasActions, pendingBacklinkOutreach } from "../db/schema";
+import { marketingQueue, pendingAliasActions, pendingBacklinkOutreach, opsTasks } from "../db/schema";
 import { ADMIN_NAV } from "./nav";
 
 async function pendingQueueCount(): Promise<number> {
@@ -35,10 +35,20 @@ async function pendingBacklinkDraftsCount(): Promise<number> {
   return row?.n ?? 0;
 }
 
+async function pendingOpsTasksCount(): Promise<number> {
+  const db = getDb();
+  const [row] = await db
+    .select({ n: count() })
+    .from(opsTasks)
+    .where(eq(opsTasks.status, "pending"));
+  return row?.n ?? 0;
+}
+
 const COUNTERS: Record<string, () => Promise<number>> = {
   "/admin/marketing": pendingQueueCount,
   "/admin/inbox": pendingAliasRepliesCount,
   "/admin/backlink-outreach": pendingBacklinkDraftsCount,
+  "/admin/ops-tasks": pendingOpsTasksCount,
 };
 
 /** href -> live pending count, for every registry entry with hasPendingCount. */

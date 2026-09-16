@@ -18,7 +18,7 @@ export interface AdminNavEntry {
   href: string;
   label: string;
   labelEs: string;
-  group: "Marketing" | "Content" | "Mail" | "Outreach" | "Billing";
+  group: "Marketing" | "Content" | "Mail" | "Outreach" | "Billing" | "Ops";
   description: string;
   /** True for entries nav-counts.ts's getAdminPendingCounts() computes a live number for. */
   hasPendingCount?: boolean;
@@ -122,9 +122,17 @@ export const ADMIN_NAV: AdminNavEntry[] = [
     description: "Every Plus subscription, its status, and the customer portal history.",
     external: true,
   },
+  {
+    href: "/admin/ops-tasks",
+    label: "Ops tasks",
+    labelEs: "Tareas operativas",
+    group: "Ops",
+    description: "Recurring tasks that need a real human step, e.g. the monthly processing-times refresh.",
+    hasPendingCount: true,
+  },
 ];
 
-export const ADMIN_NAV_GROUPS = ["Marketing", "Content", "Mail", "Outreach", "Billing"] as const;
+export const ADMIN_NAV_GROUPS = ["Marketing", "Content", "Mail", "Outreach", "Billing", "Ops"] as const;
 
 export function findAdminNavEntry(pathname: string): AdminNavEntry | undefined {
   // Longest-href-first so a child route (e.g. /admin/marketing/log)

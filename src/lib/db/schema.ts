@@ -1519,3 +1519,33 @@ export const updatesOverrides = pgTable("updates_overrides", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   updatedBy: text("updated_by").notNull(),
 });
+
+// Round 112 Part B — a generic queue for recurring tasks that can't be
+// fully automated end to end (the actual work needs a real human step,
+// e.g. re-driving egov.uscis.gov's Cloudflare-blocked processing-times
+// page in a real browser), so the useful automatable half is: notice when
+// one is due and put it somewhere Peter/Code will actually see it,
+// instead of relying on someone reading a CI log line nobody's watching.
+// One row per due occurrence, not one evergreen row per type -- same
+// plain-status-enum shape as marketingQueue/pendingAliasActions, so a
+// completed run stays in history rather than being overwritten.
+export const opsTaskStatusEnum = pgEnum("ops_task_status", ["pending", "done", "dismissed"]);
+
+export const opsTasks = pgTable(
+  "ops_tasks",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    // A stable machine key (e.g. "processing-times-refresh") -- the
+    // generator route uses this, not the title, to check whether an open
+    // task of this type already exists before creating a duplicate.
+    type: text("type").notNull(),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    status: opsTaskStatusEnum("status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (table) => [index("ops_tasks_type_status_idx").on(table.type, table.status)]
+);

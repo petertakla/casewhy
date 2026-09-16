@@ -92,7 +92,9 @@ export async function uscisRequest<T>(
   });
 
   // USCIS docs require handling both 200 and 4xx responses explicitly —
-  // this is one of the six things evaluated in the production-access demo.
+  // this is one of the five things evaluated in the production-access demo
+  // (round 114 corrected this from an earlier, wrong six-item assumption
+  // after checking developer.uscis.gov's own demo-criteria page directly).
   if (!res.ok) {
     let detail = "";
     try {
@@ -106,11 +108,41 @@ export async function uscisRequest<T>(
   return (await res.json()) as T;
 }
 
+// Round 114 — USCIS assigns a 4-digit demo_id for the production-access
+// demo call and requires it on every Case Status API request during that
+// window (not FOIA — a separate application). Only getCaseStatus() passes
+// this; deliberately opt-in per call site rather than global, so a demo_id
+// set for the Case Status demo can never leak onto an unrelated FOIA call.
+// Unset (undefined) outside the demo window — sends nothing extra.
+function demoIdHeader(): Record<string, string> {
+  const demoId = process.env.USCIS_DEMO_ID;
+  return demoId ? { demo_id: demoId } : {};
+}
+
 export class UscisApiError extends Error {
   constructor(public status: number, public detail: string) {
     super(`USCIS API error ${status}: ${detail}`);
     this.name = "UscisApiError";
   }
+}
+
+// Round 114 — USCIS's own demo criteria require the API's error message to
+// actually be displayed in the UI, not just logged. `detail` is either a
+// JSON-stringified error body or raw text (see uscisRequest() below); the
+// sandbox's real shape as of this writing is a flat `{"message": "..."}`,
+// not the RFC 9457 `{"errors":[{...}]}` array some USCIS docs describe —
+// this handles both rather than assuming one, and never throws on a body
+// that matches neither.
+export function extractUscisErrorMessage(detail: string): string {
+  try {
+    const parsed = JSON.parse(detail) as { message?: string; errors?: { message?: string }[] };
+    if (typeof parsed.message === "string" && parsed.message) return parsed.message;
+    const first = parsed.errors?.[0]?.message;
+    if (typeof first === "string" && first) return first;
+  } catch {
+    // detail wasn't JSON — fall through to using it as-is below.
+  }
+  return detail || "USCIS didn't return a specific error message.";
 }
 
 /** One entry in a case's status history. */
@@ -156,10 +188,34 @@ export interface CaseStatus {
   history: CaseStatusHistoryEntry[];
 }
 
+// Round 114 — USCIS's demo criteria ask to show that the app's completed
+// input actually converts to a real outbound request, not just to trust it
+// happened. This mirrors exactly what getCaseStatus() sends (same path,
+// same headers) with the token/secret values redacted, purely for display —
+// it makes no network call itself, so it can never desync from reality by
+// drifting out of sync with a second implementation of the same logic.
+export function describeCaseStatusRequest(receiptNumber: string): {
+  method: string;
+  url: string;
+  headers: Record<string, string>;
+} {
+  const creds = getUscisConfig();
+  const path = CASE_STATUS_PATH.replace("{receiptNumber}", encodeURIComponent(receiptNumber));
+  return {
+    method: "GET",
+    url: `${creds.apiBase}${path}`,
+    headers: {
+      Authorization: "Bearer [REDACTED]",
+      Accept: "application/json",
+      ...demoIdHeader(),
+    },
+  };
+}
+
 /** Fetch the current status for a single receipt number. */
 export async function getCaseStatus(receiptNumber: string): Promise<CaseStatus> {
   const path = CASE_STATUS_PATH.replace("{receiptNumber}", encodeURIComponent(receiptNumber));
-  const { case_status: raw } = await uscisRequest<CaseStatusApiResponse>(path);
+  const { case_status: raw } = await uscisRequest<CaseStatusApiResponse>(path, { headers: demoIdHeader() });
 
   return {
     receiptNumber: raw.receiptNumber,

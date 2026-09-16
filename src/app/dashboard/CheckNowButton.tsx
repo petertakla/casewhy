@@ -36,6 +36,8 @@ export function CheckNowButton({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [checkedAt, setCheckedAt] = useState(lastCheckedAt);
+  const [requestPreview, setRequestPreview] = useState<{ method: string; url: string; headers: Record<string, string> } | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   if (!canCheckNow) {
     return (
@@ -58,7 +60,7 @@ export function CheckNowButton({
   }
 
   return (
-    <div className="mt-1.5 flex items-center gap-2 text-xs text-muted">
+    <div className="relative mt-1.5 flex items-center gap-2 text-xs text-muted">
       <span>{formatCheckedAt(checkedAt, es)}</span>
       <span>·</span>
       <button
@@ -68,8 +70,9 @@ export function CheckNowButton({
           startTransition(async () => {
             setError(null);
             try {
-              await checkCaseNow(trackedCaseId);
+              const result = await checkCaseNow(trackedCaseId);
               setCheckedAt(new Date());
+              setRequestPreview(result.requestPreview);
             } catch (err) {
               setError(err instanceof Error ? err.message : es ? "Algo salió mal." : "Something went wrong.");
             }
@@ -80,6 +83,24 @@ export function CheckNowButton({
         {isPending ? (es ? "Revisando…" : "Checking…") : es ? "Revisar ahora" : "Check now"}
       </button>
       {error && <span className="text-red-500">{error}</span>}
+      {requestPreview && (
+        <button
+          type="button"
+          onClick={() => setShowPreview((v) => !v)}
+          className="text-muted underline decoration-dotted hover:text-foreground"
+        >
+          {showPreview ? (es ? "Ocultar detalles técnicos" : "Hide technical details") : es ? "Ver detalles técnicos" : "Show technical details"}
+        </button>
+      )}
+      {requestPreview && showPreview && (
+        <pre className="absolute left-0 top-full z-10 mt-1 max-w-md whitespace-pre-wrap rounded-lg border border-border-strong bg-surface p-3 font-mono text-[10px] text-foreground shadow-lg">
+          {requestPreview.method} {requestPreview.url}
+          {"\n"}
+          {Object.entries(requestPreview.headers)
+            .map(([k, v]) => `${k}: ${v}`)
+            .join("\n")}
+        </pre>
+      )}
     </div>
   );
 }

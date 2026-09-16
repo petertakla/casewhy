@@ -7,7 +7,7 @@ import { getDb } from "@/lib/db/client";
 import { trackedCases } from "@/lib/db/schema";
 import { encryptField, decryptField } from "@/lib/db/crypto";
 import { getSubscriptionTier, getSubscriptionDetails, TIER_LIMITS, PLUS_HARD_CEILING_MAX_CASES } from "@/lib/billing/tier";
-import { UscisApiError } from "@/lib/uscis/client";
+import { UscisApiError, extractUscisErrorMessage, describeCaseStatusRequest } from "@/lib/uscis/client";
 import { checkTrackedCaseNow } from "@/lib/uscis/check-status";
 import { CASE_TYPES } from "@/lib/kb/case-type-timeline";
 import { subscriptions } from "@/lib/db/schema";
@@ -62,7 +62,9 @@ export async function getTrackedCases(userId: string): Promise<TrackedCase[]> {
  * once-daily cron). Reuses the exact same fetch/notify/update logic the
  * cron job runs per-row, just for one case, right now.
  */
-export async function checkCaseNow(trackedCaseId: string): Promise<{ statusText: string }> {
+export async function checkCaseNow(
+  trackedCaseId: string
+): Promise<{ statusText: string; requestPreview: { method: string; url: string; headers: Record<string, string> } }> {
   const { data: session } = await auth.getSession();
   if (!session?.user) {
     throw new Error("Sign in required.");
@@ -85,19 +87,27 @@ export async function checkCaseNow(trackedCaseId: string): Promise<{ statusText:
     throw new Error("This case is pending review and can't be checked yet.");
   }
 
+  // Round 114 — built for the USCIS demo's "show the JSON payload" step,
+  // but real going forward, not a demo-only hack: gives any Plus user real
+  // visibility into the actual outbound request their click triggers.
+  const requestPreview = describeCaseStatusRequest(decryptField(row.receiptNumber));
+
   let result;
   try {
     result = await checkTrackedCaseNow(row);
   } catch (err) {
+    // Round 114 — USCIS's own demo criteria require their API's error
+    // message to actually reach the UI, not be swallowed for a generic
+    // string (CheckNowButton.tsx already renders whatever this throws).
     throw new Error(
       err instanceof UscisApiError
-        ? "Couldn't reach USCIS right now. Please try again shortly."
+        ? `USCIS: ${extractUscisErrorMessage(err.detail)}`
         : "Something went wrong checking this case."
     );
   }
 
   revalidatePath("/dashboard");
-  return { statusText: result.status.statusText };
+  return { statusText: result.status.statusText, requestPreview };
 }
 
 /**

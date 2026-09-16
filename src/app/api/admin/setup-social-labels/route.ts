@@ -27,15 +27,27 @@ export async function POST() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Round 113 -- real labels and the filter go through two different
+  // Gmail API scopes (gmail.labels vs. gmail.settings.basic, the latter
+  // never granted per round 86/87's own already-documented finding).
+  // Reporting partial success on a mid-sequence failure, not swallowing
+  // real progress behind one thrown error.
+  const labelResults: Record<string, string> = {};
   try {
-    const labelResults: Record<string, string> = {};
     for (const label of SOCIAL_LABELS) {
       labelResults[label] = await createLabelIfMissing(label);
     }
+  } catch (err) {
+    return NextResponse.json(
+      { labels: labelResults, catchAllFilter: null, filterError: err instanceof Error ? err.message : String(err), stage: "labels" },
+      { status: 500 }
+    );
+  }
 
+  try {
     const otherLabelId = await getLabelId("Social/Other");
     if (!otherLabelId) {
-      return NextResponse.json({ error: "Social/Other label id not found right after creating it." }, { status: 500 });
+      return NextResponse.json({ labels: labelResults, error: "Social/Other label id not found right after creating it." }, { status: 500 });
     }
 
     const toAddress = "social@casewhy.com";
@@ -49,6 +61,9 @@ export async function POST() {
 
     return NextResponse.json({ labels: labelResults, catchAllFilter: filterResult });
   } catch (err) {
-    return NextResponse.json({ error: err instanceof Error ? err.message : String(err) }, { status: 500 });
+    return NextResponse.json(
+      { labels: labelResults, catchAllFilter: null, filterError: err instanceof Error ? err.message : String(err), stage: "filter" },
+      { status: 500 }
+    );
   }
 }

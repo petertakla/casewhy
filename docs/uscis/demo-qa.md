@@ -69,6 +69,9 @@ The format (3 letters + 10 digits) gets real-time client-side feedback as you ty
 **Does the error message actually reach the screen, or just the logs?**
 It reaches the screen — the on-demand check button shows USCIS's actual message directly, not a generic substitute.
 
+**What about rate-limit (429), server-error (5xx), or timeout responses?**
+Every one of those goes through the exact same error-display path as the 422/404 above — there's no special-casing that could silently diverge. We've directly observed a real 429 once during sandbox testing (see the rate-limiting section) and it was handled cleanly; 5xx and auth-failure responses haven't occurred live but would route through the identical code. A 15-second client-side timeout was added specifically so a hung request can't wait forever. *See the response-code table in technical-brief.md, Section 4.*
+
 **Do you retry on failure?**
 No automatic retries in the API client — a failed call is reported as an error for that specific check, so we're not compounding load on USCIS's API with a retry storm. The next scheduled check will naturally try again.
 
@@ -79,11 +82,11 @@ No — our status-check job only holds a decrypted receipt number in memory for 
 
 ## Rate limiting and volume
 
-**What's your current and projected call volume?**
-Today: a small number of daily calls, one per actively tracked case, on a fixed schedule — volume scales with how many cases our users track, not with site traffic. There's no user-facing action that fires an uncapped burst of API calls; even our paid tier's "check now" feature is gated by a real human click.
+**What's your current and projected call volume, and is there a real limit, not just a documented plan?**
+Today: a small number of daily calls, one per actively tracked case, on a fixed schedule — volume scales with how many cases our users track, not with site traffic. There's a real, enforced hard cap in the client itself, not just documented pacing: no more than 1,000 calls per day and no more than 4 per second, checked before every call and refused (with a logged alert) if either would be exceeded. Those thresholds match the sandbox's own confirmed limits; we'll raise them once USCIS shares the real production quota. *See "Rate limiting and volume" in technical-brief.md.*
 
 **Have you actually load-tested against the sandbox?**
-Yes — a real 5-business-day sandbox volume test, September 14–18, 2026, using our actual production code path, not a mock. ~900 calls/day, under the sandbox's published 1,000/day, 5-TPS ceiling. Zero quota-exceeded responses, zero unexpected errors, every day so far. *See technical-brief.md Section 10 for exact numbers as of the demo date.*
+Yes — a real 5-business-day sandbox volume test, September 14–18, 2026, using our actual production code path, not a mock. ~900 calls/day, under the sandbox's published 1,000/day, 5-TPS ceiling. One real `429` occurred once, Tuesday, one call out of 50 in a single batch — the next scheduled batch completed cleanly, and it hasn't repeated. We're telling you that rather than claiming a suspiciously perfect record. *See "Sandbox testing" in technical-brief.md for current day-by-day numbers.*
 
 **Do you cache results, or hit the API on every page load?**
 Results are cached in our own database between scheduled checks — a user viewing their dashboard isn't triggering a new USCIS API call; they're seeing the last fetched result.
@@ -135,10 +138,10 @@ Form type, processing center, dates, status text, history, and general policy ba
 Removing an individual case is immediate and self-serve. Full account deletion is a request — email `privacy@casewhy.com` and it's completed within 30 days.
 
 **Who else receives any case data?**
-USCIS itself (to retrieve status), our AI provider (as described above), our email provider (to send notifications), and — for a paid-tier congressional-representative lookup only — the U.S. Census Bureau's public geocoding API. No advertising, no data brokers, no sale of personal information, ever.
+USCIS itself (to retrieve status), Anthropic (status text, dates, and history for AI explanations, plus the receipt number specifically for the letter-drafting exception above), Postmark (the notification email address and status text, to send emails), Vercel and Neon (infrastructure — hosting and database, no independent access to decrypted data outside our own code), Stripe (billing information only, never case data), and — for a paid-tier congressional-representative lookup only — the U.S. Census Bureau's public geocoding API. No advertising, no data brokers, no sale of personal information, ever.
 
 **What's your security posture, honestly?**
-HTTPS/TLS everywhere via our hosting platform, encryption at rest for sensitive fields, a single fail-closed admin allowlist, and no hardcoded secrets anywhere in the codebase. Two honest gaps: we don't yet have custom security-header configuration (CSP/HSTS) layered on top of the platform defaults, and we don't run a formal automated dependency-vulnerability scan. Neither is hidden — both are on our list.
+HTTPS/TLS everywhere, security headers (HSTS, a Content-Security-Policy, and the standard set) on every response, encryption at rest for sensitive fields, a single fail-closed admin allowlist, and no hardcoded secrets anywhere in the codebase. Automated dependency monitoring runs via Dependabot, with `npm audit` also visible in CI. One honest, tracked-not-hidden gap: two pre-existing findings in transitive dev-tooling dependencies (not runtime application code) are open pending a deliberate major-version upgrade we didn't want to force through days before this demo.
 
 ---
 

@@ -22,6 +22,16 @@ jobs:
       - run: npm run check:language-switcher
       - run: npm run check:processing-times-age
       - run: npm run check:founder-name
+      # Round 114 follow-up (Cloud review) — real visibility, not a hard
+      # gate: two pre-existing transitive dev-tooling vulnerabilities
+      # (drizzle-kit's esbuild dep, postcss via next) need a deliberate,
+      # tested major-version upgrade (next 16, drizzle-kit 0.18.1) to
+      # clear, not a same-day forced fix days before a federal demo.
+      # continue-on-error keeps this from blocking CI while findings
+      # exist; Dependabot (.github/dependabot.yml) is the actual
+      # remediation path, opening PRs as fixes become available.
+      - run: npm audit --audit-level=high
+        continue-on-error: true
       - run: npm run build
         env:
           USCIS_ENV: sandbox

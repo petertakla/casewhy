@@ -13,6 +13,7 @@
 //     omitted for those — see RawCaseStatus below.
 
 import { getUscisConfig } from "@/lib/config";
+import { assertUscisCallBudget } from "@/lib/uscis/rate-limit";
 
 const CASE_STATUS_PATH = "/case-status/{receiptNumber}";
 
@@ -82,14 +83,32 @@ export async function uscisRequest<T>(
   const creds = credentials ?? getUscisConfig();
   const token = await getAccessToken(creds);
 
-  const res = await fetch(`${creds.apiBase}${path}`, {
-    ...init,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-      ...init.headers,
-    },
-  });
+  // Round 114 follow-up (Cloud review) — a real gap: no timeout existed at
+  // all, meaning a hung USCIS response could leave a request (and the
+  // Vercel function serving it) waiting indefinitely. 15s is comfortably
+  // under Vercel's own function timeout for these routes.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15_000);
+
+  let res: Response;
+  try {
+    res = await fetch(`${creds.apiBase}${path}`, {
+      ...init,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        ...init.headers,
+      },
+      signal: controller.signal,
+    });
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new UscisApiError(0, JSON.stringify({ message: "Request to USCIS timed out after 15 seconds." }));
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   // USCIS docs require handling both 200 and 4xx responses explicitly —
   // this is one of the five things evaluated in the production-access demo
@@ -214,6 +233,7 @@ export function describeCaseStatusRequest(receiptNumber: string): {
 
 /** Fetch the current status for a single receipt number. */
 export async function getCaseStatus(receiptNumber: string): Promise<CaseStatus> {
+  await assertUscisCallBudget();
   const path = CASE_STATUS_PATH.replace("{receiptNumber}", encodeURIComponent(receiptNumber));
   const { case_status: raw } = await uscisRequest<CaseStatusApiResponse>(path, { headers: demoIdHeader() });
 

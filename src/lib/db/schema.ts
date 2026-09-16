@@ -1549,3 +1549,20 @@ export const opsTasks = pgTable(
   },
   (table) => [index("ops_tasks_type_status_idx").on(table.type, table.status)]
 );
+
+// Round 114 follow-up (Cloud review) — a real, enforced hard cap on
+// USCIS Case Status API call volume, not just documented pacing. One row
+// per real outbound call, checked before the call is made (see
+// assertUscisCallBudget() in src/lib/uscis/rate-limit.ts) -- both a daily
+// count and a rolling 1-second window are computed from this same table,
+// so it's the single source of truth for both caps.
+export const uscisApiCallLog = pgTable(
+  "uscis_api_call_log",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    calledAt: timestamp("called_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("uscis_api_call_log_called_at_idx").on(table.calledAt)]
+);

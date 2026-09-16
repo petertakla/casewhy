@@ -27,6 +27,52 @@ const nextConfig: NextConfig = {
   // this is a deliberate belt-and-suspenders addition, not just a copy of
   // what already failed.
   serverExternalPackages: ["ffmpeg-static", "sharp"],
+  // Round 114 follow-up (Cloud review) — baseline security headers were a
+  // real, previously-undisclosed gap (the technical brief said so
+  // honestly). HSTS/nosniff/frame-deny/referrer-policy are always safe,
+  // non-breaking additions. The CSP is deliberately conservative rather
+  // than maximally strict: this app has no next/image remote domains, no
+  // externally-hosted fonts (next/font/google self-hosts at build time),
+  // and Stripe Checkout/Billing Portal are hosted redirects, not embedded
+  // iframes/scripts (round 13's own design choice, "keeps this out of any
+  // real PCI scope") -- so 'self' covers almost everything real. Verified
+  // locally (sign-in, dashboard, /plus checkout redirect) before shipping,
+  // not assumed safe from reading the code alone.
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              // Next.js App Router ships inline hydration/RSC payload
+              // scripts -- 'unsafe-inline' on script-src is required for
+              // the app to function at all without a nonce-based setup,
+              // which is a larger change than this pass's scope.
+              "script-src 'self' 'unsafe-inline'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: blob:",
+              "font-src 'self' data:",
+              "connect-src 'self'",
+              // Stripe Checkout/Billing Portal are top-level redirects
+              // (startCheckout/openBillingPortal), never embedded --
+              // frame-ancestors 'none' both blocks this app from being
+              // framed and doesn't need a form-action allowance beyond self.
+              "frame-ancestors 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+            ].join("; "),
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

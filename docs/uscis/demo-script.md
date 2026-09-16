@@ -9,18 +9,20 @@ Shows USCIS's five real Case Status API criteria, in order: (1) data entry usabi
 ## Before the call
 
 1. **Confirm the `demo_id` step is already done and accepted by USCIS.** USCIS won't send the scheduler link until they've seen proof `demo_id` is wired in — that has to happen before this call can even be booked. See "demo_id setup," below.
-2. **Set up a dedicated demo account with no real PII** — a fresh sign-up, on CaseWhy Plus (so the on-demand check / request-preview / error-detail features are all available live), with cases tracked only under confirmed sandbox test receipt numbers (table at the bottom of this script). Do not use Peter's own real account or any account with a genuine tracked case.
+2. **Set up a dedicated demo account with no real PII** — a fresh sign-up, then upgrade it to Plus via `/plus` → Stripe Checkout using a Stripe test card (`4242 4242 4242 4242`, any future expiry/CVC) — billing is in test mode, so this is a real checkout with no real charge. Plus is needed so the on-demand check / request-preview / error-detail features are all available live. Track cases only under confirmed sandbox test receipt numbers (table at the bottom of this script). Do not use Peter's own real account or any account with a genuine tracked case.
 3. Have `docs/uscis/technical-brief.md` (PDF) and `docs/uscis/demo-qa.md` open or printed.
 4. Keep a second window open with a Cloud session signed in — if a question stumps you, type it in a few words; an answer comes back in under a minute, and you read it back.
 5. Confirm the sandbox is up before the call: it operates 7 AM–8 PM ET only. This call is scheduled 1–2 PM ET, inside that window, but re-check the same morning.
 6. **Rehearse the whole script once against the sandbox, with Code watching the logs, before the demo_id screenshot is even sent.** Not done as of this document being written — do this first.
+7. **Check `app.casewhy.com` loads normally right before the call** (`curl -I https://app.casewhy.com`, or just open it). Vercel's automatic bot/DDoS mitigation has tripped on this domain before from a burst of rapid API calls — exactly what rehearsing this script, or the call itself, looks like. If the site 403s with a "Security Checkpoint" page, run `vercel firewall system-mitigations pause` from a real terminal inside the `casewhy` project directory (it needs an interactive confirmation, so a Cloud session can't run it for you) and re-check.
 
 ## `demo_id` setup (must happen before the call can be scheduled)
 
 1. USCIS assigns a 4-digit ID. Set it as `USCIS_DEMO_ID` in Vercel's production environment (`vercel env add USCIS_DEMO_ID`).
-2. Confirm it's live: use the on-demand check button on any tracked case (Step 2 below) and open "Show technical details" — the `demo_id` header should appear in the redacted request preview. That screenshot *is* the proof USCIS wants.
-3. Email that screenshot to Torch Developer Support. The scheduler link comes back after they see it.
-4. **Remove `USCIS_DEMO_ID` from Vercel after the real demo is done** — it should only be set during the actual demo window, not permanently.
+2. **Redeploy production** (`vercel --prod`) — a new/changed environment variable isn't picked up by already-running functions until the next deploy.
+3. Confirm it's live: use the on-demand check button on any tracked case (Step 2 below) and open "Show technical details" — the `demo_id` header should appear in the redacted request preview. That screenshot *is* the proof USCIS wants.
+4. Email that screenshot to Torch Developer Support. The scheduler link comes back after they see it.
+5. **Remove `USCIS_DEMO_ID` from Vercel and redeploy again after the real demo is done** — it should only be set during the actual demo window, not permanently.
 
 ---
 

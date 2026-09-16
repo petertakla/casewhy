@@ -7,7 +7,7 @@ import { auth } from "@/lib/auth/server";
 import { isAdminEmail } from "@/lib/auth/admin";
 import { getDb } from "@/lib/db/client";
 import { communitySourceConfigs } from "@/lib/db/schema";
-import { setDailyDraftCap, setSpanishSocialEnabled } from "@/lib/marketing/config";
+import { setDailyDraftCap, setSpanishSocialEnabled, setGeminiVideoMonthlyCap } from "@/lib/marketing/config";
 
 async function requireAdmin() {
   const { data: session } = await auth.getSession();
@@ -61,5 +61,14 @@ export async function updateDailyCap(cap: number) {
 export async function toggleSpanishSocial(enabled: boolean) {
   await requireAdmin();
   await setSpanishSocialEnabled(enabled);
+  revalidatePath("/admin/marketing/settings");
+}
+
+// Round 91 — budget guard for /api/cron/render-content-briefs' Veo video
+// generation. Same shape as updateDailyCap above.
+export async function updateGeminiVideoCap(cap: number) {
+  await requireAdmin();
+  if (!Number.isInteger(cap) || cap < 0 || cap > 100) return;
+  await setGeminiVideoMonthlyCap(cap);
   revalidatePath("/admin/marketing/settings");
 }

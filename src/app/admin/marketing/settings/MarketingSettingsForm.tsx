@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { addSubreddit, toggleSubredditEnabled, removeSubreddit, updateDailyCap, toggleSpanishSocial } from "./actions";
+import {
+  addSubreddit,
+  toggleSubredditEnabled,
+  removeSubreddit,
+  updateDailyCap,
+  toggleSpanishSocial,
+  updateGeminiVideoCap,
+} from "./actions";
 
 interface SubredditRow {
   id: string;
@@ -14,14 +21,17 @@ export function MarketingSettingsForm({
   subreddits,
   dailyCap,
   spanishSocialEnabled,
+  geminiVideoCap,
 }: {
   subreddits: SubredditRow[];
   dailyCap: number;
   spanishSocialEnabled: boolean;
+  geminiVideoCap: number;
 }) {
   const [pending, startTransition] = useTransition();
   const [newSubreddit, setNewSubreddit] = useState("");
   const [capInput, setCapInput] = useState(String(dailyCap));
+  const [videoCapInput, setVideoCapInput] = useState(String(geminiVideoCap));
 
   return (
     <div className="space-y-8">
@@ -143,6 +153,40 @@ export function MarketingSettingsForm({
         >
           {spanishSocialEnabled ? "Enabled — turn off" : "Disabled — turn on"}
         </button>
+      </section>
+
+      <section>
+        <h2 className="mb-1 text-base font-semibold text-foreground">Video budget guard</h2>
+        <p className="mb-4 text-sm text-muted">
+          Round 91 — maximum Veo-generated short videos <code>render-content-briefs</code> creates per calendar
+          month. Images (pins, square graphics, stories) aren&apos;t capped — only video, since it&apos;s the
+          expensive generation path.
+        </p>
+        <form
+          className="flex items-center gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const n = parseInt(videoCapInput, 10);
+            if (Number.isFinite(n)) startTransition(() => updateGeminiVideoCap(n));
+          }}
+        >
+          <input
+            type="number"
+            min={0}
+            max={100}
+            value={videoCapInput}
+            onChange={(e) => setVideoCapInput(e.target.value)}
+            disabled={pending}
+            className="w-24 rounded-lg border border-border-strong bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-60"
+          />
+          <button
+            type="submit"
+            disabled={pending || videoCapInput === String(geminiVideoCap)}
+            className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Save
+          </button>
+        </form>
       </section>
 
       <section>

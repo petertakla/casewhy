@@ -1296,8 +1296,83 @@ export const marketingSettings = pgTable("marketing_settings", {
   // per news item, targeted at separate Spanish accounts Peter creates at
   // that time — see the round 90 task doc's Section 4.
   spanishSocialEnabled: boolean("spanish_social_enabled").notNull().default(false),
+  // Round 91 — same shape/reasoning as spanishSocialEnabled above, for the
+  // Gemini graphics/video pipeline's own Phase 2. Peter creates these
+  // accounts and fills the fields in when Phase 2 actually starts (task
+  // doc Section 5) — not now, so every column here is nullable and unused
+  // until then.
+  pinterestBoardEs: text("pinterest_board_es"),
+  youtubeChannelEs: text("youtube_channel_es"),
+  tiktokAccountEs: text("tiktok_account_es"),
+  instagramAccountEs: text("instagram_account_es"),
+  // Round 91 — budget guard for Veo video generation (task doc Section 2:
+  // "config cap on videos/month, default 8"). Checked against a real
+  // count of content_briefs rendered this calendar month before the
+  // weekly cron renders another one, not a separate running counter that
+  // could drift from what actually got generated.
+  geminiVideoMonthlyCap: integer("gemini_video_monthly_cap").notNull().default(8),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// Round 91 — content_briefs: the cloud session's editorial input to the
+// Gemini graphics/video pipeline. Round 42 (the task doc's suggested
+// "existing KB refresh pipeline" for this) was never actually built --
+// checked directly (no data_source column anywhere, no refresh scripts,
+// only a Sep 9 planning note in CLOUD_CLAUDE.md) -- so this is a new
+// table, following this codebase's own established convention for
+// marketing content (marketing_queue, nurture_issues-shaped tables), not
+// a repo JSON/MD folder.
+export const contentBriefPillarEnum = pgEnum("content_brief_pillar", [
+  "founder-story",
+  "status-explained",
+  "processing-times",
+  "visa-bulletin",
+  "delays-and-escalation",
+  "get-help",
+  // Task doc's own "pillar 07" -- a distinct angle within the get-help
+  // territory (who to ask, not just that help exists), kept as its own
+  // value since the task doc numbers it separately from pillar 6.
+  "not-sure-who-to-ask",
+]);
+
+export const contentBriefFormatEnum = pgEnum("content_brief_format", ["pin", "short_video", "square_graphic", "story"]);
+
+export const contentBriefStatusEnum = pgEnum("content_brief_status", ["pending", "rendering", "rendered", "failed"]);
+
+export const contentBriefs = pgTable(
+  "content_briefs",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    pillar: contentBriefPillarEnum("pillar").notNull(),
+    format: contentBriefFormatEnum("format").notNull(),
+    headline: text("headline").notNull(),
+    bodyCopy: text("body_copy").notNull(),
+    imagePrompt: text("image_prompt").notNull(),
+    // Null for pin/square_graphic/story; required for short_video.
+    videoScript: text("video_script"),
+    // Every factual claim needs one (guardrails Section 2) -- same plain-
+    // text-joined-with-"; "-convention as marketingQueue.sourceCitations,
+    // kept consistent rather than introducing jsonb for one field.
+    sources: text("sources").notNull(),
+    // Comma-joined channel names (pinterest, youtube, tiktok, instagram,
+    // facebook) -- same plain-text-list convention as sources above.
+    targetChannels: text("target_channels").notNull(),
+    scheduleAfter: timestamp("schedule_after", { withTimezone: true }).notNull().defaultNow(),
+    locale: text("locale").notNull().default("en"),
+    status: contentBriefStatusEnum("status").notNull().default("pending"),
+    // Null until rendered. The primary generated asset's URL (a pin's
+    // image, a short_video's final stitched MP4) -- individual per-
+    // channel queue items each get their own marketingQueue.mediaRefs
+    // row, this is the brief's own record of what it produced.
+    renderedAssetUrl: text("rendered_asset_url"),
+    renderError: text("render_error"),
+    renderedAt: timestamp("rendered_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("content_briefs_status_idx").on(table.status), index("content_briefs_pillar_idx").on(table.pillar)]
+);
 
 // Round 90 — one row per news/policy item the poll-policy-news watcher has
 // ever seen, across every source in src/lib/marketing/news-watcher/sources.ts.

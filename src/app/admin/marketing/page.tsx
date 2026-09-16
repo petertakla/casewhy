@@ -190,6 +190,7 @@ export default async function MarketingQueueAdminPage({
                       postedUrl={row.postedUrl}
                       reviewedAt={row.reviewedAt}
                       locale={row.locale}
+                      mediaRefs={row.mediaRefs}
                     />
                   ) : (
                     <MarketingQueueCard
@@ -202,6 +203,7 @@ export default async function MarketingQueueAdminPage({
                       sourceCitations={row.sourceCitations}
                       guardrailNotes={row.guardrailNotes}
                       locale={row.locale}
+                      mediaRefs={row.mediaRefs}
                       blogPost={
                         row.channel === "blog"
                           ? blogPostBySlug.get(row.destination.replace(/^\/updates\//, "")) ?? null

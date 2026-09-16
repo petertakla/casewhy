@@ -15,6 +15,18 @@ const nextConfig: NextConfig = {
   experimental: {
     nodeMiddleware: true,
   } as unknown as NextConfig["experimental"],
+  // Round 91 — ffmpeg-static exports a binary file path, not JS; Next's
+  // server bundler tried to resolve/bundle that path as a module and
+  // failed at runtime ("spawn .../vendor-chunks/ffmpeg ENOENT"), confirmed
+  // by a real local test before this was added. serverExternalPackages
+  // tells Next to leave these packages' own require() calls alone instead
+  // of bundling them, which is what actually lets the binary be found at
+  // its real on-disk path. sharp listed too even though its own test
+  // passed without this -- Vercel's actual serverless bundler can behave
+  // differently from local `next dev` for native/binary-path packages, so
+  // this is a deliberate belt-and-suspenders addition, not just a copy of
+  // what already failed.
+  serverExternalPackages: ["ffmpeg-static", "sharp"],
 };
 
 export default nextConfig;

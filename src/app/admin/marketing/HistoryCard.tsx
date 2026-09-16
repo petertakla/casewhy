@@ -27,6 +27,7 @@ export function HistoryCard({
   postedUrl,
   reviewedAt,
   locale,
+  mediaRefs,
 }: {
   channel: string;
   destination: string;
@@ -36,6 +37,8 @@ export function HistoryCard({
   reviewedAt: Date | null;
   /** Round 90 — "en" | "es", shown as a chip. */
   locale?: string;
+  /** Round 91 — the rendered Gemini/Veo asset, for pinterest/youtube/tiktok/instagram/facebook rows. */
+  mediaRefs?: string | null;
 }) {
   return (
     <div className="rounded-2xl border border-border bg-surface p-6 opacity-80">
@@ -53,9 +56,28 @@ export function HistoryCard({
         </span>
       </div>
 
-      <a href={destination} target="_blank" rel="noopener noreferrer" className="mt-2 block text-xs text-brand-600 hover:underline dark:text-brand-400">
-        {destination}
-      </a>
+      {destination.startsWith("http") || destination.startsWith("/") ? (
+        <a href={destination} target="_blank" rel="noopener noreferrer" className="mt-2 block text-xs text-brand-600 hover:underline dark:text-brand-400">
+          {destination}
+        </a>
+      ) : (
+        // Round 91 — same fix as round 94's MarketingQueueCard: "new
+        // post" (pinterest/youtube's own destination convention, no
+        // reply target to link to) isn't a URL; a raw <a href> would be
+        // broken. Plain text instead, same as that round's fix.
+        <span className="mt-2 block font-mono text-xs text-muted">{destination}</span>
+      )}
+
+      {mediaRefs && (
+        <div className="mt-3">
+          {mediaRefs.endsWith(".mp4") ? (
+            <video src={mediaRefs} controls className="max-h-64 rounded-lg border border-border-strong" />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element -- a generated asset URL, not something next/image's optimizer has ever seen
+            <img src={mediaRefs} alt="" className="max-h-64 rounded-lg border border-border-strong" />
+          )}
+        </div>
+      )}
 
       {draftText && <p className="mt-3 whitespace-pre-wrap text-sm text-foreground/80">{draftText}</p>}
 

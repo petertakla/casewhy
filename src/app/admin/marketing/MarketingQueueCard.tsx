@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { markPosted, rejectItem, approveForAutoPost } from "./actions";
-import { REGISTERED_POSTER_CHANNELS } from "@/lib/marketing/posters/registry";
+import { REGISTERED_POSTER_CHANNELS } from "@/lib/marketing/posters/registered-channels";
 import { CHANNEL_LABELS } from "@/lib/marketing/channel-labels";
 import type { UpdatePost } from "@/lib/updates/updates";
+
+const MEDIA_CHANNELS = new Set(["pinterest", "youtube", "tiktok", "instagram", "facebook"]);
 
 export function MarketingQueueCard({
   id,
@@ -16,6 +18,7 @@ export function MarketingQueueCard({
   guardrailNotes,
   locale,
   blogPost,
+  mediaRefs,
 }: {
   id: string;
   channel: string;
@@ -28,6 +31,8 @@ export function MarketingQueueCard({
   locale?: string;
   /** Round 107 — the merged post (repo file + any DB override) for blog rows, fetched by the parent page. undefined for non-blog channels; null if somehow no matching post exists on disk. */
   blogPost?: UpdatePost | null;
+  /** Round 91 — the rendered Gemini/Veo asset URL for pinterest/youtube/tiktok/instagram/facebook rows. Null for every other channel. */
+  mediaRefs?: string | null;
 }) {
   const [text, setText] = useState(draftText ?? "");
   const [pending, setPending] = useState(false);
@@ -159,6 +164,17 @@ export function MarketingQueueCard({
         // 1-intro") -- linking it would 404 against this admin page's own
         // path. Shown as plain text instead of a broken link.
         <span className="mt-2 block font-mono text-xs text-muted">{destination}</span>
+      )}
+
+      {MEDIA_CHANNELS.has(channel) && mediaRefs && (
+        <div className="mt-3">
+          {mediaRefs.endsWith(".mp4") ? (
+            <video src={mediaRefs} controls className="max-h-96 rounded-lg border border-border-strong" />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element -- a generated asset URL, not something next/image's optimizer has ever seen
+            <img src={mediaRefs} alt="" className="max-h-96 rounded-lg border border-border-strong" />
+          )}
+        </div>
       )}
 
       {isEscalationOnly ? (

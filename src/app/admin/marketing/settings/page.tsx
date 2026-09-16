@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth/server";
 import { isAdminEmail } from "@/lib/auth/admin";
 import { getDb } from "@/lib/db/client";
 import { communitySourceConfigs } from "@/lib/db/schema";
-import { getDailyDraftCap, getSpanishSocialEnabled } from "@/lib/marketing/config";
+import { getDailyDraftCap, getSpanishSocialEnabled, getGeminiVideoMonthlyCap } from "@/lib/marketing/config";
 import { MarketingSettingsForm } from "./MarketingSettingsForm";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +22,7 @@ export default async function MarketingSettingsPage() {
   }
 
   const db = getDb();
-  const [subreddits, dailyCap, spanishSocialEnabled] = await Promise.all([
+  const [subreddits, dailyCap, spanishSocialEnabled, geminiVideoCap] = await Promise.all([
     db
       .select({
         id: communitySourceConfigs.id,
@@ -34,6 +34,7 @@ export default async function MarketingSettingsPage() {
       .orderBy(asc(communitySourceConfigs.label)),
     getDailyDraftCap(),
     getSpanishSocialEnabled(),
+    getGeminiVideoMonthlyCap(),
   ]);
 
   return (
@@ -43,7 +44,12 @@ export default async function MarketingSettingsPage() {
         The subreddit reference list and the daily draft cap, live-editable. Guardrails and channel-specific rules
         are still a document, not a setting — see <code>SOCIAL_MEDIA_GUARDRAILS.md</code>.
       </p>
-      <MarketingSettingsForm subreddits={subreddits} dailyCap={dailyCap} spanishSocialEnabled={spanishSocialEnabled} />
+      <MarketingSettingsForm
+        subreddits={subreddits}
+        dailyCap={dailyCap}
+        spanishSocialEnabled={spanishSocialEnabled}
+        geminiVideoCap={geminiVideoCap}
+      />
     </div>
   );
 }

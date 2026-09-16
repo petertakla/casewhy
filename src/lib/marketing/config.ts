@@ -69,3 +69,26 @@ export async function setSpanishSocialEnabled(enabled: boolean): Promise<void> {
     .values({ id: SETTINGS_ID, spanishSocialEnabled: enabled })
     .onConflictDoUpdate({ target: marketingSettings.id, set: { spanishSocialEnabled: enabled, updatedAt: new Date() } });
 }
+
+// Round 91 — same admin-editable pattern as the two settings above, for
+// the Gemini content pipeline's monthly video budget guard (task doc
+// Section 2: "config cap on videos/month, default 8").
+export const GEMINI_VIDEO_MONTHLY_CAP_DEFAULT = 8;
+
+export async function getGeminiVideoMonthlyCap(): Promise<number> {
+  const db = getDb();
+  const [row] = await db
+    .select({ cap: marketingSettings.geminiVideoMonthlyCap })
+    .from(marketingSettings)
+    .where(eq(marketingSettings.id, SETTINGS_ID))
+    .limit(1);
+  return row?.cap ?? GEMINI_VIDEO_MONTHLY_CAP_DEFAULT;
+}
+
+export async function setGeminiVideoMonthlyCap(cap: number): Promise<void> {
+  const db = getDb();
+  await db
+    .insert(marketingSettings)
+    .values({ id: SETTINGS_ID, geminiVideoMonthlyCap: cap })
+    .onConflictDoUpdate({ target: marketingSettings.id, set: { geminiVideoMonthlyCap: cap, updatedAt: new Date() } });
+}

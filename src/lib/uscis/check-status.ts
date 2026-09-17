@@ -38,6 +38,15 @@ export interface TrackedCaseRow {
  * without waiting for the next cron run), and checkTrackedCaseNow() (the
  * cron + Plus's on-demand check) — both paths already have a real
  * `CaseStatus` in hand, this just persists it.
+ *
+ * Real bug found live (Peter: tracked 5 cases, dashboard list showed "Not
+ * yet checked" on all of them despite each one having just been looked up
+ * seconds earlier): this function only ever wrote to case_status_history,
+ * never to trackedCases.lastStatusText/lastCheckedAt — the two fields
+ * TrackedCasesList.tsx actually reads. checkTrackedCaseNow() (the cron
+ * and Plus's "Check now" button) separately updated those two fields
+ * itself; the dashboard's own render path, which calls only this
+ * function, never did. Now both paths go through the same update, here.
  */
 export async function recordCaseHistory(
   trackedCaseId: string,
@@ -94,6 +103,11 @@ export async function recordCaseHistory(
   for (const row of rows) {
     await db.insert(caseStatusHistory).values(row).onConflictDoNothing();
   }
+
+  await db
+    .update(trackedCases)
+    .set({ lastStatusText: encryptField(status.statusText), lastCheckedAt: new Date() })
+    .where(eq(trackedCases.id, trackedCaseId));
 }
 
 export async function checkTrackedCaseNow(
@@ -105,7 +119,6 @@ export async function checkTrackedCaseNow(
 
   const status = await getCaseStatus(receiptNumber);
   let notified = false;
-  const db = getDb();
 
   if (previousStatusText !== null && previousStatusText !== status.statusText) {
     if (await getStatusChangeEmailsEnabled(row.userId)) {
@@ -134,12 +147,10 @@ export async function checkTrackedCaseNow(
   // since that's the only way a case tracked mid-process ever gets its
   // real prior history backfilled. Safe to call unconditionally — the
   // table's own unique constraint no-ops anything already recorded.
+  // recordCaseHistory() also updates trackedCases.lastStatusText/
+  // lastCheckedAt now (see its own comment) -- no separate update needed
+  // here anymore.
   await recordCaseHistory(row.id, row.caseType, receiptNumber, status);
-
-  await db
-    .update(trackedCases)
-    .set({ lastStatusText: encryptField(status.statusText), lastCheckedAt: new Date() })
-    .where(eq(trackedCases.id, row.id));
 
   return { status, notified };
 }

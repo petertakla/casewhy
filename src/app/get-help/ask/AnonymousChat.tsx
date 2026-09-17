@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { PendingButton } from "@/components/PendingButton";
+import { apiRequest } from "@/lib/http/apiRequest";
 
 interface Message {
   role: "user" | "assistant";
@@ -47,10 +48,11 @@ export function AnonymousChat({ es, initialQuery }: { es: boolean; initialQuery?
     setError(null);
 
     try {
-      const res = await fetch("/api/get-help/ask", {
+      const res = await apiRequest("/api/get-help/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: nextMessages, lang: es ? "es" : "en" }),
+        timeoutMs: 30000,
       });
       const data = await res.json();
 

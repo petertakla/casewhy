@@ -10,6 +10,7 @@ import { Logo } from "./Logo";
 import { ResourcesMenu } from "./ResourcesMenu";
 import { PlusBadge } from "./PlusBadge";
 import { SiteSearch } from "./SiteSearch";
+import { apiRequest } from "@/lib/http/apiRequest";
 
 // Round 101 — Processing times, Visa bulletin, and News moved out of here
 // into the registry-driven Resources menu (see ResourcesMenu.tsx); this
@@ -88,7 +89,7 @@ function AuthHeaderInner() {
       setIsAdmin(false);
       return;
     }
-    fetch("/api/admin/is-admin")
+    apiRequest("/api/admin/is-admin")
       .then((r) => r.json())
       .then((data) => setIsAdmin(Boolean(data.isAdmin)))
       .catch(() => setIsAdmin(false));

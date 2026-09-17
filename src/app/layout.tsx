@@ -5,6 +5,8 @@ import "./globals.css";
 import { AuthHeader } from "@/components/AuthHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { NavigationProvider } from "@/lib/navigation/NavigationProvider";
+import { TopProgressBar } from "@/components/TopProgressBar";
 
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
@@ -42,13 +44,16 @@ export default function RootLayout({
     <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
       <body className="antialiased font-sans">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <ServiceWorkerRegister />
-          <AuthHeader />
-          {children}
-          {/* Round 101 — mounted once here (no longer per-page via
-              PublicPage.tsx); SiteFooter reads the current path itself and
-              renders nothing on /admin/* or /auth/* (showSiteFooter()). */}
-          <SiteFooter />
+          <NavigationProvider>
+            <TopProgressBar />
+            <ServiceWorkerRegister />
+            <AuthHeader />
+            {children}
+            {/* Round 101 — mounted once here (no longer per-page via
+                PublicPage.tsx); SiteFooter reads the current path itself and
+                renders nothing on /admin/* or /auth/* (showSiteFooter()). */}
+            <SiteFooter />
+          </NavigationProvider>
         </ThemeProvider>
       </body>
     </html>

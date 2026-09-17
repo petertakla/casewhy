@@ -16,6 +16,7 @@ import { useIsSpanish } from "@/lib/i18n/use-is-spanish";
 import { searchContent, type IndexedDoc } from "@/lib/search/client";
 import { SEARCH_OPEN_EVENT } from "@/lib/search/open-search-event";
 import { PlusBadge } from "./PlusBadge";
+import { apiRequest } from "@/lib/http/apiRequest";
 
 interface DirectoryRow {
   name: string;
@@ -76,7 +77,7 @@ export function SiteSearch() {
         getHelp: directoryGroups.reduce((sum, g) => sum + g.rows.length, 0),
         pages: content.pages.length,
       };
-      fetch("/api/search/log-event", {
+      apiRequest("/api/search/log-event", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: query.trim(), locale, resultCounts, outcome }),
@@ -157,7 +158,7 @@ export function SiteSearch() {
       return;
     }
     let cancelled = false;
-    fetch(`/api/search/directory?q=${encodeURIComponent(debouncedQuery.trim())}&locale=${locale}`)
+    apiRequest(`/api/search/directory?q=${encodeURIComponent(debouncedQuery.trim())}&locale=${locale}`)
       .then((r) => r.json())
       .then((data) => {
         if (!cancelled) setDirectoryGroups(data.groups ?? []);

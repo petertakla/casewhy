@@ -12,11 +12,10 @@
 // server-rendered children (now reflecting the new receipt) render as
 // normal -- no client-side data-fetching duplicated here.
 
-import { useRouter } from "next/navigation";
-import { useTransition } from "react";
 import { ReceiptNumberInput } from "./ReceiptNumberInput";
 import { PendingButton } from "@/components/PendingButton";
 import { ResultSkeleton } from "@/components/ResultSkeleton";
+import { useAppNavigation } from "@/lib/navigation/NavigationProvider";
 
 export function DashboardSearchArea({
   receiptNumber,
@@ -34,16 +33,13 @@ export function DashboardSearchArea({
   trackedCasesSlot?: React.ReactNode;
   children: React.ReactNode;
 }) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const { isPending, navigate } = useAppNavigation();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const receipt = String(new FormData(e.currentTarget).get("receipt") ?? "").trim();
     if (!receipt) return;
-    startTransition(() => {
-      router.push(`/dashboard?receipt=${encodeURIComponent(receipt)}${es ? "&lang=es" : ""}`);
-    });
+    navigate(`/dashboard?receipt=${encodeURIComponent(receipt)}${es ? "&lang=es" : ""}`);
   }
 
   return (

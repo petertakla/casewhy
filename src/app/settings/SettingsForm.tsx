@@ -15,6 +15,7 @@ import {
   NOTIFICATION_BLOCKED_WHY_ES,
   type BlockedHelp,
 } from "@/lib/push/client";
+import { apiRequest } from "@/lib/http/apiRequest";
 
 function ToggleRow({
   label,
@@ -94,7 +95,7 @@ function PushNotificationsRow({ es }: { es: boolean }) {
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!) as BufferSource,
       });
-      const res = await fetch("/api/push/subscribe", {
+      const res = await apiRequest("/api/push/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(subscription.toJSON()),
@@ -115,7 +116,7 @@ function PushNotificationsRow({ es }: { es: boolean }) {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
       if (subscription) {
-        await fetch("/api/push/unsubscribe", {
+        await apiRequest("/api/push/unsubscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ endpoint: subscription.endpoint }),

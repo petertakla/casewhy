@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { PlusBadge } from "@/components/PlusBadge";
+import { PendingButton } from "@/components/PendingButton";
+import { apiRequest } from "@/lib/http/apiRequest";
 
 interface DocumentItem {
   id: string;
@@ -38,13 +40,14 @@ export function DocumentVault({
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!trackedCaseId) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/documents?trackedCaseId=${encodeURIComponent(trackedCaseId)}`);
+      const res = await apiRequest(`/api/documents?trackedCaseId=${encodeURIComponent(trackedCaseId)}`);
       const data = await res.json();
       if (res.ok) setDocuments(data.documents);
     } finally {
@@ -64,7 +67,8 @@ export function DocumentVault({
       const form = new FormData();
       form.set("trackedCaseId", trackedCaseId);
       form.set("file", file);
-      const res = await fetch("/api/documents", { method: "POST", body: form });
+      // 60s, not the default 15s — this is a real file upload, not a JSON call.
+      const res = await apiRequest("/api/documents", { method: "POST", body: form, timeoutMs: 60000 });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error ?? (es ? "La subida falló." : "Upload failed."));
@@ -79,8 +83,13 @@ export function DocumentVault({
   }
 
   async function handleDelete(id: string) {
-    await fetch(`/api/documents/${id}`, { method: "DELETE" });
-    await load();
+    setDeletingId(id);
+    try {
+      await apiRequest(`/api/documents/${id}`, { method: "DELETE" });
+      await load();
+    } finally {
+      setDeletingId(null);
+    }
   }
 
   if (!trackedCaseId) {
@@ -159,13 +168,16 @@ export function DocumentVault({
               </a>
               <div className="flex shrink-0 items-center gap-3 text-xs text-muted">
                 <span>{formatSize(doc.sizeBytes)}</span>
-                <button
+                <PendingButton
                   type="button"
                   onClick={() => handleDelete(doc.id)}
-                  className="text-red-600 hover:underline dark:text-red-400"
+                  pending={deletingId === doc.id}
+                  pendingLabel={es ? "Eliminando…" : "Removing…"}
+                  className="inline-flex items-center gap-1 text-red-600 hover:underline disabled:cursor-not-allowed disabled:opacity-60 dark:text-red-400"
+                  spinnerClassName="h-3 w-3"
                 >
                   {es ? "Eliminar" : "Remove"}
-                </button>
+                </PendingButton>
               </div>
             </li>
           ))}

@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { untrackCase, type TrackedCase } from "./actions";
 import { CASE_TYPES } from "@/lib/kb/case-type-timeline";
+import { useAppNavigation } from "@/lib/navigation/NavigationProvider";
+import { Spinner } from "@/components/Spinner";
 
 function caseTypeLabel(caseType: string | null, es: boolean): string {
   const found = caseType ? CASE_TYPES.find((c) => c.id === caseType) : undefined;
@@ -46,6 +48,19 @@ export function TrackedCasesList({
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const { isPending: isNavigating, navigate } = useAppNavigation();
+  // Round 114 follow-up, Finding 4 (extended) — Peter's own report:
+  // switching to a different tracked receipt is a real outside-the-app
+  // request (a fresh live USCIS status fetch, same as the search form)
+  // and needs the same treatment. isNavigating is shared/global (the top
+  // bar reads it too); navigatingReceipt is local, just so THIS specific
+  // row can show its own spinner instead of leaving the click looking
+  // like it did nothing while some other part of the page updates.
+  const [navigatingReceipt, setNavigatingReceipt] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isNavigating) setNavigatingReceipt(null);
+  }, [isNavigating]);
 
   return (
     <div className="mb-6 space-y-2">
@@ -54,6 +69,8 @@ export function TrackedCasesList({
         const pending = c.status === "pending_review";
         const confirming = confirmingId === c.id;
         const removing = isPending && removingId === c.id;
+        const switchingHere = isNavigating && navigatingReceipt === c.receiptNumber;
+        const href = `${basePath}?receipt=${encodeURIComponent(c.receiptNumber)}${es ? "&lang=es" : ""}`;
 
         return (
           <div
@@ -63,21 +80,33 @@ export function TrackedCasesList({
             }`}
           >
             <Link
-              href={`${basePath}?receipt=${encodeURIComponent(c.receiptNumber)}${es ? "&lang=es" : ""}`}
-              className="min-w-0 flex-1"
+              href={href}
+              aria-busy={switchingHere}
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                e.preventDefault();
+                setNavigatingReceipt(c.receiptNumber);
+                navigate(href);
+              }}
+              className={`flex min-w-0 flex-1 items-center gap-2 ${switchingHere ? "opacity-60" : ""}`}
             >
-              <p className="font-mono text-xs text-muted">{c.receiptNumber}</p>
-              <div className="mt-1 flex flex-wrap items-center gap-2">
-                <span className="text-xs text-muted">{caseTypeLabel(c.caseType, es)}</span>
-                {pending ? (
-                  <span className="rounded-full border border-dashed border-amber-500/40 px-2 py-0.5 text-[10px] uppercase tracking-wide text-amber-600 dark:text-amber-400">
-                    {es ? "Pendiente" : "Pending"}
-                  </span>
-                ) : (
-                  c.lastStatusText && <span className="text-xs font-medium text-foreground/80">{c.lastStatusText}</span>
-                )}
-              </div>
-              <p className="mt-0.5 text-[11px] text-muted">{formatCheckedAt(c.lastCheckedAt, es)}</p>
+              {switchingHere && <Spinner className="h-3.5 w-3.5 shrink-0 text-muted" />}
+              <span className="min-w-0 flex-1">
+                <p className="font-mono text-xs text-muted">{c.receiptNumber}</p>
+                <div className="mt-1 flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-muted">{caseTypeLabel(c.caseType, es)}</span>
+                  {pending ? (
+                    <span className="rounded-full border border-dashed border-amber-500/40 px-2 py-0.5 text-[10px] uppercase tracking-wide text-amber-600 dark:text-amber-400">
+                      {es ? "Pendiente" : "Pending"}
+                    </span>
+                  ) : (
+                    c.lastStatusText && <span className="text-xs font-medium text-foreground/80">{c.lastStatusText}</span>
+                  )}
+                </div>
+                <p className="mt-0.5 text-[11px] text-muted">
+                  {switchingHere ? (es ? "Consultando…" : "Looking up…") : formatCheckedAt(c.lastCheckedAt, es)}
+                </p>
+              </span>
             </Link>
 
             {confirming ? (

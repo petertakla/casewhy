@@ -6,6 +6,7 @@ import { PlusBadge } from "@/components/PlusBadge";
 import { PendingButton } from "@/components/PendingButton";
 import { suggestedQuestions } from "@/lib/ai/suggested-questions";
 import { linkifyExplanation } from "@/lib/kb/linkify";
+import { apiRequest } from "@/lib/http/apiRequest";
 
 interface RelatedPolicy {
   id: string;
@@ -114,7 +115,7 @@ export function CaseChat({
     setError(null);
 
     try {
-      const res = await fetch("/api/chat", {
+      const res = await apiRequest("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -122,6 +123,7 @@ export function CaseChat({
           messages: nextMessages,
           ...(effectiveLinkedUrl ? { linkedUrl: effectiveLinkedUrl } : {}),
         }),
+        timeoutMs: 30000,
       });
       const data = await res.json();
 

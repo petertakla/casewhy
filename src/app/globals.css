@@ -41,3 +41,18 @@ body {
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
+
+/* Round 114 follow-up, Finding 4 (extended) — the global top progress
+   bar's indeterminate fill, used by TopProgressBar.tsx. Grows to ~85%
+   over ~8s (any real navigation should finish well before then) and
+   never reaches 100% on its own -- TopProgressBar itself snaps it to
+   100% and fades out once isPending actually goes false, so the bar
+   never looks "stuck" waiting for an animation to catch up. */
+@keyframes top-progress-grow {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 85%;
+  }
+}

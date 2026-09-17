@@ -96,7 +96,12 @@ export async function getMyRepresentatives(): Promise<
 const DraftLetterInput = z.object({
   trackedCaseId: z.string().min(1),
   letterType: z.enum(["congressional", "field_office", "ombudsman"]),
-  userReason: z.string().trim().min(1).max(1000),
+  // Round 110 follow-up — was max(1000) (~170 words); Peter hit this
+  // writing a real, one-page explanation and the old generic error gave
+  // no indication why. 1000 was arbitrary rather than sized against real
+  // usage -- 4000 (~650-700 words) comfortably covers a full page of
+  // reason text while still bounding the AI prompt.
+  userReason: z.string().trim().min(1).max(4000),
   /** Round 110 follow-up — Peter's own report: the reps list had no way
    * to pick which one a congressional letter goes to. An index into
    * findRepresentatives()'s own return order, not client-supplied

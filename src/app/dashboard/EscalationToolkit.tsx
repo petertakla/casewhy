@@ -369,12 +369,14 @@ export function EscalationToolkit({
             onChange={(e) => setReason(e.target.value)}
             placeholder={
               es
-                ? "¿Qué te está costando realmente este retraso? (un par de oraciones)"
-                : "What's this delay actually costing you? (a couple of sentences)"
+                ? "¿Qué te está costando realmente este retraso? (un par de oraciones o más, si lo necesitas)"
+                : "What's this delay actually costing you? (a couple of sentences or more, if you need it)"
             }
-            rows={2}
+            rows={5}
+            maxLength={4000}
             className="w-full rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
           />
+          <p className="mt-1 text-right text-[11px] text-muted">{reason.length}/4000</p>
           <button
             type="button"
             onClick={() => handleDraft(activeLetterType)}

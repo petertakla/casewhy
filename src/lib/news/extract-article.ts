@@ -101,6 +101,42 @@ function stripToReadableText(html: string): string {
   return text.replace(/[ \t]+/g, " ").replace(/\n\s*\n+/g, "\n\n").trim();
 }
 
+const PROSE_LINE_MIN_CHARS = 120;
+const BOILERPLATE_RUN_MIN_LINES = 15;
+
+/**
+ * Live-verified real bug: flattening a nav-heavy page (mega-menus,
+ * breadcrumbs, "Skip to Content" links) produces dozens of short lines
+ * before any real article text, and since extraction just takes the
+ * first MAX_EXTRACTED_CHARS from the start, the whole visible preview
+ * could be pure nav with the real article never reached. Confirmed
+ * against two independent sources with different markup (CitizenPath's
+ * WordPress mega-menu, which even mislabels itself with a semantic
+ * <article> tag; Federal Register's own site nav) -- a general pattern,
+ * not a one-off. A real article essentially never opens with 15+
+ * consecutive short lines before its first real paragraph, so skipping
+ * past a run that long is safe without needing to identify "nav"
+ * semantically.
+ */
+function skipLeadingBoilerplate(text: string): string {
+  const lines = text.split("\n");
+  let shortRun = 0;
+  let offset = 0;
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.length === 0) {
+      offset += line.length + 1;
+      continue;
+    }
+    if (trimmed.length >= PROSE_LINE_MIN_CHARS) {
+      return shortRun >= BOILERPLATE_RUN_MIN_LINES ? text.slice(offset).trimStart() : text;
+    }
+    shortRun++;
+    offset += line.length + 1;
+  }
+  return text;
+}
+
 /**
  * Fetches and extracts readable article text. Returns null if extraction
  * fails or returns too little usable text — a real, expected outcome for
@@ -115,7 +151,7 @@ export async function extractArticle(url: string): Promise<ExtractedArticle | nu
     return null;
   }
 
-  const text = stripToReadableText(html);
+  const text = skipLeadingBoilerplate(stripToReadableText(html));
   if (!text || text.length < 200) return null;
 
   const truncated = text.length > MAX_EXTRACTED_CHARS;

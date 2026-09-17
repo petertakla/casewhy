@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { untrackCase, type TrackedCase } from "./actions";
 import { CASE_TYPES } from "@/lib/kb/case-type-timeline";
-import { useAppNavigation } from "@/lib/navigation/NavigationProvider";
+import { useAppNavigation, extractReceiptFromUrl } from "@/lib/navigation/NavigationProvider";
 import { Spinner } from "@/components/Spinner";
 
 function caseTypeLabel(caseType: string | null, es: boolean): string {
@@ -48,28 +48,27 @@ export function TrackedCasesList({
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  const { isPending: isNavigating, navigate } = useAppNavigation();
-  // Round 114 follow-up, Finding 4 (extended) — Peter's own report:
-  // switching to a different tracked receipt is a real outside-the-app
-  // request (a fresh live USCIS status fetch, same as the search form)
-  // and needs the same treatment. isNavigating is shared/global (the top
-  // bar reads it too); navigatingReceipt is local, just so THIS specific
-  // row can show its own spinner instead of leaving the click looking
-  // like it did nothing while some other part of the page updates.
-  const [navigatingReceipt, setNavigatingReceipt] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isNavigating) setNavigatingReceipt(null);
-  }, [isNavigating]);
+  const { isPending: isNavigating, targetUrl, navigate } = useAppNavigation();
+  // Round 114 follow-up, Finding 4 (extended), second same-day fix —
+  // Peter caught live: the highlighted/active row and the per-row
+  // spinner both need to reflect the receipt actually being fetched,
+  // the instant it's clicked, not whichever row was active before.
+  // Deriving directly from the shared navigation signal (rather than
+  // local state set only from this component's own onClick) means this
+  // is correct even if the navigation to a matching receipt was
+  // triggered elsewhere (e.g. typing it into the search form above),
+  // not just from clicking this specific row.
+  const optimisticReceipt = isNavigating && targetUrl ? extractReceiptFromUrl(targetUrl) : null;
+  const effectiveActiveReceipt = optimisticReceipt ?? activeReceiptNumber;
 
   return (
     <div className="mb-6 space-y-2">
       {cases.map((c) => {
-        const active = c.receiptNumber === activeReceiptNumber;
+        const active = c.receiptNumber === effectiveActiveReceipt;
         const pending = c.status === "pending_review";
         const confirming = confirmingId === c.id;
         const removing = isPending && removingId === c.id;
-        const switchingHere = isNavigating && navigatingReceipt === c.receiptNumber;
+        const switchingHere = optimisticReceipt !== null && optimisticReceipt === c.receiptNumber;
         const href = `${basePath}?receipt=${encodeURIComponent(c.receiptNumber)}${es ? "&lang=es" : ""}`;
 
         return (
@@ -85,7 +84,6 @@ export function TrackedCasesList({
               onClick={(e) => {
                 if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
                 e.preventDefault();
-                setNavigatingReceipt(c.receiptNumber);
                 navigate(href);
               }}
               className={`flex min-w-0 flex-1 items-center gap-2 ${switchingHere ? "opacity-60" : ""}`}

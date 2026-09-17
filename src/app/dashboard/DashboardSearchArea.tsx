@@ -15,7 +15,7 @@
 import { ReceiptNumberInput } from "./ReceiptNumberInput";
 import { PendingButton } from "@/components/PendingButton";
 import { ResultSkeleton } from "@/components/ResultSkeleton";
-import { useAppNavigation } from "@/lib/navigation/NavigationProvider";
+import { useAppNavigation, extractReceiptFromUrl } from "@/lib/navigation/NavigationProvider";
 
 export function DashboardSearchArea({
   receiptNumber,
@@ -33,7 +33,18 @@ export function DashboardSearchArea({
   trackedCasesSlot?: React.ReactNode;
   children: React.ReactNode;
 }) {
-  const { isPending, navigate } = useAppNavigation();
+  const { isPending, targetUrl, navigate } = useAppNavigation();
+  // Round 114 follow-up, second same-day fix — the input has to reflect
+  // the receipt actually being fetched, not whatever it showed before
+  // the click. Peter caught this live: switching tracked cases showed
+  // "Looking up..." next to the OLD receipt number for the few seconds
+  // the navigation was in flight, since this input's defaultValue only
+  // ever reflected the last server render. targetUrl is set the instant
+  // navigate() is called (see NavigationProvider), so this is correct
+  // the same render as the click -- true optimistic UI, not a race with
+  // the network. Falls back to the real server-provided receiptNumber
+  // once nothing is pending.
+  const displayedReceipt = (isPending && targetUrl ? extractReceiptFromUrl(targetUrl) : undefined) ?? receiptNumber;
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -46,7 +57,14 @@ export function DashboardSearchArea({
     <>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <div className="flex flex-col gap-3 sm:flex-row">
-          <ReceiptNumberInput defaultValue={receiptNumber} es={es} disabled={isPending} />
+          {/* key forces a remount when the displayed receipt changes --
+              ReceiptNumberInput manages its own typed-value state
+              internally (for its real-time format validation), so a
+              defaultValue prop change alone wouldn't update what's shown;
+              remounting resets it to the new value, same as a real
+              controlled input would, without restructuring that
+              component's own state. */}
+          <ReceiptNumberInput key={displayedReceipt ?? ""} defaultValue={displayedReceipt} es={es} disabled={isPending} />
           <PendingButton
             type="submit"
             pending={isPending}

@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { useIsSpanish } from "@/lib/i18n/use-is-spanish";
@@ -242,7 +242,16 @@ function SignInForms() {
   // network round-trip away from the page the cookie was set on, where a
   // timing assumption is worth not needing at all.
   const es = useIsSpanish();
-  const dashboardHref = es ? "/dashboard?lang=es" : "/dashboard";
+  // Round 114 follow-up — a look-up that prompts sign-in (Track this case,
+  // signed out) previously always landed back on a bare /dashboard,
+  // losing the receipt the user was just looking at. Carried through the
+  // same query-param pattern round 79's own lang= signal already uses.
+  const searchParams = useSearchParams();
+  const receipt = searchParams.get("receipt");
+  const dashboardParams = new URLSearchParams();
+  if (es) dashboardParams.set("lang", "es");
+  if (receipt) dashboardParams.set("receipt", receipt);
+  const dashboardHref = dashboardParams.size > 0 ? `/dashboard?${dashboardParams.toString()}` : "/dashboard";
 
   return (
     <AuthCard es={es}>

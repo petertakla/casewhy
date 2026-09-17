@@ -72,6 +72,10 @@ export interface SubscriptionDetails {
   currentPeriodEnd: Date | null;
   cancelAtPeriodEnd: boolean;
   hasStripeCustomer: boolean;
+  /** Round 114 follow-up — needed to look up the real live plan/price/
+   * start-date from Stripe itself (src/lib/billing/live-subscription.ts);
+   * null until a real Stripe subscription exists. */
+  stripeSubscriptionId: string | null;
   /** Plus's own gated-unlimited cap for this account — 10 until an admin
    * approval raises it to 25 (PLUS_HARD_CEILING_MAX_CASES). Meaningless for
    * free-tier accounts, which use TIER_LIMITS.free.maxCases directly. */
@@ -89,6 +93,7 @@ export async function getSubscriptionDetails(userId: string): Promise<Subscripti
     currentPeriodEnd: row?.currentPeriodEnd ?? null,
     cancelAtPeriodEnd: row?.cancelAtPeriodEnd ?? false,
     hasStripeCustomer: !!row?.stripeCustomerId,
+    stripeSubscriptionId: row?.stripeSubscriptionId ?? null,
     effectiveMaxCases: row?.effectiveMaxCases ?? TIER_LIMITS[tier].maxCases,
   };
 }

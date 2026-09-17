@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { auth } from "@/lib/auth/server";
 import { getSubscriptionDetails } from "@/lib/billing/tier";
+import { getLiveSubscriptionDetail } from "@/lib/billing/live-subscription";
 import { getAllEffectivePrices, type EffectivePrice, type PlanId } from "@/lib/billing/pricing";
 import { startCheckout, openBillingPortal } from "@/app/plus/actions";
 import { ShareButton } from "@/components/ShareButton";
@@ -189,6 +190,7 @@ export default async function PlusPageEs({
   const details = session?.user ? await getSubscriptionDetails(session.user.id) : null;
   const isPlus = details?.tier === "plus";
   const prices = await getAllEffectivePrices();
+  const liveDetail = isPlus && details?.stripeSubscriptionId ? await getLiveSubscriptionDetail(details.stripeSubscriptionId) : null;
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
@@ -220,6 +222,12 @@ export default async function PlusPageEs({
           es
         />
       </div>
+
+      {isPlus && liveDetail && (
+        <div className="mt-4 rounded-xl border border-brand-500/20 bg-brand-500/5 p-4 text-sm text-brand-700 dark:text-brand-400">
+          Tienes CaseWhy Plus desde el {liveDetail.startDate.toLocaleDateString("es")}.
+        </div>
+      )}
 
       {isPlus && details?.cancelAtPeriodEnd && details.currentPeriodEnd && (
         <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm text-amber-700 dark:text-amber-400">
@@ -307,9 +315,21 @@ export default async function PlusPageEs({
       <div className="mt-10 rounded-2xl border border-border bg-surface p-6">
         <div className="grid grid-cols-[1fr_auto_auto] gap-4 border-b border-border-strong pb-3 text-xs font-semibold uppercase tracking-widest text-muted sm:grid-cols-[1fr_140px_140px]">
           <span></span>
-          <span className="text-center">Gratis</span>
+          <span className="text-center">
+            Gratis
+            {!isPlus && session?.user && (
+              <span className="mt-1 block text-[9px] font-semibold normal-case tracking-normal text-brand-600 dark:text-brand-400">
+                tu plan
+              </span>
+            )}
+          </span>
           <span className="text-center">
             <PlusBadge size="sm" />
+            {isPlus && (
+              <span className="mt-1 block text-[9px] font-semibold normal-case tracking-normal text-brand-600 dark:text-brand-400">
+                tu plan
+              </span>
+            )}
           </span>
         </div>
         {PLUS_FEATURES.map((feature) => (

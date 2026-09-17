@@ -10,7 +10,7 @@ import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { TrackCaseButton } from "./TrackCaseButton";
 import { CheckNowButton } from "./CheckNowButton";
 import { DownloadReportLink } from "./DownloadReportLink";
-import { CaseSwitcher } from "./CaseSwitcher";
+import { TrackedCasesList } from "./TrackedCasesList";
 import { DocumentVault } from "./DocumentVault";
 import { PlusBadge } from "@/components/PlusBadge";
 import { detectStalledCase } from "@/lib/escalation/stall-detector";
@@ -104,7 +104,7 @@ function SearchForm({
               wrong action and was found confusing while testing live
               before the USCIS demo -- a user could click this repeatedly
               expecting each click to save a case, and nothing would. */}
-          {es ? "Buscar caso" : "Look up case"}
+          {es ? "Consultar estado" : "Look up status"}
         </button>
       </div>
       <p className="text-xs text-muted">
@@ -362,26 +362,11 @@ function StatusCard({
         )}
       </div>
 
-      {explanation && (
-        <ExplanationBox
-          explanation={explanation}
-          receiptNumber={status.receiptNumber}
-          alreadyTracked={tracking?.alreadyTracked ?? false}
-          es={es}
-        />
-      )}
-
-      {/* Round 80 — statusDescription and each history entry's
-          completed_text_en are USCIS's own raw words, Track 2, never
-          translated. */}
-      <p className="mt-4 text-sm leading-relaxed text-foreground/90">{status.statusDescription}</p>
-
-      {stall.isStalled && stall.milestoneText && (
-        <StalledCaseCard daysSinceLastUpdate={stall.daysSinceLastUpdate} milestoneText={stall.milestoneText} es={es} />
-      )}
-
-      {!stall.isStalled && isPositiveStatus(status.statusText) && <PositiveShareNudge es={es} />}
-
+      {/* Round 114 follow-up — moved here, right under the status line, from
+          further down the card. Found live before the demo: with the save
+          action buried below the explanation/history, a user (or a USCIS
+          reviewer) scanning the top of the card had no visible way to
+          actually track what they just looked up. */}
       {tracking && (
         <div className="mt-3">
           {tracking.signedIn ? (
@@ -415,7 +400,10 @@ function StatusCard({
             </>
           ) : (
             <p className="text-xs text-muted">
-              <Link href={es ? "/auth/sign-in?lang=es" : "/auth/sign-in"} className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+              <Link
+                href={es ? `/auth/sign-in?lang=es&receipt=${encodeURIComponent(status.receiptNumber)}` : `/auth/sign-in?receipt=${encodeURIComponent(status.receiptNumber)}`}
+                className="font-semibold text-brand-600 dark:text-brand-400 hover:underline"
+              >
                 {es ? "Inicia sesión" : "Sign in"}
               </Link>{" "}
               {es ? "para guardar este caso." : "to save this case."}
@@ -423,6 +411,26 @@ function StatusCard({
           )}
         </div>
       )}
+
+      {explanation && (
+        <ExplanationBox
+          explanation={explanation}
+          receiptNumber={status.receiptNumber}
+          alreadyTracked={tracking?.alreadyTracked ?? false}
+          es={es}
+        />
+      )}
+
+      {/* Round 80 — statusDescription and each history entry's
+          completed_text_en are USCIS's own raw words, Track 2, never
+          translated. */}
+      <p className="mt-4 text-sm leading-relaxed text-foreground/90">{status.statusDescription}</p>
+
+      {stall.isStalled && stall.milestoneText && (
+        <StalledCaseCard daysSinceLastUpdate={stall.daysSinceLastUpdate} milestoneText={stall.milestoneText} es={es} />
+      )}
+
+      {!stall.isStalled && isPositiveStatus(status.statusText) && <PositiveShareNudge es={es} />}
 
       {status.history.length > 0 && (
         <div className="mt-6 border-t border-border pt-5">
@@ -456,45 +464,6 @@ function ErrorCard({ message }: { message: string }) {
   return (
     <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6">
       <p className="text-sm text-red-600 dark:text-red-400">{message}</p>
-    </div>
-  );
-}
-
-/**
- * Round 114 follow-up — found by live-testing before the demo: when a
- * fresh status check fails (sandbox down, network blip), a real tracked
- * case with a genuine prior result previously rendered nothing but a bare
- * error, as if the user had never tracked anything. This shows the last
- * real status this case actually fetched, so a transient failure doesn't
- * blank the whole page for a case that has real data.
- */
-function LastKnownStatusCard({
-  receiptNumber,
-  lastStatusText,
-  lastCheckedAt,
-  es,
-}: {
-  receiptNumber: string;
-  lastStatusText: string;
-  lastCheckedAt: Date | null;
-  es: boolean;
-}) {
-  const checkedLabel = lastCheckedAt
-    ? lastCheckedAt.toLocaleString(es ? "es" : undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })
-    : null;
-  return (
-    <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
-      <p className="font-mono text-xs uppercase tracking-widest text-muted">{receiptNumber}</p>
-      <div className="mt-2 flex items-center gap-2">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-2.5 py-1 text-xs font-semibold text-foreground/80">
-          {lastStatusText}
-        </span>
-      </div>
-      <p className="mt-3 text-sm text-muted">
-        {es
-          ? `No pudimos obtener una actualización en vivo ahora mismo — este es el último estado real que consultamos${checkedLabel ? ` (${checkedLabel})` : ""}.`
-          : `We couldn't get a live update just now — this is the last real status we fetched${checkedLabel ? ` (${checkedLabel})` : ""}.`}
-      </p>
     </div>
   );
 }
@@ -599,23 +568,55 @@ export default async function DashboardPage({
     trackedCasesList.length >= effectiveMaxCases &&
     trackedCasesList.length < PLUS_HARD_CEILING_MAX_CASES;
 
+  const heading =
+    trackedCasesList.length > 1 ? (es ? "Tus casos" : "Your cases") : es ? "Tu caso" : "Your case";
+  // Round 114 follow-up — Peter, testing Plus, found no signal anywhere on
+  // the dashboard of how many cases were tracked or which plan the
+  // account was on. This line (free: "N of M tracked"; Plus: "N tracked ·
+  // Plus") is the dashboard's own piece of that; Settings/plus carry the
+  // rest (round 114 follow-up, Finding 2).
+  const caseCountLabel = session?.user
+    ? isPlus
+      ? es
+        ? `${trackedCasesList.length} caso${trackedCasesList.length === 1 ? "" : "s"} rastreado${trackedCasesList.length === 1 ? "" : "s"} · Plus`
+        : `${trackedCasesList.length} case${trackedCasesList.length === 1 ? "" : "s"} tracked · Plus`
+      : es
+        ? `${trackedCasesList.length} de ${maxCases} casos rastreados`
+        : `${trackedCasesList.length} of ${maxCases} cases tracked`
+    : null;
+
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
       <LanguageSwitcher es={es} href={localeToggleHref("/dashboard", { receipt }, es)} />
-      <h1 className="text-2xl font-bold tracking-tight">{es ? "Tu caso" : "Your case"}</h1>
+      <h1 className="text-2xl font-bold tracking-tight">{heading}</h1>
+      {caseCountLabel && <p className="mt-1 text-xs font-medium text-muted">{caseCountLabel}</p>}
       <p className="mb-8 mt-2 text-muted">
         {es ? "Ingresa tu número de recibo de USCIS para ver su estado actual." : "Enter your USCIS receipt number to see its current status."}
       </p>
 
       <SearchForm receiptNumber={receiptNumber} trackedCaseCount={trackedCasesList.length} es={es} />
 
-      {trackedCasesList.length > 1 && (
-        <CaseSwitcher
+      {/* Round 114 follow-up — always renders from the database, every
+          tracked case, independent of whether today's live refresh below
+          succeeds. Previously only shown (as a bare pill switcher) when
+          there was more than one case; found live before the demo that a
+          failed refresh left a signed-in user with real tracked cases
+          seeing nothing about them at all. */}
+      {trackedCasesList.length > 0 && (
+        <TrackedCasesList
           cases={trackedCasesList}
           activeReceiptNumber={receiptNumber}
           basePath="/dashboard"
           es={es}
         />
+      )}
+
+      {errorMessage && trackedMatch && (
+        <p className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-xs text-amber-700 dark:text-amber-400">
+          {es
+            ? `No pudimos actualizar desde USCIS en este momento — mostrando el último estado conocido arriba. Mensaje de USCIS: ${errorMessage}`
+            : `Couldn't refresh from USCIS just now — showing the last known status above. USCIS's message: ${errorMessage}`}
+        </p>
       )}
 
       <div className="mt-6">
@@ -640,17 +641,8 @@ export default async function DashboardPage({
             }}
           />
         )}
-        {errorMessage && trackedMatch?.lastStatusText ? (
-          <LastKnownStatusCard
-            receiptNumber={trackedMatch.receiptNumber}
-            lastStatusText={trackedMatch.lastStatusText}
-            lastCheckedAt={trackedMatch.lastCheckedAt}
-            es={es}
-          />
-        ) : (
-          errorMessage && <ErrorCard message={errorMessage} />
-        )}
-        {!status && !isPendingReview && !errorMessage && !receiptNumber && (
+        {errorMessage && !trackedMatch && <ErrorCard message={errorMessage} />}
+        {!status && !isPendingReview && !errorMessage && !receiptNumber && trackedCasesList.length === 0 && (
           <div className="rounded-2xl border border-dashed border-border-strong p-8 text-center">
             <p className="text-sm text-muted">
               {es ? "Ningún caso rastreado aún — ingresa un número de recibo arriba para comenzar." : "No case tracked yet — enter a receipt number above to get started."}

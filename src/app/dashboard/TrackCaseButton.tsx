@@ -36,7 +36,12 @@ export function TrackCaseButton({
 }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [caseType, setCaseType] = useState("");
+  // Round 114 follow-up — defaults to "other" so the button works with a
+  // single click (found live before the demo: requiring an explicit
+  // selection first made "track this case" a two-step action that wasn't
+  // obvious from the button alone). The type can still be refined via the
+  // select before or after saving.
+  const [caseType, setCaseType] = useState("other");
   const selected = CASE_TYPES.find((c) => c.id === caseType);
 
   // Round 22 — the list grew past a flat dropdown (9 real types + "Other"),
@@ -64,7 +69,7 @@ export function TrackCaseButton({
           <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5 text-emerald-500">
             <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          {es ? "Rastreado" : "Tracked"}
+          {es ? "Rastreando · revisado a diario" : "Tracking · checked daily"}
         </p>
         <button
           type="button"
@@ -134,36 +139,54 @@ export function TrackCaseButton({
 
   return (
     <div>
-      <label className="block text-xs font-medium text-muted" htmlFor="track-case-type">
-        {es ? "¿Qué tipo de caso es este?" : "What kind of case is this?"}
-      </label>
-      <select
-        id="track-case-type"
-        value={caseType}
-        onChange={(e) => setCaseType(e.target.value)}
-        required
-        className="mt-1 w-full max-w-xs rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
-      >
-        <option value="">{es ? "Selecciona un tipo de caso…" : "Select a case type…"}</option>
-        {groupedOptions.map((g) => (
-          <optgroup key={g.group} label={(es && g.options[0]?.groupEs) || g.group}>
-            {g.options.map((c) => (
-              <option key={c.id} value={c.id}>
-                {es && c.labelEs ? c.labelEs : c.label}
-              </option>
-            ))}
-          </optgroup>
-        ))}
-        {ungrouped.map((c) => (
-          <option key={c.id} value={c.id}>
-            {es && c.labelEs ? c.labelEs : c.label}
-          </option>
-        ))}
-      </select>
+      <p className="text-xs text-muted">
+        {es
+          ? "No rastreado todavía — rastréalo para recibir una alerta cuando cambie el estado."
+          : "Not tracked yet — track it to get an alert when the status changes."}
+      </p>
+      <div className="mt-2 flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          disabled={isPending}
+          onClick={() => startTransition(async () => {
+            setError(null);
+            try {
+              await trackCase(receiptNumber, caseType);
+            } catch (err) {
+              setError(err instanceof Error ? err.message : es ? "Algo salió mal." : "Something went wrong.");
+            }
+          })}
+          className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {isPending ? (es ? "Guardando…" : "Saving…") : es ? "Rastrear este caso" : "Track this case"}
+        </button>
+        <select
+          id="track-case-type"
+          value={caseType}
+          onChange={(e) => setCaseType(e.target.value)}
+          aria-label={es ? "¿Qué tipo de caso es este?" : "What kind of case is this?"}
+          className="rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
+        >
+          {groupedOptions.map((g) => (
+            <optgroup key={g.group} label={(es && g.options[0]?.groupEs) || g.group}>
+              {g.options.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {es && c.labelEs ? c.labelEs : c.label}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+          {ungrouped.map((c) => (
+            <option key={c.id} value={c.id}>
+              {es && c.labelEs ? c.labelEs : c.label}
+            </option>
+          ))}
+        </select>
+      </div>
       <p className="mt-1 text-xs text-muted">
         {es
-          ? "Ingresa tu tipo de formulario para una respuesta de IA más detallada y específica."
-          : "Enter your form type for a more detailed, form-specific AI response."}
+          ? "Ajusta el tipo de formulario para una respuesta de IA más detallada y específica."
+          : "Adjust the form type for a more detailed, form-specific AI response."}
       </p>
       {selected && <p className="mt-1.5 max-w-xl text-xs leading-relaxed text-muted">{selected.timelineBlurb}</p>}
       {willQueueForReview && (
@@ -183,21 +206,6 @@ export function TrackCaseButton({
           )}
         </p>
       )}
-      <button
-        type="button"
-        disabled={isPending || !caseType}
-        onClick={() => startTransition(async () => {
-          setError(null);
-          try {
-            await trackCase(receiptNumber, caseType);
-          } catch (err) {
-            setError(err instanceof Error ? err.message : es ? "Algo salió mal." : "Something went wrong.");
-          }
-        })}
-        className="mt-2 text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline disabled:cursor-not-allowed disabled:opacity-40"
-      >
-        {isPending ? (es ? "Guardando…" : "Saving…") : es ? "Rastrear este caso" : "Track this case"}
-      </button>
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
     </div>
   );

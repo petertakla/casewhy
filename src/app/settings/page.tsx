@@ -6,6 +6,7 @@ import { RESOURCE_LINKS } from "@/lib/resources/links";
 import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { SettingsForm } from "./SettingsForm";
+import { PlanSection } from "./PlanSection";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const dynamic = "force-dynamic";
@@ -37,6 +38,8 @@ export default async function SettingsPage({
           ? "Preferencias de notificaciones, fuentes de noticias, y enlaces útiles."
           : "Notification preferences, news sources, and useful links."}
       </p>
+
+      <PlanSection userId={session.user.id} es={es} />
 
       {/* Round 80 follow-up — SettingsForm.tsx is now translated too. It
           still has round 75's own paused, uncommitted work sitting in it

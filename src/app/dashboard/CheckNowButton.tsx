@@ -93,7 +93,7 @@ export function CheckNowButton({
         </button>
       )}
       {requestPreview && showPreview && (
-        <pre className="absolute left-0 top-full z-10 mt-1 max-w-md whitespace-pre-wrap rounded-lg border border-border-strong bg-surface p-3 font-mono text-[10px] text-foreground shadow-lg">
+        <pre className="absolute left-0 top-full z-10 mt-1 max-w-[calc(100vw-2rem)] overflow-x-auto whitespace-pre-wrap rounded-lg border border-border-strong bg-surface p-3 font-mono text-[10px] text-foreground shadow-lg sm:max-w-md">
           {requestPreview.method} {requestPreview.url}
           {"\n"}
           {Object.entries(requestPreview.headers)

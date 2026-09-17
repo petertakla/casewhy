@@ -10,15 +10,28 @@
 import { isAuthorizedCronRequest } from "@/lib/auth/cron-auth";
 import { testXCredentials } from "@/lib/marketing/posters/x";
 
+// Real 401 seen on the first live run of this check -- added a safe
+// "does this value have stray whitespace" probe (length before/after
+// trim only, never the value itself) since a trailing newline from a
+// paste is a common, real cause of exactly this failure mode with
+// OAuth 1.0a's exact-string signing.
+function whitespaceCheck(name: string): { name: string; set: boolean; hasWhitespace: boolean } {
+  const raw = process.env[name];
+  if (!raw) return { name, set: false, hasWhitespace: false };
+  return { name, set: true, hasWhitespace: raw !== raw.trim() };
+}
+
 export async function POST(request: Request) {
   if (!isAuthorizedCronRequest(request)) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
+  const whitespace = ["X_API_KEY", "X_API_SECRET", "X_ACCESS_TOKEN", "X_ACCESS_TOKEN_SECRET"].map(whitespaceCheck);
+
   try {
     const user = await testXCredentials();
-    return Response.json({ ok: true, authenticatedAs: user });
+    return Response.json({ ok: true, authenticatedAs: user, whitespace });
   } catch (err) {
-    return Response.json({ ok: false, error: err instanceof Error ? err.message : String(err) }, { status: 200 });
+    return Response.json({ ok: false, error: err instanceof Error ? err.message : String(err), whitespace }, { status: 200 });
   }
 }

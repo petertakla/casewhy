@@ -15,7 +15,7 @@ import { DocumentVault } from "./DocumentVault";
 import { PlusBadge } from "@/components/PlusBadge";
 import { detectStalledCase } from "@/lib/escalation/stall-detector";
 import { EscalationToolkit } from "./EscalationToolkit";
-import { ReceiptNumberInput } from "./ReceiptNumberInput";
+import { DashboardSearchArea } from "./DashboardSearchArea";
 import { linkifyExplanation } from "@/lib/kb/linkify";
 import { PositiveShareNudge } from "./PositiveShareNudge";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -75,50 +75,6 @@ function statusTone(statusText: string): { dot: string; text: string; bg: string
   return { dot: "bg-brand-500", text: "text-brand-600 dark:text-brand-400", bg: "bg-brand-500/10" };
 }
 
-function SearchForm({
-  receiptNumber,
-  trackedCaseCount,
-  es,
-}: {
-  receiptNumber?: string;
-  /** Round 114 follow-up — the submit button itself is now the same
-   * "Look up case" regardless of count (round 71's "Add New Case" wording
-   * was dropped along with the rest of this button's old "Track"
-   * framing, since it never actually tracked anything). Still used to
-   * vary the helper line's copy below the button. */
-  trackedCaseCount: number;
-  es: boolean;
-}) {
-  return (
-    <form action="/dashboard" method="get" className="flex flex-col gap-3">
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <ReceiptNumberInput defaultValue={receiptNumber} es={es} />
-        <button
-          type="submit"
-          className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
-        >
-          {/* Round 114 follow-up — this button only runs a live lookup, it
-              never saves anything (that's TrackCaseButton, "Track this
-              case", inside the result card below). It was previously
-              labeled "Track case"/"Add New Case", which described the
-              wrong action and was found confusing while testing live
-              before the USCIS demo -- a user could click this repeatedly
-              expecting each click to save a case, and nothing would. */}
-          {es ? "Consultar estado" : "Look up status"}
-        </button>
-      </div>
-      <p className="text-xs text-muted">
-        {trackedCaseCount > 0
-          ? es
-            ? "Busca un número de recibo, luego pulsa \"Rastrear este caso\" en el resultado para guardarlo."
-            : 'Look up a receipt number, then click "Track this case" on the result to save it.'
-          : es
-            ? "Busca un número de recibo para ver su estado — luego pulsa \"Rastrear este caso\" para guardarlo."
-            : 'Look up a receipt number to see its status — then click "Track this case" to save it.'}
-      </p>
-    </form>
-  );
-}
 
 /**
  * CW-39, Part A — free on every tier. Surfaces a real delay honestly
@@ -607,62 +563,69 @@ export default async function DashboardPage({
         {es ? "Ingresa tu número de recibo de USCIS para ver su estado actual." : "Enter your USCIS receipt number to see its current status."}
       </p>
 
-      <SearchForm receiptNumber={receiptNumber} trackedCaseCount={trackedCasesList.length} es={es} />
-
-      {/* Round 114 follow-up — always renders from the database, every
-          tracked case, independent of whether today's live refresh below
-          succeeds. Previously only shown (as a bare pill switcher) when
-          there was more than one case; found live before the demo that a
-          failed refresh left a signed-in user with real tracked cases
-          seeing nothing about them at all. */}
-      {trackedCasesList.length > 0 && (
-        <TrackedCasesList
-          cases={trackedCasesList}
-          activeReceiptNumber={receiptNumber}
-          basePath="/dashboard"
-          es={es}
-        />
-      )}
-
-      {errorMessage && trackedMatch && (
-        <p className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-xs text-amber-700 dark:text-amber-400">
-          {es
-            ? `No pudimos actualizar desde USCIS en este momento — mostrando el último estado conocido arriba. Mensaje de USCIS: ${errorMessage}`
-            : `Couldn't refresh from USCIS just now — showing the last known status above. USCIS's message: ${errorMessage}`}
-        </p>
-      )}
-
-      <div className="mt-6">
-        {isPendingReview && receiptNumber && <PendingReviewCard receiptNumber={receiptNumber} es={es} />}
-        {status && (
-          <StatusCard
-            status={status}
-            explanation={explanation}
-            es={es}
-            tracking={{
-              signedIn: !!session?.user,
-              alreadyTracked: trackedCasesList.some((c) => c.receiptNumber === status.receiptNumber),
-              trackedCaseId: trackedCasesList.find((c) => c.receiptNumber === status.receiptNumber)?.id,
-              lastCheckedAt: trackedCasesList.find((c) => c.receiptNumber === status.receiptNumber)?.lastCheckedAt,
-              canCheckNow,
-              canDownloadReport: canCheckNow,
-              canUseVault: canCheckNow,
-              atCap,
-              maxCases: isPlus && atCap ? PLUS_HARD_CEILING_MAX_CASES : maxCases,
-              willQueueForReview,
-              isPlusHardCeiling: isPlus && atCap,
-            }}
-          />
+      <DashboardSearchArea
+        receiptNumber={receiptNumber}
+        trackedCaseCount={trackedCasesList.length}
+        es={es}
+        trackedCasesSlot={
+          // Round 114 follow-up — always renders from the database, every
+          // tracked case, independent of whether today's live refresh
+          // below succeeds. Previously only shown (as a bare pill
+          // switcher) when there was more than one case; found live
+          // before the demo that a failed refresh left a signed-in user
+          // with real tracked cases seeing nothing about them at all.
+          // Stays outside the pending-skeleton area — this list doesn't
+          // "load" per search, it's the account's own stable case list.
+          trackedCasesList.length > 0 ? (
+            <TrackedCasesList
+              cases={trackedCasesList}
+              activeReceiptNumber={receiptNumber}
+              basePath="/dashboard"
+              es={es}
+            />
+          ) : null
+        }
+      >
+        {errorMessage && trackedMatch && (
+          <p className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-xs text-amber-700 dark:text-amber-400">
+            {es
+              ? `No pudimos actualizar desde USCIS en este momento — mostrando el último estado conocido arriba. Mensaje de USCIS: ${errorMessage}`
+              : `Couldn't refresh from USCIS just now — showing the last known status above. USCIS's message: ${errorMessage}`}
+          </p>
         )}
-        {errorMessage && !trackedMatch && <ErrorCard message={errorMessage} />}
-        {!status && !isPendingReview && !errorMessage && !receiptNumber && trackedCasesList.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-border-strong p-8 text-center">
-            <p className="text-sm text-muted">
-              {es ? "Ningún caso rastreado aún — ingresa un número de recibo arriba para comenzar." : "No case tracked yet — enter a receipt number above to get started."}
-            </p>
-          </div>
-        )}
-      </div>
+
+        <div className="mt-6">
+          {isPendingReview && receiptNumber && <PendingReviewCard receiptNumber={receiptNumber} es={es} />}
+          {status && (
+            <StatusCard
+              status={status}
+              explanation={explanation}
+              es={es}
+              tracking={{
+                signedIn: !!session?.user,
+                alreadyTracked: trackedCasesList.some((c) => c.receiptNumber === status.receiptNumber),
+                trackedCaseId: trackedCasesList.find((c) => c.receiptNumber === status.receiptNumber)?.id,
+                lastCheckedAt: trackedCasesList.find((c) => c.receiptNumber === status.receiptNumber)?.lastCheckedAt,
+                canCheckNow,
+                canDownloadReport: canCheckNow,
+                canUseVault: canCheckNow,
+                atCap,
+                maxCases: isPlus && atCap ? PLUS_HARD_CEILING_MAX_CASES : maxCases,
+                willQueueForReview,
+                isPlusHardCeiling: isPlus && atCap,
+              }}
+            />
+          )}
+          {errorMessage && !trackedMatch && <ErrorCard message={errorMessage} />}
+          {!status && !isPendingReview && !errorMessage && !receiptNumber && trackedCasesList.length === 0 && (
+            <div className="rounded-2xl border border-dashed border-border-strong p-8 text-center">
+              <p className="text-sm text-muted">
+                {es ? "Ningún caso rastreado aún — ingresa un número de recibo arriba para comenzar." : "No case tracked yet — enter a receipt number above to get started."}
+              </p>
+            </div>
+          )}
+        </div>
+      </DashboardSearchArea>
     </main>
   );
 }

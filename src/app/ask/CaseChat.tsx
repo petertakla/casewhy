@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { PlusBadge } from "@/components/PlusBadge";
+import { PendingButton } from "@/components/PendingButton";
 import { suggestedQuestions } from "@/lib/ai/suggested-questions";
 import { linkifyExplanation } from "@/lib/kb/linkify";
 
@@ -401,13 +402,16 @@ export function CaseChat({
             disabled={pending || limitReached}
             className="flex-1 rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500 disabled:opacity-60"
           />
-          <button
+          <PendingButton
             type="submit"
-            disabled={pending || limitReached || !input.trim()}
-            className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={limitReached || !input.trim()}
+            pending={pending}
+            pendingLabel={es ? "Enviando…" : "Sending…"}
+            waitingLabel={es ? "Esto puede tardar un momento…" : "This can take a moment…"}
+            className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {es ? "Enviar" : "Send"}
-          </button>
+          </PendingButton>
         </form>
         {usage && usage.limit !== null && !limitReached && (
           <p className="mt-2 text-xs text-muted">

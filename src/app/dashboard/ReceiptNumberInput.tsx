@@ -10,7 +10,16 @@ import { isValidReceiptNumberFormat } from "@/lib/uscis/receipt-number";
  * it's well-formed. Feedback only starts once there's enough input to be
  * meaningful, so an empty/just-started field doesn't flash red immediately.
  */
-export function ReceiptNumberInput({ defaultValue, es }: { defaultValue?: string; es?: boolean }) {
+export function ReceiptNumberInput({
+  defaultValue,
+  es,
+  disabled,
+}: {
+  defaultValue?: string;
+  es?: boolean;
+  /** Round 114 follow-up, Finding 4 — "the input locks" while a lookup is in flight. */
+  disabled?: boolean;
+}) {
   const [value, setValue] = useState(defaultValue ?? "");
   const trimmed = value.trim();
   const showFeedback = trimmed.length >= 3;
@@ -30,6 +39,7 @@ export function ReceiptNumberInput({ defaultValue, es }: { defaultValue?: string
         type="text"
         name="receipt"
         required
+        disabled={disabled}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={es ? "ej. EAC9999103403" : "e.g. EAC9999103403"}
@@ -37,7 +47,7 @@ export function ReceiptNumberInput({ defaultValue, es }: { defaultValue?: string
         autoComplete="off"
         aria-label={es ? "Número de recibo de USCIS" : "USCIS receipt number"}
         aria-invalid={showFeedback && !valid}
-        className={`w-full rounded-lg border bg-surface pl-10 pr-9 py-2.5 font-mono text-sm outline-none transition-shadow focus:ring-2 ${
+        className={`w-full rounded-lg border bg-surface pl-10 pr-9 py-2.5 font-mono text-sm outline-none transition-shadow focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60 ${
           showFeedback && !valid
             ? "border-red-400 focus:ring-red-400"
             : "border-border-strong focus:ring-brand-500"

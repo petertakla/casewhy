@@ -8,6 +8,7 @@ import { startCheckout, openBillingPortal } from "@/app/plus/actions";
 import { ShareButton } from "@/components/ShareButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { PlusBadge } from "@/components/PlusBadge";
+import { FormSubmitButton } from "@/components/FormSubmitButton";
 
 // Round 79 — Spanish translation of /plus. Reuses the real Stripe actions
 // and pricing/subscription logic from the English page as-is (business
@@ -159,12 +160,13 @@ function PlanCard({
       )}
       {canSubscribe && (
         <form action={startCheckout.bind(null, planId)} className="mt-4">
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600"
+          <FormSubmitButton
+            pendingLabel="Iniciando pago…"
+            waitingLabel="Aún esperando a Stripe…"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70"
           >
             Suscribirse
-          </button>
+          </FormSubmitButton>
         </form>
       )}
     </div>
@@ -245,12 +247,13 @@ export default async function PlusPageEs({
       {isPlus ? (
         <div className="mt-6">
           <form action={openBillingPortal}>
-            <button
-              type="submit"
-              className="rounded-lg bg-brand-500 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-600"
+            <FormSubmitButton
+              pendingLabel="Abriendo facturación…"
+              waitingLabel="Aún esperando a Stripe…"
+              className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70"
             >
               Administrar suscripción
-            </button>
+            </FormSubmitButton>
           </form>
         </div>
       ) : (

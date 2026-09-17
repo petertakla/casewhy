@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PlusBadge } from "@/components/PlusBadge";
+import { PendingButton } from "@/components/PendingButton";
 import {
   saveMyMailingAddress,
   getMySavedAddress,
@@ -212,27 +213,30 @@ export function EscalationToolkit({
             required
             className="rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
           />
-          <button
+          <PendingButton
             type="submit"
-            disabled={saving}
-            className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60"
+            pending={saving}
+            pendingLabel={es ? "Guardando…" : "Saving…"}
+            className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {saving ? (es ? "Guardando…" : "Saving…") : hasAddress ? (es ? "Actualizar dirección" : "Update address") : es ? "Guardar dirección" : "Save address"}
-          </button>
+            {hasAddress ? (es ? "Actualizar dirección" : "Update address") : es ? "Guardar dirección" : "Save address"}
+          </PendingButton>
         </form>
       )}
       {saveError && <p className="mt-1 text-xs text-red-500">{saveError}</p>}
 
       {hasAddress && (
         <div className="mt-4">
-          <button
+          <PendingButton
             type="button"
             onClick={handleLookup}
-            disabled={lookingUp}
-            className="text-xs font-semibold text-brand-600 hover:underline disabled:opacity-60 dark:text-brand-400"
+            pending={lookingUp}
+            pendingLabel={es ? "Buscando…" : "Looking up…"}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:underline disabled:cursor-not-allowed disabled:opacity-60 dark:text-brand-400"
+            spinnerClassName="h-3 w-3"
           >
-            {lookingUp ? (es ? "Buscando…" : "Looking up…") : es ? "Encontrar a mis representantes" : "Find my representatives"}
-          </button>
+            {es ? "Encontrar a mis representantes" : "Find my representatives"}
+          </PendingButton>
           {lookupError && <p className="mt-1 text-xs text-red-500">{lookupError}</p>}
 
           {reps && reps.representatives.length === 0 && (
@@ -377,14 +381,17 @@ export function EscalationToolkit({
             className="w-full rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
           />
           <p className="mt-1 text-right text-[11px] text-muted">{reason.length}/4000</p>
-          <button
+          <PendingButton
             type="button"
             onClick={() => handleDraft(activeLetterType)}
-            disabled={drafting || !reason.trim()}
-            className="mt-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={!reason.trim()}
+            pending={drafting}
+            pendingLabel={es ? "Redactando…" : "Drafting…"}
+            waitingLabel={es ? "Esto puede tardar un momento…" : "This can take a moment…"}
+            className="mt-2 inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {drafting ? (es ? "Redactando…" : "Drafting…") : es ? "Redactar carta" : "Draft letter"}
-          </button>
+            {es ? "Redactar carta" : "Draft letter"}
+          </PendingButton>
           {draftError && <p className="mt-1 text-xs text-red-500">{draftError}</p>}
           {letterText && (
             <textarea

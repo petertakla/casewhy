@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PendingButton } from "@/components/PendingButton";
 import { approvePendingAction, rejectPendingAction } from "./actions";
 
 export function PendingActionCard({
@@ -104,22 +105,26 @@ export function PendingActionCard({
       {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
 
       <div className="mt-3 flex gap-3">
-        <button
+        <PendingButton
           type="button"
-          disabled={pending || !reply.trim()}
+          disabled={!reply.trim()}
+          pending={pending}
+          pendingLabel="Sending…"
           onClick={handleApprove}
-          className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Approve &amp; send
-        </button>
-        <button
+        </PendingButton>
+        <PendingButton
           type="button"
-          disabled={pending}
+          pending={pending}
+          pendingLabel="Rejecting…"
           onClick={handleReject}
-          className="rounded-lg border border-border-strong px-4 py-2 text-sm font-medium text-muted transition-colors hover:border-red-500/50 hover:text-red-500 disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-lg border border-border-strong px-4 py-2 text-sm font-medium text-muted transition-colors hover:border-red-500/50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-60"
+          spinnerClassName="h-3.5 w-3.5"
         >
           Reject
-        </button>
+        </PendingButton>
       </div>
     </div>
   );

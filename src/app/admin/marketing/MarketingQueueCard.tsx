@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PendingButton } from "@/components/PendingButton";
 import { markPosted, rejectItem, approveForAutoPost } from "./actions";
 import { REGISTERED_POSTER_CHANNELS } from "@/lib/marketing/posters/registered-channels";
 import { CHANNEL_LABELS } from "@/lib/marketing/channel-labels";
@@ -231,42 +232,50 @@ export function MarketingQueueCard({
       <div className="mt-3 flex flex-wrap gap-3">
         {!isEscalationOnly && effectiveMode === "manual_post" && (
           <>
-            <button
+            <PendingButton
               type="button"
-              disabled={pending || !text.trim()}
+              disabled={!text.trim()}
+              pending={pending}
+              pendingLabel="Marking posted…"
               onClick={() => handlePosted(false)}
-              className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Mark posted (as-is)
-            </button>
-            <button
+            </PendingButton>
+            <PendingButton
               type="button"
-              disabled={pending || !text.trim() || text === draftText}
+              disabled={!text.trim() || text === draftText}
+              pending={pending}
+              pendingLabel="Marking posted…"
               onClick={() => handlePosted(true)}
-              className="rounded-lg border border-border-strong px-4 py-2 text-sm font-medium text-foreground/80 transition-colors hover:border-brand-500/50 disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex items-center gap-2 rounded-lg border border-border-strong px-4 py-2 text-sm font-medium text-foreground/80 transition-colors hover:border-brand-500/50 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Mark posted (edited)
-            </button>
+            </PendingButton>
           </>
         )}
         {!isEscalationOnly && effectiveMode === "auto_post" && (
-          <button
+          <PendingButton
             type="button"
-            disabled={pending || !text.trim()}
+            disabled={!text.trim()}
+            pending={pending}
+            pendingLabel={isBlog ? "Publishing…" : "Approving…"}
             onClick={handleApproveAutoPost}
-            className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {isBlog ? "Publish to /updates" : "Approve (queue for auto-post)"}
-          </button>
+          </PendingButton>
         )}
-        <button
+        <PendingButton
           type="button"
-          disabled={pending}
+          pending={pending}
+          pendingLabel={isEscalationOnly ? "Dismissing…" : "Rejecting…"}
           onClick={handleReject}
-          className="rounded-lg border border-border-strong px-4 py-2 text-sm font-medium text-muted transition-colors hover:border-red-500/50 hover:text-red-500 disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-lg border border-border-strong px-4 py-2 text-sm font-medium text-muted transition-colors hover:border-red-500/50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-60"
+          spinnerClassName="h-3.5 w-3.5"
         >
           {isEscalationOnly ? "Acknowledge / dismiss" : "Reject"}
-        </button>
+        </PendingButton>
       </div>
     </div>
   );

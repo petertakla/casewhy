@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { checkCaseNow } from "./actions";
 import { PlusBadge } from "@/components/PlusBadge";
+import { PendingButton } from "@/components/PendingButton";
 
 function formatCheckedAt(date: Date | null, es: boolean): string {
   if (!date) return es ? "Nunca revisado" : "Never checked";
@@ -63,9 +64,10 @@ export function CheckNowButton({
     <div className="relative mt-1.5 flex items-center gap-2 text-xs text-muted">
       <span>{formatCheckedAt(checkedAt, es)}</span>
       <span>·</span>
-      <button
-        type="button"
-        disabled={isPending}
+      <PendingButton
+        pending={isPending}
+        pendingLabel={es ? "Revisando…" : "Checking…"}
+        waitingLabel={es ? "Aún esperando a USCIS…" : "Still waiting on USCIS…"}
         onClick={() =>
           startTransition(async () => {
             setError(null);
@@ -78,10 +80,11 @@ export function CheckNowButton({
             }
           })
         }
-        className="font-semibold text-brand-600 hover:underline disabled:opacity-60 dark:text-brand-400"
+        className="inline-flex items-center gap-1.5 font-semibold text-brand-600 hover:underline disabled:cursor-not-allowed disabled:opacity-60 dark:text-brand-400"
+        spinnerClassName="h-3 w-3"
       >
-        {isPending ? (es ? "Revisando…" : "Checking…") : es ? "Revisar ahora" : "Check now"}
-      </button>
+        {es ? "Revisar ahora" : "Check now"}
+      </PendingButton>
       {error && <span className="text-red-500">{error}</span>}
       {requestPreview && (
         <button

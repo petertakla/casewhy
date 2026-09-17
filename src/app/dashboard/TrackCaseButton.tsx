@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { trackCase, untrackCase } from "./actions";
 import { PlusBadge } from "@/components/PlusBadge";
+import { PendingButton } from "@/components/PendingButton";
 import { CASE_TYPES } from "@/lib/kb/case-type-timeline";
 
 export function TrackCaseButton({
@@ -71,16 +72,17 @@ export function TrackCaseButton({
           </svg>
           {es ? "Rastreando · revisado a diario" : "Tracking · checked daily"}
         </p>
-        <button
-          type="button"
-          disabled={isPending}
+        <PendingButton
+          pending={isPending}
+          pendingLabel={es ? "Eliminando…" : "Removing…"}
           onClick={() => startTransition(async () => {
             await untrackCase(trackedCaseId);
           })}
-          className="text-xs font-semibold text-muted hover:text-red-500 hover:underline disabled:opacity-60"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-red-500 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+          spinnerClassName="h-3 w-3"
         >
-          {isPending ? (es ? "Eliminando…" : "Removing…") : es ? "Dejar de rastrear" : "Stop tracking"}
-        </button>
+          {es ? "Dejar de rastrear" : "Stop tracking"}
+        </PendingButton>
       </div>
     );
   }
@@ -145,9 +147,9 @@ export function TrackCaseButton({
           : "Not tracked yet — track it to get an alert when the status changes."}
       </p>
       <div className="mt-2 flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          disabled={isPending}
+        <PendingButton
+          pending={isPending}
+          pendingLabel={es ? "Guardando…" : "Saving…"}
           onClick={() => startTransition(async () => {
             setError(null);
             try {
@@ -156,10 +158,10 @@ export function TrackCaseButton({
               setError(err instanceof Error ? err.message : es ? "Algo salió mal." : "Something went wrong.");
             }
           })}
-          className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isPending ? (es ? "Guardando…" : "Saving…") : es ? "Rastrear este caso" : "Track this case"}
-        </button>
+          {es ? "Rastrear este caso" : "Track this case"}
+        </PendingButton>
         <select
           id="track-case-type"
           value={caseType}

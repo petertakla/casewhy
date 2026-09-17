@@ -8,6 +8,7 @@ import { startCheckout, openBillingPortal } from "./actions";
 import { ShareButton } from "@/components/ShareButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { PlusBadge } from "@/components/PlusBadge";
+import { FormSubmitButton } from "@/components/FormSubmitButton";
 
 export const metadata: Metadata = {
   title: "CaseWhy Plus — Pricing & Features | CaseWhy",
@@ -153,12 +154,13 @@ function PlanCard({
       )}
       {canSubscribe && (
         <form action={startCheckout.bind(null, planId)} className="mt-4">
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600"
+          <FormSubmitButton
+            pendingLabel="Starting checkout…"
+            waitingLabel="Still waiting on Stripe…"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70"
           >
             Subscribe
-          </button>
+          </FormSubmitButton>
         </form>
       )}
     </div>
@@ -241,12 +243,13 @@ export default async function PlusPage({
       {isPlus ? (
         <div className="mt-6">
           <form action={openBillingPortal}>
-            <button
-              type="submit"
-              className="rounded-lg bg-brand-500 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-600"
+            <FormSubmitButton
+              pendingLabel="Opening billing…"
+              waitingLabel="Still waiting on Stripe…"
+              className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70"
             >
               Manage subscription
-            </button>
+            </FormSubmitButton>
           </form>
         </div>
       ) : (

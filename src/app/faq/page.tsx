@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { PublicPage } from "@/components/PublicPage";
-import { FaqPageSearch } from "@/components/FaqPageSearch";
+import { PageFilter } from "@/components/PageFilter";
 import { slugify } from "@/lib/search/slugify";
 
 // Round 73 item 8 — the common trust/product questions this audience
@@ -33,6 +33,16 @@ export const metadata: Metadata = {
     },
   },
 };
+
+// Round 110 follow-up — this page was statically prerendered, which meant
+// the root layout's AuthHeader (needs per-request session data) couldn't
+// be baked into the static HTML at all: Next.js deferred it to a client-
+// only render for this page specifically. Confirmed live -- curl (no JS)
+// showed zero <header> content, while a real browser showed it fine after
+// hydration, but not in the initial HTML a crawler or slow-JS client
+// would see. force-dynamic matches every other page in the app that
+// needs the real signed-in header (processing-times, policy, etc.).
+export const dynamic = "force-dynamic";
 
 interface Faq {
   question: string;
@@ -326,7 +336,12 @@ export default function FaqPage() {
         .
       </p>
 
-      <FaqPageSearch isSpanish={false} />
+      <PageFilter
+        basePath="/faq"
+        placeholder="Search these questions…"
+        noMatchText="No questions on this page match."
+        isSpanish={false}
+      />
 
       <div className="space-y-10">
         {GROUPS.map((group) => (

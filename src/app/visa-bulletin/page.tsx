@@ -15,6 +15,7 @@ import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { ShareButton } from "@/components/ShareButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PageFilter } from "@/components/PageFilter";
 
 // Round 83 — was a static `export const metadata`; converted to
 // generateMetadata() so a Spanish visitor gets a Spanish title/description
@@ -272,6 +273,13 @@ export default async function VisaBulletinPage({
           es={es}
         />
       </div>
+
+      <PageFilter
+        basePath="/visa-bulletin"
+        placeholder={es ? "Filtrar por categoría o país…" : "Filter by category or country…"}
+        noMatchText={es ? "Ninguna categoría en esta página coincide." : "No categories on this page match."}
+        isSpanish={es}
+      />
 
       <h2 className="mb-3 text-sm font-semibold uppercase tracking-widest text-muted">
         {es ? "Preferencias por patrocinio familiar" : "Family-sponsored preferences"}

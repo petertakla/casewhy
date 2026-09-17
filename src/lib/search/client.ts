@@ -73,10 +73,54 @@ export interface GroupedResults {
   pages: IndexedDoc[];
 }
 
+// Round 110 follow-up — live-verified via /admin/search's own example
+// queries: "attorney florida" surfaced two USCIS news stories about
+// attorneys committing fraud ahead of the actual "Find an immigration
+// attorney" page; "I-485" surfaced I-131/I-751/I-129/I-821D FAQ answers
+// above I-485's own content, because MiniSearch's default fuzzy (0.2)
+// matching treats "I-485" and "I-131" as near-neighbors (same "I-\d\d\d"
+// shape). Both fixed the same way: a boostDocument multiplier, not a
+// fields/fuzzy config change, so unrelated queries are unaffected.
+const FORM_NUMBER_RE = /\b([A-Z]-\d{2,4}[A-Z]?)\b/;
+
+function extractFormNumber(text: string): string | null {
+  const m = text.toUpperCase().match(FORM_NUMBER_RE);
+  return m ? m[1] : null;
+}
+
 export async function searchContent(locale: "en" | "es", query: string): Promise<GroupedResults> {
   if (!query.trim()) return { answers: [], reference: [], pages: [] };
   const mini = await loadSearchIndex(locale);
-  const results = mini.search(query) as unknown as IndexedDoc[];
+  const queryFormNumber = extractFormNumber(query);
+
+  const results = mini.search(query, {
+    boostDocument: (_id, _term, storedFields) => {
+      let boost = 1;
+      const title = String(storedFields?.title ?? "");
+      const url = String(storedFields?.url ?? "");
+
+      if (queryFormNumber) {
+        const titleFormNumber = extractFormNumber(title);
+        if (titleFormNumber === queryFormNumber) {
+          boost *= 4;
+        } else if (titleFormNumber) {
+          // A different form's own content, pulled in only because its
+          // form number fuzzy-matches the query's -- demote so it
+          // doesn't bury the form actually being searched for.
+          boost *= 0.25;
+        }
+      }
+
+      // News is time-sensitive/low-signal for a "find a form/process/
+      // person" query -- demote relative to editorial and directory
+      // content that's written to answer exactly that kind of question.
+      if (storedFields?.type === "reference" && url.includes("/news/")) {
+        boost *= 0.4;
+      }
+
+      return boost;
+    },
+  }) as unknown as IndexedDoc[];
 
   return {
     answers: results.filter((r) => r.type === "answer").slice(0, 5),

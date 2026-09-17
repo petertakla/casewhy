@@ -8,6 +8,7 @@ import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { ShareButton } from "@/components/ShareButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PageFilter } from "@/components/PageFilter";
 
 // Round 83 — same static-metadata gap as processing-times/visa-bulletin.
 export async function generateMetadata({
@@ -108,7 +109,14 @@ export default async function NewsPage({
           {es ? "Ninguna noticia disponible en este momento — vuelve a revisar pronto." : "No stories available right now — check back shortly."}
         </div>
       ) : (
-        <div className="space-y-4">
+        <>
+          <PageFilter
+            basePath="/news/"
+            placeholder={es ? "Filtrar estas noticias…" : "Filter these stories…"}
+            noMatchText={es ? "Ninguna noticia en esta página coincide." : "No stories on this page match."}
+            isSpanish={es}
+          />
+          <div className="space-y-4">
           {items.map((item) => (
             <div
               key={`${item.sourceId}-${item.link}`}
@@ -137,7 +145,8 @@ export default async function NewsPage({
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        </>
       )}
 
       {failedSources.length > 0 && (

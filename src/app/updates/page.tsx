@@ -4,6 +4,7 @@ import { getPublishedUpdates, type UpdatePost } from "@/lib/updates/updates";
 import { ShareButton } from "@/components/ShareButton";
 import { isSpanishLocale } from "@/lib/i18n/locale";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PageFilter } from "@/components/PageFilter";
 
 // Round 93 — the public list page for CaseWhy's editorial blog. Same
 // list+permalink shape as /policy and /news, but the posts rendered here
@@ -106,7 +107,14 @@ export default async function UpdatesIndexPage({
       {posts.length === 0 ? (
         <p className="text-sm text-muted">{es ? "Aún no hay publicaciones — vuelva a revisar pronto." : "No posts yet — check back soon."}</p>
       ) : (
-        <div className="space-y-4">
+        <>
+          <PageFilter
+            basePath="/updates/"
+            placeholder={es ? "Filtrar estas publicaciones…" : "Filter these posts…"}
+            noMatchText={es ? "Ninguna publicación en esta página coincide." : "No posts on this page match."}
+            isSpanish={es}
+          />
+          <div className="space-y-4">
           {posts.map((post) => (
             <Link
               key={post.slug}
@@ -121,7 +129,8 @@ export default async function UpdatesIndexPage({
               <p className="mt-1 text-sm text-muted">{post.summary}</p>
             </Link>
           ))}
-        </div>
+          </div>
+        </>
       )}
     </main>
   );

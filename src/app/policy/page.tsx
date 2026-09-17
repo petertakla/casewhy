@@ -4,6 +4,7 @@ import { POLICY_MEMOS } from "@/lib/kb/policy-memos";
 import { ShareButton } from "@/components/ShareButton";
 import { isSpanishLocale } from "@/lib/i18n/locale";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PageFilter } from "@/components/PageFilter";
 
 // Round 73 — the public, indexable mirror of the policy-memo knowledge
 // base that already powers CaseWhy's in-app, per-case explanations
@@ -99,6 +100,13 @@ export default async function PolicyIndexPage({
           es={es}
         />
       </div>
+
+      <PageFilter
+        basePath="/policy/"
+        placeholder={es ? "Filtrar estos memorandos…" : "Filter these memos…"}
+        noMatchText={es ? "Ningún memorando en esta página coincide." : "No memos on this page match."}
+        isSpanish={es}
+      />
 
       <div className="space-y-4">
         {memos.map((memo) => {

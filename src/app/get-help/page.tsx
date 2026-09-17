@@ -41,6 +41,12 @@ export const metadata: Metadata = {
 // alongside its description — answers "which one applies to me" directly,
 // which the page never said anywhere before.
 
+// Round 110 follow-up — see /faq's own comment: statically prerendered,
+// which bailed the root layout's session-dependent AuthHeader (search
+// icon included) to client-only rendering, missing from the initial HTML
+// a crawler or slow-JS client would see.
+export const dynamic = "force-dynamic";
+
 export default function GetHelpPage() {
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">

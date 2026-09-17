@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { PublicPage } from "@/components/PublicPage";
-import { FaqPageSearch } from "@/components/FaqPageSearch";
+import { PageFilter } from "@/components/PageFilter";
 import { slugify } from "@/lib/search/slugify";
 
 // Round 97 item 3 — Spanish translation of /faq (round 73). Round 104
@@ -24,6 +24,11 @@ export const metadata: Metadata = {
     },
   },
 };
+
+// Round 110 follow-up — see /faq's own comment: this page was statically
+// prerendered, which bailed the root layout's session-dependent
+// AuthHeader to client-only rendering, missing from the initial HTML.
+export const dynamic = "force-dynamic";
 
 interface Faq {
   question: string;
@@ -299,7 +304,12 @@ export default function FaqPageEs() {
         (en inglés).
       </p>
 
-      <FaqPageSearch isSpanish={true} />
+      <PageFilter
+        basePath="/es/faq"
+        placeholder="Buscar en estas preguntas…"
+        noMatchText="Ninguna pregunta en esta página coincide."
+        isSpanish={true}
+      />
 
       <div className="space-y-10">
         {GROUPS.map((group) => (

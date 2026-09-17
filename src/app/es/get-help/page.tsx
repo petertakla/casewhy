@@ -87,6 +87,11 @@ const ENTITY_TYPES_ES: EntityCardEs[] = [
   },
 ];
 
+// Round 110 follow-up — see /faq's own comment: statically prerendered,
+// which bailed the root layout's session-dependent AuthHeader to client-
+// only rendering.
+export const dynamic = "force-dynamic";
+
 export default function GetHelpPageEs() {
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">

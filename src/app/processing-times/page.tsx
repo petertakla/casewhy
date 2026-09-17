@@ -14,6 +14,7 @@ import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { ShareButton } from "@/components/ShareButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PageFilter } from "@/components/PageFilter";
 
 // Round 83 — was a static `export const metadata`, so every visitor got
 // the English title/description regardless of `?lang=es`, and there was
@@ -153,6 +154,13 @@ export default async function ProcessingTimesPage({
           es={es}
         />
       </div>
+
+      <PageFilter
+        basePath="/processing-times"
+        placeholder={es ? "Filtrar por formulario u oficina…" : "Filter by form or office…"}
+        noMatchText={es ? "Ningún formulario en esta página coincide." : "No forms on this page match."}
+        isSpanish={es}
+      />
 
       <div className="space-y-4">
         {PROCESSING_TIMES.map((entry) => (

@@ -47,3 +47,7 @@ jobs:
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
           POSTMARK_API_TOKEN: ${{ secrets.POSTMARK_API_TOKEN }}
+      # Round 110 follow-up — reads .next/prerender-manifest.json (which
+      # page routes were statically prerendered), so it has to run after
+      # `npm run build`, unlike the other check: scripts above.
+      - run: npm run check:page-filters

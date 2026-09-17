@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo/organization-jsonld";
 import { PublicPage } from "@/components/PublicPage";
 import { publicPagesFor } from "@/lib/site/pages";
+import { SitemapFilter, type SitemapSection } from "@/components/SitemapFilter";
 
 // Round 73 — a human-readable site index, distinct from sitemap.xml (the
 // machine-readable one at src/app/sitemap.ts). Same underlying goal
@@ -30,6 +30,11 @@ export const metadata: Metadata = {
 
 const SECTIONS = ["CaseWhy", "Get help", "Reference", "Legal"] as const;
 
+// Round 110 follow-up — see /faq's own comment: statically prerendered,
+// which bailed the root layout's session-dependent AuthHeader to client-
+// only rendering, missing from the initial HTML.
+export const dynamic = "force-dynamic";
+
 export default function SiteIndexPage() {
   return (
     <PublicPage es={false} switcherHref="/es/sitemap">
@@ -52,34 +57,17 @@ export default function SiteIndexPage() {
       <h1 className="text-2xl font-bold tracking-tight">Site index</h1>
       <p className="mb-8 mt-2 text-muted">Every public page on CaseWhy, in one place.</p>
 
-      <div className="space-y-8">
-        {SECTIONS.map((section) => {
-          const entries = publicPagesFor(section).filter((p) => p.showInIndex);
-          if (entries.length === 0) return null;
-          return (
-            <div key={section}>
-              <h2 className="mb-3 text-sm font-semibold uppercase tracking-widest text-muted">{section}</h2>
-              <ul className="space-y-2 text-sm">
-                {entries.map((entry) =>
-                  entry.external ? (
-                    <li key={entry.href}>
-                      <a href={entry.href} target="_blank" rel="noopener noreferrer" className="text-brand-600 hover:underline dark:text-brand-400">
-                        {entry.label} ↗
-                      </a>
-                    </li>
-                  ) : (
-                    <li key={entry.href}>
-                      <Link href={entry.href} className="text-brand-600 hover:underline dark:text-brand-400">
-                        {entry.label}
-                      </Link>
-                    </li>
-                  )
-                )}
-              </ul>
-            </div>
-          );
-        })}
-      </div>
+      <SitemapFilter
+        sections={SECTIONS.map((section): SitemapSection => ({
+          name: section,
+          entries: publicPagesFor(section)
+            .filter((p) => p.showInIndex)
+            .map((entry) => ({ href: entry.href, label: entry.label, external: entry.external })),
+        })).filter((s) => s.entries.length > 0)}
+        placeholder="Filter this index…"
+        noMatchText="No pages match."
+        externalLabelSuffix=" ↗"
+      />
 
       {/* Round 102 — moved out of the Reference section (where it read as
           a broken seventh list item, body-sized, right under FAQ) to the

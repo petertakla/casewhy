@@ -31,6 +31,7 @@
 import { createHmac, randomBytes } from "crypto";
 import type { Poster } from "./types";
 import { assertXWriteBudget } from "./x-rate-limit";
+import { isUnconfigured } from "./env";
 
 const X_API_BASE = "https://api.x.com/2/tweets";
 
@@ -74,12 +75,12 @@ function requireCredentials() {
   const apiSecret = process.env.X_API_SECRET;
   const accessToken = process.env.X_ACCESS_TOKEN;
   const accessTokenSecret = process.env.X_ACCESS_TOKEN_SECRET;
-  if (!apiKey || !apiSecret || !accessToken || !accessTokenSecret) {
+  if (isUnconfigured(apiKey) || isUnconfigured(apiSecret) || isUnconfigured(accessToken) || isUnconfigured(accessTokenSecret)) {
     throw new Error(
       "X posting isn't configured yet -- X_API_KEY/X_API_SECRET/X_ACCESS_TOKEN/X_ACCESS_TOKEN_SECRET aren't all set. See the round 90 checklist in CLOUD_CLAUDE.md for the one-time developer-project setup."
     );
   }
-  return { apiKey, apiSecret, accessToken, accessTokenSecret };
+  return { apiKey: apiKey!, apiSecret: apiSecret!, accessToken: accessToken!, accessTokenSecret: accessTokenSecret! };
 }
 
 async function postOneTweet(text: string, replyToId: string | null, credentials: ReturnType<typeof requireCredentials>): Promise<string> {

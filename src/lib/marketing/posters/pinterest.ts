@@ -13,18 +13,19 @@
 // throws a clear "not configured" error -- same pattern as X/Threads.
 
 import type { Poster } from "./types";
+import { isUnconfigured } from "./env";
 
 const PINTEREST_API_BASE = "https://api.pinterest.com/v5";
 
 function requireCredentials() {
   const accessToken = process.env.PINTEREST_ACCESS_TOKEN;
   const boardId = process.env.PINTEREST_BOARD_ID;
-  if (!accessToken || !boardId) {
+  if (isUnconfigured(accessToken) || isUnconfigured(boardId)) {
     throw new Error(
       "Pinterest posting isn't configured yet -- PINTEREST_ACCESS_TOKEN/PINTEREST_BOARD_ID aren't both set. See the round 91 checklist in CLOUD_CLAUDE.md for the one-time developer-app setup."
     );
   }
-  return { accessToken, boardId };
+  return { accessToken: accessToken!, boardId: boardId! };
 }
 
 export const postToPinterest: Poster = async (item) => {

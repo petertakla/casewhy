@@ -17,23 +17,24 @@
 
 import { google } from "googleapis";
 import type { Poster } from "./types";
+import { isUnconfigured } from "./env";
 
 function requireCredentials() {
   const clientId = process.env.YOUTUBE_CLIENT_ID;
   const clientSecret = process.env.YOUTUBE_CLIENT_SECRET;
   const refreshToken = process.env.YOUTUBE_REFRESH_TOKEN;
-  if (!clientId || !clientSecret || !refreshToken) {
+  if (isUnconfigured(clientId) || isUnconfigured(clientSecret) || isUnconfigured(refreshToken)) {
     throw new Error(
       "YouTube posting isn't configured yet -- YOUTUBE_CLIENT_ID/YOUTUBE_CLIENT_SECRET/YOUTUBE_REFRESH_TOKEN aren't all set. See the round 91 checklist in CLOUD_CLAUDE.md, and visit /api/admin/youtube-oauth/start once signed in as admin."
     );
   }
-  return { clientId, clientSecret, refreshToken };
+  return { clientId: clientId!, clientSecret: clientSecret!, refreshToken: refreshToken! };
 }
 
 export function getYoutubeOAuthClient(redirectUri: string) {
   const clientId = process.env.YOUTUBE_CLIENT_ID;
   const clientSecret = process.env.YOUTUBE_CLIENT_SECRET;
-  if (!clientId || !clientSecret) {
+  if (isUnconfigured(clientId) || isUnconfigured(clientSecret)) {
     throw new Error("YOUTUBE_CLIENT_ID/YOUTUBE_CLIENT_SECRET aren't set yet.");
   }
   return new google.auth.OAuth2(clientId, clientSecret, redirectUri);

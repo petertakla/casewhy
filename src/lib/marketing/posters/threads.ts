@@ -14,18 +14,19 @@
 // a confusing API failure.
 
 import type { Poster } from "./types";
+import { isUnconfigured } from "./env";
 
 const THREADS_API_BASE = "https://graph.threads.net/v1.0";
 
 function requireCredentials() {
   const accessToken = process.env.THREADS_ACCESS_TOKEN;
   const userId = process.env.THREADS_USER_ID;
-  if (!accessToken || !userId) {
+  if (isUnconfigured(accessToken) || isUnconfigured(userId)) {
     throw new Error(
       "Threads posting isn't configured yet -- THREADS_ACCESS_TOKEN/THREADS_USER_ID aren't both set. See the round 90 checklist in CLOUD_CLAUDE.md for the one-time Meta app setup."
     );
   }
-  return { accessToken, userId };
+  return { accessToken: accessToken!, userId: userId! };
 }
 
 export const postToThreads: Poster = async (item) => {

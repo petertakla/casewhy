@@ -543,6 +543,19 @@ export default async function DashboardPage({
       if (trackedMatch) {
         try {
           await recordCaseHistory(trackedMatch.id, trackedMatch.caseType, receiptNumber, status);
+          // Round 110 follow-up — real bug found live (Peter: tracked 5
+          // cases, list showed "Not yet checked" on all of them despite
+          // just looking each one up): recordCaseHistory() now persists
+          // lastStatusText/lastCheckedAt, but trackedCasesList was already
+          // fetched above, before this call, so its copy of trackedMatch
+          // is stale for the rest of THIS render. trackedMatch is the same
+          // object reference as the entry inside trackedCasesList (from
+          // .find()), so mutating it here updates what <TrackedCasesList>
+          // renders below without a second DB round-trip. Verified live:
+          // without this, a case's very first check still showed "Not yet
+          // checked" until the *next* page load.
+          trackedMatch.lastStatusText = status.statusText;
+          trackedMatch.lastCheckedAt = new Date();
         } catch {
           // Best-effort — never block rendering the dashboard on this.
         }

@@ -15,6 +15,19 @@ function formatDate(date: Date, es: boolean): string {
   return date.toLocaleDateString(es ? "es" : undefined, { year: "numeric", month: "long", day: "numeric" });
 }
 
+const INTERVAL_LABELS: Record<string, { en: string; es: string }> = {
+  day: { en: "day", es: "día" },
+  week: { en: "week", es: "semana" },
+  month: { en: "month", es: "mes" },
+  year: { en: "year", es: "año" },
+};
+
+function intervalLabel(interval: string, es: boolean): string {
+  const entry = INTERVAL_LABELS[interval];
+  if (!entry) return interval;
+  return es ? entry.es : entry.en;
+}
+
 /**
  * Round 114 follow-up — Peter, testing Plus: "it doesn't show the tier
  * anywhere." A first Settings section, sourced live from the real
@@ -62,7 +75,7 @@ export async function PlanSection({ userId, es }: { userId: string; es: boolean 
   }
 
   const priceLine = live
-    ? `${formatMoney(live.amountCents, live.currency)}/${live.interval}`
+    ? `${formatMoney(live.amountCents, live.currency)}/${intervalLabel(live.interval, es)}`
     : null;
 
   return (

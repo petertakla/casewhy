@@ -130,3 +130,22 @@ export const postToX: Poster = async (item) => {
   const handle = process.env.X_HANDLE || "CaseWhy";
   return { url: `https://x.com/${handle}/status/${firstId}` };
 };
+
+// Round 90 prep — a way to verify the 4 credentials actually authenticate
+// before ever risking a real posted tweet. GET /2/users/me needs the same
+// OAuth 1.0a user-context signing as posting, but reads instead of
+// writes, so it's a safe, side-effect-free way to confirm a pasted key
+// set actually works. Used by the one-time /api/admin/devcheck-x-auth
+// diagnostic route (see that route's own comment for why it's temporary).
+export async function testXCredentials(): Promise<{ id: string; username: string; name: string }> {
+  const credentials = requireCredentials();
+  const url = "https://api.x.com/2/users/me";
+  const res = await fetch(url, {
+    headers: { Authorization: oauthHeader("GET", url, credentials) },
+  });
+  const data = (await res.json()) as { data?: { id: string; username: string; name: string }; detail?: string; title?: string };
+  if (!res.ok || !data.data) {
+    throw new Error(`X API error (${res.status}): ${data.detail ?? data.title ?? "unknown"}`);
+  }
+  return data.data;
+}

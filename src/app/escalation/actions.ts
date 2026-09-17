@@ -97,6 +97,14 @@ const DraftLetterInput = z.object({
   trackedCaseId: z.string().min(1),
   letterType: z.enum(["congressional", "field_office", "ombudsman"]),
   userReason: z.string().trim().min(1).max(1000),
+  /** Round 110 follow-up — Peter's own report: the reps list had no way
+   * to pick which one a congressional letter goes to. An index into
+   * findRepresentatives()'s own return order, not client-supplied
+   * representative data -- that function is pure over static data, so
+   * re-deriving the list server-side and indexing into it (below) can't
+   * be used to inject an arbitrary "representative" into an AI-drafted
+   * official letter. */
+  representativeIndex: z.number().int().min(0).optional(),
 });
 
 export async function draftMyEscalationLetter(
@@ -105,9 +113,13 @@ export async function draftMyEscalationLetter(
   const user = await requirePlusUser();
   const parsed = DraftLetterInput.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: "Missing or invalid input." };
+    // Round 110 follow-up — was a bare "Missing or invalid input.", not
+    // diagnosable when Peter hit it live and this session couldn't
+    // reproduce it. Names the real field and reason now.
+    const issue = parsed.error.issues[0];
+    return { ok: false, error: `Missing or invalid input: ${issue.path.join(".") || "input"} — ${issue.message}` };
   }
-  const { trackedCaseId, letterType, userReason } = parsed.data;
+  const { trackedCaseId, letterType, userReason, representativeIndex } = parsed.data;
 
   const db = getDb();
   const [row] = await db
@@ -127,9 +139,9 @@ export async function draftMyEscalationLetter(
   if (letterType === "congressional") {
     const district = await resolveCongressionalDistrict(address).catch(() => null);
     if (district) {
-      representative = findRepresentatives(district.state, district.district).find(
-        (r) => r.chamber === "house" || r.chamber === "senate"
-      );
+      const candidates = findRepresentatives(district.state, district.district);
+      representative =
+        representativeIndex !== undefined ? candidates[representativeIndex] : candidates.find((r) => r.chamber === "house" || r.chamber === "senate");
     }
   }
 

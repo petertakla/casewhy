@@ -48,6 +48,12 @@ export function EscalationToolkit({
   const [reps, setReps] = useState<RepresentativesResult | null>(null);
   const [lookingUp, setLookingUp] = useState(false);
   const [lookupError, setLookupError] = useState<string | null>(null);
+  /** Peter's own report: the reps list had no way to pick which one a
+   * congressional letter actually goes to — it silently used whichever
+   * findRepresentatives() returned first. Defaults to the first result
+   * once a lookup returns, so drafting isn't blocked on an explicit
+   * click, but is now a real, visible, user-changeable choice. */
+  const [selectedRepIndex, setSelectedRepIndex] = useState<number | null>(null);
 
   const [activeLetterType, setActiveLetterType] = useState<LetterType | null>(null);
   const [reason, setReason] = useState("");
@@ -114,6 +120,7 @@ export function EscalationToolkit({
         return;
       }
       setReps(result.result);
+      setSelectedRepIndex(result.result.representatives.length > 0 ? 0 : null);
     } finally {
       setLookingUp(false);
     }
@@ -124,7 +131,12 @@ export function EscalationToolkit({
     setDraftError(null);
     setLetterText(null);
     try {
-      const result = await draftMyEscalationLetter({ trackedCaseId, letterType, userReason: reason });
+      const result = await draftMyEscalationLetter({
+        trackedCaseId,
+        letterType,
+        userReason: reason,
+        representativeIndex: letterType === "congressional" ? (selectedRepIndex ?? undefined) : undefined,
+      });
       if (!result.ok) {
         setDraftError(result.error);
         return;
@@ -276,26 +288,50 @@ export function EscalationToolkit({
           )}
 
           {reps && reps.representatives.length > 0 && (
-            <ul className="mt-2 space-y-2">
-              {reps.representatives.map((r) => (
-                <li key={`${r.chamber}-${r.name}`} className="rounded-lg border border-border bg-surface px-3 py-2 text-sm">
-                  <p className="font-semibold">
-                    {r.name} ({r.party}) —{" "}
-                    {r.chamber === "senate"
-                      ? es ? "Senador de EE.UU." : "U.S. Senator"
-                      : es
-                        ? `Representante de EE.UU., ${r.state}-${r.district}`
-                        : `U.S. Representative, ${r.state}-${r.district}`}
-                  </p>
-                  <p className="mt-0.5 text-xs text-muted">
-                    {r.phone} ·{" "}
-                    <a href={r.website} target="_blank" rel="noopener noreferrer" className="text-brand-600 hover:underline dark:text-brand-400">
-                      {es ? "Sitio web" : "Website"}
-                    </a>
-                  </p>
-                </li>
-              ))}
-            </ul>
+            <>
+              <p className="mt-2 text-xs text-muted">
+                {es
+                  ? "Elige a quién va dirigida la carta al Congreso:"
+                  : "Choose who the congressional letter is addressed to:"}
+              </p>
+              <ul className="mt-1 space-y-2">
+                {reps.representatives.map((r, i) => (
+                  <li key={`${r.chamber}-${r.name}`}>
+                    <label className="flex cursor-pointer items-start gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm has-[:checked]:border-brand-500">
+                      <input
+                        type="radio"
+                        name="selectedRep"
+                        checked={selectedRepIndex === i}
+                        onChange={() => setSelectedRepIndex(i)}
+                        className="mt-1 accent-brand-500"
+                      />
+                      <span>
+                        <p className="font-semibold">
+                          {r.name} ({r.party}) —{" "}
+                          {r.chamber === "senate"
+                            ? es ? "Senador de EE.UU." : "U.S. Senator"
+                            : es
+                              ? `Representante de EE.UU., ${r.state}-${r.district}`
+                              : `U.S. Representative, ${r.state}-${r.district}`}
+                        </p>
+                        <p className="mt-0.5 text-xs text-muted">
+                          {r.phone} ·{" "}
+                          <a
+                            href={r.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-brand-600 hover:underline dark:text-brand-400"
+                          >
+                            {es ? "Sitio web" : "Website"}
+                          </a>
+                        </p>
+                      </span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
         </div>
       )}

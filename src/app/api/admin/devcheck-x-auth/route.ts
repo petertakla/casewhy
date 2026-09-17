@@ -15,10 +15,10 @@ import { testXCredentials } from "@/lib/marketing/posters/x";
 // trim only, never the value itself) since a trailing newline from a
 // paste is a common, real cause of exactly this failure mode with
 // OAuth 1.0a's exact-string signing.
-function whitespaceCheck(name: string): { name: string; set: boolean; hasWhitespace: boolean } {
+function whitespaceCheck(name: string): { name: string; set: boolean; hasWhitespace: boolean; length: number } {
   const raw = process.env[name];
-  if (!raw) return { name, set: false, hasWhitespace: false };
-  return { name, set: true, hasWhitespace: raw !== raw.trim() };
+  if (!raw) return { name, set: false, hasWhitespace: false, length: 0 };
+  return { name, set: true, hasWhitespace: raw !== raw.trim(), length: raw.length };
 }
 
 export async function POST(request: Request) {

@@ -81,22 +81,41 @@ function SearchForm({
   es,
 }: {
   receiptNumber?: string;
-  /** Round 71 — an account with ≥1 already-tracked case gets "Add New Case"
-   * instead of the plain "Track case" copy, which previously read as if
-   * nothing were tracked yet regardless of how many cases the account
-   * already had. */
+  /** Round 114 follow-up — the submit button itself is now the same
+   * "Look up case" regardless of count (round 71's "Add New Case" wording
+   * was dropped along with the rest of this button's old "Track"
+   * framing, since it never actually tracked anything). Still used to
+   * vary the helper line's copy below the button. */
   trackedCaseCount: number;
   es: boolean;
 }) {
   return (
-    <form action="/dashboard" method="get" className="flex flex-col gap-3 sm:flex-row">
-      <ReceiptNumberInput defaultValue={receiptNumber} es={es} />
-      <button
-        type="submit"
-        className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
-      >
-        {trackedCaseCount > 0 ? (es ? "Agregar caso nuevo" : "Add New Case") : es ? "Rastrear caso" : "Track case"}
-      </button>
+    <form action="/dashboard" method="get" className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <ReceiptNumberInput defaultValue={receiptNumber} es={es} />
+        <button
+          type="submit"
+          className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+        >
+          {/* Round 114 follow-up — this button only runs a live lookup, it
+              never saves anything (that's TrackCaseButton, "Track this
+              case", inside the result card below). It was previously
+              labeled "Track case"/"Add New Case", which described the
+              wrong action and was found confusing while testing live
+              before the USCIS demo -- a user could click this repeatedly
+              expecting each click to save a case, and nothing would. */}
+          {es ? "Buscar caso" : "Look up case"}
+        </button>
+      </div>
+      <p className="text-xs text-muted">
+        {trackedCaseCount > 0
+          ? es
+            ? "Busca un número de recibo, luego pulsa \"Rastrear este caso\" en el resultado para guardarlo."
+            : 'Look up a receipt number, then click "Track this case" on the result to save it.'
+          : es
+            ? "Busca un número de recibo para ver su estado — luego pulsa \"Rastrear este caso\" para guardarlo."
+            : 'Look up a receipt number to see its status — then click "Track this case" to save it.'}
+      </p>
     </form>
   );
 }
@@ -442,6 +461,45 @@ function ErrorCard({ message }: { message: string }) {
 }
 
 /**
+ * Round 114 follow-up — found by live-testing before the demo: when a
+ * fresh status check fails (sandbox down, network blip), a real tracked
+ * case with a genuine prior result previously rendered nothing but a bare
+ * error, as if the user had never tracked anything. This shows the last
+ * real status this case actually fetched, so a transient failure doesn't
+ * blank the whole page for a case that has real data.
+ */
+function LastKnownStatusCard({
+  receiptNumber,
+  lastStatusText,
+  lastCheckedAt,
+  es,
+}: {
+  receiptNumber: string;
+  lastStatusText: string;
+  lastCheckedAt: Date | null;
+  es: boolean;
+}) {
+  const checkedLabel = lastCheckedAt
+    ? lastCheckedAt.toLocaleString(es ? "es" : undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })
+    : null;
+  return (
+    <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+      <p className="font-mono text-xs uppercase tracking-widest text-muted">{receiptNumber}</p>
+      <div className="mt-2 flex items-center gap-2">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-2.5 py-1 text-xs font-semibold text-foreground/80">
+          {lastStatusText}
+        </span>
+      </div>
+      <p className="mt-3 text-sm text-muted">
+        {es
+          ? `No pudimos obtener una actualización en vivo ahora mismo — este es el último estado real que consultamos${checkedLabel ? ` (${checkedLabel})` : ""}.`
+          : `We couldn't get a live update just now — this is the last real status we fetched${checkedLabel ? ` (${checkedLabel})` : ""}.`}
+      </p>
+    </div>
+  );
+}
+
+/**
  * Round 46 — shown instead of a live status lookup for a case pending
  * review past Plus's 10-case auto-approved band. Deliberately never calls
  * getCaseStatus() for a pending case — that's the whole point of the gate,
@@ -582,7 +640,16 @@ export default async function DashboardPage({
             }}
           />
         )}
-        {errorMessage && <ErrorCard message={errorMessage} />}
+        {errorMessage && trackedMatch?.lastStatusText ? (
+          <LastKnownStatusCard
+            receiptNumber={trackedMatch.receiptNumber}
+            lastStatusText={trackedMatch.lastStatusText}
+            lastCheckedAt={trackedMatch.lastCheckedAt}
+            es={es}
+          />
+        ) : (
+          errorMessage && <ErrorCard message={errorMessage} />
+        )}
         {!status && !isPendingReview && !errorMessage && !receiptNumber && (
           <div className="rounded-2xl border border-dashed border-border-strong p-8 text-center">
             <p className="text-sm text-muted">

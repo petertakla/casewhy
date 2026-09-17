@@ -17,6 +17,11 @@ export interface TrackedCase {
   id: string;
   receiptNumber: string;
   lastCheckedAt: Date | null;
+  /** Round 114 follow-up — the last live status text this case actually
+   * fetched, decrypted. Null until the first successful check. Lets the
+   * dashboard show something real (not just a bare error) when today's
+   * live call fails but a real prior result already exists. */
+  lastStatusText: string | null;
   /** One of CASE_TYPES' ids, or null for a case tracked before round 21. */
   caseType: string | null;
   /** Round 46 — "pending_review" cases are never polled and never counted
@@ -32,6 +37,7 @@ export async function getTrackedCases(userId: string): Promise<TrackedCase[]> {
       id: trackedCases.id,
       receiptNumber: trackedCases.receiptNumber,
       lastCheckedAt: trackedCases.lastCheckedAt,
+      lastStatusText: trackedCases.lastStatusText,
       caseType: trackedCases.caseType,
       status: trackedCases.status,
     })
@@ -46,6 +52,7 @@ export async function getTrackedCases(userId: string): Promise<TrackedCase[]> {
         id: row.id,
         receiptNumber: decryptField(row.receiptNumber),
         lastCheckedAt: row.lastCheckedAt,
+        lastStatusText: row.lastStatusText ? decryptField(row.lastStatusText) : null,
         caseType: row.caseType,
         status: row.status === "pending_review" ? "pending_review" : "active",
       });

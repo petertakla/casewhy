@@ -92,8 +92,9 @@ export async function searchContent(locale: "en" | "es", query: string): Promise
   if (!query.trim()) return { answers: [], reference: [], pages: [] };
   const mini = await loadSearchIndex(locale);
   const queryFormNumber = extractFormNumber(query);
+  const queryWordCount = query.trim().split(/\s+/).length;
 
-  const results = mini.search(query, {
+  const rawResults = mini.search(query, {
     boostDocument: (_id, _term, storedFields) => {
       let boost = 1;
       const title = String(storedFields?.title ?? "");
@@ -120,6 +121,21 @@ export async function searchContent(locale: "en" | "es", query: string): Promise
 
       return boost;
     },
+  });
+
+  // The demotion above only reorders -- it can't remove a news item that's
+  // the ONLY reference-type match (exactly what happened live: "attorney
+  // florida" fuzzy-matched two news headlines on "attorney" alone, with no
+  // other reference doc to outrank them). For a multi-word query, require
+  // a news result to match every distinct query word, not just one --
+  // genuine news relevance (a real Florida-specific story) still passes;
+  // an off-target single-term fuzzy hit doesn't.
+  const results = rawResults.filter((r) => {
+    const url = String(r.url ?? "");
+    if (r.type === "reference" && url.includes("/news/") && queryWordCount > 1) {
+      return r.queryTerms.length >= queryWordCount;
+    }
+    return true;
   }) as unknown as IndexedDoc[];
 
   return {

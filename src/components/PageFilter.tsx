@@ -43,7 +43,17 @@ export function PageFilter({
     searchContent(locale, query).then((r) => {
       if (cancelled) return;
       const all = [...r.answers, ...r.reference, ...r.pages];
-      setResults(all.filter((d) => d.url.startsWith(basePath)));
+      setResults(
+        all.filter((d) => {
+          if (d.url.startsWith(basePath)) return true;
+          // Round 110 follow-up — news results now link to their real
+          // external source (url no longer starts with "/news/"), so
+          // basePath-prefix matching can't find them on /news's own
+          // filter; match by type+external instead for that one page.
+          if (basePath.startsWith("/news") && d.type === "reference" && d.external) return true;
+          return false;
+        })
+      );
     });
     return () => {
       cancelled = true;
@@ -65,7 +75,12 @@ export function PageFilter({
             <ul className="space-y-1">
               {results.map((r) => (
                 <li key={r.id}>
-                  <a href={r.url} className="block rounded-md px-2 py-1.5 text-sm text-brand-600 hover:bg-surface-2 hover:underline dark:text-brand-400">
+                  <a
+                    href={r.url}
+                    target={r.external ? "_blank" : undefined}
+                    rel={r.external ? "noopener noreferrer" : undefined}
+                    className="block rounded-md px-2 py-1.5 text-sm text-brand-600 hover:bg-surface-2 hover:underline dark:text-brand-400"
+                  >
                     {r.title}
                   </a>
                 </li>

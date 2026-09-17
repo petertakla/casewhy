@@ -28,7 +28,6 @@ import { FAQ_SEARCH_ENTRIES } from "../src/lib/search/faq-search-data";
 import { slugify } from "../src/lib/search/slugify";
 import { NEWS_SOURCES } from "../src/lib/news/sources";
 import { fetchNews } from "../src/lib/news/fetch-news";
-import { newsItemId } from "../src/lib/news/permalink";
 import { getPublishedUpdates } from "../src/lib/updates/updates";
 
 const MAX_INDEX_BYTES = 400 * 1024;
@@ -39,6 +38,8 @@ export interface SearchDoc {
   title: string;
   snippet: string;
   url: string;
+  /** True when url points off-site (news items only, as of round 110 follow-up) -- consuming components must render this with target="_blank", not a same-tab Link. */
+  external?: boolean;
   keywords: string;
   /** The actual language of THIS item's content, independent of which locale's JSON file it's in -- a doc can appear in the "es" file with locale "en" (Section 6's explicit fallback), never silently dropped or machine-translated. */
   locale: "en" | "es";
@@ -148,12 +149,22 @@ function buildDocs(
   // section for this build rather than failing the whole index. Source
   // feeds are English-only (src/lib/news/sources.ts), so these are always
   // locale: "en", same real-content-language reasoning as above.
+  //
+  // Round 110 follow-up — url is the real external source (item.link),
+  // marked `external: true`, not CaseWhy's own /news/[id] permalink.
+  // Peter's report: "when search on news the result is not the external
+  // site" -- /news itself already links every story straight to its real
+  // source in a new tab (src/app/news/page.tsx); a search result for the
+  // same story pointing at the internal permalink instead was a real
+  // inconsistency, not the permalink page's own content being broken
+  // (that's a separate, already-fixed bug — see extract-article.ts).
   for (const item of newsItems) {
     docs.push({
       type: "reference",
       title: item.title,
       snippet: item.sourceName,
-      url: `/news/${newsItemId(item)}`,
+      url: item.link,
+      external: true,
       keywords: "",
       locale: "en",
     });

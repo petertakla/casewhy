@@ -20,6 +20,8 @@ export interface SearchDoc {
   title: string;
   snippet: string;
   url: string;
+  /** True when url points off-site (news items) -- render with target="_blank", not a same-tab Link. */
+  external?: boolean;
   keywords: string;
   locale: "en" | "es";
 }
@@ -50,7 +52,7 @@ export function loadSearchIndex(locale: "en" | "es"): Promise<MiniSearch<Indexed
       const indexed: IndexedDoc[] = docs.map((d, id) => ({ ...d, id }));
       const mini = new MiniSearch<IndexedDoc>({
         fields: ["title", "keywords", "snippet"],
-        storeFields: ["type", "title", "snippet", "url", "locale"],
+        storeFields: ["type", "title", "snippet", "url", "external", "locale"],
         idField: "id",
         processTerm: (term) => foldDiacritics(term),
         searchOptions: {
@@ -98,7 +100,6 @@ export async function searchContent(locale: "en" | "es", query: string): Promise
     boostDocument: (_id, _term, storedFields) => {
       let boost = 1;
       const title = String(storedFields?.title ?? "");
-      const url = String(storedFields?.url ?? "");
 
       if (queryFormNumber) {
         const titleFormNumber = extractFormNumber(title);
@@ -115,7 +116,10 @@ export async function searchContent(locale: "en" | "es", query: string): Promise
       // News is time-sensitive/low-signal for a "find a form/process/
       // person" query -- demote relative to editorial and directory
       // content that's written to answer exactly that kind of question.
-      if (storedFields?.type === "reference" && url.includes("/news/")) {
+      // Round 110 follow-up: news urls now point off-site (real fix for
+      // "the result is not the external site"), so `external` is the
+      // real news signal now, not a "/news/" substring in the url.
+      if (storedFields?.type === "reference" && storedFields?.external) {
         boost *= 0.4;
       }
 
@@ -131,8 +135,7 @@ export async function searchContent(locale: "en" | "es", query: string): Promise
   // genuine news relevance (a real Florida-specific story) still passes;
   // an off-target single-term fuzzy hit doesn't.
   const results = rawResults.filter((r) => {
-    const url = String(r.url ?? "");
-    if (r.type === "reference" && url.includes("/news/") && queryWordCount > 1) {
+    if (r.type === "reference" && r.external && queryWordCount > 1) {
       return r.queryTerms.length >= queryWordCount;
     }
     return true;

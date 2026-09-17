@@ -366,8 +366,8 @@ function ResultGroup({ title, children }: { title: string; children: React.React
 function ContentResultRow({ doc, isSpanish, onNavigate }: { doc: IndexedDoc; isSpanish: boolean; onNavigate: () => void }) {
   const isEnFallback = isSpanish && doc.locale === "en";
   const isPlusPage = doc.url === "/plus" || doc.url === "/es/plus";
-  return (
-    <Link href={doc.url} onClick={onNavigate} className="block rounded-lg px-3 py-2 text-sm hover:bg-surface-2">
+  const inner = (
+    <>
       <span className="text-foreground">
         {isPlusPage ? (
           <>
@@ -379,6 +379,27 @@ function ContentResultRow({ doc, isSpanish, onNavigate }: { doc: IndexedDoc; isS
       </span>
       {isEnFallback && <span className="ml-2 text-xs text-muted">(en inglés)</span>}
       {doc.snippet && <span className="block text-xs text-muted">{doc.snippet}</span>}
+    </>
+  );
+  // Round 110 follow-up — news results point at their real external
+  // source (same behavior as /news itself), so they open in a new tab
+  // like every other outbound link in this product, not a same-tab Link.
+  if (doc.external) {
+    return (
+      <a
+        href={doc.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onNavigate}
+        className="block rounded-lg px-3 py-2 text-sm hover:bg-surface-2"
+      >
+        {inner}
+      </a>
+    );
+  }
+  return (
+    <Link href={doc.url} onClick={onNavigate} className="block rounded-lg px-3 py-2 text-sm hover:bg-surface-2">
+      {inner}
     </Link>
   );
 }

@@ -11,6 +11,7 @@ const MEDIA_CHANNELS = new Set(["pinterest", "youtube", "tiktok", "instagram", "
 
 export function MarketingQueueCard({
   id,
+  status,
   channel,
   mode,
   destination,
@@ -22,6 +23,8 @@ export function MarketingQueueCard({
   mediaRefs,
 }: {
   id: string;
+  /** Round 90 prep follow-up — "approved" reaches this card for real now (posting-paused, master switch off). Initializes the same compact "paused" summary a fresh approve click produces, so a page reload doesn't re-show the full editable draft for something already approved. */
+  status: string;
   channel: string;
   mode: "manual_post" | "auto_post";
   destination: string;
@@ -38,7 +41,7 @@ export function MarketingQueueCard({
   const [text, setText] = useState(draftText ?? "");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState<string | null>(null);
+  const [done, setDone] = useState<string | null>(status === "approved" ? "paused" : null);
 
   const isEscalationOnly = !draftText;
   const isBlog = channel === "blog";
@@ -90,7 +93,7 @@ export function MarketingQueueCard({
     // caught and fixed the same day).
     const result = await approveForAutoPost(id, text, channel);
     if (result.ok) {
-      setDone("posted");
+      setDone(result.posted ? "posted" : "paused");
     } else {
       setError(result.error);
       setPending(false);
@@ -103,6 +106,11 @@ export function MarketingQueueCard({
         <p className="text-sm text-muted">
           {isBlog && done === "posted" ? (
             <>Blog — published.</>
+          ) : done === "paused" ? (
+            <>
+              {CHANNEL_LABELS[channel] ?? channel} — approved, <strong>posting paused</strong>. Will post once you
+              turn posting on in Marketing settings.
+            </>
           ) : (
             <>
               {CHANNEL_LABELS[channel] ?? channel} — marked <strong>{done}</strong>.

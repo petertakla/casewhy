@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth/server";
 import { isAdminEmail } from "@/lib/auth/admin";
 import { getDb } from "@/lib/db/client";
 import { communitySourceConfigs } from "@/lib/db/schema";
-import { getDailyDraftCap, getSpanishSocialEnabled, getGeminiVideoMonthlyCap } from "@/lib/marketing/config";
+import { getDailyDraftCap, getSpanishSocialEnabled, getGeminiVideoMonthlyCap, getSocialPostingEnabled } from "@/lib/marketing/config";
 import { getMonthlyXWriteCount, X_FREE_TIER_MONTHLY_WRITE_LIMIT } from "@/lib/marketing/posters/x-rate-limit";
 import { MarketingSettingsForm } from "./MarketingSettingsForm";
 
@@ -23,7 +23,7 @@ export default async function MarketingSettingsPage() {
   }
 
   const db = getDb();
-  const [subreddits, dailyCap, spanishSocialEnabled, geminiVideoCap, xWriteCount] = await Promise.all([
+  const [subreddits, dailyCap, spanishSocialEnabled, geminiVideoCap, xWriteCount, socialPostingEnabled] = await Promise.all([
     db
       .select({
         id: communitySourceConfigs.id,
@@ -37,6 +37,7 @@ export default async function MarketingSettingsPage() {
     getSpanishSocialEnabled(),
     getGeminiVideoMonthlyCap(),
     getMonthlyXWriteCount(),
+    getSocialPostingEnabled(),
   ]);
 
   return (
@@ -58,6 +59,7 @@ export default async function MarketingSettingsPage() {
         dailyCap={dailyCap}
         spanishSocialEnabled={spanishSocialEnabled}
         geminiVideoCap={geminiVideoCap}
+        socialPostingEnabled={socialPostingEnabled}
       />
     </div>
   );

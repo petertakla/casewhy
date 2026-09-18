@@ -1311,6 +1311,14 @@ export const marketingSettings = pgTable("marketing_settings", {
   // weekly cron renders another one, not a separate running counter that
   // could drift from what actually got generated.
   geminiVideoMonthlyCap: integer("gemini_video_monthly_cap").notNull().default(8),
+  // Round 90 prep follow-up (Sep 18) — the master switch the marketing-
+  // before-production kickoff doc asked for: while off, approveForAutoPost
+  // still moves an item to "approved" but skips calling the channel's
+  // poster, so nothing actually posts. Default false so the very first
+  // real X/Threads/Facebook credentials in production can't post anything
+  // before Peter has reviewed at least one approval and flipped this
+  // himself from /admin/marketing/settings.
+  socialPostingEnabled: boolean("social_posting_enabled").notNull().default(false),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

@@ -92,3 +92,24 @@ export async function setGeminiVideoMonthlyCap(cap: number): Promise<void> {
     .values({ id: SETTINGS_ID, geminiVideoMonthlyCap: cap })
     .onConflictDoUpdate({ target: marketingSettings.id, set: { geminiVideoMonthlyCap: cap, updatedAt: new Date() } });
 }
+
+// Round 90 prep follow-up (Sep 18) — master switch read by
+// approveForAutoPost before it ever calls a channel's poster. Off by
+// default (see schema.ts's comment on the column).
+export async function getSocialPostingEnabled(): Promise<boolean> {
+  const db = getDb();
+  const [row] = await db
+    .select({ enabled: marketingSettings.socialPostingEnabled })
+    .from(marketingSettings)
+    .where(eq(marketingSettings.id, SETTINGS_ID))
+    .limit(1);
+  return row?.enabled ?? false;
+}
+
+export async function setSocialPostingEnabled(enabled: boolean): Promise<void> {
+  const db = getDb();
+  await db
+    .insert(marketingSettings)
+    .values({ id: SETTINGS_ID, socialPostingEnabled: enabled })
+    .onConflictDoUpdate({ target: marketingSettings.id, set: { socialPostingEnabled: enabled, updatedAt: new Date() } });
+}

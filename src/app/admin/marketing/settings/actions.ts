@@ -7,7 +7,8 @@ import { auth } from "@/lib/auth/server";
 import { isAdminEmail } from "@/lib/auth/admin";
 import { getDb } from "@/lib/db/client";
 import { communitySourceConfigs } from "@/lib/db/schema";
-import { setDailyDraftCap, setSpanishSocialEnabled, setGeminiVideoMonthlyCap } from "@/lib/marketing/config";
+import { setDailyDraftCap, setSpanishSocialEnabled, setGeminiVideoMonthlyCap, setSocialPostingEnabled } from "@/lib/marketing/config";
+import { flushApprovedQueueItems } from "../actions";
 
 async function requireAdmin() {
   const { data: session } = await auth.getSession();
@@ -71,4 +72,16 @@ export async function updateGeminiVideoCap(cap: number) {
   if (!Number.isInteger(cap) || cap < 0 || cap > 100) return;
   await setGeminiVideoMonthlyCap(cap);
   revalidatePath("/admin/marketing/settings");
+}
+
+// Round 90 prep follow-up (Sep 18) — the master switch. Turning it on
+// also flushes every row a prior approval left sitting at "approved"
+// (flushApprovedQueueItems), so Peter's first approvals actually go out
+// the moment he flips this rather than needing a second click each.
+export async function toggleSocialPosting(enabled: boolean): Promise<{ posted: number; failed: number } | null> {
+  await requireAdmin();
+  await setSocialPostingEnabled(enabled);
+  revalidatePath("/admin/marketing/settings");
+  if (!enabled) return null;
+  return flushApprovedQueueItems();
 }

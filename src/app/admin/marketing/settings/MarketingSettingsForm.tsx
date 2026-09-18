@@ -8,6 +8,7 @@ import {
   updateDailyCap,
   toggleSpanishSocial,
   updateGeminiVideoCap,
+  toggleSocialPosting,
 } from "./actions";
 
 interface SubredditRow {
@@ -22,19 +23,59 @@ export function MarketingSettingsForm({
   dailyCap,
   spanishSocialEnabled,
   geminiVideoCap,
+  socialPostingEnabled,
 }: {
   subreddits: SubredditRow[];
   dailyCap: number;
   spanishSocialEnabled: boolean;
   geminiVideoCap: number;
+  socialPostingEnabled: boolean;
 }) {
   const [pending, startTransition] = useTransition();
   const [newSubreddit, setNewSubreddit] = useState("");
   const [capInput, setCapInput] = useState(String(dailyCap));
   const [videoCapInput, setVideoCapInput] = useState(String(geminiVideoCap));
+  const [flushResult, setFlushResult] = useState<{ posted: number; failed: number } | null>(null);
 
   return (
     <div className="space-y-8">
+      <section>
+        <h2 className="mb-1 text-base font-semibold text-foreground">Social posting</h2>
+        <p className="mb-4 text-sm text-muted">
+          Master switch for every real auto-post channel (X, Threads, Facebook Page, Pinterest, Instagram, YouTube).
+          While off, approving an item still moves it to &quot;approved&quot; and marks it posting-paused, but nothing
+          actually posts — nothing can go out before you&apos;ve reviewed at least one approval yourself. Doesn&apos;t
+          apply to blog publishing, which is your own site, not a social post. Turning this on immediately posts
+          everything currently sitting approved-and-paused.
+        </p>
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() =>
+            startTransition(async () => {
+              const result = await toggleSocialPosting(!socialPostingEnabled);
+              setFlushResult(result);
+            })
+          }
+          className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+            socialPostingEnabled
+              ? "bg-brand-500 text-white hover:bg-brand-600"
+              : "border border-border-strong text-foreground/80 hover:border-brand-500/50"
+          }`}
+        >
+          {socialPostingEnabled ? "Posting enabled — turn off" : "Posting paused — turn on"}
+        </button>
+        {flushResult && (
+          <p className="mt-2 text-sm text-muted">
+            {flushResult.posted + flushResult.failed === 0
+              ? "Nothing was waiting to post."
+              : `Posted ${flushResult.posted} item(s) that were approved and paused${
+                  flushResult.failed > 0 ? `; ${flushResult.failed} failed and reverted to pending — check the queue.` : "."
+                }`}
+          </p>
+        )}
+      </section>
+
       <section>
         <h2 className="mb-1 text-base font-semibold text-foreground">Subreddit list (manual reference)</h2>
         <p className="mb-4 text-sm text-muted">

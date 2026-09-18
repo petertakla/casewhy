@@ -27,7 +27,13 @@ export const dynamic = "force-dynamic";
 // (MarketingQueueCard) is untouched, per the task doc's own instruction
 // -- history rows use a separate, simpler read-only HistoryCard instead.
 
-const NEEDS_ACTION_STATUSES = ["pending", "escalated"] as const;
+// Round 90 prep follow-up (Sep 18) — "approved" added: an item can now
+// sit here for real (posting-paused, master switch off), and this queue
+// page already has one documented lesson about a status silently falling
+// out of both lists here and becoming an invisible row (see
+// approveForAutoPost's own comment in actions.ts). Not a new hole, just
+// the same one re-checked against a newly-reachable status.
+const NEEDS_ACTION_STATUSES = ["pending", "escalated", "approved"] as const;
 const HISTORY_STATUSES = ["posted", "edited_posted", "rejected"] as const;
 const HISTORY_WINDOW_DAYS = 30;
 
@@ -196,6 +202,7 @@ export default async function MarketingQueueAdminPage({
                     <MarketingQueueCard
                       key={row.id}
                       id={row.id}
+                      status={row.status}
                       channel={row.channel}
                       mode={row.mode}
                       destination={row.destination}

@@ -1,0 +1,1 @@
+ALTER TABLE "marketing_settings" ADD COLUMN "social_posting_enabled" boolean DEFAULT false NOT NULL;

@@ -23,22 +23,26 @@ import { postToThreads } from "./threads";
 import { postToPinterest } from "./pinterest";
 import { postToYoutube } from "./youtube";
 import { postToFacebookPage } from "./facebook";
+import { postToTikTok } from "./tiktok";
 
 // Round 91 — Pinterest/YouTube registered (real posters, gated on
 // Peter's own credentials, same "poster exists, credentials might not
-// yet" pattern as round 90's X/Threads). TikTok/Instagram deliberately
-// NOT registered here -- no approved app exists for either (Instagram's
-// own attempt this round hit a real Meta platform gap, parked -- see
-// facebook.ts's own comment for the "Profile Plus" finding that also
-// explains why Facebook needed its own dedicated Business-Portfolio
-// token-fetch route instead of the usual me/accounts one).
+// yet" pattern as round 90's X/Threads). Instagram deliberately NOT
+// registered -- hit a real Meta platform gap, parked (see facebook.ts's
+// own comment for the "Profile Plus" finding that also explains why
+// Facebook needed its own dedicated Business-Portfolio token-fetch
+// route instead of the usual me/accounts one).
 //
-// Round 90 follow-up — Facebook registered now. Same channel value is
-// still used for Facebook *group* posts (guardrails Section 0, always
+// Round 90 follow-up — Facebook registered. Same channel value is still
+// used for Facebook *group* posts (guardrails Section 0, always
 // manual_post) -- registering a poster here only affects rows whose own
 // `mode` is "auto_post" (the Page's own posts), group rows are
 // unaffected since approveForAutoPost only ever invokes a poster on
 // that specific dispatch.
+//
+// Round 91A follow-up — TikTok registered. Real OAuth app + Content
+// Posting API integration (see tiktok.ts's own comment on its rotating
+// refresh token, stored in the DB rather than an env var).
 const POSTERS: Partial<Record<string, Poster>> = {
   blog: blogPoster,
   x: postToX,
@@ -46,6 +50,7 @@ const POSTERS: Partial<Record<string, Poster>> = {
   pinterest: postToPinterest,
   youtube: postToYoutube,
   facebook: postToFacebookPage,
+  tiktok: postToTikTok,
 };
 
 export function getPosterForChannel(channel: string): Poster | undefined {

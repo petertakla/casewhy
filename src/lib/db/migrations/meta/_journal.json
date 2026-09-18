@@ -302,6 +302,13 @@
       "when": 1789729744996,
       "tag": "0042_true_pestilence",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1789748735909,
+      "tag": "0043_overconfident_stardust",
+      "breakpoints": true
     }
   ]
 }

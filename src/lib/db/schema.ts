@@ -1574,3 +1574,23 @@ export const uscisApiCallLog = pgTable(
   },
   (table) => [index("uscis_api_call_log_called_at_idx").on(table.calledAt)]
 );
+
+// Round 91A follow-up (Sep 18) — TikTok's refresh_token rotates: every
+// refresh-token exchange may return a new refresh_token that must
+// replace the old one ("You must use the newly-returned token if the
+// value is different than the previous one" -- TikTok's own docs).
+// Every other poster's token (X/Threads/Facebook/Pinterest static,
+// YouTube's own non-rotating refresh token) is stable enough to live in
+// a Vercel env var Peter sets once; this one genuinely isn't -- the
+// poster itself needs to durably persist a value that changes on its
+// own, which an env var can't do from inside a running function. DB
+// row instead, one singleton, written by both the OAuth callback (first
+// authorization) and the poster itself (every refresh).
+export const tiktokOauthToken = pgTable("tiktok_oauth_token", {
+  id: text("id").primaryKey().default("singleton"),
+  accessToken: text("access_token").notNull(),
+  accessTokenExpiresAt: timestamp("access_token_expires_at", { withTimezone: true }).notNull(),
+  refreshToken: text("refresh_token").notNull(),
+  openId: text("open_id").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});

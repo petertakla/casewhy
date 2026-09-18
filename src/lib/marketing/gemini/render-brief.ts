@@ -43,23 +43,21 @@ async function nextDueBrief(format: (typeof FORMATS)[number]) {
   return row;
 }
 
-// instagram: no approved app exists as of this round (hit a real Meta
-// "Profile Plus" platform gap, parked -- see facebook.ts's own comment)
-// -- manual_post with the rendered asset itself as destination, which
-// MarketingQueueCard already renders as a clickable download link
-// (round 94's destination-link fix).
-// pinterest/youtube/tiktok: auto_post -- a real poster is registered for
-// each (gated on Peter's own credentials/authorization, same "poster
-// exists, credentials might not yet" pattern as round 90's X/Threads).
-// tiktok added round 91A follow-up (Sep 18) once a real TikTok developer
-// app + Content Posting API integration existed.
+// pinterest/youtube/tiktok/instagram: auto_post -- a real poster is
+// registered for each (gated on Peter's own credentials/authorization,
+// same "poster exists, credentials might not yet" pattern as round 90's
+// X/Threads). tiktok added round 91A follow-up (Sep 18) once a real
+// TikTok developer app + Content Posting API integration existed.
+// instagram added same day, once the round 90/91 "Meta platform gap"
+// diagnosis turned out to be a missing permission scope, not a real
+// gap -- see instagram.ts's own comment.
 // facebook: guardrails Section 0 -- community/group channels are always
 // manual_post, no exception, regardless of whether a poster could exist.
 const CHANNEL_MODE: Record<string, "auto_post" | "manual_post"> = {
   pinterest: "auto_post",
   youtube: "auto_post",
   tiktok: "auto_post",
-  instagram: "manual_post",
+  instagram: "auto_post",
   facebook: "manual_post",
 };
 

@@ -24,14 +24,14 @@ import { postToPinterest } from "./pinterest";
 import { postToYoutube } from "./youtube";
 import { postToFacebookPage } from "./facebook";
 import { postToTikTok } from "./tiktok";
+import { postToInstagram } from "./instagram";
 
 // Round 91 — Pinterest/YouTube registered (real posters, gated on
 // Peter's own credentials, same "poster exists, credentials might not
-// yet" pattern as round 90's X/Threads). Instagram deliberately NOT
-// registered -- hit a real Meta platform gap, parked (see facebook.ts's
-// own comment for the "Profile Plus" finding that also explains why
-// Facebook needed its own dedicated Business-Portfolio token-fetch
-// route instead of the usual me/accounts one).
+// yet" pattern as round 90's X/Threads). Instagram was NOT registered
+// this round -- see instagram.ts's own comment for why that "Meta
+// platform gap" diagnosis turned out to be incomplete (round 91A
+// remainder, Sep 18, fixed it for real).
 //
 // Round 90 follow-up — Facebook registered. Same channel value is still
 // used for Facebook *group* posts (guardrails Section 0, always
@@ -51,6 +51,7 @@ const POSTERS: Partial<Record<string, Poster>> = {
   youtube: postToYoutube,
   facebook: postToFacebookPage,
   tiktok: postToTikTok,
+  instagram: postToInstagram,
 };
 
 export function getPosterForChannel(channel: string): Poster | undefined {

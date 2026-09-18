@@ -7,18 +7,53 @@
 // confirmed working -- same temporary-diagnostic pattern as
 // devcheck-x-auth and devcheck-social-senders earlier this project.
 
+import { createHmac } from "crypto";
+import OAuth from "oauth-1.0a";
 import { isAuthorizedCronRequest } from "@/lib/auth/cron-auth";
 import { testXPost } from "@/lib/marketing/posters/x";
+
+// One-time cross-check against a well-tested OAuth 1.0a library, added
+// after the hand-rolled signing in x.ts failed with 401 on both a read
+// and a real write using freshly-regenerated, correctly-shaped
+// credentials -- ruling out a paste error. If this ALSO 401s with the
+// same credentials, the signing code isn't the problem; if it succeeds,
+// it is. Delete alongside the rest of this temporary route.
+async function libraryCrossCheck(): Promise<{ status: number; body: unknown }> {
+  const apiKey = process.env.X_API_KEY!;
+  const apiSecret = process.env.X_API_SECRET!;
+  const accessToken = process.env.X_ACCESS_TOKEN!;
+  const accessTokenSecret = process.env.X_ACCESS_TOKEN_SECRET!;
+
+  const oauth = new OAuth({
+    consumer: { key: apiKey, secret: apiSecret },
+    signature_method: "HMAC-SHA1",
+    hash_function(base_string, key) {
+      return createHmac("sha1", key).update(base_string).digest("base64");
+    },
+  });
+
+  const url = "https://api.x.com/2/users/me";
+  const authHeader = oauth.toHeader(oauth.authorize({ url, method: "GET" }, { key: accessToken, secret: accessTokenSecret }));
+
+  const res = await fetch(url, { headers: { ...authHeader } });
+  const body = await res.json();
+  return { status: res.status, body };
+}
 
 export async function POST(request: Request) {
   if (!isAuthorizedCronRequest(request)) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
+  const crossCheck = await libraryCrossCheck().catch((err) => ({
+    status: -1,
+    body: err instanceof Error ? err.message : String(err),
+  }));
+
   try {
     const result = await testXPost();
-    return Response.json({ ok: true, ...result });
+    return Response.json({ ok: true, ...result, crossCheck });
   } catch (err) {
-    return Response.json({ ok: false, error: err instanceof Error ? err.message : String(err) }, { status: 200 });
+    return Response.json({ ok: false, error: err instanceof Error ? err.message : String(err), crossCheck }, { status: 200 });
   }
 }

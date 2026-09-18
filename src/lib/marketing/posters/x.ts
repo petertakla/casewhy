@@ -137,6 +137,12 @@ export const postToX: Poster = async (item) => {
 // writes, so it's a safe, side-effect-free way to confirm a pasted key
 // set actually works. Used by the one-time /api/admin/devcheck-x-auth
 // diagnostic route (see that route's own comment for why it's temporary).
+//
+// Found live (Sep 2026) this doesn't work on X's Free API tier -- Free
+// only permits posting, not most GET endpoints, so this throws 401 even
+// with correct credentials on that tier. testXPost() below is the actual
+// working verification for a Free-tier project. Left in place since it's
+// still correct/useful for any Basic+ tier project.
 export async function testXCredentials(): Promise<{ id: string; username: string; name: string }> {
   const credentials = requireCredentials();
   const url = "https://api.x.com/2/users/me";
@@ -148,4 +154,17 @@ export async function testXCredentials(): Promise<{ id: string; username: string
     throw new Error(`X API error (${res.status}): ${data.detail ?? data.title ?? "unknown"}`);
   }
   return data.data;
+}
+
+// Real-post verification for Free-tier projects, where testXCredentials()
+// above can't work (Free blocks the GET read it needs). Posts one real,
+// clearly-marked test tweet -- Peter explicitly authorized this live,
+// same category as any other real post per this session's explicit-
+// permission rule. Used by the one-time /api/admin/devcheck-x-post route,
+// delete both once credentials are confirmed working.
+export async function testXPost(): Promise<{ id: string; url: string }> {
+  const credentials = requireCredentials();
+  const id = await postOneTweet(`Testing CaseWhy's X integration -- please ignore. (${new Date().toISOString()})`, null, credentials);
+  const handle = process.env.X_HANDLE || "CaseWhy";
+  return { id, url: `https://x.com/${handle}/status/${id}` };
 }

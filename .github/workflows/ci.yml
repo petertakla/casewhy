@@ -23,6 +23,7 @@ jobs:
       - run: npm run check:processing-times-age
       - run: npm run check:founder-name
       - run: npm run check:poster-env-vars
+      - run: npm run check:page-metadata
       # Round 114 follow-up (Cloud review) — real visibility, not a hard
       # gate: two pre-existing transitive dev-tooling vulnerabilities
       # (drizzle-kit's esbuild dep, postcss via next) need a deliberate,

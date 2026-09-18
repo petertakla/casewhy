@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://casewhy.com/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://casewhy.com/"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://casewhy.com/es/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://casewhy.com/"/>
+    <loc>https://www.casewhy.com/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.casewhy.com/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.casewhy.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.casewhy.com/"/>
   </url>
   <url>
-    <loc>https://casewhy.com/es/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://casewhy.com/"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://casewhy.com/es/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://casewhy.com/"/>
+    <loc>https://www.casewhy.com/es/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.casewhy.com/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.casewhy.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.casewhy.com/"/>
   </url>
   <url>
-    <loc>https://casewhy.com/privacy.html</loc>
+    <loc>https://www.casewhy.com/privacy.html</loc>
   </url>
   <url>
-    <loc>https://casewhy.com/terms.html</loc>
+    <loc>https://www.casewhy.com/terms.html</loc>
   </url>
   <url>
-    <loc>https://casewhy.com/faq.html</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://casewhy.com/faq.html"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://casewhy.com/es/faq.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://casewhy.com/faq.html"/>
+    <loc>https://www.casewhy.com/faq.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.casewhy.com/faq.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.casewhy.com/es/faq.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.casewhy.com/faq.html"/>
   </url>
   <url>
-    <loc>https://casewhy.com/es/faq.html</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://casewhy.com/faq.html"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://casewhy.com/es/faq.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://casewhy.com/faq.html"/>
+    <loc>https://www.casewhy.com/es/faq.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.casewhy.com/faq.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.casewhy.com/es/faq.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.casewhy.com/faq.html"/>
   </url>
 </urlset>

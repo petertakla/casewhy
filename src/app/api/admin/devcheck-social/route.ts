@@ -64,3 +64,15 @@ export async function POST(request: Request) {
     return Response.json({ ok: false, error: err instanceof Error ? err.message : String(err) }, { status: 500 });
   }
 }
+
+export async function GET(request: Request) {
+  if (!isAuthorizedCronRequest(request)) {
+    return Response.json({ error: "unauthorized" }, { status: 401 });
+  }
+  const names = ["THREADS_ACCESS_TOKEN", "THREADS_USER_ID", "PINTEREST_ACCESS_TOKEN", "PINTEREST_BOARD_ID", "YOUTUBE_CLIENT_ID", "YOUTUBE_CLIENT_SECRET", "YOUTUBE_REFRESH_TOKEN"];
+  const shapes = names.map((name) => {
+    const raw = process.env[name];
+    return { name, set: Boolean(raw), isReplaceMe: raw === "REPLACE_ME", length: raw?.length ?? 0 };
+  });
+  return Response.json({ shapes });
+}

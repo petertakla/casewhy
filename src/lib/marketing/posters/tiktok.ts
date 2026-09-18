@@ -1,8 +1,10 @@
 // Round 91A follow-up (Sep 18) — real TikTok Content Posting API poster
-// (Direct Post, FILE_UPLOAD). Unlike every other poster's static or
-// non-rotating credential, TikTok's OAuth is a genuine three-legged
-// flow with a **rotating refresh token** -- see schema.ts's own comment
-// on tiktokOauthToken for why that token lives in the DB, not an env var.
+// (draft-inbox upload, FILE_UPLOAD -- see postToTikTok's own comment on
+// why this uses /inbox/video/init/ rather than Direct Post). Unlike
+// every other poster's static or non-rotating credential, TikTok's
+// OAuth is a genuine three-legged flow with a **rotating refresh
+// token** -- see schema.ts's own comment on tiktokOauthToken for why
+// that token lives in the DB, not an env var.
 //
 // TIKTOK_CLIENT_KEY/TIKTOK_CLIENT_SECRET (static, app-level) still come
 // from env vars via `vercel env add`, same as every other poster's app
@@ -19,9 +21,13 @@
 // is hosted.
 //
 // Real, current constraint (not assumed): while this app is unaudited,
-// every post lands in a private-only visibility state, visible only to
-// the authorizing account -- expected, not a bug, until the production
-// audit clears (see the round 91A task doc / CLOUD_CLAUDE.md checklist).
+// Direct Post (/v2/post/publish/video/init/) rejects every publish
+// attempt with "unaudited_client_can_only_post_to_private_accounts"
+// unless the authorizing account's own TikTok privacy setting is
+// Private -- a whole-account setting, not this call's privacy_level
+// param. Peter opted to keep casewhyapp public and use the draft-inbox
+// upload instead (confirmed live 2026-09-18); switch back to Direct
+// Post once the app clears TikTok's content-sharing audit.
 
 import { eq } from "drizzle-orm";
 import type { Poster } from "./types";
@@ -148,11 +154,6 @@ async function getValidAccessToken(): Promise<string> {
   return data.access_token;
 }
 
-interface CreatorInfoResponse {
-  data?: { privacy_level_options?: string[]; max_video_post_duration_sec?: number };
-  error?: { code: string; message: string };
-}
-
 interface InitResponse {
   data?: { publish_id?: string; upload_url?: string };
   error?: { code: string; message: string };
@@ -168,33 +169,24 @@ export const postToTikTok: Poster = async (item) => {
   const accessToken = await getValidAccessToken();
   const authHeaders = { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json; charset=UTF-8" };
 
-  // Privacy level must come from the account's own real options, not be
-  // guessed -- an unaudited app's account is typically forced to
-  // SELF_ONLY regardless, but this call is what tells us for sure.
-  const creatorRes = await fetch(`${TIKTOK_API_BASE}/v2/post/publish/creator_info/query/`, {
-    method: "POST",
-    headers: authHeaders,
-  });
-  const creatorData = (await creatorRes.json()) as CreatorInfoResponse;
-  if (!creatorRes.ok || !creatorData.data) {
-    throw new Error(`TikTok creator_info query failed: ${creatorData.error?.message ?? creatorRes.status}`);
-  }
-  const privacyLevel =
-    creatorData.data.privacy_level_options?.find((p) => p === "PUBLIC_TO_EVERYONE") ??
-    creatorData.data.privacy_level_options?.[0];
-  if (!privacyLevel) throw new Error("TikTok creator_info query returned no privacy_level_options.");
-
   const videoRes = await fetch(item.mediaRefs);
   if (!videoRes.ok) throw new Error(`TikTok poster: couldn't download rendered video from storage (${videoRes.status}).`);
   const videoBuffer = Buffer.from(await videoRes.arrayBuffer());
 
-  const title = item.draftText.split("\n\n")[0]?.slice(0, 2200) ?? "";
-
-  const initRes = await fetch(`${TIKTOK_API_BASE}/v2/post/publish/video/init/`, {
+  // Draft-inbox upload (video.upload scope), not Direct Post. Direct
+  // Post's own /video/init/ rejects every unaudited client with
+  // "unaudited_client_can_only_post_to_private_accounts" UNLESS the
+  // authorizing account's own TikTok privacy setting is Private (a
+  // whole-account setting, separate from this call's privacy_level
+  // param) -- confirmed live 2026-09-18. Peter opted to keep casewhyapp
+  // public and use drafts instead, so this uploads to the creator's
+  // TikTok inbox for a manual finish-and-post tap in the TikTok app.
+  // Switch to /video/init/ + post_info once the app clears TikTok's
+  // content-sharing audit and Direct Post no longer needs that.
+  const initRes = await fetch(`${TIKTOK_API_BASE}/v2/post/publish/inbox/video/init/`, {
     method: "POST",
     headers: authHeaders,
     body: JSON.stringify({
-      post_info: { title, privacy_level: privacyLevel },
       source_info: {
         source: "FILE_UPLOAD",
         video_size: videoBuffer.length,
@@ -205,7 +197,7 @@ export const postToTikTok: Poster = async (item) => {
   });
   const initData = (await initRes.json()) as InitResponse;
   if (!initRes.ok || !initData.data?.publish_id || !initData.data?.upload_url) {
-    throw new Error(`TikTok post init failed: ${initData.error?.message ?? initRes.status}`);
+    throw new Error(`TikTok draft upload init failed: ${initData.error?.message ?? initRes.status}`);
   }
   const { publish_id, upload_url } = initData.data;
 
@@ -234,7 +226,7 @@ export const postToTikTok: Poster = async (item) => {
       body: JSON.stringify({ publish_id }),
     });
     const statusData = (await statusRes.json()) as StatusResponse;
-    if (statusData.data?.status === "PUBLISH_COMPLETE") {
+    if (statusData.data?.status === "SEND_TO_USER_INBOX") {
       return { url: `https://www.tiktok.com/@${process.env.TIKTOK_HANDLE || "casewhyapp"}` };
     }
     if (statusData.data?.status === "FAILED") {

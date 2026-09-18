@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import Link from "next/link";
 import {
   getProBonoRepresentationDirectory,
   PRO_BONO_REPRESENTATION_DISCLAIMER,
 } from "@/lib/pro-bono-representation/directory";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/pro-bono-representation", {
   title: "Find Free Immigration Court Representation | CaseWhy",
   description:
     "Directory of organizations offering free representation in immigration court (removal defense) proceedings, organized by court.",
-  alternates: {
-    languages: {
-      en: "https://app.casewhy.com/pro-bono-representation",
-      es: "https://app.casewhy.com/es/pro-bono-representation",
-    },
+
+  languages: {
+    en: "https://app.casewhy.com/pro-bono-representation",
+    es: "https://app.casewhy.com/es/pro-bono-representation",
   },
-};
+});
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -29,11 +29,14 @@ export default async function ProBonoRepresentationPage() {
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
       <LanguageSwitcher es={false} href="/es/pro-bono-representation" />
 
-      <h1 className="text-2xl font-bold tracking-tight">Find pro bono immigration-court representation</h1>
+      <h1 className="text-2xl font-bold tracking-tight">
+        Find pro bono immigration-court representation
+      </h1>
       <p className="mb-2 mt-2 text-muted">
-        Organizations offering free representation in immigration court proceedings (removal
-        defense), organized by the immigration court they serve — a more specific, often
-        higher-stakes need than general legal aid.
+        Organizations offering free representation in immigration court
+        proceedings (removal defense), organized by the immigration court they
+        serve — a more specific, often higher-stakes need than general legal
+        aid.
       </p>
       <p className="mb-2 rounded-lg border border-border-strong bg-surface-2 p-3 text-sm text-foreground/90">
         {PRO_BONO_REPRESENTATION_DISCLAIMER}
@@ -45,8 +48,8 @@ export default async function ProBonoRepresentationPage() {
       {directory.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border-strong p-8 text-center">
           <p className="text-sm text-muted">
-            We&apos;re still building this list out — check back soon. In the meantime, EOIR
-            publishes its own{" "}
+            We&apos;re still building this list out — check back soon. In the
+            meantime, EOIR publishes its own{" "}
             <a
               href="https://www.justice.gov/eoir/list-pro-bono-legal-service-providers"
               target="_blank"
@@ -67,7 +70,10 @@ export default async function ProBonoRepresentationPage() {
             searchText: `${org.organizationName} ${org.cityStateZip ?? ""} ${org.immigrationCourt}`,
             node: (
               <div className="rounded-xl border border-border bg-surface transition-colors hover:border-border-strong">
-                <Link href={`/pro-bono-representation/${org.slug}`} className="block p-5">
+                <Link
+                  href={`/pro-bono-representation/${org.slug}`}
+                  className="block p-5"
+                >
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <p className="font-semibold text-foreground">
                       {org.organizationName}
@@ -79,8 +85,12 @@ export default async function ProBonoRepresentationPage() {
                     </p>
                     <p className="text-xs text-muted">{org.state}</p>
                   </div>
-                  {org.cityStateZip && <p className="text-sm text-muted">{org.cityStateZip}</p>}
-                  <p className="mt-1 text-xs text-muted">{org.immigrationCourt}</p>
+                  {org.cityStateZip && (
+                    <p className="text-sm text-muted">{org.cityStateZip}</p>
+                  )}
+                  <p className="mt-1 text-xs text-muted">
+                    {org.immigrationCourt}
+                  </p>
                 </Link>
                 <div className="border-t border-border px-5 py-2">
                   <ReportListingLink
@@ -97,7 +107,10 @@ export default async function ProBonoRepresentationPage() {
 
       <p className="mt-8 text-sm text-muted">
         Provide pro bono immigration-court representation?{" "}
-        <Link href="/pro-bono-representation/join" className="text-brand-600 hover:underline dark:text-brand-400">
+        <Link
+          href="/pro-bono-representation/join"
+          className="text-brand-600 hover:underline dark:text-brand-400"
+        >
           Apply to be listed
         </Link>{" "}
         — free, no cost to join.

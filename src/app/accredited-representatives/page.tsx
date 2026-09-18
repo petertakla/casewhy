@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import Link from "next/link";
 import {
   getAccreditedRepresentativeDirectory,
   ACCREDITED_REPRESENTATIVE_DIRECTORY_DISCLAIMER,
 } from "@/lib/accredited-representatives/directory";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/accredited-representatives", {
   title: "Find a DOJ-Accredited Representative | CaseWhy",
   description:
     "Free, nationwide directory of DOJ-accredited representatives — non-lawyers authorized to practice immigration law, sourced from DOJ's own public roster.",
-  alternates: {
-    languages: {
-      en: "https://app.casewhy.com/accredited-representatives",
-      es: "https://app.casewhy.com/es/accredited-representatives",
-    },
+
+  languages: {
+    en: "https://app.casewhy.com/accredited-representatives",
+    es: "https://app.casewhy.com/es/accredited-representatives",
   },
-};
+});
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -33,11 +33,13 @@ export default async function AccreditedRepresentativesPage() {
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
       <LanguageSwitcher es={false} href="/es/accredited-representatives" />
 
-      <h1 className="text-2xl font-bold tracking-tight">Find an accredited representative</h1>
+      <h1 className="text-2xl font-bold tracking-tight">
+        Find an accredited representative
+      </h1>
       <p className="mb-2 mt-2 text-muted">
-        DOJ-accredited representatives — non-lawyers authorized to practice immigration law,
-        typically at nonprofit organizations. Sourced from DOJ&apos;s own public roster,
-        nationwide.
+        DOJ-accredited representatives — non-lawyers authorized to practice
+        immigration law, typically at nonprofit organizations. Sourced from
+        DOJ&apos;s own public roster, nationwide.
       </p>
       <p className="mb-2 rounded-lg border border-border-strong bg-surface-2 p-3 text-sm text-foreground/90">
         {ACCREDITED_REPRESENTATIVE_DIRECTORY_DISCLAIMER}
@@ -49,8 +51,8 @@ export default async function AccreditedRepresentativesPage() {
       {directory.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border-strong p-8 text-center">
           <p className="text-sm text-muted">
-            We&apos;re still building this list out — check back soon. In the meantime, the
-            Department of Justice publishes its own{" "}
+            We&apos;re still building this list out — check back soon. In the
+            meantime, the Department of Justice publishes its own{" "}
             <a
               href="https://www.justice.gov/eoir/recognition-accreditation-roster-reports"
               target="_blank"
@@ -71,15 +73,22 @@ export default async function AccreditedRepresentativesPage() {
             searchText: `${rep.representativeName} ${rep.organizationName} ${rep.cityStateZip ?? ""} ${rep.streetAddress ?? ""}`,
             node: (
               <div className="rounded-xl border border-border bg-surface transition-colors hover:border-border-strong">
-                <Link href={`/accredited-representatives/${rep.slug}`} className="block p-5">
+                <Link
+                  href={`/accredited-representatives/${rep.slug}`}
+                  className="block p-5"
+                >
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <p className="font-semibold text-foreground">{rep.representativeName}</p>
+                    <p className="font-semibold text-foreground">
+                      {rep.representativeName}
+                    </p>
                     <p className="text-xs text-muted">{rep.state}</p>
                   </div>
                   <p className="text-sm text-muted">{rep.organizationName}</p>
                   <p className="mt-1 text-xs text-muted">
                     {rep.dhsOnly ? "DHS only" : "Full accreditation"}
-                    {rep.accreditationPendingRenewal ? " · renewal pending" : ""}
+                    {rep.accreditationPendingRenewal
+                      ? " · renewal pending"
+                      : ""}
                   </p>
                 </Link>
                 <div className="border-t border-border px-5 py-2">
@@ -97,7 +106,10 @@ export default async function AccreditedRepresentativesPage() {
 
       <p className="mt-8 text-sm text-muted">
         Represent a nonprofit with DOJ-accredited staff?{" "}
-        <Link href="/accredited-representatives/join" className="text-brand-600 hover:underline dark:text-brand-400">
+        <Link
+          href="/accredited-representatives/join"
+          className="text-brand-600 hover:underline dark:text-brand-400"
+        >
           Apply to be listed
         </Link>{" "}
         — free, no cost to join.

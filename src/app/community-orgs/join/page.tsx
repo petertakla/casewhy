@@ -1,22 +1,25 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import { ApplicationForm } from "./ApplicationForm";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/community-orgs/join", {
   title: "List Your Organization — Free for Community Groups | CaseWhy",
   description:
     "Community and cultural organizations serving immigrants can apply to be listed in CaseWhy's free directory.",
-};
+});
 
 export default function CommunityOrgJoinPage() {
   return (
     <main className="mx-auto min-h-screen max-w-xl px-6 py-10">
       <h1 className="text-2xl font-bold tracking-tight">Apply to be listed</h1>
       <p className="mt-2 text-sm text-muted">
-        For community and cultural organizations, churches, and similar groups serving immigrant
-        communities. This is an informational listing, not an endorsement: every application is
-        reviewed before anyone is added.
+        For community and cultural organizations, churches, and similar groups
+        serving immigrant communities. This is an informational listing, not an
+        endorsement: every application is reviewed before anyone is added.
       </p>
-      <p className="mt-2 text-xs text-muted">Free to join, always — no fee to be listed.</p>
+      <p className="mt-2 text-xs text-muted">
+        Free to join, always — no fee to be listed.
+      </p>
       <div className="mt-8">
         <ApplicationForm />
       </div>

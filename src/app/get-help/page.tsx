@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import Link from "next/link";
 import { ShareButton } from "@/components/ShareButton";
 import { ENTITY_TYPES } from "@/lib/get-help/entity-types";
 import { GetHelpChooser } from "./GetHelpChooser";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/get-help", {
   title: "Get Help — Find an Immigration Attorney or Free Legal Aid | CaseWhy",
   description:
     "Free directory of legal aid organizations, accredited representatives, immigration attorneys, and more — no fees, no ads, no sign-in required.",
-  alternates: {
-    languages: {
-      en: "https://app.casewhy.com/get-help",
-      es: "https://app.casewhy.com/es/get-help",
-    },
+
+  languages: {
+    en: "https://app.casewhy.com/get-help",
+    es: "https://app.casewhy.com/es/get-help",
   },
-};
+});
 
 // Round 29 — ties the separate "talk to a professional" directories
 // together so they're discoverable as one coherent feature instead of a
@@ -54,17 +54,19 @@ export default function GetHelpPage() {
 
       <h1 className="text-2xl font-bold tracking-tight">Get help</h1>
       <p className="mt-2 text-muted">
-        CaseWhy gives you plain-language information, not legal advice. When your situation needs
-        a licensed professional&apos;s judgment, here&apos;s where to find one.
+        CaseWhy gives you plain-language information, not legal advice. When
+        your situation needs a licensed professional&apos;s judgment,
+        here&apos;s where to find one.
       </p>
       <p className="mt-2 text-xs text-muted">
-        This page is an informational list, not an endorsement or a referral service. CaseWhy
-        doesn&apos;t vouch for outcomes, and being listed here doesn&apos;t mean any listing is
-        right for your specific situation.
+        This page is an informational list, not an endorsement or a referral
+        service. CaseWhy doesn&apos;t vouch for outcomes, and being listed here
+        doesn&apos;t mean any listing is right for your specific situation.
       </p>
       <p className="mt-2 text-xs text-muted">
-        Every resource here is free to use, always — no fees, no ads, no hidden cost. Same as the
-        rest of CaseWhy: we don&apos;t sell your data or run ads either.
+        Every resource here is free to use, always — no fees, no ads, no hidden
+        cost. Same as the rest of CaseWhy: we don&apos;t sell your data or run
+        ads either.
       </p>
 
       <div className="mt-4">
@@ -96,7 +98,10 @@ export default function GetHelpPage() {
               )}
             </Link>
           ) : (
-            <div key={category.id} className="rounded-xl border border-dashed border-border-strong p-5">
+            <div
+              key={category.id}
+              className="rounded-xl border border-dashed border-border-strong p-5"
+            >
               <div className="flex items-baseline justify-between gap-2">
                 <p className="font-semibold text-muted">{category.label}</p>
                 <span className="shrink-0 rounded-full bg-surface-2 px-2 py-0.5 text-xs font-medium text-muted">
@@ -105,7 +110,7 @@ export default function GetHelpPage() {
               </div>
               <p className="mt-1 text-sm text-muted">{category.description}</p>
             </div>
-          )
+          ),
         )}
       </div>
     </main>

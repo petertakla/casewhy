@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { PublicPage } from "@/components/PublicPage";
@@ -22,17 +23,16 @@ import { slugify } from "@/lib/search/slugify";
 // verification rule (round 97's own lesson) -- three real corrections
 // came out of that check, documented inline below at each one.
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/faq", {
   title: "Frequently Asked Questions | CaseWhy",
   description:
     "Answers to common questions about CaseWhy — tracking a case, AI explanations, Plus pricing, privacy, and how your data is protected.",
-  alternates: {
-    languages: {
-      en: "https://app.casewhy.com/faq",
-      es: "https://app.casewhy.com/es/faq",
-    },
+
+  languages: {
+    en: "https://app.casewhy.com/faq",
+    es: "https://app.casewhy.com/es/faq",
   },
-};
+});
 
 // Round 110 follow-up — this page was statically prerendered, which meant
 // the root layout's AuthHeader (needs per-request session data) couldn't
@@ -74,10 +74,15 @@ const GROUPS: FaqGroup[] = [
           "CaseWhy is built by CaseWhy LLC, a small company in Florida, by a founder who spent fifteen years as a solution architect and then watched a family naturalization case stall at the last step. There's no venture funding and no ad network behind it. The founder's own account of why it exists is on the Updates page.",
         answer: (
           <>
-            CaseWhy is built by CaseWhy LLC, a small company in Florida, by a founder who spent fifteen years as a
-            solution architect and then watched a family naturalization case stall at the last step. There&apos;s no
-            venture funding and no ad network behind it. The founder&apos;s own account of why it exists is on the{" "}
-            <Link href="/updates/a-note-from-the-founder" className="text-brand-600 hover:underline dark:text-brand-400">
+            CaseWhy is built by CaseWhy LLC, a small company in Florida, by a
+            founder who spent fifteen years as a solution architect and then
+            watched a family naturalization case stall at the last step.
+            There&apos;s no venture funding and no ad network behind it. The
+            founder&apos;s own account of why it exists is on the{" "}
+            <Link
+              href="/updates/a-note-from-the-founder"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               Updates page
             </Link>
             .
@@ -90,21 +95,31 @@ const GROUPS: FaqGroup[] = [
           "No. CaseWhy is not a law firm, does not provide legal advice, and using it does not create an attorney-client relationship of any kind. Explanations of your case status, AI chat answers, processing-time estimates, visa bulletin information, and escalation-toolkit drafting assistance are all general, informational content drawn from public USCIS materials — describing what a status or process generally means, never a conclusion about what you, specifically, should do about your case. For asylum (I-589) and DACA (I-821D) cases in particular, CaseWhy will never tell you whether you're eligible for relief or predict your case's outcome — only a licensed immigration attorney or accredited representative can do that, and CaseWhy will direct you to one whenever a question depends on your individual facts.",
         answer: (
           <>
-            No. CaseWhy is not a law firm, does not provide legal advice, and using it does not create an
-            attorney-client relationship of any kind. Explanations of your case status, AI chat answers,{" "}
-            <Link href="/processing-times" className="text-brand-600 hover:underline dark:text-brand-400">
+            No. CaseWhy is not a law firm, does not provide legal advice, and
+            using it does not create an attorney-client relationship of any
+            kind. Explanations of your case status, AI chat answers,{" "}
+            <Link
+              href="/processing-times"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               processing-time estimates
             </Link>
             ,{" "}
-            <Link href="/visa-bulletin" className="text-brand-600 hover:underline dark:text-brand-400">
+            <Link
+              href="/visa-bulletin"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               visa bulletin information
             </Link>
-            , and escalation-toolkit drafting assistance are all general, informational content drawn from public
-            USCIS materials — describing what a status or process generally means, never a conclusion about what
-            you, specifically, should do about your case. For asylum (I-589) and DACA (I-821D) cases in particular,
-            CaseWhy will never tell you whether you&apos;re eligible for relief or predict your case&apos;s outcome —
-            only a licensed immigration attorney or accredited representative can do that, and CaseWhy will direct
-            you to one whenever a question depends on your individual facts.
+            , and escalation-toolkit drafting assistance are all general,
+            informational content drawn from public USCIS materials — describing
+            what a status or process generally means, never a conclusion about
+            what you, specifically, should do about your case. For asylum
+            (I-589) and DACA (I-821D) cases in particular, CaseWhy will never
+            tell you whether you&apos;re eligible for relief or predict your
+            case&apos;s outcome — only a licensed immigration attorney or
+            accredited representative can do that, and CaseWhy will direct you
+            to one whenever a question depends on your individual facts.
           </>
         ),
       },
@@ -121,7 +136,7 @@ const GROUPS: FaqGroup[] = [
       {
         question: "How often does CaseWhy check my case?",
         answer:
-          "Every tracked case is checked automatically once a day. CaseWhy Plus adds a \"Check now\" button for an on-demand check whenever you want one.",
+          'Every tracked case is checked automatically once a day. CaseWhy Plus adds a "Check now" button for an on-demand check whenever you want one.',
       },
       {
         question: "How will I know when my status changes?",
@@ -134,20 +149,30 @@ const GROUPS: FaqGroup[] = [
           "Yes — the free tier tracks up to three cases, and Plus tracks up to ten (with more available on request). You'll need the receipt number from their notice. Track only cases you're entitled to see; CaseWhy shows the same public status USCIS would show anyone with that number.",
       },
       {
-        question: 'What does "Case Was Received" mean, and what\'s a stalled case?',
+        question:
+          'What does "Case Was Received" mean, and what\'s a stalled case?',
         plainText:
-          "\"Case Was Received\" is the first status almost every case shows; it confirms USCIS has your filing and fee, and nothing more. A case becomes \"outside normal processing time\" when it has waited longer than the time USCIS itself publishes for that form and office — CaseWhy flags this automatically on every tier, and shows the formal channels that open up at that point (a USCIS e-Request, a congressional inquiry, the CIS Ombudsman). Plus can draft those letters for you.",
+          '"Case Was Received" is the first status almost every case shows; it confirms USCIS has your filing and fee, and nothing more. A case becomes "outside normal processing time" when it has waited longer than the time USCIS itself publishes for that form and office — CaseWhy flags this automatically on every tier, and shows the formal channels that open up at that point (a USCIS e-Request, a congressional inquiry, the CIS Ombudsman). Plus can draft those letters for you.',
         answer: (
           <>
-            &quot;Case Was Received&quot; is the first status almost every case shows; it confirms USCIS has your
-            filing and fee, and nothing more. A case becomes{" "}
-            <Link href="/updates/when-your-case-goes-silent" className="text-brand-600 hover:underline dark:text-brand-400">
+            &quot;Case Was Received&quot; is the first status almost every case
+            shows; it confirms USCIS has your filing and fee, and nothing more.
+            A case becomes{" "}
+            <Link
+              href="/updates/when-your-case-goes-silent"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               &quot;outside normal processing time&quot;
             </Link>{" "}
-            when it has waited longer than the time USCIS itself publishes for that form and office — CaseWhy flags
-            this automatically on every tier, and shows the formal channels that open up at that point (a USCIS
-            e-Request, a congressional inquiry, the CIS Ombudsman). Plus can draft those letters for you. See also{" "}
-            <Link href="/updates/what-case-was-received-actually-means" className="text-brand-600 hover:underline dark:text-brand-400">
+            when it has waited longer than the time USCIS itself publishes for
+            that form and office — CaseWhy flags this automatically on every
+            tier, and shows the formal channels that open up at that point (a
+            USCIS e-Request, a congressional inquiry, the CIS Ombudsman). Plus
+            can draft those letters for you. See also{" "}
+            <Link
+              href="/updates/what-case-was-received-actually-means"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               what &quot;Case Was Received&quot; actually means
             </Link>
             .
@@ -166,11 +191,15 @@ const GROUPS: FaqGroup[] = [
         answer: (
           <>
             No. Ask CaseWhy on the{" "}
-            <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+            <Link
+              href="/get-help"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               Get Help
             </Link>{" "}
-            page answers three questions without any sign-in; after that, a free account gives you three AI
-            questions about your own case each month, and Plus makes them unlimited.
+            page answers three questions without any sign-in; after that, a free
+            account gives you three AI questions about your own case each month,
+            and Plus makes them unlimited.
           </>
         ),
       },
@@ -204,13 +233,18 @@ const GROUPS: FaqGroup[] = [
         answer: (
           <>
             Yes — the site, the app,{" "}
-            <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+            <Link
+              href="/get-help"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               Get Help
             </Link>{" "}
-            (including its free-text question box), and the FAQ are available in Spanish; use the Español link at
-            the top of any page. Some reference pages are still English-only and marked &quot;(en inglés)&quot;
-            where they&apos;re linked. The AI-generated case explanations and the signed-in &quot;Ask a
-            question&quot; chat currently reply in English only, even on a Spanish-language page — a gap we&apos;re
+            (including its free-text question box), and the FAQ are available in
+            Spanish; use the Español link at the top of any page. Some reference
+            pages are still English-only and marked &quot;(en inglés)&quot;
+            where they&apos;re linked. The AI-generated case explanations and
+            the signed-in &quot;Ask a question&quot; chat currently reply in
+            English only, even on a Spanish-language page — a gap we&apos;re
             aware of.
           </>
         ),
@@ -226,18 +260,28 @@ const GROUPS: FaqGroup[] = [
           "CaseWhy has a free tier — up to three tracked cases, a status timeline, AI-generated plain-language explanations, and three AI questions about your case each month — plus an optional paid Plus tier for tracking more cases, unlimited questions, and other add-ons (see the Plus page for current pricing). Get Help — CaseWhy's directories of free legal aid, accredited representatives, attorneys, and other resources — is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost.",
         answer: (
           <>
-            CaseWhy has a free tier — up to three tracked cases, a status timeline, AI-generated plain-language
-            explanations, and three AI questions about your case each month — plus an optional paid Plus tier for
-            tracking more cases, unlimited questions, and other add-ons (see the{" "}
-            <Link href="/plus" className="text-brand-600 hover:underline dark:text-brand-400">
+            CaseWhy has a free tier — up to three tracked cases, a status
+            timeline, AI-generated plain-language explanations, and three AI
+            questions about your case each month — plus an optional paid Plus
+            tier for tracking more cases, unlimited questions, and other add-ons
+            (see the{" "}
+            <Link
+              href="/plus"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               Plus page
             </Link>{" "}
             for current pricing).{" "}
-            <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+            <Link
+              href="/get-help"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               Get Help
             </Link>{" "}
-            — CaseWhy&apos;s directories of free legal aid, accredited representatives, attorneys, and other
-            resources — is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost.
+            — CaseWhy&apos;s directories of free legal aid, accredited
+            representatives, attorneys, and other resources — is free to
+            everyone, always, regardless of subscription: no fees, no ads, no
+            hidden cost.
           </>
         ),
       },
@@ -252,13 +296,17 @@ const GROUPS: FaqGroup[] = [
           "Plus is $9.99 a month, $22.99 a quarter, or $66.99 a year, billed through Stripe. Cancel any time from the Manage subscription link on the Plus page; you keep Plus until the end of the period you've paid for. There are no refunds or proration for partial periods.",
         answer: (
           <>
-            Plus is $9.99 a month, $22.99 a quarter, or $66.99 a year, billed through Stripe. Cancel any time from
-            the &quot;Manage subscription&quot; link on the{" "}
-            <Link href="/plus" className="text-brand-600 hover:underline dark:text-brand-400">
+            Plus is $9.99 a month, $22.99 a quarter, or $66.99 a year, billed
+            through Stripe. Cancel any time from the &quot;Manage
+            subscription&quot; link on the{" "}
+            <Link
+              href="/plus"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               Plus page
             </Link>
-            ; you keep Plus until the end of the period you&apos;ve paid for. There are no refunds or proration for
-            partial periods.
+            ; you keep Plus until the end of the period you&apos;ve paid for.
+            There are no refunds or proration for partial periods.
           </>
         ),
       },
@@ -268,12 +316,17 @@ const GROUPS: FaqGroup[] = [
           "Plus includes an attorney-handoff PDF: your case timeline, status history, and the explanations in one document you can send to your lawyer or accredited representative. If you don't have one yet, Get Help lists free legal aid, accredited representatives, and attorneys, free to everyone.",
         answer: (
           <>
-            Plus includes an attorney-handoff PDF: your case timeline, status history, and the explanations in one
-            document you can send to your lawyer or accredited representative. If you don&apos;t have one yet,{" "}
-            <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+            Plus includes an attorney-handoff PDF: your case timeline, status
+            history, and the explanations in one document you can send to your
+            lawyer or accredited representative. If you don&apos;t have one yet,{" "}
+            <Link
+              href="/get-help"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               Get Help
             </Link>{" "}
-            lists free legal aid, accredited representatives, and attorneys, free to everyone.
+            lists free legal aid, accredited representatives, and attorneys,
+            free to everyone.
           </>
         ),
       },
@@ -303,17 +356,25 @@ const faqJsonLd = {
     group.faqs.map((faq) => ({
       "@type": "Question",
       name: faq.question,
-      acceptedAnswer: { "@type": "Answer", text: faq.plainText ?? (faq.answer as string) },
-    }))
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.plainText ?? (faq.answer as string),
+      },
+    })),
   ),
 };
 
 export default function FaqPage() {
   return (
     <PublicPage es={false} switcherHref="/es/faq">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
 
-      <h1 className="text-2xl font-bold tracking-tight">Frequently asked questions</h1>
+      <h1 className="text-2xl font-bold tracking-tight">
+        Frequently asked questions
+      </h1>
       <p className="mb-8 mt-2 text-muted">
         The most common questions about CaseWhy. For full detail, see the{" "}
         <a
@@ -346,11 +407,19 @@ export default function FaqPage() {
       <div className="space-y-10">
         {GROUPS.map((group) => (
           <div key={group.heading}>
-            <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-muted">{group.heading}</h2>
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-muted">
+              {group.heading}
+            </h2>
             <div className="space-y-6">
               {group.faqs.map((faq) => (
-                <div key={faq.question} id={slugify(faq.question)} className="scroll-mt-20">
-                  <h3 className="text-base font-semibold text-foreground">{faq.question}</h3>
+                <div
+                  key={faq.question}
+                  id={slugify(faq.question)}
+                  className="scroll-mt-20"
+                >
+                  <h3 className="text-base font-semibold text-foreground">
+                    {faq.question}
+                  </h3>
                   <p className="mt-2 text-sm text-muted">{faq.answer}</p>
                 </div>
               ))}

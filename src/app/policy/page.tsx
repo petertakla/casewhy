@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import Link from "next/link";
 import { POLICY_MEMOS } from "@/lib/kb/policy-memos";
 import { ShareButton } from "@/components/ShareButton";
@@ -27,39 +28,37 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await searchParams;
   const es = await isSpanishLocale(lang);
+  const languages = {
+    en: "https://app.casewhy.com/policy",
+    es: "https://app.casewhy.com/policy?lang=es",
+  };
   return es
-    ? {
+    ? pageMetadata("/policy?lang=es", {
         title: "Memorandos de Política de USCIS, Explicados | CaseWhy",
         description:
           "Explicaciones en lenguaje sencillo de los principales memorandos de política, cambios de reglas y fallos judiciales de USCIS que pueden afectar un caso de inmigración pendiente.",
-        alternates: {
-          languages: {
-            en: "https://app.casewhy.com/policy",
-            es: "https://app.casewhy.com/policy?lang=es",
-          },
-        },
-      }
-    : {
+        locale: "es",
+        languages,
+      })
+    : pageMetadata("/policy", {
         title: "USCIS Policy Memos, Explained | CaseWhy",
         description:
           "Plain-language explanations of major USCIS policy memos, rule changes, and court rulings that can affect a pending immigration case.",
-        alternates: {
-          languages: {
-            en: "https://app.casewhy.com/policy",
-            es: "https://app.casewhy.com/policy?lang=es",
-          },
-        },
-      };
+        languages,
+      });
 }
 
 function formatDate(iso: string, es: boolean): string {
   const [year, month, day] = iso.split("-").map(Number);
-  return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString(es ? "es" : "en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+  return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString(
+    es ? "es" : "en-US",
+    {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      timeZone: "UTC",
+    },
+  );
 }
 
 export default async function PolicyIndexPage({
@@ -69,13 +68,17 @@ export default async function PolicyIndexPage({
 }) {
   const { lang } = await searchParams;
   const es = await isSpanishLocale(lang);
-  const memos = [...POLICY_MEMOS].sort((a, b) => (a.datePublished < b.datePublished ? 1 : -1));
+  const memos = [...POLICY_MEMOS].sort((a, b) =>
+    a.datePublished < b.datePublished ? 1 : -1,
+  );
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
       <LanguageSwitcher es={es} basePath="/policy" />
       <h1 className="text-2xl font-bold tracking-tight">
-        {es ? "Memorandos de política de USCIS, explicados" : "USCIS policy memos, explained"}
+        {es
+          ? "Memorandos de política de USCIS, explicados"
+          : "USCIS policy memos, explained"}
       </h1>
       <p className="mb-2 mt-2 text-muted">
         {es
@@ -104,7 +107,11 @@ export default async function PolicyIndexPage({
       <PageFilter
         basePath="/policy/"
         placeholder={es ? "Filtrar estos memorandos…" : "Filter these memos…"}
-        noMatchText={es ? "Ningún memorando en esta página coincide." : "No memos on this page match."}
+        noMatchText={
+          es
+            ? "Ningún memorando en esta página coincide."
+            : "No memos on this page match."
+        }
         isSpanish={es}
       />
 
@@ -124,7 +131,9 @@ export default async function PolicyIndexPage({
               </p>
               <p className="mt-1.5 font-semibold text-foreground">
                 {title}
-                {untranslated && <span className="font-normal text-muted"> (en inglés)</span>}
+                {untranslated && (
+                  <span className="font-normal text-muted"> (en inglés)</span>
+                )}
               </p>
             </Link>
           );

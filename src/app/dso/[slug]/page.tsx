@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import { notFound } from "next/navigation";
 import { getDsoBySlug } from "@/lib/dso/directory";
 import { BackLink } from "@/components/BackLink";
@@ -20,20 +21,33 @@ export async function generateMetadata({
   const { lang } = await searchParams;
   const es = await isSpanishLocale(lang);
   const school = await getDsoBySlug(slug);
-  if (!school) return { title: es ? "Escuela no encontrada | CaseWhy" : "School not found | CaseWhy" };
-  const campusSuffix = school.campusName && school.campusName !== school.schoolName ? ` (${school.campusName})` : "";
-  return {
-    title: es ? `${school.schoolName} — Oficina de Estudiantes Internacionales | CaseWhy` : `${school.schoolName} — International Student Office | CaseWhy`,
-    description: es
-      ? `Listado de escuela certificada por SEVP para ${school.schoolName}${campusSuffix}. Directorio gratuito, solo listado informativo.`
-      : `SEVP-certified school listing for ${school.schoolName}${campusSuffix}. Free directory, informational listing only.`,
-    alternates: {
-      languages: {
-        en: `https://app.casewhy.com/dso/${school.slug}`,
-        es: `https://app.casewhy.com/dso/${school.slug}?lang=es`,
-      },
-    },
+  if (!school)
+    return {
+      title: es
+        ? "Escuela no encontrada | CaseWhy"
+        : "School not found | CaseWhy",
+    };
+  const campusSuffix =
+    school.campusName && school.campusName !== school.schoolName
+      ? ` (${school.campusName})`
+      : "";
+  const languages = {
+    en: `https://app.casewhy.com/dso/${school.slug}`,
+    es: `https://app.casewhy.com/dso/${school.slug}?lang=es`,
   };
+  return pageMetadata(
+    es ? `/dso/${school.slug}?lang=es` : `/dso/${school.slug}`,
+    {
+      title: es
+        ? `${school.schoolName} — Oficina de Estudiantes Internacionales | CaseWhy`
+        : `${school.schoolName} — International Student Office | CaseWhy`,
+      description: es
+        ? `Listado de escuela certificada por SEVP para ${school.schoolName}${campusSuffix}. Directorio gratuito, solo listado informativo.`
+        : `SEVP-certified school listing for ${school.schoolName}${campusSuffix}. Free directory, informational listing only.`,
+      locale: es ? "es" : undefined,
+      languages,
+    },
+  );
 }
 
 export default async function DsoDetailPage({
@@ -52,37 +66,63 @@ export default async function DsoDetailPage({
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-10">
       <div className="mb-2 flex items-center justify-between">
-        <BackLink href="/dso" label={es ? "Todas las escuelas" : "All schools"} />
-        <LanguageSwitcher es={es} basePath={`/dso/${school.slug}`} variant="inline" />
+        <BackLink
+          href="/dso"
+          label={es ? "Todas las escuelas" : "All schools"}
+        />
+        <LanguageSwitcher
+          es={es}
+          basePath={`/dso/${school.slug}`}
+          variant="inline"
+        />
       </div>
 
-      <h1 className="mt-4 text-2xl font-bold tracking-tight">{school.schoolName}</h1>
+      <h1 className="mt-4 text-2xl font-bold tracking-tight">
+        {school.schoolName}
+      </h1>
       {school.campusName && school.campusName !== school.schoolName && (
         <p className="mt-1 text-muted">
           {school.campusName}
-          {school.isMainCampus ? (es ? " (campus principal)" : " (main campus)") : ""}
+          {school.isMainCampus
+            ? es
+              ? " (campus principal)"
+              : " (main campus)"
+            : ""}
         </p>
       )}
 
       <div className="mt-6 space-y-4 rounded-xl border border-border bg-surface p-5 text-sm">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Certificación SEVP" : "SEVP certification"}</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+            {es ? "Certificación SEVP" : "SEVP certification"}
+          </p>
           <p className="mt-1">
-            {[school.f1Certified && "F-1", school.m1Certified && "M-1"].filter(Boolean).join(es ? " y " : " and ")}
+            {[school.f1Certified && "F-1", school.m1Certified && "M-1"]
+              .filter(Boolean)
+              .join(es ? " y " : " and ")}
           </p>
         </div>
         {(school.streetAddress || school.cityStateZip) && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Dirección" : "Address"}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {es ? "Dirección" : "Address"}
+            </p>
             <p className="mt-1">
-              {school.streetAddress && <>{school.streetAddress}<br /></>}
+              {school.streetAddress && (
+                <>
+                  {school.streetAddress}
+                  <br />
+                </>
+              )}
               {school.cityStateZip}
             </p>
           </div>
         )}
         {school.phone && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Teléfono" : "Phone"}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {es ? "Teléfono" : "Phone"}
+            </p>
             <p className="mt-1">{school.phone}</p>
           </div>
         )}
@@ -95,14 +135,16 @@ export default async function DsoDetailPage({
           rel="noopener noreferrer"
           className="mt-6 inline-block text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
         >
-          {es ? "Visitar sitio web de la oficina de estudiantes internacionales" : "Visit international student office website"}
+          {es
+            ? "Visitar sitio web de la oficina de estudiantes internacionales"
+            : "Visit international student office website"}
         </a>
       ) : (
         <p className="mt-6 text-sm text-muted">
           {es ? (
             <>
-              Aún no se ha confirmado un enlace directo a la oficina de estudiantes internacionales para
-              esta escuela —{" "}
+              Aún no se ha confirmado un enlace directo a la oficina de
+              estudiantes internacionales para esta escuela —{" "}
               <a
                 href="https://studyinthestates.dhs.gov/school-search"
                 target="_blank"
@@ -115,7 +157,8 @@ export default async function DsoDetailPage({
             </>
           ) : (
             <>
-              A direct international-student-office link isn&apos;t confirmed for this school yet —{" "}
+              A direct international-student-office link isn&apos;t confirmed
+              for this school yet —{" "}
               <a
                 href="https://studyinthestates.dhs.gov/school-search"
                 target="_blank"
@@ -138,7 +181,11 @@ export default async function DsoDetailPage({
       </p>
 
       <div className="mt-6">
-        <VerificationLinks name={school.schoolName} context={school.cityStateZip ?? undefined} es={es} />
+        <VerificationLinks
+          name={school.schoolName}
+          context={school.cityStateZip ?? undefined}
+          es={es}
+        />
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -162,7 +209,8 @@ export default async function DsoDetailPage({
                   trigger: "¿Ves algo incorrecto en este listado? Repórtalo",
                   success: "Gracias — lo revisaremos.",
                   whatsWrong: "¿Qué está mal en este listado?",
-                  whatsWrongPlaceholder: "ej. el teléfono está desconectado, ya no está en esta dirección, la organización cerró",
+                  whatsWrongPlaceholder:
+                    "ej. el teléfono está desconectado, ya no está en esta dirección, la organización cerró",
                   email: "Tu correo (opcional, si quieres una respuesta)",
                   sending: "Enviando…",
                   send: "Enviar reporte",

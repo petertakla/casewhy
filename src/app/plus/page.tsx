@@ -1,26 +1,30 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import Link from "next/link";
 import { auth } from "@/lib/auth/server";
 import { getSubscriptionDetails } from "@/lib/billing/tier";
 import { getLiveSubscriptionDetail } from "@/lib/billing/live-subscription";
-import { getAllEffectivePrices, type EffectivePrice, type PlanId } from "@/lib/billing/pricing";
+import {
+  getAllEffectivePrices,
+  type EffectivePrice,
+  type PlanId,
+} from "@/lib/billing/pricing";
 import { startCheckout, openBillingPortal } from "./actions";
 import { ShareButton } from "@/components/ShareButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { PlusBadge } from "@/components/PlusBadge";
 import { FormSubmitButton } from "@/components/FormSubmitButton";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/plus", {
   title: "CaseWhy Plus — Pricing & Features | CaseWhy",
   description:
     "Compare CaseWhy's free and Plus tiers — multiple tracked cases, faster notifications, and unlimited AI questions about your case.",
-  alternates: {
-    languages: {
-      en: "https://app.casewhy.com/plus",
-      es: "https://app.casewhy.com/es/plus",
-    },
+
+  languages: {
+    en: "https://app.casewhy.com/plus",
+    es: "https://app.casewhy.com/es/plus",
   },
-};
+});
 
 // Round 14 — each feature is now a hyperlink to its own fuller explanation
 // (below, under "Plus, in depth") instead of a flat bullet, per the
@@ -101,14 +105,29 @@ const PLUS_FEATURES: PlusFeature[] = [
   },
 ];
 
-function FeatureRow({ id, title, free, plus }: { id: string; title: string; free: string; plus: string }) {
+function FeatureRow({
+  id,
+  title,
+  free,
+  plus,
+}: {
+  id: string;
+  title: string;
+  free: string;
+  plus: string;
+}) {
   return (
     <div className="grid grid-cols-[1fr_auto_auto] items-center gap-4 border-b border-border py-4 text-sm last:border-b-0 sm:grid-cols-[1fr_140px_140px]">
-      <a href={`#${id}`} className="font-medium text-foreground/90 hover:text-brand-600 dark:hover:text-brand-400 hover:underline">
+      <a
+        href={`#${id}`}
+        className="font-medium text-foreground/90 hover:text-brand-600 dark:hover:text-brand-400 hover:underline"
+      >
         {title}
       </a>
       <span className="text-center text-muted">{free}</span>
-      <span className="text-center font-semibold text-brand-600 dark:text-brand-400">{plus}</span>
+      <span className="text-center font-semibold text-brand-600 dark:text-brand-400">
+        {plus}
+      </span>
     </div>
   );
 }
@@ -142,15 +161,25 @@ function PlanCard({
   return (
     <div className="flex flex-col rounded-xl border border-border bg-surface p-5">
       <p className="text-sm font-semibold text-muted">
-        {planId === "plus_monthly" ? "Monthly" : planId === "plus_quarterly" ? "Quarterly" : "Annual"}
+        {planId === "plus_monthly"
+          ? "Monthly"
+          : planId === "plus_quarterly"
+            ? "Quarterly"
+            : "Annual"}
       </p>
       <p className="mt-1">
-        <span className="font-mono text-2xl font-bold text-foreground">${formatDollars(price.priceCents)}</span>{" "}
+        <span className="font-mono text-2xl font-bold text-foreground">
+          ${formatDollars(price.priceCents)}
+        </span>{" "}
         <span className="text-sm text-muted">{PLAN_PERIOD_LABEL[planId]}</span>
       </p>
-      <p className="mt-1 text-xs text-muted">${formatDollars(perMonth)} / month equivalent</p>
+      <p className="mt-1 text-xs text-muted">
+        ${formatDollars(perMonth)} / month equivalent
+      </p>
       {price.appliedRuleLabel && (
-        <p className="mt-1 text-xs font-medium text-brand-600 dark:text-brand-400">{price.appliedRuleLabel}</p>
+        <p className="mt-1 text-xs font-medium text-brand-600 dark:text-brand-400">
+          {price.appliedRuleLabel}
+        </p>
       )}
       {canSubscribe && (
         <form action={startCheckout.bind(null, planId)} className="mt-4">
@@ -183,13 +212,18 @@ export default async function PlusPage({
 }) {
   const { checkout } = await searchParams;
   const { data: session } = await auth.getSession();
-  const details = session?.user ? await getSubscriptionDetails(session.user.id) : null;
+  const details = session?.user
+    ? await getSubscriptionDetails(session.user.id)
+    : null;
   const isPlus = details?.tier === "plus";
   const prices = await getAllEffectivePrices();
   // Round 114 follow-up — "it doesn't show the tier anywhere" (Peter,
   // testing Plus). Live Stripe read for the real subscription start
   // date, same reasoning as live-subscription.ts's own comment.
-  const liveDetail = isPlus && details?.stripeSubscriptionId ? await getLiveSubscriptionDetail(details.stripeSubscriptionId) : null;
+  const liveDetail =
+    isPlus && details?.stripeSubscriptionId
+      ? await getLiveSubscriptionDetail(details.stripeSubscriptionId)
+      : null;
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
@@ -197,7 +231,8 @@ export default async function PlusPage({
 
       {checkout === "success" && (
         <div className="mb-6 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-700 dark:text-emerald-400">
-          You&apos;re subscribed to CaseWhy Plus. It may take a few seconds for every feature to unlock.
+          You&apos;re subscribed to CaseWhy Plus. It may take a few seconds for
+          every feature to unlock.
         </div>
       )}
       {checkout === "cancelled" && (
@@ -210,8 +245,8 @@ export default async function PlusPage({
         CaseWhy <PlusBadge size="lg" />
       </h1>
       <p className="mb-2 mt-2 text-lg text-muted">
-        Unlimited, cited AI chat about your case — plus the escalation toolkit for when it
-        stalls. For you and your whole family.
+        Unlimited, cited AI chat about your case — plus the escalation toolkit
+        for when it stalls. For you and your whole family.
       </p>
       <div className="mt-4">
         <ShareButton
@@ -223,20 +258,22 @@ export default async function PlusPage({
 
       {isPlus && liveDetail && (
         <div className="mt-4 rounded-xl border border-brand-500/20 bg-brand-500/5 p-4 text-sm text-brand-700 dark:text-brand-400">
-          You&apos;re on CaseWhy Plus since {liveDetail.startDate.toLocaleDateString()}.
+          You&apos;re on CaseWhy Plus since{" "}
+          {liveDetail.startDate.toLocaleDateString()}.
         </div>
       )}
 
       {isPlus && details?.cancelAtPeriodEnd && details.currentPeriodEnd && (
         <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm text-amber-700 dark:text-amber-400">
-          Your subscription is set to cancel on {details.currentPeriodEnd.toLocaleDateString()}.
-          You&apos;ll keep full access until then.
+          Your subscription is set to cancel on{" "}
+          {details.currentPeriodEnd.toLocaleDateString()}. You&apos;ll keep full
+          access until then.
         </div>
       )}
       {isPlus && details?.status === "past_due" && (
         <div className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-600 dark:text-red-400">
-          Your last payment didn&apos;t go through. Update your payment method to keep your
-          subscription active.
+          Your last payment didn&apos;t go through. Update your payment method
+          to keep your subscription active.
         </div>
       )}
 
@@ -255,9 +292,21 @@ export default async function PlusPage({
       ) : (
         <>
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <PlanCard planId="plus_monthly" price={prices.plus_monthly} canSubscribe={!!session?.user} />
-            <PlanCard planId="plus_quarterly" price={prices.plus_quarterly} canSubscribe={!!session?.user} />
-            <PlanCard planId="plus_annual" price={prices.plus_annual} canSubscribe={!!session?.user} />
+            <PlanCard
+              planId="plus_monthly"
+              price={prices.plus_monthly}
+              canSubscribe={!!session?.user}
+            />
+            <PlanCard
+              planId="plus_quarterly"
+              price={prices.plus_quarterly}
+              canSubscribe={!!session?.user}
+            />
+            <PlanCard
+              planId="plus_annual"
+              price={prices.plus_annual}
+              canSubscribe={!!session?.user}
+            />
           </div>
           {!session?.user && (
             <div className="mt-4">
@@ -270,8 +319,8 @@ export default async function PlusPage({
             </div>
           )}
           <p className="mt-4 text-xs text-muted">
-            No refunds, no proration — cancel anytime and you&apos;ll keep access through the end of
-            your current billing period.
+            No refunds, no proration — cancel anytime and you&apos;ll keep
+            access through the end of your current billing period.
           </p>
 
           <div className="mt-8 grid grid-cols-1 gap-4 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6 sm:grid-cols-2">
@@ -280,9 +329,9 @@ export default async function PlusPage({
                 Unlimited questions, actually grounded
               </p>
               <p className="mt-1.5 text-sm text-muted">
-                Ask as many questions as you need, the moment your case changes. Every answer
-                cites CaseWhy&apos;s own USCIS policy knowledge base — not a generic chatbot
-                guessing.
+                Ask as many questions as you need, the moment your case changes.
+                Every answer cites CaseWhy&apos;s own USCIS policy knowledge
+                base — not a generic chatbot guessing.
               </p>
               <a
                 href="#ai-chat"
@@ -296,8 +345,9 @@ export default async function PlusPage({
                 A real escalation toolkit
               </p>
               <p className="mt-1.5 text-sm text-muted">
-                When a case stalls, find your real congressional representative and draft a real
-                escalation letter — pre-filled with your case&apos;s details, not a blank page.
+                When a case stalls, find your real congressional representative
+                and draft a real escalation letter — pre-filled with your
+                case&apos;s details, not a blank page.
               </p>
               <a
                 href="#escalation-letters"
@@ -331,19 +381,28 @@ export default async function PlusPage({
           </span>
         </div>
         {PLUS_FEATURES.map((feature) => (
-          <FeatureRow key={feature.id} id={feature.id} title={feature.title} free={feature.free} plus={feature.plus} />
+          <FeatureRow
+            key={feature.id}
+            id={feature.id}
+            title={feature.title}
+            free={feature.free}
+            plus={feature.plus}
+          />
         ))}
       </div>
       <p className="mt-2 text-xs text-muted">
-        The stalled-case alert itself is always free — only the representative lookup and letter
-        drafting that follow it are part of CaseWhy Plus.
+        The stalled-case alert itself is always free — only the representative
+        lookup and letter drafting that follow it are part of CaseWhy Plus.
       </p>
       <p className="mt-1 text-xs text-muted">
-        <Link href="/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+        <Link
+          href="/get-help"
+          className="text-brand-600 hover:underline dark:text-brand-400"
+        >
           Get Help
         </Link>{" "}
-        — finding an attorney or accredited representative — is free on every tier too, not a
-        Plus perk.
+        — finding an attorney or accredited representative — is free on every
+        tier too, not a Plus perk.
       </p>
 
       <div className="mt-10">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import { notFound } from "next/navigation";
 import { getProBonoRepresentationBySlug } from "@/lib/pro-bono-representation/directory";
 import { BackLink } from "@/components/BackLink";
@@ -20,21 +21,31 @@ export async function generateMetadata({
   const { lang } = await searchParams;
   const es = await isSpanishLocale(lang);
   const org = await getProBonoRepresentationBySlug(slug);
-  if (!org) return { title: es ? "Organización no encontrada | CaseWhy" : "Organization not found | CaseWhy" };
-  return {
-    title: es
-      ? `${org.organizationName} — Representación Gratuita en la Corte de Inmigración | CaseWhy`
-      : `${org.organizationName} — Pro Bono Immigration Court Representation | CaseWhy`,
-    description: es
-      ? `${org.organizationName}, ofreciendo representación gratuita ante la corte de inmigración de ${org.immigrationCourt}. Directorio gratuito, solo listado informativo.`
-      : `${org.organizationName}, offering free representation before the ${org.immigrationCourt} immigration court. Free directory, informational listing only.`,
-    alternates: {
-      languages: {
-        en: `https://app.casewhy.com/pro-bono-representation/${org.slug}`,
-        es: `https://app.casewhy.com/pro-bono-representation/${org.slug}?lang=es`,
-      },
-    },
+  if (!org)
+    return {
+      title: es
+        ? "Organización no encontrada | CaseWhy"
+        : "Organization not found | CaseWhy",
+    };
+  const languages = {
+    en: `https://app.casewhy.com/pro-bono-representation/${org.slug}`,
+    es: `https://app.casewhy.com/pro-bono-representation/${org.slug}?lang=es`,
   };
+  return pageMetadata(
+    es
+      ? `/pro-bono-representation/${org.slug}?lang=es`
+      : `/pro-bono-representation/${org.slug}`,
+    {
+      title: es
+        ? `${org.organizationName} — Representación Gratuita en la Corte de Inmigración | CaseWhy`
+        : `${org.organizationName} — Pro Bono Immigration Court Representation | CaseWhy`,
+      description: es
+        ? `${org.organizationName}, ofreciendo representación gratuita ante la corte de inmigración de ${org.immigrationCourt}. Directorio gratuito, solo listado informativo.`
+        : `${org.organizationName}, offering free representation before the ${org.immigrationCourt} immigration court. Free directory, informational listing only.`,
+      locale: es ? "es" : undefined,
+      languages,
+    },
+  );
 }
 
 export default async function ProBonoRepresentationDetailPage({
@@ -53,8 +64,19 @@ export default async function ProBonoRepresentationDetailPage({
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-10">
       <div className="mb-2 flex items-center justify-between">
-        <BackLink href="/pro-bono-representation" label={es ? "Toda la representación gratuita" : "All pro bono representation"} />
-        <LanguageSwitcher es={es} basePath={`/pro-bono-representation/${org.slug}`} variant="inline" />
+        <BackLink
+          href="/pro-bono-representation"
+          label={
+            es
+              ? "Toda la representación gratuita"
+              : "All pro bono representation"
+          }
+        />
+        <LanguageSwitcher
+          es={es}
+          basePath={`/pro-bono-representation/${org.slug}`}
+          variant="inline"
+        />
       </div>
 
       <h1 className="mt-4 text-2xl font-bold tracking-tight">
@@ -70,34 +92,49 @@ export default async function ProBonoRepresentationDetailPage({
       <div className="mt-6 space-y-4 rounded-xl border border-border bg-surface p-5 text-sm">
         {(org.streetAddress || org.cityStateZip) && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Dirección" : "Address"}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {es ? "Dirección" : "Address"}
+            </p>
             <p className="mt-1">
-              {org.streetAddress && <>{org.streetAddress}<br /></>}
+              {org.streetAddress && (
+                <>
+                  {org.streetAddress}
+                  <br />
+                </>
+              )}
               {org.cityStateZip}
             </p>
           </div>
         )}
         {org.phone && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Teléfono" : "Phone"}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {es ? "Teléfono" : "Phone"}
+            </p>
             <p className="mt-1">{org.phone}</p>
           </div>
         )}
         {org.languages && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Idiomas" : "Languages"}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {es ? "Idiomas" : "Languages"}
+            </p>
             <p className="mt-1">{org.languages}</p>
           </div>
         )}
         {org.caseTypeLimits && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Límites de tipo de caso" : "Case-type limits"}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {es ? "Límites de tipo de caso" : "Case-type limits"}
+            </p>
             <p className="mt-1">{org.caseTypeLimits}</p>
           </div>
         )}
         {org.intakePolicy && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Política de admisión" : "Intake policy"}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {es ? "Política de admisión" : "Intake policy"}
+            </p>
             <p className="mt-1">{org.intakePolicy}</p>
           </div>
         )}
@@ -105,7 +142,11 @@ export default async function ProBonoRepresentationDetailPage({
 
       {org.website && (
         <a
-          href={org.website.startsWith("http") ? org.website : `https://${org.website}`}
+          href={
+            org.website.startsWith("http")
+              ? org.website
+              : `https://${org.website}`
+          }
           target="_blank"
           rel="noopener noreferrer"
           className="mt-6 inline-block text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
@@ -122,7 +163,11 @@ export default async function ProBonoRepresentationDetailPage({
       </p>
 
       <div className="mt-6">
-        <VerificationLinks name={org.organizationName} context={org.cityStateZip ?? undefined} es={es} />
+        <VerificationLinks
+          name={org.organizationName}
+          context={org.cityStateZip ?? undefined}
+          es={es}
+        />
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -146,7 +191,8 @@ export default async function ProBonoRepresentationDetailPage({
                   trigger: "¿Ves algo incorrecto en este listado? Repórtalo",
                   success: "Gracias — lo revisaremos.",
                   whatsWrong: "¿Qué está mal en este listado?",
-                  whatsWrongPlaceholder: "ej. el teléfono está desconectado, ya no está en esta dirección, la organización cerró",
+                  whatsWrongPlaceholder:
+                    "ej. el teléfono está desconectado, ya no está en esta dirección, la organización cerró",
                   email: "Tu correo (opcional, si quieres una respuesta)",
                   sending: "Enviando…",
                   send: "Enviar reporte",

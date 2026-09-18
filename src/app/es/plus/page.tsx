@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import Link from "next/link";
 import { auth } from "@/lib/auth/server";
 import { getSubscriptionDetails } from "@/lib/billing/tier";
 import { getLiveSubscriptionDetail } from "@/lib/billing/live-subscription";
-import { getAllEffectivePrices, type EffectivePrice, type PlanId } from "@/lib/billing/pricing";
+import {
+  getAllEffectivePrices,
+  type EffectivePrice,
+  type PlanId,
+} from "@/lib/billing/pricing";
 import { startCheckout, openBillingPortal } from "@/app/plus/actions";
 import { ShareButton } from "@/components/ShareButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -20,17 +25,17 @@ import { FormSubmitButton } from "@/components/FormSubmitButton";
 // flows already live in production, and making them locale-aware is a
 // real code change to payment-critical code, out of this round's static-
 // copy scope. Flagged in CLOUD_CLAUDE.md, not silently shipped.
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/es/plus", {
   title: "CaseWhy Plus — Precios y Funciones | CaseWhy",
   description:
     "Compara los niveles gratuito y Plus de CaseWhy — múltiples casos rastreados, notificaciones más rápidas y preguntas ilimitadas de IA sobre tu caso.",
-  alternates: {
-    languages: {
-      en: "https://app.casewhy.com/plus",
-      es: "https://app.casewhy.com/es/plus",
-    },
+
+  locale: "es",
+  languages: {
+    en: "https://app.casewhy.com/plus",
+    es: "https://app.casewhy.com/es/plus",
   },
-};
+});
 
 interface PlusFeature {
   id: string;
@@ -47,7 +52,7 @@ const PLUS_FEATURES: PlusFeature[] = [
     free: "3 / mes",
     plus: "Ilimitado",
     explanation:
-      "Tu estado acaba de cambiar a \"Solicitud de Evidencia\" y no sabes qué significa, si tu cronograma se reinició, o qué es lo que USCIS realmente quiere — para eso es exactamente el chat. Pregunta en lenguaje sencillo y obtén una respuesta basada en la propia base de conocimiento de políticas y jurisprudencia de CaseWhy, con citas visibles que puedes verificar tú mismo, en lugar de un chatbot genérico adivinando a partir de datos de entrenamiento generales. En el nivel gratuito, 3 preguntas al mes se agotan rápido — una sola actualización real de tu caso puede fácilmente generar tres preguntas de seguimiento en una sola noche, y luego quedas bloqueado hasta el próximo mes justo cuando más lo necesitas. Plus elimina el límite por completo, para que puedas hacer una pregunta en el momento en que te preocupe, sin tener que racionarlas.",
+      'Tu estado acaba de cambiar a "Solicitud de Evidencia" y no sabes qué significa, si tu cronograma se reinició, o qué es lo que USCIS realmente quiere — para eso es exactamente el chat. Pregunta en lenguaje sencillo y obtén una respuesta basada en la propia base de conocimiento de políticas y jurisprudencia de CaseWhy, con citas visibles que puedes verificar tú mismo, en lugar de un chatbot genérico adivinando a partir de datos de entrenamiento generales. En el nivel gratuito, 3 preguntas al mes se agotan rápido — una sola actualización real de tu caso puede fácilmente generar tres preguntas de seguimiento en una sola noche, y luego quedas bloqueado hasta el próximo mes justo cuando más lo necesitas. Plus elimina el límite por completo, para que puedas hacer una pregunta en el momento en que te preocupe, sin tener que racionarlas.',
   },
   {
     id: "tracked-cases",
@@ -63,7 +68,7 @@ const PLUS_FEATURES: PlusFeature[] = [
     free: "—",
     plus: "Incluido",
     explanation:
-      "Cada cuenta, gratuita o Plus, recibe una revisión automática de estado una vez al día. La mayoría de los días eso es suficiente — pero el día en que tu caso realmente pudo haber avanzado no es la mayoría de los días. Plus agrega un botón real de \"Revisar ahora\" directamente en el panel para exactamente ese momento: escuchaste que algo cambió, o simplemente ha estado en silencio demasiado tiempo y quieres saberlo ahora mismo en lugar de esperar la revisión programada de mañana. Consulta a USCIS directamente, de la misma forma que lo hace la revisión diaria, solo que según tu propio horario en lugar de uno fijo.",
+      'Cada cuenta, gratuita o Plus, recibe una revisión automática de estado una vez al día. La mayoría de los días eso es suficiente — pero el día en que tu caso realmente pudo haber avanzado no es la mayoría de los días. Plus agrega un botón real de "Revisar ahora" directamente en el panel para exactamente ese momento: escuchaste que algo cambió, o simplemente ha estado en silencio demasiado tiempo y quieres saberlo ahora mismo en lugar de esperar la revisión programada de mañana. Consulta a USCIS directamente, de la misma forma que lo hace la revisión diaria, solo que según tu propio horario en lugar de uno fijo.',
   },
   {
     id: "document-vault",
@@ -87,7 +92,7 @@ const PLUS_FEATURES: PlusFeature[] = [
     free: "—",
     plus: "Incluido",
     explanation:
-      "Una vez que un caso se marca como estancado, el primer instinto de muchas personas es \"¿puede ayudarme mi representante en el Congreso con esto?\" — y la mayoría en realidad no sabe quién es, o tiene un nombre desactualizado de hace años. Ingresa tu dirección y CaseWhy busca tus Senadores y Representante de la Cámara reales y actuales — extraídos de datos gubernamentales en vivo, no de una lista estática que queda obsoleta después de cada elección — como un punto de partida genuino para una consulta al Congreso, una de las formas más efectivas en la práctica de lograr que revisen un caso estancado.",
+      'Una vez que un caso se marca como estancado, el primer instinto de muchas personas es "¿puede ayudarme mi representante en el Congreso con esto?" — y la mayoría en realidad no sabe quién es, o tiene un nombre desactualizado de hace años. Ingresa tu dirección y CaseWhy busca tus Senadores y Representante de la Cámara reales y actuales — extraídos de datos gubernamentales en vivo, no de una lista estática que queda obsoleta después de cada elección — como un punto de partida genuino para una consulta al Congreso, una de las formas más efectivas en la práctica de lograr que revisen un caso estancado.',
   },
   {
     id: "escalation-letters",
@@ -103,18 +108,33 @@ const PLUS_FEATURES: PlusFeature[] = [
     free: "—",
     plus: "Incluido",
     explanation:
-      "Si un caso llega al punto en que realmente necesitas un abogado, la primera reunión normalmente comienza contigo volviendo a explicar todo desde el principio mientras ellos toman notas. Esto genera en su lugar un PDF real de una página — el estado actual de tu caso y la propia explicación en lenguaje sencillo de CaseWhy, lista para entregar o adjuntar a un correo — para que esa primera conversación comience desde \"así están las cosas\" en lugar de empezar desde cero.",
+      'Si un caso llega al punto en que realmente necesitas un abogado, la primera reunión normalmente comienza contigo volviendo a explicar todo desde el principio mientras ellos toman notas. Esto genera en su lugar un PDF real de una página — el estado actual de tu caso y la propia explicación en lenguaje sencillo de CaseWhy, lista para entregar o adjuntar a un correo — para que esa primera conversación comience desde "así están las cosas" en lugar de empezar desde cero.',
   },
 ];
 
-function FeatureRow({ id, title, free, plus }: { id: string; title: string; free: string; plus: string }) {
+function FeatureRow({
+  id,
+  title,
+  free,
+  plus,
+}: {
+  id: string;
+  title: string;
+  free: string;
+  plus: string;
+}) {
   return (
     <div className="grid grid-cols-[1fr_auto_auto] items-center gap-4 border-b border-border py-4 text-sm last:border-b-0 sm:grid-cols-[1fr_140px_140px]">
-      <a href={`#${id}`} className="font-medium text-foreground/90 hover:text-brand-600 dark:hover:text-brand-400 hover:underline">
+      <a
+        href={`#${id}`}
+        className="font-medium text-foreground/90 hover:text-brand-600 dark:hover:text-brand-400 hover:underline"
+      >
         {title}
       </a>
       <span className="text-center text-muted">{free}</span>
-      <span className="text-center font-semibold text-brand-600 dark:text-brand-400">{plus}</span>
+      <span className="text-center font-semibold text-brand-600 dark:text-brand-400">
+        {plus}
+      </span>
     </div>
   );
 }
@@ -148,15 +168,25 @@ function PlanCard({
   return (
     <div className="flex flex-col rounded-xl border border-border bg-surface p-5">
       <p className="text-sm font-semibold text-muted">
-        {planId === "plus_monthly" ? "Mensual" : planId === "plus_quarterly" ? "Trimestral" : "Anual"}
+        {planId === "plus_monthly"
+          ? "Mensual"
+          : planId === "plus_quarterly"
+            ? "Trimestral"
+            : "Anual"}
       </p>
       <p className="mt-1">
-        <span className="font-mono text-2xl font-bold text-foreground">${formatDollars(price.priceCents)}</span>{" "}
+        <span className="font-mono text-2xl font-bold text-foreground">
+          ${formatDollars(price.priceCents)}
+        </span>{" "}
         <span className="text-sm text-muted">{PLAN_PERIOD_LABEL[planId]}</span>
       </p>
-      <p className="mt-1 text-xs text-muted">${formatDollars(perMonth)} / mes equivalente</p>
+      <p className="mt-1 text-xs text-muted">
+        ${formatDollars(perMonth)} / mes equivalente
+      </p>
       {price.appliedRuleLabel && (
-        <p className="mt-1 text-xs font-medium text-brand-600 dark:text-brand-400">{price.appliedRuleLabel}</p>
+        <p className="mt-1 text-xs font-medium text-brand-600 dark:text-brand-400">
+          {price.appliedRuleLabel}
+        </p>
       )}
       {canSubscribe && (
         <form action={startCheckout.bind(null, planId)} className="mt-4">
@@ -189,10 +219,15 @@ export default async function PlusPageEs({
 }) {
   const { checkout } = await searchParams;
   const { data: session } = await auth.getSession();
-  const details = session?.user ? await getSubscriptionDetails(session.user.id) : null;
+  const details = session?.user
+    ? await getSubscriptionDetails(session.user.id)
+    : null;
   const isPlus = details?.tier === "plus";
   const prices = await getAllEffectivePrices();
-  const liveDetail = isPlus && details?.stripeSubscriptionId ? await getLiveSubscriptionDetail(details.stripeSubscriptionId) : null;
+  const liveDetail =
+    isPlus && details?.stripeSubscriptionId
+      ? await getLiveSubscriptionDetail(details.stripeSubscriptionId)
+      : null;
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
@@ -200,7 +235,8 @@ export default async function PlusPageEs({
 
       {checkout === "success" && (
         <div className="mb-6 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-700 dark:text-emerald-400">
-          Estás suscrito a CaseWhy Plus. Puede tardar unos segundos en desbloquearse cada función.
+          Estás suscrito a CaseWhy Plus. Puede tardar unos segundos en
+          desbloquearse cada función.
         </div>
       )}
       {checkout === "cancelled" && (
@@ -213,8 +249,9 @@ export default async function PlusPageEs({
         CaseWhy <PlusBadge size="lg" />
       </h1>
       <p className="mb-2 mt-2 text-lg text-muted">
-        Chat de IA ilimitado y con citas sobre tu caso — más el kit de herramientas de
-        escalamiento para cuando se estanca. Para ti y toda tu familia.
+        Chat de IA ilimitado y con citas sobre tu caso — más el kit de
+        herramientas de escalamiento para cuando se estanca. Para ti y toda tu
+        familia.
       </p>
       <div className="mt-4">
         <ShareButton
@@ -227,20 +264,22 @@ export default async function PlusPageEs({
 
       {isPlus && liveDetail && (
         <div className="mt-4 rounded-xl border border-brand-500/20 bg-brand-500/5 p-4 text-sm text-brand-700 dark:text-brand-400">
-          Tienes CaseWhy Plus desde el {liveDetail.startDate.toLocaleDateString("es")}.
+          Tienes CaseWhy Plus desde el{" "}
+          {liveDetail.startDate.toLocaleDateString("es")}.
         </div>
       )}
 
       {isPlus && details?.cancelAtPeriodEnd && details.currentPeriodEnd && (
         <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm text-amber-700 dark:text-amber-400">
-          Tu suscripción está programada para cancelarse el {details.currentPeriodEnd.toLocaleDateString("es")}.
-          Mantendrás acceso completo hasta entonces.
+          Tu suscripción está programada para cancelarse el{" "}
+          {details.currentPeriodEnd.toLocaleDateString("es")}. Mantendrás acceso
+          completo hasta entonces.
         </div>
       )}
       {isPlus && details?.status === "past_due" && (
         <div className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-600 dark:text-red-400">
-          Tu último pago no se completó. Actualiza tu método de pago para mantener tu suscripción
-          activa.
+          Tu último pago no se completó. Actualiza tu método de pago para
+          mantener tu suscripción activa.
         </div>
       )}
 
@@ -259,9 +298,21 @@ export default async function PlusPageEs({
       ) : (
         <>
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <PlanCard planId="plus_monthly" price={prices.plus_monthly} canSubscribe={!!session?.user} />
-            <PlanCard planId="plus_quarterly" price={prices.plus_quarterly} canSubscribe={!!session?.user} />
-            <PlanCard planId="plus_annual" price={prices.plus_annual} canSubscribe={!!session?.user} />
+            <PlanCard
+              planId="plus_monthly"
+              price={prices.plus_monthly}
+              canSubscribe={!!session?.user}
+            />
+            <PlanCard
+              planId="plus_quarterly"
+              price={prices.plus_quarterly}
+              canSubscribe={!!session?.user}
+            />
+            <PlanCard
+              planId="plus_annual"
+              price={prices.plus_annual}
+              canSubscribe={!!session?.user}
+            />
           </div>
           {!session?.user && (
             <div className="mt-4">
@@ -274,8 +325,8 @@ export default async function PlusPageEs({
             </div>
           )}
           <p className="mt-4 text-xs text-muted">
-            Sin reembolsos, sin prorrateo — cancela cuando quieras y mantendrás el acceso hasta el
-            final de tu período de facturación actual.
+            Sin reembolsos, sin prorrateo — cancela cuando quieras y mantendrás
+            el acceso hasta el final de tu período de facturación actual.
           </p>
 
           <div className="mt-8 grid grid-cols-1 gap-4 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6 sm:grid-cols-2">
@@ -284,9 +335,10 @@ export default async function PlusPageEs({
                 Preguntas ilimitadas, realmente fundamentadas
               </p>
               <p className="mt-1.5 text-sm text-muted">
-                Haz todas las preguntas que necesites, en el momento en que tu caso cambie. Cada
-                respuesta cita la propia base de conocimiento de políticas de USCIS de CaseWhy —
-                no un chatbot genérico adivinando.
+                Haz todas las preguntas que necesites, en el momento en que tu
+                caso cambie. Cada respuesta cita la propia base de conocimiento
+                de políticas de USCIS de CaseWhy — no un chatbot genérico
+                adivinando.
               </p>
               <a
                 href="#ai-chat"
@@ -300,9 +352,9 @@ export default async function PlusPageEs({
                 Un kit de herramientas de escalamiento real
               </p>
               <p className="mt-1.5 text-sm text-muted">
-                Cuando un caso se estanca, encuentra a tu representante real en el Congreso y
-                redacta una carta de escalamiento real — prellenada con los detalles de tu caso,
-                no una página en blanco.
+                Cuando un caso se estanca, encuentra a tu representante real en
+                el Congreso y redacta una carta de escalamiento real —
+                prellenada con los detalles de tu caso, no una página en blanco.
               </p>
               <a
                 href="#escalation-letters"
@@ -336,19 +388,29 @@ export default async function PlusPageEs({
           </span>
         </div>
         {PLUS_FEATURES.map((feature) => (
-          <FeatureRow key={feature.id} id={feature.id} title={feature.title} free={feature.free} plus={feature.plus} />
+          <FeatureRow
+            key={feature.id}
+            id={feature.id}
+            title={feature.title}
+            free={feature.free}
+            plus={feature.plus}
+          />
         ))}
       </div>
       <p className="mt-2 text-xs text-muted">
-        La alerta de caso estancado siempre es gratuita — solo la búsqueda de representante y la
-        redacción de cartas que le siguen son parte de CaseWhy Plus.
+        La alerta de caso estancado siempre es gratuita — solo la búsqueda de
+        representante y la redacción de cartas que le siguen son parte de
+        CaseWhy Plus.
       </p>
       <p className="mt-1 text-xs text-muted">
-        <Link href="/es/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+        <Link
+          href="/es/get-help"
+          className="text-brand-600 hover:underline dark:text-brand-400"
+        >
           Obtener Ayuda
         </Link>{" "}
-        — encontrar un abogado o representante acreditado — también es gratis en todos los
-        niveles, no es un beneficio de Plus.
+        — encontrar un abogado o representante acreditado — también es gratis en
+        todos los niveles, no es un beneficio de Plus.
       </p>
 
       <div className="mt-10">

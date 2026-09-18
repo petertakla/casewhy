@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import { notFound } from "next/navigation";
 import { getCommunityOrgBySlug } from "@/lib/community-orgs/directory";
 import { BackLink } from "@/components/BackLink";
@@ -20,19 +21,29 @@ export async function generateMetadata({
   const { lang } = await searchParams;
   const es = await isSpanishLocale(lang);
   const org = await getCommunityOrgBySlug(slug);
-  if (!org) return { title: es ? "Organización no encontrada | CaseWhy" : "Organization not found | CaseWhy" };
-  return {
-    title: es ? `${org.organizationName} — Organización Comunitaria | CaseWhy` : `${org.organizationName} — Community Organization | CaseWhy`,
-    description: es
-      ? `${org.organizationName}, una organización comunitaria que sirve a inmigrantes. Directorio gratuito, solo listado informativo.`
-      : `${org.organizationName}, a community organization serving immigrants. Free directory, informational listing only.`,
-    alternates: {
-      languages: {
-        en: `https://app.casewhy.com/community-orgs/${org.slug}`,
-        es: `https://app.casewhy.com/community-orgs/${org.slug}?lang=es`,
-      },
-    },
+  if (!org)
+    return {
+      title: es
+        ? "Organización no encontrada | CaseWhy"
+        : "Organization not found | CaseWhy",
+    };
+  const languages = {
+    en: `https://app.casewhy.com/community-orgs/${org.slug}`,
+    es: `https://app.casewhy.com/community-orgs/${org.slug}?lang=es`,
   };
+  return pageMetadata(
+    es ? `/community-orgs/${org.slug}?lang=es` : `/community-orgs/${org.slug}`,
+    {
+      title: es
+        ? `${org.organizationName} — Organización Comunitaria | CaseWhy`
+        : `${org.organizationName} — Community Organization | CaseWhy`,
+      description: es
+        ? `${org.organizationName}, una organización comunitaria que sirve a inmigrantes. Directorio gratuito, solo listado informativo.`
+        : `${org.organizationName}, a community organization serving immigrants. Free directory, informational listing only.`,
+      locale: es ? "es" : undefined,
+      languages,
+    },
+  );
 }
 
 export default async function CommunityOrgDetailPage({
@@ -51,16 +62,31 @@ export default async function CommunityOrgDetailPage({
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-10">
       <div className="mb-2 flex items-center justify-between">
-        <BackLink href="/community-orgs" label={es ? "Todas las organizaciones comunitarias" : "All community organizations"} />
-        <LanguageSwitcher es={es} basePath={`/community-orgs/${org.slug}`} variant="inline" />
+        <BackLink
+          href="/community-orgs"
+          label={
+            es
+              ? "Todas las organizaciones comunitarias"
+              : "All community organizations"
+          }
+        />
+        <LanguageSwitcher
+          es={es}
+          basePath={`/community-orgs/${org.slug}`}
+          variant="inline"
+        />
       </div>
 
-      <h1 className="mt-4 text-2xl font-bold tracking-tight">{org.organizationName}</h1>
+      <h1 className="mt-4 text-2xl font-bold tracking-tight">
+        {org.organizationName}
+      </h1>
 
       <div className="mt-6 space-y-4 rounded-xl border border-border bg-surface p-5 text-sm">
         {org.cityStateZip && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Ubicación" : "Location"}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {es ? "Ubicación" : "Location"}
+            </p>
             <p className="mt-1">{org.cityStateZip}</p>
           </div>
         )}
@@ -72,7 +98,9 @@ export default async function CommunityOrgDetailPage({
         </div>
         {org.description && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Acerca de" : "About"}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {es ? "Acerca de" : "About"}
+            </p>
             <p className="mt-1">{org.description}</p>
           </div>
         )}
@@ -97,7 +125,11 @@ export default async function CommunityOrgDetailPage({
       </p>
 
       <div className="mt-6">
-        <VerificationLinks name={org.organizationName} context={org.cityStateZip ?? undefined} es={es} />
+        <VerificationLinks
+          name={org.organizationName}
+          context={org.cityStateZip ?? undefined}
+          es={es}
+        />
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -121,7 +153,8 @@ export default async function CommunityOrgDetailPage({
                   trigger: "¿Ves algo incorrecto en este listado? Repórtalo",
                   success: "Gracias — lo revisaremos.",
                   whatsWrong: "¿Qué está mal en este listado?",
-                  whatsWrongPlaceholder: "ej. el teléfono está desconectado, ya no está en esta dirección, la organización cerró",
+                  whatsWrongPlaceholder:
+                    "ej. el teléfono está desconectado, ya no está en esta dirección, la organización cerró",
                   email: "Tu correo (opcional, si quieres una respuesta)",
                   sending: "Enviando…",
                   send: "Enviar reporte",

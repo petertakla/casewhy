@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { organizationJsonLd, websiteJsonLd } from "@/lib/seo/organization-jsonld";
+import { pageMetadata } from "@/lib/site/metadata";
+import {
+  organizationJsonLd,
+  websiteJsonLd,
+} from "@/lib/seo/organization-jsonld";
 import { PublicPage } from "@/components/PublicPage";
 import { publicPagesFor } from "@/lib/site/pages";
 import { SitemapFilter, type SitemapSection } from "@/components/SitemapFilter";
@@ -17,16 +21,15 @@ import { SitemapFilter, type SitemapSection } from "@/components/SitemapFilter";
 // straight off the app) instead of /dashboard, and its legal links hit
 // casewhy.com/privacy.html — a 308 to www. on every click.
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/sitemap", {
   title: "Site Index | CaseWhy",
-  description: "Every public page on CaseWhy, in one place.",
-  alternates: {
-    languages: {
-      en: "https://app.casewhy.com/sitemap",
-      es: "https://app.casewhy.com/es/sitemap",
-    },
+  description:
+    "Every public page on CaseWhy in one place — case tools, attorney and legal aid directories, immigration news, policy explainers, FAQ, and pricing.",
+  languages: {
+    en: "https://app.casewhy.com/sitemap",
+    es: "https://app.casewhy.com/es/sitemap",
   },
-};
+});
 
 const SECTIONS = ["CaseWhy", "Get help", "Reference", "Legal"] as const;
 
@@ -47,7 +50,9 @@ export default function SiteIndexPage() {
           directly, since that page genuinely is the root. */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationJsonLd()),
+        }}
       />
       <script
         type="application/ld+json"
@@ -55,14 +60,20 @@ export default function SiteIndexPage() {
       />
 
       <h1 className="text-2xl font-bold tracking-tight">Site index</h1>
-      <p className="mb-8 mt-2 text-muted">Every public page on CaseWhy, in one place.</p>
+      <p className="mb-8 mt-2 text-muted">
+        Every public page on CaseWhy, in one place.
+      </p>
 
       <SitemapFilter
         sections={SECTIONS.map((section): SitemapSection => ({
           name: section,
           entries: publicPagesFor(section)
             .filter((p) => p.showInIndex)
-            .map((entry) => ({ href: entry.href, label: entry.label, external: entry.external })),
+            .map((entry) => ({
+              href: entry.href,
+              label: entry.label,
+              external: entry.external,
+            })),
         })).filter((s) => s.entries.length > 0)}
         placeholder="Filter this index…"
         noMatchText="No pages match."
@@ -74,10 +85,14 @@ export default function SiteIndexPage() {
           end of <main>, small and muted, same as a real footnote. */}
       <p className="mt-8 text-xs text-muted">
         Looking for the machine-readable version? See{" "}
-        <a href="/sitemap.xml" className="text-brand-600 hover:underline dark:text-brand-400">
+        <a
+          href="/sitemap.xml"
+          className="text-brand-600 hover:underline dark:text-brand-400"
+        >
           sitemap.xml
         </a>
-        , which also lists every individual directory listing and policy-memo permalink.
+        , which also lists every individual directory listing and policy-memo
+        permalink.
       </p>
     </PublicPage>
   );

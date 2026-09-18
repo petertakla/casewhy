@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import { notFound } from "next/navigation";
 import { getLegalAidBySlug } from "@/lib/legal-aid/directory";
 import { BackLink } from "@/components/BackLink";
@@ -20,19 +21,29 @@ export async function generateMetadata({
   const { lang } = await searchParams;
   const es = await isSpanishLocale(lang);
   const org = await getLegalAidBySlug(slug);
-  if (!org) return { title: es ? "Organización no encontrada | CaseWhy" : "Organization not found | CaseWhy" };
-  return {
-    title: es ? `${org.organizationName} — Asistencia Legal Gratuita | CaseWhy` : `${org.organizationName} — Free Legal Aid | CaseWhy`,
-    description: es
-      ? `${org.organizationName}, una organización sin fines de lucro de asistencia legal de inmigración. Directorio gratuito, solo listado informativo.`
-      : `${org.organizationName}, a nonprofit immigration legal aid organization. Free directory, informational listing only.`,
-    alternates: {
-      languages: {
-        en: `https://app.casewhy.com/legal-aid/${org.slug}`,
-        es: `https://app.casewhy.com/legal-aid/${org.slug}?lang=es`,
-      },
-    },
+  if (!org)
+    return {
+      title: es
+        ? "Organización no encontrada | CaseWhy"
+        : "Organization not found | CaseWhy",
+    };
+  const languages = {
+    en: `https://app.casewhy.com/legal-aid/${org.slug}`,
+    es: `https://app.casewhy.com/legal-aid/${org.slug}?lang=es`,
   };
+  return pageMetadata(
+    es ? `/legal-aid/${org.slug}?lang=es` : `/legal-aid/${org.slug}`,
+    {
+      title: es
+        ? `${org.organizationName} — Asistencia Legal Gratuita | CaseWhy`
+        : `${org.organizationName} — Free Legal Aid | CaseWhy`,
+      description: es
+        ? `${org.organizationName}, una organización sin fines de lucro de asistencia legal de inmigración. Directorio gratuito, solo listado informativo.`
+        : `${org.organizationName}, a nonprofit immigration legal aid organization. Free directory, informational listing only.`,
+      locale: es ? "es" : undefined,
+      languages,
+    },
+  );
 }
 
 export default async function LegalAidDetailPage({
@@ -51,15 +62,30 @@ export default async function LegalAidDetailPage({
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-10">
       <div className="mb-2 flex items-center justify-between">
-        <BackLink href="/legal-aid" label={es ? "Todas las organizaciones de asistencia legal" : "All legal aid organizations"} />
-        <LanguageSwitcher es={es} basePath={`/legal-aid/${org.slug}`} variant="inline" />
+        <BackLink
+          href="/legal-aid"
+          label={
+            es
+              ? "Todas las organizaciones de asistencia legal"
+              : "All legal aid organizations"
+          }
+        />
+        <LanguageSwitcher
+          es={es}
+          basePath={`/legal-aid/${org.slug}`}
+          variant="inline"
+        />
       </div>
 
-      <h1 className="mt-4 text-2xl font-bold tracking-tight">{org.organizationName}</h1>
+      <h1 className="mt-4 text-2xl font-bold tracking-tight">
+        {org.organizationName}
+      </h1>
 
       <div className="mt-6 space-y-4 rounded-xl border border-border bg-surface p-5 text-sm">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Estado de reconocimiento" : "Recognition status"}</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+            {es ? "Estado de reconocimiento" : "Recognition status"}
+          </p>
           <p className="mt-1">
             {org.organizationStatus}
             {org.organizationRecognitionExpiration && (
@@ -68,36 +94,55 @@ export default async function LegalAidDetailPage({
                 {es
                   ? `— el reconocimiento expira ${org.organizationRecognitionExpiration}`
                   : `— recognition expires ${org.organizationRecognitionExpiration}`}
-                {org.organizationRecognitionPendingRenewal && (es ? " (renovación pendiente)" : " (renewal pending)")}
+                {org.organizationRecognitionPendingRenewal &&
+                  (es ? " (renovación pendiente)" : " (renewal pending)")}
               </>
             )}
           </p>
         </div>
         {(org.officeType || org.streetAddress || org.cityStateZip) && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Oficina" : "Office"}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {es ? "Oficina" : "Office"}
+            </p>
             <p className="mt-1">
-              {org.officeType && <>{org.officeType}<br /></>}
-              {org.streetAddress && <>{org.streetAddress}<br /></>}
+              {org.officeType && (
+                <>
+                  {org.officeType}
+                  <br />
+                </>
+              )}
+              {org.streetAddress && (
+                <>
+                  {org.streetAddress}
+                  <br />
+                </>
+              )}
               {org.cityStateZip}
             </p>
           </div>
         )}
         {org.phone && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Teléfono" : "Phone"}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {es ? "Teléfono" : "Phone"}
+            </p>
             <p className="mt-1">{org.phone}</p>
           </div>
         )}
         {org.servicesOffered && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Servicios ofrecidos" : "Services offered"}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {es ? "Servicios ofrecidos" : "Services offered"}
+            </p>
             <p className="mt-1">{org.servicesOffered}</p>
           </div>
         )}
         {org.populationServed && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Población atendida" : "Population served"}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {es ? "Población atendida" : "Population served"}
+            </p>
             <p className="mt-1">{org.populationServed}</p>
           </div>
         )}
@@ -107,8 +152,9 @@ export default async function LegalAidDetailPage({
       <p className="mt-2 text-xs text-muted">
         {es ? (
           <>
-            Este es un listado informativo, no un aval ni un servicio de referencia. Siempre confirma
-            los detalles actuales directamente antes de confiar en alguien —{" "}
+            Este es un listado informativo, no un aval ni un servicio de
+            referencia. Siempre confirma los detalles actuales directamente
+            antes de confiar en alguien —{" "}
             <a
               href="https://www.justice.gov/eoir/recognition-accreditation-roster-reports"
               target="_blank"
@@ -121,8 +167,9 @@ export default async function LegalAidDetailPage({
           </>
         ) : (
           <>
-            This is an informational listing, not an endorsement or a referral service. Always confirm
-            current details yourself before relying on anyone —{" "}
+            This is an informational listing, not an endorsement or a referral
+            service. Always confirm current details yourself before relying on
+            anyone —{" "}
             <a
               href="https://www.justice.gov/eoir/recognition-accreditation-roster-reports"
               target="_blank"
@@ -137,7 +184,11 @@ export default async function LegalAidDetailPage({
       </p>
 
       <div className="mt-6">
-        <VerificationLinks name={org.organizationName} context={org.cityStateZip ?? undefined} es={es} />
+        <VerificationLinks
+          name={org.organizationName}
+          context={org.cityStateZip ?? undefined}
+          es={es}
+        />
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -161,7 +212,8 @@ export default async function LegalAidDetailPage({
                   trigger: "¿Ves algo incorrecto en este listado? Repórtalo",
                   success: "Gracias — lo revisaremos.",
                   whatsWrong: "¿Qué está mal en este listado?",
-                  whatsWrongPlaceholder: "ej. el teléfono está desconectado, ya no está en esta dirección, la organización cerró",
+                  whatsWrongPlaceholder:
+                    "ej. el teléfono está desconectado, ya no está en esta dirección, la organización cerró",
                   email: "Tu correo (opcional, si quieres una respuesta)",
                   sending: "Enviando…",
                   send: "Enviar reporte",

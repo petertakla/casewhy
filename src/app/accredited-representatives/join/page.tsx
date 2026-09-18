@@ -1,21 +1,27 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import { ApplicationForm } from "./ApplicationForm";
 
-export const metadata: Metadata = {
-  title: "List Your Organization — Free for Accredited Representatives | CaseWhy",
-  description:
-    "BIA-accredited representatives can apply to be listed in CaseWhy's free directory — no cost to join, reviewed against DOJ's Recognition & Accreditation roster.",
-};
+export const metadata: Metadata = pageMetadata(
+  "/accredited-representatives/join",
+  {
+    title:
+      "List Your Organization — Free for Accredited Representatives | CaseWhy",
+    description:
+      "BIA-accredited representatives can apply to be listed in CaseWhy's free directory — no cost to join, reviewed against DOJ's Recognition & Accreditation roster.",
+  },
+);
 
 export default function RepresentativeJoinPage() {
   return (
     <main className="mx-auto min-h-screen max-w-xl px-6 py-10">
       <h1 className="text-2xl font-bold tracking-tight">Apply to be listed</h1>
       <p className="mt-2 text-sm text-muted">
-        For BIA-accredited representatives — non-lawyers authorized by the DOJ to practice
-        immigration law, typically at a nonprofit organization. This is an informational listing,
-        not an endorsement: every application is reviewed against the DOJ&apos;s own
-        Recognition &amp; Accreditation roster before anyone is added.
+        For BIA-accredited representatives — non-lawyers authorized by the DOJ
+        to practice immigration law, typically at a nonprofit organization. This
+        is an informational listing, not an endorsement: every application is
+        reviewed against the DOJ&apos;s own Recognition &amp; Accreditation
+        roster before anyone is added.
       </p>
       <p className="mt-2 text-xs text-muted">
         Free to join, always — no fee to be listed.

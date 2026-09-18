@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import Link from "next/link";
 import { getPublishedUpdates, type UpdatePost } from "@/lib/updates/updates";
 import { ShareButton } from "@/components/ShareButton";
@@ -26,44 +27,44 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await searchParams;
   const es = await isSpanishLocale(lang);
+  const languages = {
+    en: "https://app.casewhy.com/updates",
+    es: "https://app.casewhy.com/updates?lang=es",
+  };
   return es
-    ? {
+    ? pageMetadata("/updates?lang=es", {
         title: "Actualizaciones | CaseWhy",
         description:
           "Explicaciones en lenguaje sencillo de cómo funciona realmente el procesamiento de USCIS, escritas por el equipo que construye CaseWhy.",
-        alternates: {
-          languages: {
-            en: "https://app.casewhy.com/updates",
-            es: "https://app.casewhy.com/updates?lang=es",
-          },
-        },
-      }
-    : {
+        locale: "es",
+        languages,
+      })
+    : pageMetadata("/updates", {
         title: "Updates | CaseWhy",
         description:
           "Plain-language explanations of how USCIS processing actually works, written by the team building CaseWhy.",
-        alternates: {
-          languages: {
-            en: "https://app.casewhy.com/updates",
-            es: "https://app.casewhy.com/updates?lang=es",
-          },
-        },
-      };
+        languages,
+      });
 }
 
 function formatDate(iso: string, es: boolean): string {
   const [year, month, day] = iso.split("-").map(Number);
-  return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString(es ? "es" : "en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+  return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString(
+    es ? "es" : "en-US",
+    {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      timeZone: "UTC",
+    },
+  );
 }
 
 function sortForLocale(posts: UpdatePost[], es: boolean): UpdatePost[] {
   if (!es) return posts;
-  return [...posts].sort((a, b) => Number(b.lang === "es") - Number(a.lang === "es"));
+  return [...posts].sort(
+    (a, b) => Number(b.lang === "es") - Number(a.lang === "es"),
+  );
 }
 
 export default async function UpdatesIndexPage({
@@ -78,7 +79,9 @@ export default async function UpdatesIndexPage({
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
       <LanguageSwitcher es={es} basePath="/updates" />
-      <h1 className="text-2xl font-bold tracking-tight">{es ? "Actualizaciones" : "Updates"}</h1>
+      <h1 className="text-2xl font-bold tracking-tight">
+        {es ? "Actualizaciones" : "Updates"}
+      </h1>
       <p className="mb-8 mt-2 text-muted">
         {es
           ? "Explicaciones en lenguaje sencillo de cómo funciona realmente el procesamiento de USCIS — qué significa un estado, cómo leer el boletín de visas, cuándo escalar — escritas una vez, para que cualquiera las lea."
@@ -105,30 +108,42 @@ export default async function UpdatesIndexPage({
       </div>
 
       {posts.length === 0 ? (
-        <p className="text-sm text-muted">{es ? "Aún no hay publicaciones — vuelva a revisar pronto." : "No posts yet — check back soon."}</p>
+        <p className="text-sm text-muted">
+          {es
+            ? "Aún no hay publicaciones — vuelva a revisar pronto."
+            : "No posts yet — check back soon."}
+        </p>
       ) : (
         <>
           <PageFilter
             basePath="/updates/"
-            placeholder={es ? "Filtrar estas publicaciones…" : "Filter these posts…"}
-            noMatchText={es ? "Ninguna publicación en esta página coincide." : "No posts on this page match."}
+            placeholder={
+              es ? "Filtrar estas publicaciones…" : "Filter these posts…"
+            }
+            noMatchText={
+              es
+                ? "Ninguna publicación en esta página coincide."
+                : "No posts on this page match."
+            }
             isSpanish={es}
           />
           <div className="space-y-4">
-          {posts.map((post) => (
-            <Link
-              key={post.slug}
-              href={`/updates/${post.slug}`}
-              className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
-            >
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted">
-                {formatDate(post.publishedAt!, es)}
-                {es && post.lang !== "es" && <span> · (en inglés)</span>}
-              </p>
-              <p className="mt-1.5 font-semibold text-foreground">{post.title}</p>
-              <p className="mt-1 text-sm text-muted">{post.summary}</p>
-            </Link>
-          ))}
+            {posts.map((post) => (
+              <Link
+                key={post.slug}
+                href={`/updates/${post.slug}`}
+                className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
+              >
+                <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+                  {formatDate(post.publishedAt!, es)}
+                  {es && post.lang !== "es" && <span> · (en inglés)</span>}
+                </p>
+                <p className="mt-1.5 font-semibold text-foreground">
+                  {post.title}
+                </p>
+                <p className="mt-1 text-sm text-muted">{post.summary}</p>
+              </Link>
+            ))}
           </div>
         </>
       )}

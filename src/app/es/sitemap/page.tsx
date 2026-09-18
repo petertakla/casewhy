@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import { PublicPage } from "@/components/PublicPage";
 import { publicPagesFor, type PublicPageEntry } from "@/lib/site/pages";
 import { SitemapFilter, type SitemapSection } from "@/components/SitemapFilter";
@@ -11,16 +12,17 @@ import { SitemapFilter, type SitemapSection } from "@/components/SitemapFilter";
 // everything else stays pointed at the English page with an explicit
 // "(en inglés)" tag rather than silently linking to English.
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/es/sitemap", {
   title: "Índice del Sitio | CaseWhy",
-  description: "Todas las páginas públicas de CaseWhy, en un solo lugar.",
-  alternates: {
-    languages: {
-      en: "https://app.casewhy.com/sitemap",
-      es: "https://app.casewhy.com/es/sitemap",
-    },
+  description:
+    "Todas las páginas públicas de CaseWhy en un solo lugar — directorios de abogados y asistencia legal, noticias, políticas explicadas y preguntas frecuentes.",
+
+  locale: "es",
+  languages: {
+    en: "https://app.casewhy.com/sitemap",
+    es: "https://app.casewhy.com/es/sitemap",
   },
-};
+});
 
 const SECTIONS = ["CaseWhy", "Get help", "Reference", "Legal"] as const;
 const SECTION_LABELS_ES: Record<(typeof SECTIONS)[number], string> = {
@@ -46,7 +48,9 @@ export default function SiteIndexPageEs() {
   return (
     <PublicPage es={true} switcherHref="/sitemap">
       <h1 className="text-2xl font-bold tracking-tight">Índice del sitio</h1>
-      <p className="mb-8 mt-2 text-muted">Todas las páginas públicas de CaseWhy, en un solo lugar.</p>
+      <p className="mb-8 mt-2 text-muted">
+        Todas las páginas públicas de CaseWhy, en un solo lugar.
+      </p>
 
       <SitemapFilter
         sections={SECTIONS.map((section): SitemapSection => ({
@@ -67,10 +71,14 @@ export default function SiteIndexPageEs() {
           English page. */}
       <p className="mt-8 text-xs text-muted">
         ¿Busca la versión legible por máquina? Consulte{" "}
-        <a href="/sitemap.xml" className="text-brand-600 hover:underline dark:text-brand-400">
+        <a
+          href="/sitemap.xml"
+          className="text-brand-600 hover:underline dark:text-brand-400"
+        >
           sitemap.xml
         </a>
-        , que también incluye cada listado del directorio y cada permalink de memorando.
+        , que también incluye cada listado del directorio y cada permalink de
+        memorando.
       </p>
     </PublicPage>
   );

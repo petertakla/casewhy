@@ -65,7 +65,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // comment), not stable enough for a sitemap entry.
   const lastModified = new Date();
   return [
-    ...[...staticPaths, ...entityPaths, ...policyPaths].map((path) => ({ url: `${BASE_URL}${path}`, lastModified })),
+    // Round 73 follow-up (Sep 18) — the root entry (`path === ""`, per
+    // pages.ts's own comment) rendered as `https://app.casewhy.com` with
+    // no trailing slash; every other entry already had one via its own
+    // leading `/`. Cosmetic-only fix, doesn't change the entry's own
+    // deliberate inclusion despite being a redirect (see pages.ts).
+    ...[...staticPaths, ...entityPaths, ...policyPaths].map((path) => ({
+      url: path === "" ? `${BASE_URL}/` : `${BASE_URL}${path}`,
+      lastModified,
+    })),
     ...updateEntries,
   ];
 }

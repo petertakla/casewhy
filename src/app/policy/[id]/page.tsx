@@ -4,6 +4,7 @@ import { findPolicyMemoById } from "@/lib/kb/policy-memos";
 import { BackLink } from "@/components/BackLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { isSpanishLocale } from "@/lib/i18n/locale";
+import { pageMetadata } from "@/lib/site/metadata";
 
 // Round 63 — a real internal permalink for a policy memo, so
 // relatedPolicies links (CaseChat, the dashboard explanation) and the new
@@ -45,16 +46,18 @@ export async function generateMetadata({
   const es = await isSpanishLocale(lang);
   const title = es && memo.titleEs ? memo.titleEs : memo.title;
   const summary = es && memo.summaryEs ? memo.summaryEs : memo.summary;
-  return {
-    title: es ? `${title}, Explicado | CaseWhy` : `${title}, Explained | CaseWhy`,
-    description: firstSentence(summary),
-    alternates: {
-      languages: {
-        en: `https://app.casewhy.com/policy/${id}`,
-        es: `https://app.casewhy.com/policy/${id}?lang=es`,
-      },
-    },
+  const languages = {
+    en: `https://app.casewhy.com/policy/${id}`,
+    es: `https://app.casewhy.com/policy/${id}?lang=es`,
   };
+  return pageMetadata(es ? `/policy/${id}?lang=es` : `/policy/${id}`, {
+    title: es
+      ? `${title}, Explicado | CaseWhy`
+      : `${title}, Explained | CaseWhy`,
+    description: firstSentence(summary),
+    locale: es ? "es" : undefined,
+    languages,
+  });
 }
 
 export default async function PolicyMemoPage({
@@ -72,7 +75,8 @@ export default async function PolicyMemoPage({
 
   const title = es && memo.titleEs ? memo.titleEs : memo.title;
   const summary = es && memo.summaryEs ? memo.summaryEs : memo.summary;
-  const currentStatus = es && memo.currentStatusEs ? memo.currentStatusEs : memo.currentStatus;
+  const currentStatus =
+    es && memo.currentStatusEs ? memo.currentStatusEs : memo.currentStatus;
   const untranslated = es && !memo.titleEs;
 
   const faqJsonLd = {
@@ -86,7 +90,9 @@ export default async function PolicyMemoPage({
       },
       {
         "@type": "Question",
-        name: es ? `¿Cuál es el estado actual de ${title}?` : `What is the current status of ${title}?`,
+        name: es
+          ? `¿Cuál es el estado actual de ${title}?`
+          : `What is the current status of ${title}?`,
         acceptedAnswer: { "@type": "Answer", text: currentStatus },
       },
     ],
@@ -102,13 +108,17 @@ export default async function PolicyMemoPage({
         "@type": "ListItem",
         position: 1,
         name: es ? "Memorandos de política" : "Policy memos",
-        item: es ? "https://app.casewhy.com/policy?lang=es" : "https://app.casewhy.com/policy",
+        item: es
+          ? "https://app.casewhy.com/policy?lang=es"
+          : "https://app.casewhy.com/policy",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: title,
-        item: es ? `https://app.casewhy.com/policy/${memo.id}?lang=es` : `https://app.casewhy.com/policy/${memo.id}`,
+        item: es
+          ? `https://app.casewhy.com/policy/${memo.id}?lang=es`
+          : `https://app.casewhy.com/policy/${memo.id}`,
       },
     ],
   };
@@ -124,13 +134,24 @@ export default async function PolicyMemoPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <div className="flex items-center justify-between">
-        <BackLink href="/policy" label={es ? "Todos los memorandos de política" : "All policy memos"} />
-        <LanguageSwitcher es={es} basePath={`/policy/${memo.id}`} variant="inline" />
+        <BackLink
+          href="/policy"
+          label={es ? "Todos los memorandos de política" : "All policy memos"}
+        />
+        <LanguageSwitcher
+          es={es}
+          basePath={`/policy/${memo.id}`}
+          variant="inline"
+        />
       </div>
 
       <h1 className="mt-4 text-2xl font-bold tracking-tight">
         {title}
-        {untranslated && <span className="ml-2 text-sm font-normal text-muted">(en inglés)</span>}
+        {untranslated && (
+          <span className="ml-2 text-sm font-normal text-muted">
+            (en inglés)
+          </span>
+        )}
       </h1>
       {memo.memoNumber && <p className="mt-1 text-muted">{memo.memoNumber}</p>}
 
@@ -175,16 +196,17 @@ export default async function PolicyMemoPage({
       <p className="mt-6 text-xs text-muted">
         {es ? (
           <>
-            Información general de política, no un diagnóstico de ningún caso específico — la
-            propia API de estado de casos de CaseWhy nunca confirma por qué un caso está
-            retrasado. Para orientación específica sobre su caso, consulte a un abogado de
-            inmigración con licencia.
+            Información general de política, no un diagnóstico de ningún caso
+            específico — la propia API de estado de casos de CaseWhy nunca
+            confirma por qué un caso está retrasado. Para orientación específica
+            sobre su caso, consulte a un abogado de inmigración con licencia.
           </>
         ) : (
           <>
-            General policy background, not a diagnosis of any specific case — CaseWhy&apos;s own
-            case status API never confirms why a case is delayed. For guidance specific to your
-            case, talk to a licensed immigration attorney.
+            General policy background, not a diagnosis of any specific case —
+            CaseWhy&apos;s own case status API never confirms why a case is
+            delayed. For guidance specific to your case, talk to a licensed
+            immigration attorney.
           </>
         )}
       </p>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import { notFound } from "next/navigation";
 import { getAttorneyBySlug } from "@/lib/attorneys/directory";
 import { BackLink } from "@/components/BackLink";
@@ -25,20 +26,28 @@ export async function generateMetadata({
   const { lang } = await searchParams;
   const es = await isSpanishLocale(lang);
   const attorney = await getAttorneyBySlug(id);
-  if (!attorney) return { title: es ? "Abogado no encontrado | CaseWhy" : "Attorney not found | CaseWhy" };
+  if (!attorney)
+    return {
+      title: es
+        ? "Abogado no encontrado | CaseWhy"
+        : "Attorney not found | CaseWhy",
+    };
   const nameFirm = `${attorney.name}${attorney.firm ? ` — ${attorney.firm}` : ""}`;
-  return {
-    title: `${nameFirm} | CaseWhy`,
-    description: es
-      ? `Listado de abogado de inmigración para ${attorney.name}${attorney.firm ? ` de ${attorney.firm}` : ""}, con licencia en ${attorney.statesLicensed.join(", ")}. Directorio gratuito, solo listado informativo.`
-      : `Immigration attorney listing for ${attorney.name}${attorney.firm ? ` of ${attorney.firm}` : ""}, licensed in ${attorney.statesLicensed.join(", ")}. Free directory, informational listing only.`,
-    alternates: {
-      languages: {
-        en: `https://app.casewhy.com/attorneys/${attorney.slug}`,
-        es: `https://app.casewhy.com/attorneys/${attorney.slug}?lang=es`,
-      },
-    },
+  const languages = {
+    en: `https://app.casewhy.com/attorneys/${attorney.slug}`,
+    es: `https://app.casewhy.com/attorneys/${attorney.slug}?lang=es`,
   };
+  return pageMetadata(
+    es ? `/attorneys/${attorney.slug}?lang=es` : `/attorneys/${attorney.slug}`,
+    {
+      title: `${nameFirm} | CaseWhy`,
+      description: es
+        ? `Listado de abogado de inmigración para ${attorney.name}${attorney.firm ? ` de ${attorney.firm}` : ""}, con licencia en ${attorney.statesLicensed.join(", ")}. Directorio gratuito, solo listado informativo.`
+        : `Immigration attorney listing for ${attorney.name}${attorney.firm ? ` of ${attorney.firm}` : ""}, licensed in ${attorney.statesLicensed.join(", ")}. Free directory, informational listing only.`,
+      locale: es ? "es" : undefined,
+      languages,
+    },
+  );
 }
 
 // Round 40 — now reads a real DB table by slug rather than the static
@@ -61,34 +70,56 @@ export default async function AttorneyDetailPage({
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-6 py-10">
       <div className="mb-2 flex items-center justify-between">
-        <BackLink href="/attorneys" label={es ? "Todos los abogados" : "All attorneys"} />
-        <LanguageSwitcher es={es} basePath={`/attorneys/${attorney.slug}`} variant="inline" />
+        <BackLink
+          href="/attorneys"
+          label={es ? "Todos los abogados" : "All attorneys"}
+        />
+        <LanguageSwitcher
+          es={es}
+          basePath={`/attorneys/${attorney.slug}`}
+          variant="inline"
+        />
       </div>
 
-      <h1 className="mt-4 text-2xl font-bold tracking-tight">{attorney.name}</h1>
+      <h1 className="mt-4 text-2xl font-bold tracking-tight">
+        {attorney.name}
+      </h1>
       {attorney.firm && <p className="mt-1 text-muted">{attorney.firm}</p>}
 
       <div className="mt-6 space-y-4 rounded-xl border border-border bg-surface p-5 text-sm">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Estados con licencia" : "States licensed"}</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+            {es ? "Estados con licencia" : "States licensed"}
+          </p>
           <p className="mt-1">{attorney.statesLicensed.join(", ")}</p>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Área de práctica" : "Practice focus"}</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+            {es ? "Área de práctica" : "Practice focus"}
+          </p>
           <p className="mt-1">{attorney.practiceFocus.join(", ")}</p>
         </div>
         {(attorney.streetAddress || attorney.cityStateZip) && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Oficina" : "Office"}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {es ? "Oficina" : "Office"}
+            </p>
             <p className="mt-1">
-              {attorney.streetAddress && <>{attorney.streetAddress}<br /></>}
+              {attorney.streetAddress && (
+                <>
+                  {attorney.streetAddress}
+                  <br />
+                </>
+              )}
               {attorney.cityStateZip}
             </p>
           </div>
         )}
         {attorney.phone && (
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted">{es ? "Teléfono" : "Phone"}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+              {es ? "Teléfono" : "Phone"}
+            </p>
             <p className="mt-1">{attorney.phone}</p>
           </div>
         )}
@@ -105,7 +136,9 @@ export default async function AttorneyDetailPage({
         </a>
       )}
 
-      {attorney.sourceCitation && <p className="mt-6 text-xs text-muted">{attorney.sourceCitation}</p>}
+      {attorney.sourceCitation && (
+        <p className="mt-6 text-xs text-muted">{attorney.sourceCitation}</p>
+      )}
       <p className="mt-2 text-xs text-muted">
         {es
           ? "Este es un listado informativo, no un aval ni un servicio de referencia. Siempre confirma tú mismo la vigencia actual de la licencia antes de contratar a alguien."
@@ -115,7 +148,13 @@ export default async function AttorneyDetailPage({
       <div className="mt-6">
         <VerificationLinks
           name={attorney.name}
-          context={[attorney.firm, attorney.cityStateZip, "immigration attorney"].filter(Boolean).join(" ")}
+          context={[
+            attorney.firm,
+            attorney.cityStateZip,
+            "immigration attorney",
+          ]
+            .filter(Boolean)
+            .join(" ")}
           es={es}
         />
       </div>
@@ -141,7 +180,8 @@ export default async function AttorneyDetailPage({
                   trigger: "¿Ves algo incorrecto en este listado? Repórtalo",
                   success: "Gracias — lo revisaremos.",
                   whatsWrong: "¿Qué está mal en este listado?",
-                  whatsWrongPlaceholder: "ej. el teléfono está desconectado, ya no está en esta dirección, la organización cerró",
+                  whatsWrongPlaceholder:
+                    "ej. el teléfono está desconectado, ya no está en esta dirección, la organización cerró",
                   email: "Tu correo (opcional, si quieres una respuesta)",
                   sending: "Enviando…",
                   send: "Enviar reporte",

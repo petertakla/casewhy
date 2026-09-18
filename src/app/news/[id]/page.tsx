@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { findNewsItemById } from "@/lib/news/permalink";
 import { extractArticle } from "@/lib/news/extract-article";
 import { BackLink } from "@/components/BackLink";
+import { pageMetadata } from "@/lib/site/metadata";
 
 export async function generateMetadata({
   params,
@@ -10,11 +11,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const item = await findNewsItemById(id);
-  if (!item) return { title: "Story no longer available | CaseWhy", robots: { index: false } };
-  return {
+  if (!item)
+    return {
+      title: "Story no longer available | CaseWhy",
+      robots: { index: false },
+    };
+  return pageMetadata(`/news/${id}`, {
     title: `${item.title} — ${item.sourceName} | CaseWhy`,
     description: `Immigration news from ${item.sourceName}: ${item.title}`,
-  };
+  });
 }
 
 // Round 63 — a real internal permalink for a news item, resolved by
@@ -26,12 +31,20 @@ export async function generateMetadata({
 
 function formatDate(date: Date | null): string {
   if (!date) return "";
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 export const dynamic = "force-dynamic";
 
-export default async function NewsItemPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function NewsItemPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const item = await findNewsItemById(id);
 
@@ -39,12 +52,15 @@ export default async function NewsItemPage({ params }: { params: Promise<{ id: s
     return (
       <main className="mx-auto min-h-screen max-w-2xl px-6 py-10">
         <BackLink href="/news" label="All news" />
-        <h1 className="mt-4 text-2xl font-bold tracking-tight">This story is no longer available</h1>
+        <h1 className="mt-4 text-2xl font-bold tracking-tight">
+          This story is no longer available
+        </h1>
         <p className="mt-2 text-muted">
-          CaseWhy&apos;s news permalinks resolve by matching against the live news feed, not a
-          permanent archive — this story has aged out of that window (typically days to a few
-          weeks, depending on the source). It hasn&apos;t been deleted; it&apos;s just no longer in
-          the live feed this page checks against.
+          CaseWhy&apos;s news permalinks resolve by matching against the live
+          news feed, not a permanent archive — this story has aged out of that
+          window (typically days to a few weeks, depending on the source). It
+          hasn&apos;t been deleted; it&apos;s just no longer in the live feed
+          this page checks against.
         </p>
       </main>
     );
@@ -70,8 +86,8 @@ export default async function NewsItemPage({ params }: { params: Promise<{ id: s
           </p>
         ) : (
           <p className="text-muted">
-            CaseWhy couldn&apos;t extract readable text from this article — read it at the
-            original source below.
+            CaseWhy couldn&apos;t extract readable text from this article — read
+            it at the original source below.
           </p>
         )}
       </div>

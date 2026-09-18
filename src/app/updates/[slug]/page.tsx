@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
-import { getPublishedUpdateBySlug, getUpdateBySlugFromDisk, type UpdatePost } from "@/lib/updates/updates";
+import {
+  getPublishedUpdateBySlug,
+  getUpdateBySlugFromDisk,
+  type UpdatePost,
+} from "@/lib/updates/updates";
 import { POLICY_MEMOS } from "@/lib/kb/policy-memos";
 import { BackLink } from "@/components/BackLink";
 import { ShareButton } from "@/components/ShareButton";
@@ -9,6 +13,7 @@ import { auth } from "@/lib/auth/server";
 import { isAdminEmail } from "@/lib/auth/admin";
 import { isSpanishLocale } from "@/lib/i18n/locale";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { pageMetadata } from "@/lib/site/metadata";
 
 type SearchParams = { preview?: string; lang?: string };
 
@@ -21,7 +26,10 @@ type SearchParams = { preview?: string; lang?: string };
 // `isPreview` are resolved once here and reused by both generateMetadata
 // and the page component below, so the admin check only runs once per
 // request despite Next.js calling both independently.
-async function resolvePost(slug: string, searchParams: SearchParams): Promise<{ post: UpdatePost; isPreview: boolean } | null> {
+async function resolvePost(
+  slug: string,
+  searchParams: SearchParams,
+): Promise<{ post: UpdatePost; isPreview: boolean } | null> {
   const published = await getPublishedUpdateBySlug(slug);
   if (published) return { post: published, isPreview: false };
 
@@ -73,13 +81,19 @@ export async function generateMetadata({
   if (isPreview) {
     // No canonical, no description crafted for indexing — this page
     // should never rank or get crawled while unpublished.
-    return { title: `${post.title} | CaseWhy`, robots: { index: false, follow: false } };
+    return {
+      title: `${post.title} | CaseWhy`,
+      robots: { index: false, follow: false },
+    };
   }
-  return {
+  // Round 73 follow-up (Sep 18) — post.ogImage has existed since round 93
+  // but was never actually wired into a meta tag until now; every shared
+  // update link rendered as a bare URL with no preview.
+  return pageMetadata(`/updates/${slug}`, {
     title: `${post.title} | CaseWhy`,
     description: post.summary,
-    alternates: { canonical: `https://app.casewhy.com/updates/${slug}` },
-  };
+    image: post.ogImage || undefined,
+  });
 }
 
 export default async function UpdatePostPage({
@@ -114,15 +128,28 @@ export default async function UpdatePostPage({
     dateModified: post.publishedAt,
     inLanguage: post.lang,
     url,
-    author: { "@type": "Organization", name: "CaseWhy", url: "https://app.casewhy.com" },
-    publisher: { "@type": "Organization", name: "CaseWhy", url: "https://app.casewhy.com" },
+    author: {
+      "@type": "Organization",
+      name: "CaseWhy",
+      url: "https://app.casewhy.com",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "CaseWhy",
+      url: "https://app.casewhy.com",
+    },
   };
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Updates", item: "https://app.casewhy.com/updates" },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Updates",
+        item: "https://app.casewhy.com/updates",
+      },
       { "@type": "ListItem", position: 2, name: post.title, item: url },
     ],
   };
@@ -137,7 +164,9 @@ export default async function UpdatePostPage({
           />
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(breadcrumbJsonLd),
+            }}
           />
         </>
       )}
@@ -147,7 +176,10 @@ export default async function UpdatePostPage({
           {isSpanish ? (
             <>
               Vista previa — no publicado.{" "}
-              <a href="/admin/marketing?channel=blog" className="font-semibold underline">
+              <a
+                href="/admin/marketing?channel=blog"
+                className="font-semibold underline"
+              >
                 Apruébelo en Administración › Marketing
               </a>{" "}
               para hacerlo público.
@@ -155,7 +187,10 @@ export default async function UpdatePostPage({
           ) : (
             <>
               Preview — not published.{" "}
-              <a href="/admin/marketing?channel=blog" className="font-semibold underline">
+              <a
+                href="/admin/marketing?channel=blog"
+                className="font-semibold underline"
+              >
                 Approve it in Admin › Marketing
               </a>{" "}
               to make it public.
@@ -165,25 +200,38 @@ export default async function UpdatePostPage({
       )}
 
       <div className="mb-2 flex items-center justify-between">
-        <BackLink href="/updates" label={isSpanish ? "Todas las actualizaciones" : "All updates"} />
-        <LanguageSwitcher es={isSpanish} basePath={`/updates/${slug}`} params={{ preview: sp.preview }} variant="inline" />
+        <BackLink
+          href="/updates"
+          label={isSpanish ? "Todas las actualizaciones" : "All updates"}
+        />
+        <LanguageSwitcher
+          es={isSpanish}
+          basePath={`/updates/${slug}`}
+          params={{ preview: sp.preview }}
+          variant="inline"
+        />
       </div>
 
       <h1 className="mt-4 text-2xl font-bold tracking-tight">{post.title}</h1>
       {isSpanish && post.lang !== "es" && (
-        <p className="mt-1 text-xs font-semibold uppercase tracking-widest text-muted">(en inglés)</p>
+        <p className="mt-1 text-xs font-semibold uppercase tracking-widest text-muted">
+          (en inglés)
+        </p>
       )}
       <p className="mt-1 text-muted">
         {isPreview || !post.publishedAt
           ? isSpanish
             ? "Aún no publicado"
             : "Not yet published"
-          : new Date(`${post.publishedAt}T00:00:00Z`).toLocaleDateString(isSpanish ? "es" : "en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-              timeZone: "UTC",
-            })}
+          : new Date(`${post.publishedAt}T00:00:00Z`).toLocaleDateString(
+              isSpanish ? "es" : "en-US",
+              {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+                timeZone: "UTC",
+              },
+            )}
       </p>
 
       <p className="mt-4 rounded-lg border border-border-strong bg-surface-2 p-3 text-sm text-foreground/90">
@@ -193,11 +241,22 @@ export default async function UpdatePostPage({
       <div className="update-content mt-6 space-y-4 text-sm leading-relaxed text-foreground/90">
         <ReactMarkdown
           components={{
-            h2: (props) => <h2 className="mt-6 text-lg font-bold tracking-tight text-foreground" {...props} />,
-            h3: (props) => <h3 className="mt-5 font-semibold text-foreground" {...props} />,
+            h2: (props) => (
+              <h2
+                className="mt-6 text-lg font-bold tracking-tight text-foreground"
+                {...props}
+              />
+            ),
+            h3: (props) => (
+              <h3 className="mt-5 font-semibold text-foreground" {...props} />
+            ),
             p: (props) => <p {...props} />,
-            ul: (props) => <ul className="list-disc space-y-1 pl-5" {...props} />,
-            ol: (props) => <ol className="list-decimal space-y-1 pl-5" {...props} />,
+            ul: (props) => (
+              <ul className="list-disc space-y-1 pl-5" {...props} />
+            ),
+            ol: (props) => (
+              <ol className="list-decimal space-y-1 pl-5" {...props} />
+            ),
             a: (props) => (
               <a
                 className="font-semibold text-brand-600 hover:underline dark:text-brand-400"
@@ -206,7 +265,9 @@ export default async function UpdatePostPage({
                 {...props}
               />
             ),
-            strong: (props) => <strong className="font-semibold text-foreground" {...props} />,
+            strong: (props) => (
+              <strong className="font-semibold text-foreground" {...props} />
+            ),
             em: (props) => <em className="text-muted" {...props} />,
           }}
         >
@@ -237,10 +298,16 @@ export default async function UpdatePostPage({
                       {" "}
                       ·{" "}
                       <a
-                        href={isSpanish ? `/policy/${memoId}?lang=es` : `/policy/${memoId}`}
+                        href={
+                          isSpanish
+                            ? `/policy/${memoId}?lang=es`
+                            : `/policy/${memoId}`
+                        }
                         className="text-brand-600 hover:underline dark:text-brand-400"
                       >
-                        {isSpanish ? "Pregúntele a CaseWhy sobre esto →" : "Ask CaseWhy about this →"}
+                        {isSpanish
+                          ? "Pregúntele a CaseWhy sobre esto →"
+                          : "Ask CaseWhy about this →"}
                       </a>
                     </>
                   )}
@@ -253,7 +320,12 @@ export default async function UpdatePostPage({
 
       {!isPreview && (
         <div className="mt-8">
-          <ShareButton url={url} title={post.title} text={post.summary} es={isSpanish} />
+          <ShareButton
+            url={url}
+            title={post.title}
+            text={post.summary}
+            es={isSpanish}
+          />
         </div>
       )}
     </main>

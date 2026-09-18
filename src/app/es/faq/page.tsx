@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { PublicPage } from "@/components/PublicPage";
@@ -13,17 +14,17 @@ import { slugify } from "@/lib/search/slugify";
 // source between the two — same tradeoff round 79 already made for
 // /es/plus). Formal "usted" register per round 81's decision.
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/es/faq", {
   title: "Preguntas Frecuentes | CaseWhy",
   description:
     "Respuestas a las preguntas más comunes sobre CaseWhy — cómo rastrear un caso, explicaciones de IA, precios de Plus, privacidad y cómo se protegen sus datos.",
-  alternates: {
-    languages: {
-      en: "https://app.casewhy.com/faq",
-      es: "https://app.casewhy.com/es/faq",
-    },
+
+  locale: "es",
+  languages: {
+    en: "https://app.casewhy.com/faq",
+    es: "https://app.casewhy.com/es/faq",
   },
-};
+});
 
 // Round 110 follow-up — see /faq's own comment: this page was statically
 // prerendered, which bailed the root layout's session-dependent
@@ -56,11 +57,16 @@ const GROUPS: FaqGroup[] = [
           "CaseWhy fue creado por CaseWhy LLC, una pequeña empresa en Florida, por un fundador que pasó quince años como arquitecto de soluciones y luego vio cómo el caso de naturalización de su familia se estancó en el último paso. No hay financiamiento de capital de riesgo ni red publicitaria detrás de la empresa. El propio relato del fundador sobre por qué existe CaseWhy está en la página de Actualizaciones.",
         answer: (
           <>
-            CaseWhy fue creado por CaseWhy LLC, una pequeña empresa en Florida, por un fundador que pasó quince años
-            como arquitecto de soluciones y luego vio cómo el caso de naturalización de su familia se estancó en el
-            último paso. No hay financiamiento de capital de riesgo ni red publicitaria detrás de la empresa. El
-            propio relato del fundador sobre por qué existe CaseWhy está en la{" "}
-            <Link href="/updates/a-note-from-the-founder?lang=es" className="text-brand-600 hover:underline dark:text-brand-400">
+            CaseWhy fue creado por CaseWhy LLC, una pequeña empresa en Florida,
+            por un fundador que pasó quince años como arquitecto de soluciones y
+            luego vio cómo el caso de naturalización de su familia se estancó en
+            el último paso. No hay financiamiento de capital de riesgo ni red
+            publicitaria detrás de la empresa. El propio relato del fundador
+            sobre por qué existe CaseWhy está en la{" "}
+            <Link
+              href="/updates/a-note-from-the-founder?lang=es"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               página de Actualizaciones
             </Link>
             .
@@ -73,22 +79,33 @@ const GROUPS: FaqGroup[] = [
           "No. CaseWhy no es un despacho de abogados, no ofrece asesoría legal, y su uso no crea ningún tipo de relación abogado-cliente. Las explicaciones sobre el estado de su caso, las respuestas del chat de IA, las estimaciones de tiempos de procesamiento, la información del boletín de visas y la ayuda para redactar cartas de escalamiento son todo contenido general e informativo obtenido de materiales públicos de USCIS — que describen lo que un estado o proceso generalmente significa, nunca una conclusión sobre lo que usted, específicamente, debería hacer con su caso. Para los casos de asilo (I-589) y DACA (I-821D) en particular, CaseWhy nunca le dirá si usted califica para algún alivio ni predecirá el resultado de su caso — solo un abogado de inmigración con licencia o un representante acreditado puede hacerlo, y CaseWhy lo referirá a uno cada vez que una pregunta dependa de los hechos específicos de su caso.",
         answer: (
           <>
-            No. CaseWhy no es un despacho de abogados, no ofrece asesoría legal, y su uso no crea ningún tipo de
-            relación abogado-cliente. Las explicaciones sobre el estado de su caso, las respuestas del chat de IA,{" "}
-            <Link href="/processing-times" className="text-brand-600 hover:underline dark:text-brand-400">
+            No. CaseWhy no es un despacho de abogados, no ofrece asesoría legal,
+            y su uso no crea ningún tipo de relación abogado-cliente. Las
+            explicaciones sobre el estado de su caso, las respuestas del chat de
+            IA,{" "}
+            <Link
+              href="/processing-times"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               las estimaciones de tiempos de procesamiento
             </Link>
             ,{" "}
-            <Link href="/visa-bulletin" className="text-brand-600 hover:underline dark:text-brand-400">
+            <Link
+              href="/visa-bulletin"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               la información del boletín de visas
             </Link>{" "}
-            y la ayuda para redactar cartas de escalamiento son todo contenido general e informativo obtenido de
-            materiales públicos de USCIS — que describen lo que un estado o proceso generalmente significa, nunca
-            una conclusión sobre lo que usted, específicamente, debería hacer con su caso. Para los casos de asilo
-            (I-589) y DACA (I-821D) en particular, CaseWhy nunca le dirá si usted califica para algún alivio ni
-            predecirá el resultado de su caso — solo un abogado de inmigración con licencia o un representante
-            acreditado puede hacerlo, y CaseWhy lo referirá a uno cada vez que una pregunta dependa de los hechos
-            específicos de su caso.
+            y la ayuda para redactar cartas de escalamiento son todo contenido
+            general e informativo obtenido de materiales públicos de USCIS — que
+            describen lo que un estado o proceso generalmente significa, nunca
+            una conclusión sobre lo que usted, específicamente, debería hacer
+            con su caso. Para los casos de asilo (I-589) y DACA (I-821D) en
+            particular, CaseWhy nunca le dirá si usted califica para algún
+            alivio ni predecirá el resultado de su caso — solo un abogado de
+            inmigración con licencia o un representante acreditado puede
+            hacerlo, y CaseWhy lo referirá a uno cada vez que una pregunta
+            dependa de los hechos específicos de su caso.
           </>
         ),
       },
@@ -118,20 +135,26 @@ const GROUPS: FaqGroup[] = [
           "Sí — el nivel gratuito rastrea hasta tres casos, y Plus rastrea hasta diez (con más disponibles a solicitud). Necesitará el número de recibo de su aviso. Rastree únicamente casos que tiene derecho a ver; CaseWhy muestra el mismo estado público que USCIS le mostraría a cualquier persona con ese número.",
       },
       {
-        question: '¿Qué significa "Case Was Received", y qué es un caso estancado?',
+        question:
+          '¿Qué significa "Case Was Received", y qué es un caso estancado?',
         plainText:
           '"Case Was Received" ("Su caso fue recibido") es el primer estado que muestra casi todo caso; confirma que USCIS tiene su solicitud y el pago, y nada más. Un caso pasa a estar "fuera del tiempo de procesamiento normal" cuando ha esperado más tiempo del que USCIS mismo publica para ese formulario y oficina — CaseWhy marca esto automáticamente en todos los niveles, y muestra los canales formales que se abren en ese momento (una USCIS e-Request, una consulta al Congreso, el Ombudsman de USCIS). Plus puede redactar esas cartas por usted.',
         answer: (
           <>
-            &quot;Case Was Received&quot; (&quot;Su caso fue recibido&quot;) es el primer estado que muestra casi
-            todo caso; confirma que USCIS tiene su solicitud y el pago, y nada más. Un caso pasa a estar{" "}
-            <Link href="/updates/when-your-case-goes-silent?lang=es" className="text-brand-600 hover:underline dark:text-brand-400">
+            &quot;Case Was Received&quot; (&quot;Su caso fue recibido&quot;) es
+            el primer estado que muestra casi todo caso; confirma que USCIS
+            tiene su solicitud y el pago, y nada más. Un caso pasa a estar{" "}
+            <Link
+              href="/updates/when-your-case-goes-silent?lang=es"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               &quot;fuera del tiempo de procesamiento normal&quot;
             </Link>{" "}
-            cuando ha esperado más tiempo del que USCIS mismo publica para ese formulario y oficina — CaseWhy marca
-            esto automáticamente en todos los niveles, y muestra los canales formales que se abren en ese momento
-            (una USCIS e-Request, una consulta al Congreso, el Ombudsman de USCIS). Plus puede redactar esas cartas
-            por usted. Vea también{" "}
+            cuando ha esperado más tiempo del que USCIS mismo publica para ese
+            formulario y oficina — CaseWhy marca esto automáticamente en todos
+            los niveles, y muestra los canales formales que se abren en ese
+            momento (una USCIS e-Request, una consulta al Congreso, el Ombudsman
+            de USCIS). Plus puede redactar esas cartas por usted. Vea también{" "}
             <Link
               href="/updates/what-case-was-received-actually-means?lang=es"
               className="text-brand-600 hover:underline dark:text-brand-400"
@@ -154,11 +177,15 @@ const GROUPS: FaqGroup[] = [
         answer: (
           <>
             No. Ask CaseWhy en la página de{" "}
-            <Link href="/es/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+            <Link
+              href="/es/get-help"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               Obtener ayuda
             </Link>{" "}
-            responde tres preguntas sin necesidad de iniciar sesión; después de eso, una cuenta gratuita le da tres
-            preguntas de IA sobre su propio caso cada mes, y Plus las hace ilimitadas.
+            responde tres preguntas sin necesidad de iniciar sesión; después de
+            eso, una cuenta gratuita le da tres preguntas de IA sobre su propio
+            caso cada mes, y Plus las hace ilimitadas.
           </>
         ),
       },
@@ -174,14 +201,20 @@ const GROUPS: FaqGroup[] = [
         answer: (
           <>
             Sí — el sitio, la aplicación,{" "}
-            <Link href="/es/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+            <Link
+              href="/es/get-help"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               Obtener ayuda
             </Link>{" "}
-            (incluido su cuadro de pregunta de texto libre) y las Preguntas Frecuentes están disponibles en español;
-            use el enlace English en la parte superior de cualquier página. Algunas páginas de referencia todavía
-            están solo en inglés y se marcan &quot;(en inglés)&quot; donde se enlazan. Las explicaciones de caso
-            generadas por IA y el chat de &quot;Ask a question&quot; con sesión iniciada actualmente responden solo
-            en inglés, incluso en una página en español — una limitación de la que estamos conscientes.
+            (incluido su cuadro de pregunta de texto libre) y las Preguntas
+            Frecuentes están disponibles en español; use el enlace English en la
+            parte superior de cualquier página. Algunas páginas de referencia
+            todavía están solo en inglés y se marcan &quot;(en inglés)&quot;
+            donde se enlazan. Las explicaciones de caso generadas por IA y el
+            chat de &quot;Ask a question&quot; con sesión iniciada actualmente
+            responden solo en inglés, incluso en una página en español — una
+            limitación de la que estamos conscientes.
           </>
         ),
       },
@@ -196,20 +229,28 @@ const GROUPS: FaqGroup[] = [
           "CaseWhy tiene un nivel gratuito — hasta tres casos rastreados, una línea de tiempo de estado, explicaciones en lenguaje sencillo generadas por IA, y tres preguntas de IA sobre su caso cada mes — además de un nivel Plus opcional y de pago para rastrear más casos, preguntas ilimitadas y otras funciones adicionales (consulte la página de Plus para ver los precios actuales). Obtener ayuda — los directorios de CaseWhy de asistencia legal gratuita, representantes acreditados, abogados y otros recursos — es gratis para todos, siempre, sin importar la suscripción: sin tarifas, sin anuncios, sin costos ocultos.",
         answer: (
           <>
-            CaseWhy tiene un nivel gratuito — hasta tres casos rastreados, una línea de tiempo de estado,
-            explicaciones en lenguaje sencillo generadas por IA, y tres preguntas de IA sobre su caso cada mes —
-            además de un nivel Plus opcional y de pago para rastrear más casos, preguntas ilimitadas y otras
-            funciones adicionales (consulte la{" "}
-            <Link href="/es/plus" className="text-brand-600 hover:underline dark:text-brand-400">
+            CaseWhy tiene un nivel gratuito — hasta tres casos rastreados, una
+            línea de tiempo de estado, explicaciones en lenguaje sencillo
+            generadas por IA, y tres preguntas de IA sobre su caso cada mes —
+            además de un nivel Plus opcional y de pago para rastrear más casos,
+            preguntas ilimitadas y otras funciones adicionales (consulte la{" "}
+            <Link
+              href="/es/plus"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               página de Plus
             </Link>{" "}
             para ver los precios actuales).{" "}
-            <Link href="/es/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+            <Link
+              href="/es/get-help"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               Obtener ayuda
             </Link>{" "}
-            — los directorios de CaseWhy de asistencia legal gratuita, representantes acreditados, abogados y otros
-            recursos — es gratis para todos, siempre, sin importar la suscripción: sin tarifas, sin anuncios, sin
-            costos ocultos.
+            — los directorios de CaseWhy de asistencia legal gratuita,
+            representantes acreditados, abogados y otros recursos — es gratis
+            para todos, siempre, sin importar la suscripción: sin tarifas, sin
+            anuncios, sin costos ocultos.
           </>
         ),
       },
@@ -219,13 +260,17 @@ const GROUPS: FaqGroup[] = [
           "Plus cuesta $9.99 al mes, $22.99 al trimestre, o $66.99 al año, facturado a través de Stripe. Puede cancelar en cualquier momento desde el enlace 'Administrar suscripción' en la página de Plus; conservará Plus hasta el final del período que ya pagó. No hay reembolsos ni prorrateo por períodos parciales.",
         answer: (
           <>
-            Plus cuesta $9.99 al mes, $22.99 al trimestre, o $66.99 al año, facturado a través de Stripe. Puede
-            cancelar en cualquier momento desde el enlace &quot;Administrar suscripción&quot; en la{" "}
-            <Link href="/es/plus" className="text-brand-600 hover:underline dark:text-brand-400">
+            Plus cuesta $9.99 al mes, $22.99 al trimestre, o $66.99 al año,
+            facturado a través de Stripe. Puede cancelar en cualquier momento
+            desde el enlace &quot;Administrar suscripción&quot; en la{" "}
+            <Link
+              href="/es/plus"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               página de Plus
             </Link>
-            ; conservará Plus hasta el final del período que ya pagó. No hay reembolsos ni prorrateo por períodos
-            parciales.
+            ; conservará Plus hasta el final del período que ya pagó. No hay
+            reembolsos ni prorrateo por períodos parciales.
           </>
         ),
       },
@@ -235,13 +280,18 @@ const GROUPS: FaqGroup[] = [
           "Plus incluye un informe en PDF para su abogado: la línea de tiempo de su caso, el historial de estado y las explicaciones en un solo documento que puede enviar a su abogado o representante acreditado. Si todavía no tiene uno, Obtener ayuda enumera asistencia legal gratuita, representantes acreditados y abogados, gratis para todos.",
         answer: (
           <>
-            Plus incluye un informe en PDF para su abogado: la línea de tiempo de su caso, el historial de estado y
-            las explicaciones en un solo documento que puede enviar a su abogado o representante acreditado. Si
-            todavía no tiene uno,{" "}
-            <Link href="/es/get-help" className="text-brand-600 hover:underline dark:text-brand-400">
+            Plus incluye un informe en PDF para su abogado: la línea de tiempo
+            de su caso, el historial de estado y las explicaciones en un solo
+            documento que puede enviar a su abogado o representante acreditado.
+            Si todavía no tiene uno,{" "}
+            <Link
+              href="/es/get-help"
+              className="text-brand-600 hover:underline dark:text-brand-400"
+            >
               Obtener ayuda
             </Link>{" "}
-            enumera asistencia legal gratuita, representantes acreditados y abogados, gratis para todos.
+            enumera asistencia legal gratuita, representantes acreditados y
+            abogados, gratis para todos.
           </>
         ),
       },
@@ -271,17 +321,25 @@ const faqJsonLd = {
     group.faqs.map((faq) => ({
       "@type": "Question",
       name: faq.question,
-      acceptedAnswer: { "@type": "Answer", text: faq.plainText ?? (faq.answer as string) },
-    }))
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.plainText ?? (faq.answer as string),
+      },
+    })),
   ),
 };
 
 export default function FaqPageEs() {
   return (
     <PublicPage es={true} switcherHref="/faq">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
 
-      <h1 className="text-2xl font-bold tracking-tight">Preguntas frecuentes</h1>
+      <h1 className="text-2xl font-bold tracking-tight">
+        Preguntas frecuentes
+      </h1>
       <p className="mb-8 mt-2 text-muted">
         Las preguntas más comunes sobre CaseWhy. Para más detalles, consulte los{" "}
         <a
@@ -314,11 +372,19 @@ export default function FaqPageEs() {
       <div className="space-y-10">
         {GROUPS.map((group) => (
           <div key={group.heading}>
-            <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-muted">{group.heading}</h2>
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-muted">
+              {group.heading}
+            </h2>
             <div className="space-y-6">
               {group.faqs.map((faq) => (
-                <div key={faq.question} id={slugify(faq.question)} className="scroll-mt-20">
-                  <h3 className="text-base font-semibold text-foreground">{faq.question}</h3>
+                <div
+                  key={faq.question}
+                  id={slugify(faq.question)}
+                  className="scroll-mt-20"
+                >
+                  <h3 className="text-base font-semibold text-foreground">
+                    {faq.question}
+                  </h3>
                   <p className="mt-2 text-sm text-muted">{faq.answer}</p>
                 </div>
               ))}

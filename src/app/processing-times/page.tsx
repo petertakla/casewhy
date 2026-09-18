@@ -15,6 +15,7 @@ import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { ShareButton } from "@/components/ShareButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { PageFilter } from "@/components/PageFilter";
+import { pageMetadata } from "@/lib/site/metadata";
 
 // Round 83 — was a static `export const metadata`, so every visitor got
 // the English title/description regardless of `?lang=es`, and there was
@@ -32,29 +33,24 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await searchParams;
   const es = await isSpanishLocale(lang);
+  const languages = {
+    en: "https://app.casewhy.com/processing-times",
+    es: "https://app.casewhy.com/processing-times?lang=es",
+  };
   return es
-    ? {
+    ? pageMetadata("/processing-times?lang=es", {
         title: "Tiempos de Procesamiento de USCIS por Formulario | CaseWhy",
         description:
           "Las propias estimaciones de tiempo de procesamiento publicadas por USCIS para N-400, I-485, I-765, I-130, y otros tipos de caso comunes, siempre actualizadas.",
-        alternates: {
-          languages: {
-            en: "https://app.casewhy.com/processing-times",
-            es: "https://app.casewhy.com/processing-times?lang=es",
-          },
-        },
-      }
-    : {
+        locale: "es",
+        languages,
+      })
+    : pageMetadata("/processing-times", {
         title: "USCIS Processing Times by Form | CaseWhy",
         description:
           "USCIS's own published processing-time estimates for N-400, I-485, I-765, I-130, and other common case types, kept current.",
-        alternates: {
-          languages: {
-            en: "https://app.casewhy.com/processing-times",
-            es: "https://app.casewhy.com/processing-times?lang=es",
-          },
-        },
-      };
+        languages,
+      });
 }
 
 // Round 73 — direct-answer block + FAQPage schema, so the page's own
@@ -102,7 +98,10 @@ export default async function ProcessingTimesPage({
         name: es
           ? "¿Qué significa '80% de los casos completados dentro de X meses'?"
           : "What does '80% of cases completed within X months' mean?",
-        acceptedAnswer: { "@type": "Answer", text: es ? PERCENTILE_FAQ_ANSWER_ES : PERCENTILE_FAQ_ANSWER },
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: es ? PERCENTILE_FAQ_ANSWER_ES : PERCENTILE_FAQ_ANSWER,
+        },
       },
     ],
   };
@@ -113,8 +112,13 @@ export default async function ProcessingTimesPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <LanguageSwitcher es={es} href={localeToggleHref("/processing-times", {}, es)} />
-      <h1 className="text-2xl font-bold tracking-tight">{es ? "Tiempos de procesamiento" : "Processing times"}</h1>
+      <LanguageSwitcher
+        es={es}
+        href={localeToggleHref("/processing-times", {}, es)}
+      />
+      <h1 className="text-2xl font-bold tracking-tight">
+        {es ? "Tiempos de procesamiento" : "Processing times"}
+      </h1>
       <p className="mb-2 mt-2 text-muted">
         {es
           ? "Las propias estimaciones de tiempo de procesamiento publicadas por USCIS, para los tipos de caso que CaseWhy rastrea."
@@ -134,7 +138,9 @@ export default async function ProcessingTimesPage({
           rel="noopener noreferrer"
           className="text-brand-600 dark:text-brand-400 hover:underline"
         >
-          {es ? "consulta la herramienta oficial para tu formulario y oficina exactos" : "check the official tool for your exact form and office"}
+          {es
+            ? "consulta la herramienta oficial para tu formulario y oficina exactos"
+            : "check the official tool for your exact form and office"}
         </a>
       </p>
 
@@ -150,37 +156,62 @@ export default async function ProcessingTimesPage({
         <ShareButton
           url="https://app.casewhy.com/processing-times"
           title="CaseWhy — Processing times"
-          text={es ? "Consulta estimaciones de tiempo de procesamiento de USCIS para tipos de caso reales, gratis, con CaseWhy." : "See USCIS processing-time estimates for real case types, for free, with CaseWhy."}
+          text={
+            es
+              ? "Consulta estimaciones de tiempo de procesamiento de USCIS para tipos de caso reales, gratis, con CaseWhy."
+              : "See USCIS processing-time estimates for real case types, for free, with CaseWhy."
+          }
           es={es}
         />
       </div>
 
       <PageFilter
         basePath="/processing-times"
-        placeholder={es ? "Filtrar por formulario u oficina…" : "Filter by form or office…"}
-        noMatchText={es ? "Ningún formulario en esta página coincide." : "No forms on this page match."}
+        placeholder={
+          es ? "Filtrar por formulario u oficina…" : "Filter by form or office…"
+        }
+        noMatchText={
+          es
+            ? "Ningún formulario en esta página coincide."
+            : "No forms on this page match."
+        }
         isSpanish={es}
       />
 
       <div className="space-y-4">
         {PROCESSING_TIMES.map((entry) => (
-          <div key={entry.id} id={entry.id} className="scroll-mt-20 rounded-xl border border-border bg-surface p-5">
+          <div
+            key={entry.id}
+            id={entry.id}
+            className="scroll-mt-20 rounded-xl border border-border bg-surface p-5"
+          >
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <p className="font-semibold">
-                {entry.formType} <span className="font-normal text-muted">— {entry.categoryLabel}</span>
+                {entry.formType}{" "}
+                <span className="font-normal text-muted">
+                  — {entry.categoryLabel}
+                </span>
               </p>
               <p className="text-xs text-muted">{entry.office}</p>
             </div>
             <p className="mt-2 text-sm">
-              {es ? "El 80% de los casos se completaron en" : "80% of cases completed within"}{" "}
+              {es
+                ? "El 80% de los casos se completaron en"
+                : "80% of cases completed within"}{" "}
               <span className="font-semibold text-brand-600 dark:text-brand-400">
                 {entry.percentile80Months}{" "}
                 {es
-                  ? entry.percentile80Months === 1 ? "mes" : "meses"
-                  : entry.percentile80Months === 1 ? "month" : "months"}
+                  ? entry.percentile80Months === 1
+                    ? "mes"
+                    : "meses"
+                  : entry.percentile80Months === 1
+                    ? "month"
+                    : "months"}
               </span>
             </p>
-            {entry.note && <p className="mt-2 text-xs text-muted">{entry.note}</p>}
+            {entry.note && (
+              <p className="mt-2 text-xs text-muted">{entry.note}</p>
+            )}
             <p className="mt-2 text-xs text-muted">
               {es ? "Al " : "As of "}
               {entry.asOf}
@@ -189,15 +220,22 @@ export default async function ProcessingTimesPage({
         ))}
       </div>
 
-      <div id="field-office-only" className="mt-8 scroll-mt-20 rounded-xl border border-dashed border-border-strong p-5">
+      <div
+        id="field-office-only"
+        className="mt-8 scroll-mt-20 rounded-xl border border-dashed border-border-strong p-5"
+      >
         <p className="text-xs font-semibold uppercase tracking-widest text-muted">
-          {es ? "No mostrado arriba — específico a la oficina, sin cifra nacional" : "Not shown above — office-specific, no national figure"}
+          {es
+            ? "No mostrado arriba — específico a la oficina, sin cifra nacional"
+            : "Not shown above — office-specific, no national figure"}
         </p>
         <ul className="mt-3 space-y-3 text-sm">
           {FIELD_OFFICE_ONLY_FORMS.map((f) => (
             <li key={`${f.formType}-${f.categoryLabel ?? "default"}`}>
               <span className="font-semibold">{f.formType}</span>
-              {f.categoryLabel && <span className="text-muted"> — {f.categoryLabel}</span>}
+              {f.categoryLabel && (
+                <span className="text-muted"> — {f.categoryLabel}</span>
+              )}
               <p className="mt-0.5 text-muted">{f.note}</p>
               {f.locatorUrl && (
                 <a
@@ -213,7 +251,10 @@ export default async function ProcessingTimesPage({
           ))}
         </ul>
         <p className="mt-4 text-sm text-muted">{VISA_BULLETIN_TIED_NOTE}</p>
-        <Link href={es ? "/visa-bulletin?lang=es" : "/visa-bulletin"} className="mt-2 inline-block text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400">
+        <Link
+          href={es ? "/visa-bulletin?lang=es" : "/visa-bulletin"}
+          className="mt-2 inline-block text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
+        >
           {es ? "Ver el boletín de visas →" : "See the visa bulletin →"}
         </Link>
       </div>
@@ -225,17 +266,19 @@ export default async function ProcessingTimesPage({
         <p className="mt-2 text-sm text-muted">
           {es ? (
             <>
-              Las cifras de arriba son números nacionales. Para un formulario que depende de la oficina local
-              (N-400, I-485 basado en familia) o para encontrar dónde se realiza una cita de biometría,
-              busca tu propia oficina directamente en el sitio de USCIS — es la fuente oficial y actual, y
-              no algo que CaseWhy mantenga una copia de:
+              Las cifras de arriba son números nacionales. Para un formulario
+              que depende de la oficina local (N-400, I-485 basado en familia) o
+              para encontrar dónde se realiza una cita de biometría, busca tu
+              propia oficina directamente en el sitio de USCIS — es la fuente
+              oficial y actual, y no algo que CaseWhy mantenga una copia de:
             </>
           ) : (
             <>
-              The figures above are national numbers. For a field-office-dependent form (N-400,
-              family-based I-485) or to find where a biometrics appointment happens, look up your own
-              office directly on USCIS&apos;s site — it&apos;s the current, official source and not
-              something CaseWhy keeps a copy of:
+              The figures above are national numbers. For a
+              field-office-dependent form (N-400, family-based I-485) or to find
+              where a biometrics appointment happens, look up your own office
+              directly on USCIS&apos;s site — it&apos;s the current, official
+              source and not something CaseWhy keeps a copy of:
             </>
           )}
         </p>
@@ -254,7 +297,9 @@ export default async function ProcessingTimesPage({
             rel="noopener noreferrer"
             className="text-brand-600 dark:text-brand-400 hover:underline"
           >
-            {es ? "Encuentra tu Centro de Apoyo para Solicitudes" : "Find your Application Support Center"}
+            {es
+              ? "Encuentra tu Centro de Apoyo para Solicitudes"
+              : "Find your Application Support Center"}
           </a>
         </div>
       </div>

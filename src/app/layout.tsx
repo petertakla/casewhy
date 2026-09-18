@@ -7,14 +7,24 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { NavigationProvider } from "@/lib/navigation/NavigationProvider";
 import { TopProgressBar } from "@/components/TopProgressBar";
+import { pageMetadata } from "@/lib/site/metadata";
 
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "CaseWhy — Understand your USCIS case",
-  description:
-    "Your USCIS case, explained! AI-explained USCIS case status tracking — know what's happening with your immigration case, and why.",
+  // Round 73 follow-up (Sep 18) — resolves every page's relative
+  // `alternates.canonical`/`openGraph.url`/`openGraph.images` (see
+  // pageMetadata(), src/lib/site/metadata.ts) against the real app host,
+  // per Next.js's own documented pattern. app.casewhy.com, not the
+  // marketing host (casewhy.com/www.casewhy.com) -- that's a separate
+  // static site on a different branch, handled independently.
+  metadataBase: new URL("https://app.casewhy.com"),
+  ...pageMetadata("/", {
+    title: "CaseWhy — Understand your USCIS case",
+    description:
+      "Your USCIS case, explained! AI-explained USCIS case status tracking — know what's happening with your immigration case, and why.",
+  }),
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -41,7 +51,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${sans.variable} ${mono.variable}`}
+      suppressHydrationWarning
+    >
       <body className="antialiased font-sans">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <NavigationProvider>

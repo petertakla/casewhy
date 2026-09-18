@@ -1,10 +1,9 @@
 // Round 93 — Organization + WebSite JSON-LD, shared by every place that
 // needs it on the app.casewhy.com side (see organizationJsonLd() callers).
-// `sameAs` is env-driven and deliberately empty by default: no real
-// CaseWhy social accounts exist yet (per the task doc's own note), so
-// this omits the field entirely rather than shipping placeholder/fake
-// profile URLs -- set SOCIAL_SAME_AS_URLS (comma-separated) once real
-// accounts exist.
+// `sameAs` is env-driven, still omitted entirely (not a placeholder/fake
+// URL) if unset. Round 73 follow-up (Sep 18) — real accounts now exist
+// (X, Facebook Page, Threads, Instagram all confirmed working/linked
+// this round), so SOCIAL_SAME_AS_URLS is set for real in Vercel now.
 
 function sameAsUrls(): string[] {
   const raw = process.env.SOCIAL_SAME_AS_URLS;

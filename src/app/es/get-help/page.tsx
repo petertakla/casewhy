@@ -1,20 +1,22 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import Link from "next/link";
 import { ShareButton } from "@/components/ShareButton";
 import { GetHelpChooserEs } from "./GetHelpChooserEs";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
-export const metadata: Metadata = {
-  title: "Obtener Ayuda — Encuentra un Abogado de Inmigración o Asistencia Legal Gratuita | CaseWhy",
+export const metadata: Metadata = pageMetadata("/es/get-help", {
+  title:
+    "Obtener Ayuda — Encuentra un Abogado de Inmigración o Asistencia Legal Gratuita | CaseWhy",
   description:
     "Directorio gratuito de abogados de inmigración, representantes acreditados, organizaciones de asistencia legal y más — sin cuotas, sin anuncios, sin necesidad de iniciar sesión.",
-  alternates: {
-    languages: {
-      en: "https://app.casewhy.com/get-help",
-      es: "https://app.casewhy.com/es/get-help",
-    },
+
+  locale: "es",
+  languages: {
+    en: "https://app.casewhy.com/get-help",
+    es: "https://app.casewhy.com/es/get-help",
   },
-};
+});
 
 interface EntityCardEs {
   id: string;
@@ -30,7 +32,8 @@ const ENTITY_TYPES_ES: EntityCardEs[] = [
     id: "attorneys",
     href: "/es/attorneys",
     label: "Abogados",
-    description: "Abogados con licencia de inmigración que pueden representarte y darte asesoría específica para tu caso.",
+    description:
+      "Abogados con licencia de inmigración que pueden representarte y darte asesoría específica para tu caso.",
     whenToUse:
       "Quieres un profesional con licencia que pueda representarte formalmente, firmar documentos en tu nombre, o comparecer en la corte de inmigración por ti.",
     status: "live",
@@ -49,39 +52,48 @@ const ENTITY_TYPES_ES: EntityCardEs[] = [
     id: "legal_aid",
     href: "/es/legal-aid",
     label: "Asistencia legal y organizaciones sin fines de lucro",
-    description: "Ayuda de inmigración para quienes no pueden pagar un abogado privado.",
-    whenToUse: "Necesitas orientación general o una consulta y tienes ingresos limitados.",
+    description:
+      "Ayuda de inmigración para quienes no pueden pagar un abogado privado.",
+    whenToUse:
+      "Necesitas orientación general o una consulta y tienes ingresos limitados.",
     status: "live",
   },
   {
     id: "pro_bono_representation",
     href: "/es/pro-bono-representation",
     label: "Representación gratuita en la corte de inmigración",
-    description: "Representación gratuita en procesos ante la corte de inmigración, organizada por corte.",
-    whenToUse: "Estás en la corte de inmigración / procesos de deportación ahora mismo y necesitas representación ahí, sin costo.",
+    description:
+      "Representación gratuita en procesos ante la corte de inmigración, organizada por corte.",
+    whenToUse:
+      "Estás en la corte de inmigración / procesos de deportación ahora mismo y necesitas representación ahí, sin costo.",
     status: "live",
   },
   {
     id: "dso",
     href: "/es/dso",
     label: "Oficinas internacionales de universidades",
-    description: "Encuentra la oficina de estudiantes internacionales de tu escuela, para preguntas de estatus F-1/M-1.",
-    whenToUse: "Eres un estudiante internacional F-1/M-1 con una pregunta de estatus o SEVIS relacionada con tu escuela.",
+    description:
+      "Encuentra la oficina de estudiantes internacionales de tu escuela, para preguntas de estatus F-1/M-1.",
+    whenToUse:
+      "Eres un estudiante internacional F-1/M-1 con una pregunta de estatus o SEVIS relacionada con tu escuela.",
     status: "live",
   },
   {
     id: "community_orgs",
     href: "/es/community-orgs",
     label: "Organizaciones comunitarias y culturales",
-    description: "Organizaciones locales y culturales que apoyan a los inmigrantes.",
-    whenToUse: "Quieres apoyo local, con coincidencia cultural o lingüística — no necesariamente ayuda legal.",
+    description:
+      "Organizaciones locales y culturales que apoyan a los inmigrantes.",
+    whenToUse:
+      "Quieres apoyo local, con coincidencia cultural o lingüística — no necesariamente ayuda legal.",
     status: "live",
   },
   {
     id: "employers",
     href: null,
     label: "Para empleadores",
-    description: "Patrocinando o apoyando a empleados a través del proceso de inmigración.",
+    description:
+      "Patrocinando o apoyando a empleados a través del proceso de inmigración.",
     whenToUse: null,
     status: "coming-soon",
   },
@@ -99,17 +111,19 @@ export default function GetHelpPageEs() {
 
       <h1 className="text-2xl font-bold tracking-tight">Obtener ayuda</h1>
       <p className="mt-2 text-muted">
-        CaseWhy te da información en lenguaje sencillo, no asesoría legal. Cuando tu situación
-        necesita el criterio de un profesional con licencia, aquí es donde encontrar uno.
+        CaseWhy te da información en lenguaje sencillo, no asesoría legal.
+        Cuando tu situación necesita el criterio de un profesional con licencia,
+        aquí es donde encontrar uno.
       </p>
       <p className="mt-2 text-xs text-muted">
-        Esta página es una lista informativa, no un aval ni un servicio de referencia. CaseWhy no
-        garantiza resultados, y aparecer aquí no significa que ese listado sea adecuado para tu
-        situación específica.
+        Esta página es una lista informativa, no un aval ni un servicio de
+        referencia. CaseWhy no garantiza resultados, y aparecer aquí no
+        significa que ese listado sea adecuado para tu situación específica.
       </p>
       <p className="mt-2 text-xs text-muted">
-        Cada recurso aquí es gratuito para usar, siempre — sin cuotas, sin anuncios, sin costo
-        oculto. Igual que el resto de CaseWhy: tampoco vendemos tus datos ni mostramos anuncios.
+        Cada recurso aquí es gratuito para usar, siempre — sin cuotas, sin
+        anuncios, sin costo oculto. Igual que el resto de CaseWhy: tampoco
+        vendemos tus datos ni mostramos anuncios.
       </p>
 
       <div className="mt-4">
@@ -142,7 +156,10 @@ export default function GetHelpPageEs() {
               )}
             </Link>
           ) : (
-            <div key={category.id} className="rounded-xl border border-dashed border-border-strong p-5">
+            <div
+              key={category.id}
+              className="rounded-xl border border-dashed border-border-strong p-5"
+            >
               <div className="flex items-baseline justify-between gap-2">
                 <p className="font-semibold text-muted">{category.label}</p>
                 <span className="shrink-0 rounded-full bg-surface-2 px-2 py-0.5 text-xs font-medium text-muted">
@@ -151,7 +168,7 @@ export default function GetHelpPageEs() {
               </div>
               <p className="mt-1 text-sm text-muted">{category.description}</p>
             </div>
-          )
+          ),
         )}
       </div>
     </main>

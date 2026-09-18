@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import Link from "next/link";
 import { getDsoDirectory, DSO_DIRECTORY_DISCLAIMER } from "@/lib/dso/directory";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/dso", {
   title: "Find Your School's International Student Office (DSO) | CaseWhy",
   description:
     "Directory of SEVP-certified schools for F-1/M-1 international students, sourced from DHS's official school directory.",
-  alternates: {
-    languages: {
-      en: "https://app.casewhy.com/dso",
-      es: "https://app.casewhy.com/es/dso",
-    },
+
+  languages: {
+    en: "https://app.casewhy.com/dso",
+    es: "https://app.casewhy.com/es/dso",
   },
-};
+});
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -29,12 +29,15 @@ export default async function DsoPage() {
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
       <LanguageSwitcher es={false} href="/es/dso" />
 
-      <h1 className="text-2xl font-bold tracking-tight">Find your school&apos;s international office</h1>
+      <h1 className="text-2xl font-bold tracking-tight">
+        Find your school&apos;s international office
+      </h1>
       <p className="mb-2 mt-2 text-muted">
-        SEVP-certified schools authorized to enroll F-1/M-1 international students, sourced from
-        DHS&apos;s own official school directory. DHS doesn&apos;t publish a Designated School
-        Official&apos;s name or contact info for any school — this links out to each school so you
-        can reach its international student office directly.
+        SEVP-certified schools authorized to enroll F-1/M-1 international
+        students, sourced from DHS&apos;s own official school directory. DHS
+        doesn&apos;t publish a Designated School Official&apos;s name or contact
+        info for any school — this links out to each school so you can reach its
+        international student office directly.
       </p>
       <p className="mb-2 rounded-lg border border-border-strong bg-surface-2 p-3 text-sm text-foreground/90">
         {DSO_DIRECTORY_DISCLAIMER}
@@ -46,8 +49,8 @@ export default async function DsoPage() {
       {directory.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border-strong p-8 text-center">
           <p className="text-sm text-muted">
-            We&apos;re still building this list out — check back soon. In the meantime, DHS
-            publishes its own{" "}
+            We&apos;re still building this list out — check back soon. In the
+            meantime, DHS publishes its own{" "}
             <a
               href="https://studyinthestates.dhs.gov/school-search"
               target="_blank"
@@ -70,12 +73,15 @@ export default async function DsoPage() {
               <div className="rounded-xl border border-border bg-surface transition-colors hover:border-border-strong">
                 <Link href={`/dso/${school.slug}`} className="block p-5">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <p className="font-semibold text-foreground">{school.schoolName}</p>
+                    <p className="font-semibold text-foreground">
+                      {school.schoolName}
+                    </p>
                     <p className="text-xs text-muted">{school.state}</p>
                   </div>
-                  {school.campusName && school.campusName !== school.schoolName && (
-                    <p className="text-sm text-muted">{school.campusName}</p>
-                  )}
+                  {school.campusName &&
+                    school.campusName !== school.schoolName && (
+                      <p className="text-sm text-muted">{school.campusName}</p>
+                    )}
                   <p className="mt-1 text-xs text-muted">
                     {[school.f1Certified && "F-1", school.m1Certified && "M-1"]
                       .filter(Boolean)
@@ -84,7 +90,11 @@ export default async function DsoPage() {
                   </p>
                 </Link>
                 <div className="border-t border-border px-5 py-2">
-                  <ReportListingLink entityType="dso" entityId={school.id} entityName={school.schoolName} />
+                  <ReportListingLink
+                    entityType="dso"
+                    entityId={school.id}
+                    entityName={school.schoolName}
+                  />
                 </div>
               </div>
             ),
@@ -94,7 +104,10 @@ export default async function DsoPage() {
 
       <p className="mt-8 text-sm text-muted">
         A Designated School Official?{" "}
-        <Link href="/dso/join" className="text-brand-600 hover:underline dark:text-brand-400">
+        <Link
+          href="/dso/join"
+          className="text-brand-600 hover:underline dark:text-brand-400"
+        >
           Add your contact info
         </Link>{" "}
         — free, no cost to join.

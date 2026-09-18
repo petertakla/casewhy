@@ -1,18 +1,21 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site/metadata";
 import Link from "next/link";
-import { getAttorneyDirectory, ATTORNEY_DIRECTORY_DISCLAIMER } from "@/lib/attorneys/directory";
+import {
+  getAttorneyDirectory,
+  ATTORNEY_DIRECTORY_DISCLAIMER,
+} from "@/lib/attorneys/directory";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/attorneys", {
   title: "Find an Immigration Attorney | CaseWhy",
   description:
     "Free directory of immigration attorneys — board-certified specialists sourced from official state bar records, plus self-enrolled listings.",
-  alternates: {
-    languages: {
-      en: "https://app.casewhy.com/attorneys",
-      es: "https://app.casewhy.com/es/attorneys",
-    },
+
+  languages: {
+    en: "https://app.casewhy.com/attorneys",
+    es: "https://app.casewhy.com/es/attorneys",
   },
-};
+});
 import { StateFilter } from "@/components/StateFilter";
 import { ReportListingLink } from "@/components/ReportListingLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -32,9 +35,10 @@ export default async function AttorneysPage() {
 
       <h1 className="text-2xl font-bold tracking-tight">Find an attorney</h1>
       <p className="mb-2 mt-2 text-muted">
-        Immigration attorneys — board-certified specialists sourced from official state bar
-        records, plus self-enrolled listings — for anything CaseWhy tells you needs a licensed
-        professional&apos;s judgment rather than general information.
+        Immigration attorneys — board-certified specialists sourced from
+        official state bar records, plus self-enrolled listings — for anything
+        CaseWhy tells you needs a licensed professional&apos;s judgment rather
+        than general information.
       </p>
       <p className="mb-2 rounded-lg border border-border-strong bg-surface-2 p-3 text-sm text-foreground/90">
         {ATTORNEY_DIRECTORY_DISCLAIMER}
@@ -46,8 +50,8 @@ export default async function AttorneysPage() {
       {directory.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border-strong p-8 text-center">
           <p className="text-sm text-muted">
-            We&apos;re still building this list out — check back soon. In the meantime, the American
-            Immigration Lawyers Association keeps a{" "}
+            We&apos;re still building this list out — check back soon. In the
+            meantime, the American Immigration Lawyers Association keeps a{" "}
             <a
               href="https://www.ailalawyer.com/"
               target="_blank"
@@ -68,13 +72,24 @@ export default async function AttorneysPage() {
             searchText: `${attorney.name} ${attorney.firm ?? ""} ${attorney.practiceFocus.join(" ")} ${attorney.cityStateZip ?? ""}`,
             node: (
               <div className="rounded-xl border border-border bg-surface transition-colors hover:border-border-strong">
-                <Link href={`/attorneys/${attorney.slug}`} className="block p-5">
+                <Link
+                  href={`/attorneys/${attorney.slug}`}
+                  className="block p-5"
+                >
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <p className="font-semibold text-foreground">{attorney.name}</p>
-                    <p className="text-xs text-muted">{attorney.statesLicensed.join(", ")}</p>
+                    <p className="font-semibold text-foreground">
+                      {attorney.name}
+                    </p>
+                    <p className="text-xs text-muted">
+                      {attorney.statesLicensed.join(", ")}
+                    </p>
                   </div>
-                  {attorney.firm && <p className="text-sm text-muted">{attorney.firm}</p>}
-                  <p className="mt-2 text-xs text-muted">{attorney.practiceFocus.join(" · ")}</p>
+                  {attorney.firm && (
+                    <p className="text-sm text-muted">{attorney.firm}</p>
+                  )}
+                  <p className="mt-2 text-xs text-muted">
+                    {attorney.practiceFocus.join(" · ")}
+                  </p>
                 </Link>
                 <div className="border-t border-border px-5 py-2">
                   <ReportListingLink
@@ -91,7 +106,10 @@ export default async function AttorneysPage() {
 
       <p className="mt-8 text-sm text-muted">
         Licensed immigration attorney?{" "}
-        <Link href="/attorneys/join" className="text-brand-600 hover:underline dark:text-brand-400">
+        <Link
+          href="/attorneys/join"
+          className="text-brand-600 hover:underline dark:text-brand-400"
+        >
           Apply to be listed
         </Link>{" "}
         — free, no cost to join.

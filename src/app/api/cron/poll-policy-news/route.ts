@@ -2,15 +2,18 @@
 // sources, stores every new item in news_items (dedupe by URL, a real DB
 // unique constraint, plus a title-hash check for the same story appearing
 // at two different URLs), and drafts one marketing_queue row per owned
-// channel (x, threads) for anything not already processed. Same bearer-
-// secured-cron pattern as poll-marketing-sources/poll-aliases
-// (isAuthorizedCronRequest, cron-job.org + ADMIN_DIAG_SECRET both accepted).
+// channel (x, threads, facebook -- facebook added round 90 follow-up,
+// Sep 18) for anything not already processed. Same bearer-secured-cron
+// pattern as poll-marketing-sources/poll-aliases (isAuthorizedCronRequest,
+// GitHub Actions + ADMIN_DIAG_SECRET both accepted).
 //
-// mode: "auto_post" for every row this route creates -- x/threads are
-// owned channels, per SOCIAL_MEDIA_GUARDRAILS.md Section 0 (revised this
-// round -- see that file's own note on round 89's claim not actually
-// having been applied). Nothing posts without a real approval click in
-// /admin/marketing; this route only ever gets as far as "pending."
+// mode: "auto_post" for every row this route creates -- x/threads/
+// facebook (the Page, not Facebook groups) are owned channels, per
+// SOCIAL_MEDIA_GUARDRAILS.md Section 0. Nothing posts without a real
+// approval click in /admin/marketing, and while
+// marketingSettings.socialPostingEnabled is off (round 90 prep follow-up
+// master switch), not even that click actually posts -- see
+// approveForAutoPost's own comment (src/app/admin/marketing/actions.ts).
 //
 // English-only unless marketingSettings.spanishSocialEnabled is on
 // (Peter's Sep 15 decision, task doc Section 4) -- draftXThread/
@@ -27,7 +30,7 @@ import { isAuthorizedCronRequest } from "@/lib/auth/cron-auth";
 import { fetchWatcherItems } from "@/lib/marketing/news-watcher/fetch-watcher-items";
 import { matchKbMemoIds } from "@/lib/marketing/news-watcher/kb-match";
 import { staleVisaBulletinDestination } from "@/lib/marketing/news-watcher/visa-bulletin-check";
-import { draftXThread, draftThreadsPost, type DraftLocale } from "@/lib/marketing/draft-news-post";
+import { draftXThread, draftThreadsPost, draftFacebookPost, type DraftLocale } from "@/lib/marketing/draft-news-post";
 import { getSpanishSocialEnabled } from "@/lib/marketing/config";
 import { createHash } from "crypto";
 
@@ -46,7 +49,11 @@ async function draftAndQueue(
   item: { url: string; title: string; rawSummary: string; sourceName: string },
   locale: DraftLocale
 ): Promise<"drafted" | "escalated"> {
-  const [xDraft, threadsDraft] = await Promise.all([draftXThread(item, locale), draftThreadsPost(item, locale)]);
+  const [xDraft, threadsDraft, facebookDraft] = await Promise.all([
+    draftXThread(item, locale),
+    draftThreadsPost(item, locale),
+    draftFacebookPost(item, locale),
+  ]);
 
   let anyDrafted = false;
 
@@ -99,6 +106,39 @@ async function draftAndQueue(
       .insert(marketingQueue)
       .values({
         channel: "threads",
+        mode: "auto_post",
+        destination: item.url,
+        guardrailNotes: `Escalated (Section 4, sourcing over speed): the source material wasn't enough to draft a substantive, accurate post.`,
+        locale,
+        status: "escalated",
+      })
+      .onConflictDoNothing({ target: [marketingQueue.channel, marketingQueue.destination, marketingQueue.locale] });
+  }
+
+  // Round 90 follow-up (Sep 18) — Facebook Page, same auto_post shape as
+  // x/threads above. Facebook *group* posts (a different set of rows,
+  // created elsewhere with mode "manual_post") are unaffected -- this
+  // only ever creates Page-post rows.
+  if (facebookDraft) {
+    anyDrafted = true;
+    await db
+      .insert(marketingQueue)
+      .values({
+        channel: "facebook",
+        mode: "auto_post",
+        destination: item.url,
+        draftText: facebookDraft.posts[0],
+        sourceCitations: `${item.sourceName} — ${item.url}`,
+        guardrailNotes: `Sourced directly from ${item.sourceName} (Section 4: LinkedIn/X/Threads). Posts to the CaseWhy Facebook Page.`,
+        locale,
+        status: "pending",
+      })
+      .onConflictDoNothing({ target: [marketingQueue.channel, marketingQueue.destination, marketingQueue.locale] });
+  } else {
+    await db
+      .insert(marketingQueue)
+      .values({
+        channel: "facebook",
         mode: "auto_post",
         destination: item.url,
         guardrailNotes: `Escalated (Section 4, sourcing over speed): the source material wasn't enough to draft a substantive, accurate post.`,

@@ -26,7 +26,7 @@
 import { generateText } from "ai";
 import { LINKS_ENABLED } from "./config";
 
-export type NewsChannel = "x" | "threads";
+export type NewsChannel = "x" | "threads" | "facebook";
 export type DraftLocale = "en" | "es";
 
 export interface NewsDraftResult {
@@ -100,6 +100,22 @@ export async function draftThreadsPost(item: NewsItemInput, locale: DraftLocale 
 Format: write ONE longer post (under 480 characters, Threads style) covering what changed, who it affects, and one concrete procedural detail. Output only the post text, nothing else.`;
 
   const raw = await generateOnce(instructions, `Draft the Threads post now.`);
+  if (raw.startsWith("CANNOT_DRAFT:")) return null;
+  if (!raw) return null;
+
+  const citation = locale === "es" ? `Fuente: ${item.sourceName} — ${item.url}` : `Source: ${item.sourceName} — ${item.url}`;
+  return { posts: [`${raw}\n\n${citation}`] };
+}
+
+// Round 90 follow-up (Sep 18) — Facebook Page post. Longer than Threads
+// (a Page update reads more like a short paragraph than a quick take),
+// still one post, same citation-appended shape as draftThreadsPost.
+export async function draftFacebookPost(item: NewsItemInput, locale: DraftLocale = "en"): Promise<NewsDraftResult | null> {
+  const instructions = `${baseInstructions(item, LINKS_ENABLED, locale)}
+
+Format: write ONE Facebook Page post (under 800 characters) covering what changed, who it affects, and enough concrete procedural detail to be genuinely useful on its own. Slightly more explanatory than a Threads post -- Facebook Page followers expect a bit more context, not just a quick take. Output only the post text, nothing else.`;
+
+  const raw = await generateOnce(instructions, `Draft the Facebook Page post now.`);
   if (raw.startsWith("CANNOT_DRAFT:")) return null;
   if (!raw) return null;
 

@@ -10,4 +10,4 @@
 // behind it. Keep this list in sync with registry.ts's POSTERS keys by
 // hand -- it's a plain array specifically so nothing here can re-import
 // server code.
-export const REGISTERED_POSTER_CHANNELS: string[] = ["blog", "x", "threads", "pinterest", "youtube"];
+export const REGISTERED_POSTER_CHANNELS: string[] = ["blog", "x", "threads", "pinterest", "youtube", "facebook"];

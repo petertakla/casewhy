@@ -40,11 +40,32 @@ async function libraryCrossCheck(): Promise<{ status: number; body: unknown }> {
   return { status: res.status, body };
 }
 
+// X credentials are plain ASCII (alphanumeric, base64url-ish). Anything
+// outside printable ASCII (0x20-0x7E) -- a zero-width space, smart quote,
+// non-breaking space, BOM -- would break OAuth 1.0a's exact-string
+// signing while looking completely normal on screen and passing the
+// plain trim()-based whitespace check. Reports only the offending
+// character's Unicode code point and index, never surrounding context,
+// so it stays safe to log without exposing the credential itself.
+function nonAsciiCheck(name: string): { name: string; clean: boolean; badChars: { index: number; codePoint: string }[] } {
+  const raw = process.env[name];
+  if (!raw) return { name, clean: true, badChars: [] };
+  const badChars: { index: number; codePoint: string }[] = [];
+  for (let i = 0; i < raw.length; i++) {
+    const code = raw.charCodeAt(i);
+    if (code < 0x20 || code > 0x7e) {
+      badChars.push({ index: i, codePoint: "U+" + code.toString(16).toUpperCase().padStart(4, "0") });
+    }
+  }
+  return { name, clean: badChars.length === 0, badChars };
+}
+
 export async function POST(request: Request) {
   if (!isAuthorizedCronRequest(request)) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
+  const nonAscii = ["X_API_KEY", "X_API_SECRET", "X_ACCESS_TOKEN", "X_ACCESS_TOKEN_SECRET"].map(nonAsciiCheck);
   const crossCheck = await libraryCrossCheck().catch((err) => ({
     status: -1,
     body: err instanceof Error ? err.message : String(err),
@@ -52,8 +73,8 @@ export async function POST(request: Request) {
 
   try {
     const result = await testXPost();
-    return Response.json({ ok: true, ...result, crossCheck });
+    return Response.json({ ok: true, ...result, crossCheck, nonAscii });
   } catch (err) {
-    return Response.json({ ok: false, error: err instanceof Error ? err.message : String(err), crossCheck }, { status: 200 });
+    return Response.json({ ok: false, error: err instanceof Error ? err.message : String(err), crossCheck, nonAscii }, { status: 200 });
   }
 }

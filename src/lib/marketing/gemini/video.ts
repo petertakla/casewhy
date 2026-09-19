@@ -246,6 +246,17 @@ export async function generateVideo(params: { videoScript: string; locale: strin
     const buffer = await readFile(finalPath);
     return { buffer, durationSeconds: scenes.length * VEO_CLIP_DURATION_SECONDS, estimatedCostUsd };
   } finally {
-    await rm(workDir, { recursive: true, force: true });
+    // A throw here would replace an already-successful `return buffer`
+    // above (finally's own exception-clobbers-return semantics) -- and
+    // fs.rm's recursive removal has a known Node.js TOCTOU race
+    // (ENOTEMPTY/EBUSY, confirmed live 2026-09-19) that a plain retry
+    // usually clears. workDir is inside the function's own ephemeral
+    // /tmp regardless, so a cleanup failure after retries costs nothing
+    // real -- log it, don't let it discard a real rendered video.
+    try {
+      await rm(workDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 150 });
+    } catch (cleanupErr) {
+      console.error("generateVideo: workDir cleanup failed (non-fatal)", cleanupErr);
+    }
   }
 }

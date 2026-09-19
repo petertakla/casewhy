@@ -25,21 +25,37 @@
 // assumed complete. Fixed with an explicit state-name map plus a D.C.
 // special case, re-verified to match exactly (43/64/66 for FY24/23/22).
 //
+// Round 117, Sep 19 — extended back to FY2011/FY2012 (47 new orgs, 22
+// existing orgs now correctly show an earlier award year too). Older
+// years have no per-org recipient PDF at all (confirmed: USCIS only
+// started publishing that format around FY2022) -- FY2011/2012 exist
+// only as real HTML press releases ("USCIS Announces FY20XX ... Grant
+// Program Recipients") with an Organization/Location table, no award
+// amount or description field. Since the two source types carry
+// different real information, source_citation is now per-record (falls
+// back to the FY2022-2024 default when a record doesn't specify one)
+// rather than one blanket constant, so a reader can tell which rows
+// have a real narrative description and which don't rather than the
+// citation silently overclaiming. FY2009-2010 and FY2013-2021 were not
+// found in an easily-verifiable structured or prose-table form this
+// round -- a real, disclosed gap, not assumed exhaustive.
+//
 // Usage:
-//   npx tsx scripts/seed-community-orgs.ts scripts/data/community-orgs-2026-09-09.json
+//   npx tsx scripts/seed-community-orgs.ts scripts/data/community-orgs-2026-09-19.json
 
 import { readFileSync } from "fs";
 import { getDb } from "../src/lib/db/client";
 import { communityOrgDirectory } from "../src/lib/db/schema";
 
-const SOURCE_CITATION =
+const DEFAULT_SOURCE_CITATION =
   "Sourced from USCIS's Citizenship and Integration Grant Program recipient records, FY2022-FY2024, pulled 09/09/26. This list reflects organizations that received this specific federal grant, not all community organizations.";
 
 interface SeedRecord {
   organization_name: string;
   city_state_zip: string;
+  source_citation?: string;
   state: string;
-  description: string;
+  description: string | null;
   fiscal_years_awarded: string;
 }
 
@@ -84,7 +100,7 @@ async function main() {
       description: r.description,
       fiscalYearsAwarded: r.fiscal_years_awarded,
       dataSource: "uscis_cigp",
-      sourceCitation: SOURCE_CITATION,
+      sourceCitation: r.source_citation ?? DEFAULT_SOURCE_CITATION,
     });
   }
 

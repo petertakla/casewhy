@@ -4,7 +4,6 @@ import { getDb } from "@/lib/db/client";
 import { subscriptions } from "@/lib/db/schema";
 import { TIER_LIMITS } from "@/lib/billing/tier";
 import { getLiveSubscriptionDetail } from "@/lib/billing/live-subscription";
-import { openBillingPortal } from "@/app/plus/actions";
 import { PlusBadge } from "@/components/PlusBadge";
 
 function formatMoney(amountCents: number, currency: string): string {
@@ -92,14 +91,12 @@ export async function PlanSection({ userId, es }: { userId: string; es: boolean 
             {es ? "Tu último pago no se procesó." : "Your last payment didn't go through."}
           </p>
         )}
-        <form action={openBillingPortal} className="mt-3">
-          <button
-            type="submit"
-            className="rounded-lg border border-border-strong px-4 py-2 text-xs font-semibold text-foreground transition-colors hover:border-brand-500"
-          >
-            {es ? "Administrar suscripción" : "Manage subscription"}
-          </button>
-        </form>
+        <Link
+          href={es ? "/es/plus/manage" : "/plus/manage"}
+          className="mt-3 inline-block rounded-lg border border-border-strong px-4 py-2 text-xs font-semibold text-foreground transition-colors hover:border-brand-500"
+        >
+          {es ? "Administrar plan" : "Manage plan"}
+        </Link>
       </div>
     </section>
   );

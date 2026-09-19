@@ -9,7 +9,7 @@ import {
   type EffectivePrice,
   type PlanId,
 } from "@/lib/billing/pricing";
-import { startCheckout, openBillingPortal } from "@/app/plus/actions";
+import { startCheckout } from "@/app/plus/actions";
 import { ShareButton } from "@/components/ShareButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { PlusBadge } from "@/components/PlusBadge";
@@ -285,15 +285,12 @@ export default async function PlusPageEs({
 
       {isPlus ? (
         <div className="mt-6">
-          <form action={openBillingPortal}>
-            <FormSubmitButton
-              pendingLabel="Abriendo facturación…"
-              waitingLabel="Aún esperando a Stripe…"
-              className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              Administrar suscripción
-            </FormSubmitButton>
-          </form>
+          <Link
+            href="/es/plus/manage"
+            className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-600"
+          >
+            Administrar plan
+          </Link>
         </div>
       ) : (
         <>
@@ -325,8 +322,10 @@ export default async function PlusPageEs({
             </div>
           )}
           <p className="mt-4 text-xs text-muted">
-            Sin reembolsos, sin prorrateo — cancela cuando quieras y mantendrás
-            el acceso hasta el final de tu período de facturación actual.
+            Cancela cuando quieras y mantendrás el acceso hasta el final de tu
+            período de facturación actual — sin reembolso por tiempo no
+            usado. Cambiar entre planes más adelante se prorratea
+            automáticamente.
           </p>
 
           <div className="mt-8 grid grid-cols-1 gap-4 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6 sm:grid-cols-2">

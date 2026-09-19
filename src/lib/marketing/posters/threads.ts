@@ -43,6 +43,25 @@ export const postToThreads: Poster = async (item) => {
     throw new Error(`Threads API error creating container (${createRes.status}): ${createData.error?.message ?? "unknown"}`);
   }
 
+  // The container processes asynchronously even for plain text -- publishing
+  // immediately after create fails with "The requested resource does not
+  // exist" (confirmed live 2026-09-19), the same class of bug instagram.ts
+  // hit for images. Always poll status until FINISHED, never assume ready.
+  let ready = false;
+  for (let attempt = 0; attempt < 10 && !ready; attempt++) {
+    await new Promise((r) => setTimeout(r, 2000));
+    const statusRes = await fetch(
+      `${THREADS_API_BASE}/${createData.id}?fields=status,error_message&access_token=${encodeURIComponent(accessToken)}`
+    );
+    const statusData = (await statusRes.json()) as { status?: string; error_message?: string };
+    if (statusData.status === "FINISHED") {
+      ready = true;
+    } else if (statusData.status === "ERROR") {
+      throw new Error(`Threads container failed to process: ${statusData.error_message ?? "unknown"}`);
+    }
+  }
+  if (!ready) throw new Error("Threads container still processing after the polling window -- try again shortly.");
+
   const publishRes = await fetch(
     `${THREADS_API_BASE}/${userId}/threads_publish?creation_id=${encodeURIComponent(createData.id)}&access_token=${encodeURIComponent(accessToken)}`,
     { method: "POST" }

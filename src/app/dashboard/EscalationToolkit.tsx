@@ -11,6 +11,7 @@ import {
   draftMyEscalationLetter,
   type RepresentativesResult,
 } from "../escalation/actions";
+import { OFFICIAL_HOUSE_LOOKUP_URL } from "@/lib/congress/representatives";
 
 type LetterType = "congressional" | "field_office" | "ombudsman";
 
@@ -29,8 +30,11 @@ const LETTER_LABELS_ES: Record<LetterType, string> = {
 /**
  * CW-39, Part B — CaseWhy Plus only. Save a mailing address once, look up
  * a representative from it, then draft one of three escalation letters
- * for this tracked case. See src/lib/congress/representatives.ts for the
- * (deliberately partial — Florida pilot only) coverage this pass shipped.
+ * for this tracked case. src/lib/congress/representatives.ts has covered
+ * all 50 states (100 senators + 435 House seats) since Sep 6 -- DC and
+ * the territories are the real remaining gap, not "Florida only" (round
+ * 115, Part 3: the copy below still said Florida-pilot-only, stale since
+ * national coverage shipped).
  */
 export function EscalationToolkit({
   trackedCaseId,
@@ -243,8 +247,8 @@ export function EscalationToolkit({
             <p className="mt-2 text-xs text-muted">
               {es ? (
                 <>
-                  CaseWhy aún no cubre tu área (este piloto solo cubre a los senadores de la Florida y el
-                  2do distrito). Usa las herramientas oficiales de búsqueda de la{" "}
+                  CaseWhy no pudo determinar tu representante (Washington D.C. y los territorios de EE.UU.
+                  aún no están cubiertos). Usa las herramientas oficiales de búsqueda de la{" "}
                   <a
                     href="https://www.house.gov/representatives/find-your-representative"
                     target="_blank"
@@ -266,8 +270,8 @@ export function EscalationToolkit({
                 </>
               ) : (
                 <>
-                  CaseWhy doesn&apos;t have your area covered yet (this pilot only covers Florida&apos;s
-                  senators and 2nd district). Use the official{" "}
+                  CaseWhy couldn&apos;t resolve your representative (Washington D.C. and U.S. territories
+                  aren&apos;t covered yet). Use the official{" "}
                   <a
                     href="https://www.house.gov/representatives/find-your-representative"
                     target="_blank"
@@ -321,13 +325,30 @@ export function EscalationToolkit({
                         <p className="mt-0.5 text-xs text-muted">
                           {r.phone} ·{" "}
                           <a
-                            href={r.website}
+                            href={r.contactFormUrl ?? r.website}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
                             className="text-brand-600 hover:underline dark:text-brand-400"
                           >
-                            {es ? "Sitio web" : "Website"}
+                            {/* Round 115, Part 3 — most House entries don't
+                                have a verified per-member site yet (see
+                                representatives.ts's own header note) and
+                                fall back to the generic house.gov finder
+                                stored directly in `website`. Labeling that
+                                case honestly instead of calling it
+                                "Website" as if it were r's own page --
+                                same fallback link, just not presented as
+                                something it isn't. Senators and the one
+                                verified House entry (FL-02) always show
+                                the real label. */}
+                            {r.website === OFFICIAL_HOUSE_LOOKUP_URL
+                              ? es
+                                ? "Buscar por dirección (house.gov)"
+                                : "Look up by address (house.gov)"
+                              : es
+                                ? "Sitio web"
+                                : "Website"}
                           </a>
                         </p>
                       </span>

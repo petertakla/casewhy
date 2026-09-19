@@ -68,7 +68,19 @@ export function DashboardSearchArea({
           <PendingButton
             type="submit"
             pending={isPending}
-            pendingLabel={es ? "Consultando…" : "Looking up…"}
+            pendingLabel={
+              // Round 115, Part 2 — the pending label named a receipt
+              // number in the task doc's own verify step ("Looking up… B"
+              // throughout); include the target receipt when known so the
+              // button and skeleton agree on what's actually loading.
+              displayedReceipt
+                ? es
+                  ? `Consultando ${displayedReceipt}…`
+                  : `Looking up ${displayedReceipt}…`
+                : es
+                  ? "Consultando…"
+                  : "Looking up…"
+            }
             waitingLabel={es ? "Aún esperando a USCIS…" : "Still waiting on USCIS…"}
             className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70"
           >
@@ -86,7 +98,15 @@ export function DashboardSearchArea({
         </p>
       </form>
       {trackedCasesSlot}
-      {isPending ? <ResultSkeleton /> : children}
+      {isPending ? (
+        <ResultSkeleton
+          titleText={
+            displayedReceipt ? (es ? `Consultando ${displayedReceipt}…` : `Looking up ${displayedReceipt}…`) : undefined
+          }
+        />
+      ) : (
+        children
+      )}
     </>
   );
 }

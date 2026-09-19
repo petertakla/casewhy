@@ -15,6 +15,7 @@
 // callback page to copy into env). Until all three env vars exist, this
 // poster throws a clear "not configured" error.
 
+import { Readable } from "node:stream";
 import { google } from "googleapis";
 import type { Poster } from "./types";
 import { isUnconfigured } from "./env";
@@ -64,7 +65,11 @@ export const postToYoutube: Poster = async (item) => {
       },
       status: { privacyStatus: "public", selfDeclaredMadeForKids: false },
     },
-    media: { body: videoRes.body as unknown as NodeJS.ReadableStream },
+    // fetch()'s response.body is a Web ReadableStream, but googleapis'
+    // media.body needs a Node.js stream with a real .pipe() -- passing
+    // the web stream directly fails with "b.body.pipe is not a function"
+    // (confirmed live 2026-09-19). Readable.fromWeb bridges the two.
+    media: { body: Readable.fromWeb(videoRes.body as import("stream/web").ReadableStream<Uint8Array>) },
   });
 
   const videoId = insertRes.data.id;

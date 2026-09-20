@@ -892,6 +892,14 @@ export const emailAliasConfigs = pgTable("email_alias_configs", {
   pollIntervalMinutes: integer("poll_interval_minutes").notNull(),
   actionLevel: aliasActionLevelEnum("action_level").notNull().default("draft_only"),
   enabled: boolean("enabled").notNull().default(true),
+  // Round 119 — free-text field either side of the Cloud/Code handoff can
+  // write to and the other will see, right next to the row it's about
+  // (e.g. Cloud: "billing@ volume tripled this week, consider tightening
+  // the interval" / Code: "found 3 duplicate replies Tuesday, see round
+  // 119 follow-up"). Deliberately not structured/typed -- CLOUD_CLAUDE.md
+  // stays the authoritative build log; this is a fast, per-row scratch
+  // note, not a second history.
+  notes: text("notes"),
   // Null until the poller's first real run against this alias.
   lastPolledAt: timestamp("last_polled_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -1135,6 +1143,46 @@ export const marketingChannelEnum = pgEnum("marketing_channel", [
 // action click can ever call a post/publish API, never the
 // queue-population step itself.
 export const marketingModeEnum = pgEnum("marketing_mode", ["manual_post", "auto_post"]);
+
+// Round 119 — per-channel config for the social side of the ops console,
+// the same "editable without a code change" pattern round 70's
+// emailAliasConfigs already established for the mail side (task doc's
+// own explicit instruction: build on the existing alias-config and
+// marketing-queue systems, not new infrastructure). Replaces the
+// hardcoded CHANNEL_MODE map in gemini/render-brief.ts and the hardcoded
+// "auto_post" every news/evergreen insert call used to pass directly.
+//
+// One real, deliberate carve-out: "facebook" is never mode-overridden by
+// this table anywhere. The channel enum value "facebook" means two
+// different things depending on call site -- the owned Page (round 90
+// follow-up, genuinely auto_post) and Facebook Groups (guardrails
+// Section 0: community/group channels are always manual_post, no
+// exception, regardless of what could technically post). One config row
+// can't safely represent both, so every call site keeps deciding
+// facebook's mode itself; only `enabled` (and the interval throttle) is
+// ever read from this table for facebook. The mode column still exists
+// on its row for display/documentation, not enforcement.
+export const socialChannelConfigs = pgTable("social_channel_configs", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  channel: marketingChannelEnum("channel").notNull().unique(),
+  // "Frequency" in the ops console: a minimum number of minutes between
+  // drafts for this channel, checked against marketingQueue's own most
+  // recent row for that channel -- a throttle layered on top of each
+  // route's existing (fixed, cron.yml-scheduled) polling cadence, not a
+  // replacement for it. 0 means no throttle beyond the route's own
+  // schedule, which is every existing channel's real behavior today --
+  // seeded that way so adding this table changes nothing until Peter
+  // actually raises one.
+  minIntervalMinutes: integer("min_interval_minutes").notNull().default(0),
+  mode: marketingModeEnum("mode").notNull().default("manual_post"),
+  enabled: boolean("enabled").notNull().default(true),
+  // Same bi-directional scratch-note idea as emailAliasConfigs.notes above.
+  notes: text("notes"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
 
 export const marketingQueueStatusEnum = pgEnum("marketing_queue_status", [
   "pending",

@@ -11,6 +11,7 @@ import { generateImage } from "./image";
 import { generateVideo } from "./video";
 import { uploadMarketingAsset } from "./storage";
 import { SHORT_VIDEO_MAX_SECONDS } from "./config";
+import { getSocialChannelConfig, isChannelPostable } from "../channel-config";
 
 const FORMATS = ["pin", "short_video", "square_graphic", "story"] as const;
 
@@ -43,17 +44,22 @@ async function nextDueBrief(format: (typeof FORMATS)[number]) {
   return row;
 }
 
-// pinterest/youtube/tiktok/instagram: auto_post -- a real poster is
-// registered for each (gated on Peter's own credentials/authorization,
-// same "poster exists, credentials might not yet" pattern as round 90's
-// X/Threads). tiktok added round 91A follow-up (Sep 18) once a real
-// TikTok developer app + Content Posting API integration existed.
-// instagram added same day, once the round 90/91 "Meta platform gap"
-// diagnosis turned out to be a missing permission scope, not a real
+// pinterest/youtube/tiktok/instagram: auto_post by default -- a real
+// poster is registered for each (gated on Peter's own credentials/
+// authorization, same "poster exists, credentials might not yet" pattern
+// as round 90's X/Threads). tiktok added round 91A follow-up (Sep 18)
+// once a real TikTok developer app + Content Posting API integration
+// existed. instagram added same day, once the round 90/91 "Meta platform
+// gap" diagnosis turned out to be a missing permission scope, not a real
 // gap -- see instagram.ts's own comment.
 // facebook: guardrails Section 0 -- community/group channels are always
 // manual_post, no exception, regardless of whether a poster could exist.
-const CHANNEL_MODE: Record<string, "auto_post" | "manual_post"> = {
+// This specific target-channel entry is the *group* case (the owned
+// Page's own posts are queued separately, by poll-policy-news/the
+// evergreen fallback) -- kept as a hardcoded fallback below, never
+// overridden by social_channel_configs (see that table's own comment on
+// why facebook's mode is never config-driven).
+const FALLBACK_CHANNEL_MODE: Record<string, "auto_post" | "manual_post"> = {
   pinterest: "auto_post",
   youtube: "auto_post",
   tiktok: "auto_post",
@@ -70,8 +76,16 @@ async function createQueueItemsForBrief(
   const db = getDb();
   const channels = brief.targetChannels.split(",").map((c) => c.trim()).filter(Boolean);
   for (const channel of channels) {
-    const mode = CHANNEL_MODE[channel];
-    if (!mode) continue; // an unrecognized channel in targetChannels is skipped, not guessed at
+    const fallbackMode = FALLBACK_CHANNEL_MODE[channel];
+    if (!fallbackMode) continue; // an unrecognized channel in targetChannels is skipped, not guessed at
+
+    // Round 119 — facebook's mode is never config-driven (group posts are
+    // always manual_post, full stop); every other channel here reads its
+    // real mode from social_channel_configs, falling back to the table
+    // above only if no config row exists yet. enabled/frequency apply to
+    // every channel including facebook.
+    if (!(await isChannelPostable(channel))) continue;
+    const mode = channel === "facebook" ? fallbackMode : (await getSocialChannelConfig(channel)).mode;
     await db
       .insert(marketingQueue)
       .values({

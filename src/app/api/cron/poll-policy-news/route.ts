@@ -33,6 +33,7 @@ import { staleVisaBulletinDestination } from "@/lib/marketing/news-watcher/visa-
 import { draftXThread, draftThreadsPost, draftFacebookPost, type DraftLocale } from "@/lib/marketing/draft-news-post";
 import { getSpanishSocialEnabled } from "@/lib/marketing/config";
 import { ensureEvergreenForDate } from "@/lib/marketing/evergreen/generate-weekday-evergreen";
+import { isChannelPostable } from "@/lib/marketing/channel-config";
 import { createHash } from "crypto";
 
 export const maxDuration = 60;
@@ -50,10 +51,20 @@ async function draftAndQueue(
   item: { url: string; title: string; rawSummary: string; sourceName: string },
   locale: DraftLocale
 ): Promise<"drafted" | "escalated"> {
+  // Round 119 — checked before the LLM call, not after: a disabled
+  // channel costs nothing beyond this one query, and simply isn't
+  // touched at all (no row, not even an "escalated" placeholder --
+  // disabling a channel means leave it alone, not flag it as broken).
+  const [xOn, threadsOn, facebookOn] = await Promise.all([
+    isChannelPostable("x"),
+    isChannelPostable("threads"),
+    isChannelPostable("facebook"),
+  ]);
+
   const [xDraft, threadsDraft, facebookDraft] = await Promise.all([
-    draftXThread(item, locale),
-    draftThreadsPost(item, locale),
-    draftFacebookPost(item, locale),
+    xOn ? draftXThread(item, locale) : null,
+    threadsOn ? draftThreadsPost(item, locale) : null,
+    facebookOn ? draftFacebookPost(item, locale) : null,
   ]);
 
   let anyDrafted = false;
@@ -73,7 +84,7 @@ async function draftAndQueue(
         status: "pending",
       })
       .onConflictDoNothing({ target: [marketingQueue.channel, marketingQueue.destination, marketingQueue.locale] });
-  } else {
+  } else if (xOn) {
     await db
       .insert(marketingQueue)
       .values({
@@ -102,7 +113,7 @@ async function draftAndQueue(
         status: "pending",
       })
       .onConflictDoNothing({ target: [marketingQueue.channel, marketingQueue.destination, marketingQueue.locale] });
-  } else {
+  } else if (threadsOn) {
     await db
       .insert(marketingQueue)
       .values({
@@ -135,7 +146,7 @@ async function draftAndQueue(
         status: "pending",
       })
       .onConflictDoNothing({ target: [marketingQueue.channel, marketingQueue.destination, marketingQueue.locale] });
-  } else {
+  } else if (facebookOn) {
     await db
       .insert(marketingQueue)
       .values({

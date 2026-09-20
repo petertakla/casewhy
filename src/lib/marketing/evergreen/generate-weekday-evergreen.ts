@@ -14,6 +14,7 @@ import { marketingQueue } from "@/lib/db/schema";
 import { draftEvergreenXThread, draftEvergreenThreadsPost, draftEvergreenFacebookPost } from "../draft-evergreen-post";
 import { generateImage } from "../gemini/image";
 import { uploadMarketingAsset } from "../gemini/storage";
+import { isChannelPostable } from "../channel-config";
 import { WEEKDAY_EVERGREEN_TYPE, NEWS_AWARE_WEEKDAYS, buildTopicForType, buildRecapTopic, type EvergreenType, type EvergreenTopicWithImage } from "./topics";
 
 // 10am ET (UTC-4 during EDT, which covers this rollout window) -- a fixed,
@@ -59,10 +60,20 @@ async function queueTopic(db: ReturnType<typeof getDb>, type: EvergreenType | "r
   const destination = `evergreen:${type}:${dateKey(date)}`;
   const scheduledFor = scheduledForDate(date);
 
+  // Round 119 — same per-channel enabled/frequency gate as poll-policy-
+  // news, checked before any drafting so a disabled channel costs
+  // nothing (no LLM call, no image generation).
+  const [xOn, threadsOn, facebookOn, instagramOn] = await Promise.all([
+    isChannelPostable("x"),
+    isChannelPostable("threads"),
+    isChannelPostable("facebook"),
+    isChannelPostable("instagram"),
+  ]);
+
   const [xDraft, threadsDraft, facebookDraft] = await Promise.all([
-    draftEvergreenXThread(item),
-    draftEvergreenThreadsPost(item),
-    draftEvergreenFacebookPost(item),
+    xOn ? draftEvergreenXThread(item) : null,
+    threadsOn ? draftEvergreenThreadsPost(item) : null,
+    facebookOn ? draftEvergreenFacebookPost(item) : null,
   ]);
 
   const citation = item.sourceUrl ? `${item.sourceName} — ${item.sourceUrl}` : item.sourceName;
@@ -101,7 +112,7 @@ async function queueTopic(db: ReturnType<typeof getDb>, type: EvergreenType | "r
   // text draft succeeded (Facebook's own length/tone is the closest fit
   // for an Instagram caption) -- no separate caption-drafting call.
   const caption = facebookDraft?.posts[0] ?? threadsDraft?.posts[0] ?? xDraft?.posts[0];
-  if (caption) {
+  if (caption && instagramOn) {
     try {
       const image = await generateImage({
         imagePrompt: item.imagePrompt,

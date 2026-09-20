@@ -1,34 +1,11 @@
 import { redirect } from "next/navigation";
-import { asc } from "drizzle-orm";
-import { auth } from "@/lib/auth/server";
-import { isAdminEmail } from "@/lib/auth/admin";
-import { getDb } from "@/lib/db/client";
-import { emailAliasConfigs } from "@/lib/db/schema";
-import { AliasConfigRow } from "./AliasConfigRow";
 
-export const dynamic = "force-dynamic";
-
-export default async function AdminAliasesPage() {
-  const { data: session } = await auth.getSession();
-  if (!isAdminEmail(session?.user?.email)) {
-    redirect("/");
-  }
-
-  const db = getDb();
-  const configs = await db.select().from(emailAliasConfigs).orderBy(asc(emailAliasConfigs.alias));
-
-  return (
-    <div>
-      <h1 className="text-2xl font-bold tracking-tight">Alias monitoring config</h1>
-      <p className="mb-8 mt-2 text-muted">
-        Per-alias poll interval and action level — edits apply on the next poll, no code change needed.
-      </p>
-
-      <div className="space-y-3">
-        {configs.map((config) => (
-          <AliasConfigRow key={config.id} {...config} />
-        ))}
-      </div>
-    </div>
-  );
+// Round 119 — this page's own two fields (poll interval, action level)
+// are now one section of the consolidated /admin/ops console, alongside
+// the new social-channels table and both tables' notes/pending-count
+// additions. Redirected rather than left as an orphaned duplicate editing
+// surface for the same emailAliasConfigs rows (round 98's own "a page
+// that isn't in the registry, or duplicates another, isn't done" rule).
+export default function AdminAliasesRedirect() {
+  redirect("/admin/ops");
 }

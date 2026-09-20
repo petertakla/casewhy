@@ -89,13 +89,6 @@ export const ADMIN_NAV: AdminNavEntry[] = [
     hasPendingCount: true,
   },
   {
-    href: "/admin/aliases",
-    label: "Alias config",
-    labelEs: "Configuración de alias",
-    group: "Mail",
-    description: "Poll interval and action level for each of the 12 response aliases.",
-  },
-  {
     href: "/admin/backlink-outreach",
     label: "Backlink drafts",
     labelEs: "Borradores de enlaces",
@@ -129,6 +122,13 @@ export const ADMIN_NAV: AdminNavEntry[] = [
     group: "Ops",
     description: "Recurring tasks that need a real human step, e.g. the monthly processing-times refresh.",
     hasPendingCount: true,
+  },
+  {
+    href: "/admin/ops",
+    label: "Ops console",
+    labelEs: "Consola de operaciones",
+    group: "Ops",
+    description: "Poll interval, review mode, start/stop, and notes for every email alias and social channel.",
   },
 ];
 

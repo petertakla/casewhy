@@ -8,6 +8,21 @@ import { and, eq, gte, lt, ne, or, isNull } from "drizzle-orm";
 import type { getDb } from "@/lib/db/client";
 import { marketingQueue, newsItems } from "@/lib/db/schema";
 import type { EvergreenItemInput } from "../draft-evergreen-post";
+
+/** Adds the visual-generation fields used for the Instagram square graphic (round 116 follow-up, adding Instagram to the evergreen fallback). */
+export interface EvergreenTopicWithImage extends EvergreenItemInput {
+  imagePrompt: string;
+  // Short (<40 char) headline for the image's own rendered text -- kept
+  // separate from `title` (used for the post copy/prompt context, and
+  // often much longer) after a real legibility bug: the image model
+  // reliably garbles/duplicates long headlines ("Where the Visa
+  // Bulletin's Final Action Dates stand for September 2026" rendered as
+  // "Final Doton Datie st September 20' September 2026") but renders a
+  // short one cleanly every time -- confirmed by comparing this exact
+  // topic's garbled render against the recap's own short title, which
+  // came out perfectly legible on the same run.
+  imageHeadline: string;
+}
 import { VISA_BULLETIN_MONTH, VISA_BULLETIN_SOURCE_URL, FAMILY_FINAL_ACTION, EMPLOYMENT_FINAL_ACTION, bulletinDateLabel } from "@/lib/kb/visa-bulletin";
 import { PROCESSING_TIMES, PROCESSING_TIMES_SOURCE_URL } from "@/lib/kb/processing-times";
 import { findPolicyMemoById } from "@/lib/kb/policy-memos";
@@ -29,7 +44,7 @@ export const WEEKDAY_EVERGREEN_TYPE: Record<number, EvergreenType> = {
 // topic regardless of what the news watcher found that day.
 export const NEWS_AWARE_WEEKDAYS = new Set([1, 4]);
 
-export function buildVisaBulletinTopic(): EvergreenItemInput {
+export function buildVisaBulletinTopic(): EvergreenTopicWithImage {
   const f2a = FAMILY_FINAL_ACTION.find((r) => r.category === "F2A")!;
   const eb2 = EMPLOYMENT_FINAL_ACTION.find((r) => r.category === "EB-2")!;
   const eb3 = EMPLOYMENT_FINAL_ACTION.find((r) => r.category === "EB-3")!;
@@ -43,10 +58,13 @@ export function buildVisaBulletinTopic(): EvergreenItemInput {
     facts,
     sourceName: "U.S. Department of State, Visa Bulletin",
     sourceUrl: VISA_BULLETIN_SOURCE_URL,
+    imagePrompt:
+      "A clean, modern infographic-style background: an abstract calendar/timeline motif with a subtle world map watermark, blue and white tones, professional and calm. No text or numbers rendered in the background itself.",
+    imageHeadline: `Visa Bulletin: ${VISA_BULLETIN_MONTH}`,
   };
 }
 
-export function buildFaqExplainerTopic(): EvergreenItemInput {
+export function buildFaqExplainerTopic(): EvergreenTopicWithImage {
   const entry = FAQ_SEARCH_ENTRIES.find((e) => e.question.startsWith('What does "Case Was Received"'))!;
   const facts = `A common point of confusion: ${entry.snippet} Receiving that initial status is not, by itself, evidence of a delay -- a case is only "outside normal processing time" once it has waited longer than the range USCIS itself currently publishes for that specific form and office.`;
   return {
@@ -54,10 +72,13 @@ export function buildFaqExplainerTopic(): EvergreenItemInput {
     facts,
     sourceName: "USCIS Check Case Processing Times",
     sourceUrl: PROCESSING_TIMES_SOURCE_URL,
+    imagePrompt:
+      "A clean, friendly illustration of a person looking calmly at a phone showing a simple status checklist, soft blue/green palette, reassuring tone. No text rendered in the illustration itself.",
+    imageHeadline: `"Case Was Received" Explained`,
   };
 }
 
-export function buildProcessingTimeTopic(): EvergreenItemInput {
+export function buildProcessingTimeTopic(): EvergreenTopicWithImage {
   const entry = PROCESSING_TIMES.find((e) => e.id === "i751-removing-conditions")!;
   const facts = `USCIS's own Check Case Processing Times tool (as of ${entry.asOf}) shows the 80th-percentile processing time for Form ${entry.formType} (${entry.categoryLabel}, adjudicated by ${entry.office}) at ${entry.percentile80Months} months. That means roughly 1 in 5 cases in this category is taking even longer than that. This is USCIS's own published figure, not an estimate.`;
   return {
@@ -65,20 +86,26 @@ export function buildProcessingTimeTopic(): EvergreenItemInput {
     facts,
     sourceName: "USCIS Check Case Processing Times",
     sourceUrl: PROCESSING_TIMES_SOURCE_URL,
+    imagePrompt:
+      "A clean infographic-style background with an abstract clock/hourglass motif suggesting time passing, muted professional blue/gray tones. No text or numbers rendered in the background itself.",
+    imageHeadline: `I-751: ${entry.percentile80Months} Months`,
   };
 }
 
-export function buildPolicyMemoTopic(): EvergreenItemInput {
+export function buildPolicyMemoTopic(): EvergreenTopicWithImage {
   const memo = findPolicyMemoById("public-charge-2026")!;
   return {
     title: memo.title,
     facts: `${memo.summary} Current status: ${memo.currentStatus}`,
     sourceName: memo.sourceTitle,
     sourceUrl: memo.sourceUrl,
+    imagePrompt:
+      "A clean, neutral illustration suggesting official government paperwork being reviewed -- a document and a magnifying glass or checkmark, professional blue/gray palette. No text rendered in the illustration itself.",
+    imageHeadline: "New Public Charge Guidance",
   };
 }
 
-export function buildTopicForType(type: EvergreenType): EvergreenItemInput {
+export function buildTopicForType(type: EvergreenType): EvergreenTopicWithImage {
   switch (type) {
     case "visa-bulletin":
       return buildVisaBulletinTopic();
@@ -112,7 +139,7 @@ function mondayOfWeek(date: Date): Date {
  * preempted by real news. Returns null if nothing was queued yet (e.g.
  * a brand new week with no prior days processed).
  */
-export async function buildRecapTopic(db: ReturnType<typeof getDb>, fridayDate: Date): Promise<EvergreenItemInput | null> {
+export async function buildRecapTopic(db: ReturnType<typeof getDb>, fridayDate: Date): Promise<EvergreenTopicWithImage | null> {
   const weekStart = mondayOfWeek(fridayDate);
   // A row's "which day this belongs to" is scheduledFor when set (the
   // evergreen fallback -- which may have been queued well before its own
@@ -159,5 +186,8 @@ export async function buildRecapTopic(db: ReturnType<typeof getDb>, fridayDate: 
     // No sourceUrl -- this summarizes CaseWhy's own week of posts, not an
     // external primary source.
     isRecap: true,
+    imagePrompt:
+      "A clean, friendly 'weekly wrap-up' style background with a subtle calendar-week motif, warm accent color, calm and organized feel. No text rendered in the background itself.",
+    imageHeadline: "This Week's Recap",
   };
 }

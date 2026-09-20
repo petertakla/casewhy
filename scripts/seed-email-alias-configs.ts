@@ -25,6 +25,17 @@ const ALIASES: Array<{
   { alias: "billing", purpose: "CaseWhy Plus payment/subscription questions", gmailLabel: "Alias/Billing", pollIntervalMinutes: 30, actionLevel: "draft_only" },
   { alias: "feedback", purpose: "Feature requests / general feedback", gmailLabel: "Alias/Feedback", pollIntervalMinutes: 1440, actionLevel: "draft_only" },
   { alias: "accessibility", purpose: "ADA/accessibility complaints", gmailLabel: "Alias/Accessibility", pollIntervalMinutes: 30, actionLevel: "draft_only" },
+  // Round 119 follow-up (Peter: "every alias must be monitored") --
+  // hello@ and social@ both pre-date round 70 (hello@ from the original
+  // Sep 4 mail routing, social@ added round 89 alongside press@) and both
+  // already have a real Workspace alias + Gmail filter, but neither was
+  // ever added to this config table, so poll-aliases has never actually
+  // watched them. Labels use the current post-round-87 hierarchy
+  // (Public/*, Social Media/*), not the stale "Alias/*" style the
+  // original 12 above show in this file's own historical array --
+  // matching what's actually live today, not what round 70 first wrote.
+  { alias: "hello", purpose: "General inquiries via the primary public contact address", gmailLabel: "Public/Hello", pollIntervalMinutes: 60, actionLevel: "draft_only" },
+  { alias: "social", purpose: "General social-media-related inquiries or mentions", gmailLabel: "Social Media/Other", pollIntervalMinutes: 60, actionLevel: "draft_only" },
 ];
 
 async function main() {

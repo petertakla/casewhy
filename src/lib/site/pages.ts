@@ -309,6 +309,24 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
     menuLabel: "FAQ",
     menuLabelEs: "Preguntas frecuentes",
   },
+  // Round 124 — the new Help Center, alongside /faq per the task's own
+  // "add /help alongside wherever /faq is already linked from" instruction.
+  // English-only this round (matching round 120's own scoping decision for
+  // the admin side) -- switcherExempt with a reason, same pattern every
+  // other deliberately-English-only entry already uses, so round 105's CI
+  // switcher check reads this as a decision, not a gap.
+  {
+    href: "/help",
+    label: "How-To Guides — step-by-step help using CaseWhy",
+    section: "Reference",
+    showInIndex: true,
+    showInFooter: true,
+    showInSitemapXml: true,
+    showInHeaderMenu: true,
+    menuLabel: "How-To Guides",
+    switcherExempt: true,
+    switcherExemptReason: "New in round 124, English-only content this round — no Spanish version yet.",
+  },
   // Not shown on the index itself (no self-link), but it IS one of the
   // footer's 10 links per the task doc's explicit list.
   {

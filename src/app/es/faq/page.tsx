@@ -341,7 +341,17 @@ export default function FaqPageEs() {
       <h1 className="text-2xl font-bold tracking-tight">
         Preguntas frecuentes
       </h1>
-      <p className="mb-8 mt-2 text-muted">
+      <p className="mb-2 mt-2 text-muted">
+        ¿Busca una guía paso a paso en su lugar? Consulte el{" "}
+        <Link
+          href="/help"
+          className="text-brand-600 hover:underline dark:text-brand-400"
+        >
+          Guías de Cómo Hacerlo
+        </Link>{" "}
+        (en inglés).
+      </p>
+      <p className="mb-8 text-muted">
         Las preguntas más comunes sobre CaseWhy. Para más detalles, consulte los{" "}
         <a
           href="https://casewhy.com/terms.html"

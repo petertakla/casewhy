@@ -21,6 +21,7 @@ const ROOT = process.cwd();
 const HREF_TO_FILE: Record<string, string> = {
   "/faq": "src/app/faq/page.tsx",
   "/es/faq": "src/app/es/faq/page.tsx",
+  "/help": "src/app/help/page.tsx",
   "/get-help": "src/app/get-help/page.tsx",
   "/es/get-help": "src/app/es/get-help/page.tsx",
   "/plus": "src/app/plus/page.tsx",

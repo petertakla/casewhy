@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "@/lib/auth/server";
+import { isAdminEmail } from "@/lib/auth/admin";
 import { getStalePolicies } from "@/lib/policy/acknowledgments";
 import {
   FIRST_TOUCH_COOKIE,
@@ -65,6 +66,24 @@ export async function middleware(request: NextRequest) {
   // /policy-update itself is excluded via the matcher below so the redirect
   // can't loop.
   const { data: session } = await auth.getSession();
+
+  // Round 124 follow-up — real bug found while building round 124: a
+  // page-level `redirect()` inside an async Server Component that ALSO
+  // exports metadata (static `metadata` or `generateMetadata()`) doesn't
+  // actually stop the response -- Next.js 15.5.25 still resolves and ships
+  // that page's own <title>/OG tags (confirmed live in production on
+  // /admin and /admin/updates: a signed-out request gets a real 200 with
+  // that admin page's own title, not the redirect target's). The page-
+  // level and layout-level isAdminEmail checks (round 98's own "layout is
+  // UX, page is the real boundary" rule) both stay in place as defense in
+  // depth, but neither is actually sufficient on its own against this
+  // specific framework behavior -- this middleware check is what actually
+  // stops it, by redirecting before any /admin/* page or its metadata
+  // resolution ever runs at all.
+  if (request.nextUrl.pathname.startsWith("/admin") && !isAdminEmail(session?.user?.email)) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
   if (session?.user) {
     const stale = await getStalePolicies(session.user.id, new Date(session.user.createdAt));
     if (stale.length > 0) {

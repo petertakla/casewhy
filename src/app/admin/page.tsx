@@ -28,7 +28,13 @@ export default async function AdminIndexPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold tracking-tight">Admin</h1>
-      <p className="mb-8 mt-2 text-muted">Every admin surface, in one place.</p>
+      <p className="mb-2 mt-2 text-muted">Every admin surface, in one place.</p>
+      <Link
+        href="/admin/how-to"
+        className="mb-8 inline-block rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-2 text-sm font-semibold text-brand-600 hover:border-brand-500/50 dark:text-brand-400"
+      >
+        New here? Start with the How-To guide →
+      </Link>
 
       <div className="space-y-8">
         {ADMIN_NAV_GROUPS.map((group) => (

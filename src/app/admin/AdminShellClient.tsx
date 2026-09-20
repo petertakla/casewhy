@@ -17,6 +17,7 @@ const GROUP_LABELS_ES: Record<(typeof ADMIN_NAV_GROUPS)[number], string> = {
   Outreach: "Contacto",
   Billing: "Facturación",
   Ops: "Operaciones",
+  Help: "Ayuda",
 };
 
 function useIsSpanish(): boolean {

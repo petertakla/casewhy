@@ -202,7 +202,7 @@ export async function downgradeToFreeAtPeriodEnd(): Promise<void> {
  * for actually flipping the account to Plus — a user can close the tab
  * before landing back here.
  *
- * Round 50 — takes which plan (monthly/quarterly/annual) was chosen, and
+ * Round 50 — takes which plan (monthly/6-month/annual) was chosen, and
  * builds the line item as inline Stripe `price_data` computed from
  * plan_prices + any active pricing_rules row (src/lib/billing/pricing.ts)
  * rather than a pre-created Stripe Price ID — confirmed the current Stripe

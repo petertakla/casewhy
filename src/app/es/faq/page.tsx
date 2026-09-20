@@ -257,10 +257,10 @@ const GROUPS: FaqGroup[] = [
       {
         question: "¿Cuánto cuesta Plus, y cómo lo cancelo?",
         plainText:
-          "Plus cuesta $9.99 al mes, $22.99 al trimestre, o $66.99 al año, facturado a través de Stripe. Puede cancelar en cualquier momento desde el enlace 'Administrar suscripción' en la página de Plus; conservará Plus hasta el final del período que ya pagó. No hay reembolsos ni prorrateo por períodos parciales.",
+          "Plus cuesta $9.99 al mes, $39.99 cada 6 meses, o $69.99 al año, facturado a través de Stripe. Puede cancelar en cualquier momento desde el enlace 'Administrar suscripción' en la página de Plus; conservará Plus hasta el final del período que ya pagó, sin reembolso por tiempo no usado. Cambiar entre planes más adelante se prorratea automáticamente.",
         answer: (
           <>
-            Plus cuesta $9.99 al mes, $22.99 al trimestre, o $66.99 al año,
+            Plus cuesta $9.99 al mes, $39.99 cada 6 meses, o $69.99 al año,
             facturado a través de Stripe. Puede cancelar en cualquier momento
             desde el enlace &quot;Administrar suscripción&quot; en la{" "}
             <Link
@@ -269,8 +269,9 @@ const GROUPS: FaqGroup[] = [
             >
               página de Plus
             </Link>
-            ; conservará Plus hasta el final del período que ya pagó. No hay
-            reembolsos ni prorrateo por períodos parciales.
+            ; conservará Plus hasta el final del período que ya pagó, sin
+            reembolso por tiempo no usado. Cambiar entre planes más adelante
+            se prorratea automáticamente.
           </>
         ),
       },

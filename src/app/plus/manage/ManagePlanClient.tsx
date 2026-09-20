@@ -3,7 +3,7 @@
 // Round 115, Part 1 — the in-app plan-switch flow. Portal config alone
 // can't do this (see startCheckout's own comment: checkout builds an
 // ad-hoc price_data per session, so there's no pre-registered "Monthly/
-// Quarterly/Annual" Price set for Stripe's own Portal to offer as a
+// 6-Month/Annual" Price set for Stripe's own Portal to offer as a
 // switch menu) -- this page and its two server actions (previewPlanSwitch,
 // switchPlan, both in ../actions.ts) are the real fix. Cancellation
 // itself still opens Stripe's own hosted Portal (still the right tool for
@@ -20,7 +20,7 @@ import type { PlanId } from "@/lib/billing/pricing";
 
 const PLAN_NAME: Record<PlanId, { en: string; es: string }> = {
   plus_monthly: { en: "Monthly", es: "Mensual" },
-  plus_quarterly: { en: "Quarterly", es: "Trimestral" },
+  plus_6month: { en: "6-Month", es: "Cada 6 meses" },
   plus_annual: { en: "Annual", es: "Anual" },
 };
 

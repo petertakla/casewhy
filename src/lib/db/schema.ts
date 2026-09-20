@@ -102,7 +102,12 @@ export const stripeWebhookEvents = pgTable("stripe_webhook_events", {
 // Price objects to manage. A base-price change only affects new
 // signups — existing Stripe Subscription objects keep charging whatever
 // they were created with (Peter's explicit decision, no migration path).
-export const planIdEnum = pgEnum("plan_id", ["plus_monthly", "plus_quarterly", "plus_annual"]);
+// Round 118 — plus_quarterly renamed to plus_6month (ALTER TYPE ... RENAME
+// VALUE, migration 0044) when the $22.99/quarterly tier was retired in
+// favor of a $39.99/6-month tier; existing plan_prices/pricing_rules rows
+// carried over automatically since a rename (not a drop+recreate) preserves
+// every reference to the value.
+export const planIdEnum = pgEnum("plan_id", ["plus_monthly", "plus_6month", "plus_annual"]);
 export const billingIntervalEnum = pgEnum("billing_interval", ["month", "year"]);
 export const pricingAdjustmentTypeEnum = pgEnum("pricing_adjustment_type", ["fixed_amount", "percent"]);
 
@@ -110,8 +115,8 @@ export const planPrices = pgTable("plan_prices", {
   planId: planIdEnum("plan_id").primaryKey(),
   basePriceCents: integer("base_price_cents").notNull(),
   billingInterval: billingIntervalEnum("billing_interval").notNull(),
-  // 1 for monthly/annual, 3 for quarterly (Stripe's recurring interval is
-  // interval + interval_count, not a native "quarter" unit).
+  // 1 for monthly/annual, 6 for the 6-month plan (Stripe's recurring
+  // interval is interval + interval_count, not a native "every N months" unit).
   intervalCount: integer("interval_count").notNull(),
 });
 

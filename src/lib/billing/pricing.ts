@@ -7,13 +7,13 @@ import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { planPrices, pricingRules } from "@/lib/db/schema";
 
-export type PlanId = "plus_monthly" | "plus_quarterly" | "plus_annual";
+export type PlanId = "plus_monthly" | "plus_6month" | "plus_annual";
 
-export const PLAN_IDS: PlanId[] = ["plus_monthly", "plus_quarterly", "plus_annual"];
+export const PLAN_IDS: PlanId[] = ["plus_monthly", "plus_6month", "plus_annual"];
 
 export const PLAN_LABELS: Record<PlanId, string> = {
   plus_monthly: "CaseWhy Plus (Monthly)",
-  plus_quarterly: "CaseWhy Plus (Quarterly)",
+  plus_6month: "CaseWhy Plus (6-Month)",
   plus_annual: "CaseWhy Plus (Annual)",
 };
 

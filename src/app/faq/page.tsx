@@ -293,11 +293,11 @@ const GROUPS: FaqGroup[] = [
         // subscription" link lives on the /plus page itself.
         question: "What does Plus cost, and how do I cancel?",
         plainText:
-          "Plus is $9.99 a month, $22.99 a quarter, or $66.99 a year, billed through Stripe. Cancel any time from the Manage subscription link on the Plus page; you keep Plus until the end of the period you've paid for. There are no refunds or proration for partial periods.",
+          "Plus is $9.99 a month, $39.99 every 6 months, or $69.99 a year, billed through Stripe. Cancel any time from the Manage subscription link on the Plus page; you keep Plus until the end of the period you've paid for, with no refund for unused time. Switching between plans later is prorated automatically.",
         answer: (
           <>
-            Plus is $9.99 a month, $22.99 a quarter, or $66.99 a year, billed
-            through Stripe. Cancel any time from the &quot;Manage
+            Plus is $9.99 a month, $39.99 every 6 months, or $69.99 a year,
+            billed through Stripe. Cancel any time from the &quot;Manage
             subscription&quot; link on the{" "}
             <Link
               href="/plus"
@@ -305,8 +305,9 @@ const GROUPS: FaqGroup[] = [
             >
               Plus page
             </Link>
-            ; you keep Plus until the end of the period you&apos;ve paid for.
-            There are no refunds or proration for partial periods.
+            ; you keep Plus until the end of the period you&apos;ve paid for,
+            with no refund for unused time. Switching between plans later is
+            prorated automatically.
           </>
         ),
       },

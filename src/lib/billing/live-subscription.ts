@@ -1,7 +1,7 @@
 // Round 114 follow-up — Peter, testing Plus as admin@casewhy.com: "it
 // doesn't show the tier anywhere." The subscriptions table stores tier/
 // status/currentPeriodEnd/cancelAtPeriodEnd, but not which specific plan
-// (monthly/quarterly/annual) or price a subscriber picked at checkout —
+// (monthly/6-month/annual) or price a subscriber picked at checkout —
 // that only exists on the Stripe Subscription object itself. Rather than
 // add a planId column that could drift from what Stripe actually charges
 // (a price change via the portal wouldn't update it), this reads live

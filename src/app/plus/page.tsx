@@ -134,13 +134,13 @@ function FeatureRow({
 
 const PLAN_PERIOD_LABEL: Record<PlanId, string> = {
   plus_monthly: "/ month",
-  plus_quarterly: "/ 3 months",
+  plus_6month: "/ 6 months",
   plus_annual: "/ year",
 };
 
 const PLAN_MONTHS: Record<PlanId, number> = {
   plus_monthly: 1,
-  plus_quarterly: 3,
+  plus_6month: 6,
   plus_annual: 12,
 };
 
@@ -163,8 +163,8 @@ function PlanCard({
       <p className="text-sm font-semibold text-muted">
         {planId === "plus_monthly"
           ? "Monthly"
-          : planId === "plus_quarterly"
-            ? "Quarterly"
+          : planId === "plus_6month"
+            ? "6-Month"
             : "Annual"}
       </p>
       <p className="mt-1">
@@ -295,8 +295,8 @@ export default async function PlusPage({
               canSubscribe={!!session?.user}
             />
             <PlanCard
-              planId="plus_quarterly"
-              price={prices.plus_quarterly}
+              planId="plus_6month"
+              price={prices.plus_6month}
               canSubscribe={!!session?.user}
             />
             <PlanCard

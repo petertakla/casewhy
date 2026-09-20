@@ -148,7 +148,7 @@ HTTPS/TLS everywhere, security headers (HSTS, a Content-Security-Policy, and the
 ## Business and operations
 
 **How does CaseWhy make money, and is anything from the USCIS API paywalled?**
-A free tier and an optional paid tier ($9.99/month, or discounted quarterly/annual). Nothing from the Case Status API is ever paywalled — status checking is free at every tier. The paid tier adds more tracked cases, unlimited AI questions, on-demand checks, document storage, and drafting tools.
+A free tier and an optional paid tier ($9.99/month, or discounted 6-month/annual). Nothing from the Case Status API is ever paywalled — status checking is free at every tier. The paid tier adds more tracked cases, unlimited AI questions, on-demand checks, document storage, and drafting tools.
 
 **Is billing live, or still in test mode?**
 Test mode — we haven't processed a real production payment yet. That's a deliberate, honest state, not something we're overstating; flipping to live payments is a distinct step we haven't taken.

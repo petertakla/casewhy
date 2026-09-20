@@ -9,7 +9,7 @@
 //   npx tsx scripts/set-pricing-rule.ts list <plan>
 //   npx tsx scripts/set-pricing-rule.ts deactivate <rule-id>
 //
-// <plan>            one of: plus_monthly, plus_quarterly, plus_annual
+// <plan>            one of: plus_monthly, plus_6month, plus_annual
 // <value>            fixed_amount: dollars off (e.g. "2.00" = $2.00 off)
 //                     percent: percent off (e.g. "10" = 10% off)
 // <effective_start>  YYYY-MM-DD

@@ -97,7 +97,7 @@ Security headers — HSTS, a Content-Security-Policy, X-Content-Type-Options, X-
 
 ## Business and operations
 
-A free tier (3 tracked cases, 3 AI questions/month, full access to all reference data) and a paid "Plus" tier ($9.99/month, $22.99/quarter, or $66.99/year).[^29] **Nothing from the USCIS Case Status API is ever paywalled** — status checking is free at every tier; Plus adds more tracked cases, unlimited AI questions, on-demand checks, the document vault, and drafting tools. Billing runs on Stripe, currently in test mode — CaseWhy has processed no real production payments to date.[^30]
+A free tier (3 tracked cases, 3 AI questions/month, full access to all reference data) and a paid "Plus" tier ($9.99/month, $39.99/6 months, or $69.99/year).[^29] **Nothing from the USCIS Case Status API is ever paywalled** — status checking is free at every tier; Plus adds more tracked cases, unlimited AI questions, on-demand checks, the document vault, and drafting tools. Billing runs on Stripe, currently in test mode — CaseWhy has processed no real production payments to date.[^30]
 
 Support runs through 13 real, monitored email aliases on the domain, including `security@`, `privacy@`, `legal@`, and `abuse@`.[^31] If production API access were ever revoked, CaseWhy has no scraping fallback and would show an honest degraded-service message rather than attempt an unauthorized alternative path to USCIS data.
 

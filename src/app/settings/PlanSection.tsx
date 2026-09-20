@@ -14,17 +14,22 @@ function formatDate(date: Date, es: boolean): string {
   return date.toLocaleDateString(es ? "es" : undefined, { year: "numeric", month: "long", day: "numeric" });
 }
 
-const INTERVAL_LABELS: Record<string, { en: string; es: string }> = {
-  day: { en: "day", es: "día" },
-  week: { en: "week", es: "semana" },
-  month: { en: "month", es: "mes" },
-  year: { en: "year", es: "año" },
+const INTERVAL_LABELS: Record<string, { en: string; es: string; enPlural: string; esPlural: string }> = {
+  day: { en: "day", es: "día", enPlural: "days", esPlural: "días" },
+  week: { en: "week", es: "semana", enPlural: "weeks", esPlural: "semanas" },
+  month: { en: "month", es: "mes", enPlural: "months", esPlural: "meses" },
+  year: { en: "year", es: "año", enPlural: "years", esPlural: "años" },
 };
 
-function intervalLabel(interval: string, es: boolean): string {
+// Round 118 — the 6-month plan surfaced a pre-existing gap here: this never
+// accounted for intervalCount at all, so it would have shown "$39.99/month"
+// instead of "$39.99/6 months" (round 115's quarterly plan had the same
+// bug, just less noticeable at "$22.99/month").
+function intervalLabel(interval: string, intervalCount: number, es: boolean): string {
   const entry = INTERVAL_LABELS[interval];
-  if (!entry) return interval;
-  return es ? entry.es : entry.en;
+  if (!entry) return intervalCount > 1 ? `${intervalCount} ${interval}s` : interval;
+  const unit = intervalCount > 1 ? (es ? entry.esPlural : entry.enPlural) : es ? entry.es : entry.en;
+  return intervalCount > 1 ? `${intervalCount} ${unit}` : unit;
 }
 
 /**
@@ -74,7 +79,7 @@ export async function PlanSection({ userId, es }: { userId: string; es: boolean 
   }
 
   const priceLine = live
-    ? `${formatMoney(live.amountCents, live.currency)}/${intervalLabel(live.interval, es)}`
+    ? `${formatMoney(live.amountCents, live.currency)}/${intervalLabel(live.interval, live.intervalCount, es)}`
     : null;
 
   return (

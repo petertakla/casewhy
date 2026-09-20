@@ -121,8 +121,8 @@ export const FAQ_SEARCH_ENTRIES: FaqSearchEntry[] = [
     groupEs: "CaseWhy Plus",
     question: "What does Plus cost, and how do I cancel?",
     questionEs: "¿Cuánto cuesta Plus, y cómo lo cancelo?",
-    snippet: "Plus is $9.99 a month, $22.99 a quarter, or $66.99 a year, billed through Stripe. Cancel any time from the Plus page.",
-    snippetEs: "Plus cuesta $9.99 al mes, $22.99 al trimestre, o $66.99 al año. Puede cancelar en cualquier momento desde la página de Plus.",
+    snippet: "Plus is $9.99 a month, $39.99 every 6 months, or $69.99 a year, billed through Stripe. Cancel any time from the Plus page.",
+    snippetEs: "Plus cuesta $9.99 al mes, $39.99 cada 6 meses, o $69.99 al año. Puede cancelar en cualquier momento desde la página de Plus.",
   },
   {
     group: "CaseWhy Plus",

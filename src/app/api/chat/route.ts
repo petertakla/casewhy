@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
   if (usage.limitReached) {
     return NextResponse.json(
       {
-        error: `You've used all ${usage.limit} free questions this month. Upgrade to CaseWhy Plus for unlimited questions.`,
+        error: "AI chat about your case is a CaseWhy Plus feature.",
         limitReached: true,
         usage,
       },

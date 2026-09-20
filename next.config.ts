@@ -55,7 +55,18 @@ const nextConfig: NextConfig = {
               // scripts -- 'unsafe-inline' on script-src is required for
               // the app to function at all without a nonce-based setup,
               // which is a larger change than this pass's scope.
-              "script-src 'self' 'unsafe-inline'",
+              // Round 124 follow-up -- 'unsafe-eval' is dev-only: next dev's
+              // own Fast Refresh runtime evaluates a stringified module to
+              // hot-swap changed files, and without this the browser throws
+              // "Evaluating a string as JavaScript violates CSP" from inside
+              // webpack's own chunk-loading callback, which was silently
+              // crashing client hydration on every route in local dev since
+              // this header shipped (confirmed live: password/email inputs
+              // and every other client component had zero React event
+              // listeners attached -- pure server HTML, no interactivity at
+              // all). Production's build has no eval in its runtime, so it
+              // stays on the strict policy.
+              `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob:",
               "font-src 'self' data:",

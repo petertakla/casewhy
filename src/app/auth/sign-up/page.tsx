@@ -7,6 +7,7 @@ import { authClient } from "@/lib/auth/client";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { useIsSpanish } from "@/lib/i18n/use-is-spanish";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PasswordInput } from "@/components/PasswordInput";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -86,29 +87,29 @@ function SignUpForm() {
             <label htmlFor="password" className="sr-only">
               {es ? "Contraseña" : "Password"}
             </label>
-            <input
+            <PasswordInput
               id="password"
-              type="password"
               required
               minLength={MIN_PASSWORD_LENGTH}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={es ? `Contraseña (mín. ${MIN_PASSWORD_LENGTH} caracteres)` : `Password (min. ${MIN_PASSWORD_LENGTH} characters)`}
               autoComplete="new-password"
-              className="rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
+              showLabel={es ? "Mostrar contraseña" : "Show password"}
+              hideLabel={es ? "Ocultar contraseña" : "Hide password"}
             />
             <label htmlFor="confirm-password" className="sr-only">
               {es ? "Confirmar contraseña" : "Confirm password"}
             </label>
-            <input
+            <PasswordInput
               id="confirm-password"
-              type="password"
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder={es ? "Confirmar contraseña" : "Confirm password"}
               autoComplete="new-password"
-              className="rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
+              showLabel={es ? "Mostrar contraseña" : "Show password"}
+              hideLabel={es ? "Ocultar contraseña" : "Hide password"}
             />
             <button
               type="submit"

@@ -7,6 +7,7 @@ import { authClient } from "@/lib/auth/client";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { useIsSpanish } from "@/lib/i18n/use-is-spanish";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PasswordInput } from "@/components/PasswordInput";
 
 function EnvelopeIcon() {
   return (
@@ -182,15 +183,15 @@ function PasswordSignInForm({
       <label htmlFor="password" className="sr-only">
         {es ? "Contraseña" : "Password"}
       </label>
-      <input
+      <PasswordInput
         id="password"
-        type="password"
         required
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder={es ? "Contraseña" : "Password"}
         autoComplete="current-password"
-        className="rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
+        showLabel={es ? "Mostrar contraseña" : "Show password"}
+        hideLabel={es ? "Ocultar contraseña" : "Hide password"}
       />
       <Link
         href={es ? "/auth/forgot-password?lang=es" : "/auth/forgot-password"}

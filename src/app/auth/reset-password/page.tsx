@@ -7,6 +7,7 @@ import { authClient } from "@/lib/auth/client";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { useIsSpanish } from "@/lib/i18n/use-is-spanish";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PasswordInput } from "@/components/PasswordInput";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -107,29 +108,29 @@ function ResetPasswordForm() {
               <label htmlFor="password" className="sr-only">
                 {es ? "Nueva contraseña" : "New password"}
               </label>
-              <input
+              <PasswordInput
                 id="password"
-                type="password"
                 required
                 minLength={MIN_PASSWORD_LENGTH}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={es ? `Nueva contraseña (mín. ${MIN_PASSWORD_LENGTH} caracteres)` : `New password (min. ${MIN_PASSWORD_LENGTH} characters)`}
                 autoComplete="new-password"
-                className="rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
+                showLabel={es ? "Mostrar contraseña" : "Show password"}
+                hideLabel={es ? "Ocultar contraseña" : "Hide password"}
               />
               <label htmlFor="confirm-password" className="sr-only">
                 {es ? "Confirmar nueva contraseña" : "Confirm new password"}
               </label>
-              <input
+              <PasswordInput
                 id="confirm-password"
-                type="password"
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder={es ? "Confirmar nueva contraseña" : "Confirm new password"}
                 autoComplete="new-password"
-                className="rounded-lg border border-border-strong bg-background px-4 py-2.5 text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-500"
+                showLabel={es ? "Mostrar contraseña" : "Show password"}
+                hideLabel={es ? "Ocultar contraseña" : "Hide password"}
               />
               <button
                 type="submit"

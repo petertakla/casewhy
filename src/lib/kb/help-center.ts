@@ -110,8 +110,18 @@ export const ALIAS_HELP_CATEGORIES: Record<string, HelpCategory[]> = {
   privacy: ["privacy"],
 };
 
-export function getRelevantHelpKnowledge(alias: string): HelpKnowledgeEntry[] {
-  const categories = ALIAS_HELP_CATEGORIES[alias];
-  if (!categories || categories.length === 0) return [];
+export function getHelpKnowledgeByCategories(categories: HelpCategory[]): HelpKnowledgeEntry[] {
+  if (categories.length === 0) return [];
   return HELP_KNOWLEDGE.filter((entry) => entry.categories.some((c) => categories.includes(c)));
 }
+
+export function getRelevantHelpKnowledge(alias: string): HelpKnowledgeEntry[] {
+  return getHelpKnowledgeByCategories(ALIAS_HELP_CATEGORIES[alias] ?? []);
+}
+
+// Round 119 follow-up (marketing-reply reuse) — a public community/forum
+// reply asking "does CaseWhy do X" could reasonably touch any of these;
+// unlike ALIAS_HELP_CATEGORIES there's no single inbox purpose to scope
+// it to, so this covers the full set rather than guessing which subset a
+// stranger's question needs.
+export const ALL_APP_USAGE_CATEGORIES: HelpCategory[] = ["tracking", "account", "billing", "notifications", "privacy", "documents"];

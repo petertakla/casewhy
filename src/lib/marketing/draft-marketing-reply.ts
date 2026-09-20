@@ -22,8 +22,14 @@ import { generateText } from "ai";
 import { PROCESSING_TIMES, PROCESSING_TIMES_AS_OF } from "../kb/processing-times";
 import { POLICY_MEMOS } from "../kb/policy-memos";
 import { ENTITY_TYPES } from "../get-help/entity-types";
+import { getHelpKnowledgeByCategories, ALL_APP_USAGE_CATEGORIES } from "../kb/help-center";
 
-export type MarketingResourceType = "processing_times" | "policy" | "get_help";
+// Round 119 follow-up — "app_usage" reuses the same help-center KB built
+// for alias-reply drafting (src/lib/kb/help-center.ts), for the identical
+// reason: a real "does CaseWhy let you track multiple cases?" question on
+// a public thread had no grounding to draw from before this, same gap as
+// the alias-reply drafter had.
+export type MarketingResourceType = "processing_times" | "policy" | "get_help" | "app_usage";
 
 export interface MarketingDraftResult {
   draftText: string;
@@ -48,12 +54,21 @@ function groundingContextFor(resourceType: MarketingResourceType): { context: st
       citationHint: "CaseWhy policy library (/policy)",
     };
   }
-  const rows = ENTITY_TYPES.filter((e) => e.status === "live")
-    .map((e) => `- ${e.label} (${e.href}): ${e.description}`)
+  if (resourceType === "get_help") {
+    const rows = ENTITY_TYPES.filter((e) => e.status === "live")
+      .map((e) => `- ${e.label} (${e.href}): ${e.description}`)
+      .join("\n");
+    return {
+      context: `Real CaseWhy Get Help directory categories:\n${rows}`,
+      citationHint: "CaseWhy Get Help directory (/get-help)",
+    };
+  }
+  const rows = getHelpKnowledgeByCategories(ALL_APP_USAGE_CATEGORIES)
+    .map((e) => `- ${e.topic}: ${e.answer}`)
     .join("\n");
   return {
-    context: `Real CaseWhy Get Help directory categories:\n${rows}`,
-    citationHint: "CaseWhy Get Help directory (/get-help)",
+    context: `Real facts about how the CaseWhy app actually works:\n${rows}`,
+    citationHint: "CaseWhy app features",
   };
 }
 

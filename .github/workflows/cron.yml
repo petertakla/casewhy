@@ -33,6 +33,10 @@ name: Cron
 # ops_tasks (see src/app/api/cron/refresh-attorney-directory/route.ts) show
 # up in a run where generate-ops-tasks hasn't just run too. State-bar
 # certification rosters don't change often enough to need weekly polling.
+#
+# refresh-doj-directories (round 117 monthly-automation follow-up, phase
+# 2) — same monthly cadence, offset one more day (3rd) so its own anomaly
+# ops_tasks land in their own clean run too.
 
 on:
   schedule:
@@ -44,6 +48,7 @@ on:
     - cron: "0 13 * * 1"    # weekly-attribution-digest — weekly, Monday 9:00 AM ET
     - cron: "0 12 1 * *"    # generate-ops-tasks — monthly, 1st at 8:00 AM ET
     - cron: "0 12 2 * *"    # refresh-attorney-directory — monthly, 2nd at 8:00 AM ET (offset a day from generate-ops-tasks so its own anomaly ops_tasks land in a clean run)
+    - cron: "0 12 3 * *"    # refresh-doj-directories — monthly, 3rd at 8:00 AM ET
   workflow_dispatch: {} # manual run of every job at once, for testing — every route below is idempotent/safe to re-trigger
 
 jobs:
@@ -102,3 +107,10 @@ jobs:
     steps:
       - run: |
           curl -sf -X POST https://app.casewhy.com/api/cron/refresh-attorney-directory -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}" --max-time 280
+
+  refresh-doj-directories:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 12 3 * *'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sf -X POST https://app.casewhy.com/api/cron/refresh-doj-directories -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}" --max-time 280

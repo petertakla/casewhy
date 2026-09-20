@@ -47,20 +47,12 @@ interface PlusFeature {
 
 const PLUS_FEATURES: PlusFeature[] = [
   {
-    id: "general-ask-casewhy",
-    title: "Ask CaseWhy (preguntas generales)",
-    free: "3, sin iniciar sesión",
-    plus: "3, sin iniciar sesión",
-    explanation:
-      '"¿Qué significa una RFE?" "¿Cómo funciona el ajuste de estatus?" — preguntas generales sobre política de USCIS, no vinculadas a ningún caso específico, respondidas sin necesidad de una cuenta. Es la misma herramienta gratuita en todos los niveles, incluso para visitantes que nunca se han registrado: tres preguntas, fundamentadas en la propia base de conocimiento de políticas de CaseWhy, sin ningún dato de caso involucrado. Es algo distinto del chat específico del caso de abajo, que sí conoce el estado y el historial en vivo de tu caso rastreado.',
-  },
-  {
     id: "ai-chat",
     title: "Chat con IA sobre tu caso específico",
     free: "—",
     plus: "Ilimitado",
     explanation:
-      'Tu estado acaba de cambiar a "Solicitud de Evidencia" y no sabes qué significa, si tu cronograma se reinició, o qué es lo que USCIS realmente quiere — para eso es exactamente este chat. A diferencia de la herramienta general Ask CaseWhy de arriba, este chat conoce tu caso rastreado real — su estado en vivo, su historial, su contexto específico del recibo — no solo la política de USCIS en abstracto. Pregunta en lenguaje sencillo y obtén una respuesta basada en la propia base de conocimiento de políticas y jurisprudencia de CaseWhy y en tu recibo específico rastreado, con citas visibles que puedes verificar tú mismo, en lugar de un chatbot genérico adivinando. Plus desbloquea preguntas ilimitadas sobre tu propio caso rastreado, para que puedas preguntar en el momento en que te preocupe, sin tener que racionar un puñado al mes.',
+      'Tu estado acaba de cambiar a "Solicitud de Evidencia" y no sabes qué significa, si tu cronograma se reinició, o qué es lo que USCIS realmente quiere — para eso es exactamente este chat. A diferencia de la herramienta gratuita Ask CaseWhy de la página Obtener ayuda, que no requiere iniciar sesión, este chat conoce tu caso rastreado real — su estado en vivo, su historial, su contexto específico del recibo — no solo la política de USCIS en abstracto. Pregunta en lenguaje sencillo y obtén una respuesta basada en la propia base de conocimiento de políticas y jurisprudencia de CaseWhy y en tu recibo específico rastreado, con citas visibles que puedes verificar tú mismo, en lugar de un chatbot genérico adivinando. Plus desbloquea preguntas ilimitadas sobre tu propio caso rastreado, para que puedas preguntar en el momento en que te preocupe, sin tener que racionar un puñado al mes.',
   },
   {
     id: "explanation-depth",

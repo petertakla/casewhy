@@ -40,20 +40,12 @@ interface PlusFeature {
 
 const PLUS_FEATURES: PlusFeature[] = [
   {
-    id: "general-ask-casewhy",
-    title: "Ask CaseWhy (general questions)",
-    free: "3, no sign-in",
-    plus: "3, no sign-in",
-    explanation:
-      "\"What does an RFE mean?\" \"How does adjustment of status work?\" — general USCIS-policy questions, not tied to any specific case, answered without an account. This is the same free tool on every tier, including for visitors who've never signed up: three questions, grounded in CaseWhy's own policy knowledge base, no case data involved at all. It's a different thing from the case-specific chat below, which knows your actual tracked case's live status and history.",
-  },
-  {
     id: "ai-chat",
     title: "AI chat about your specific case",
     free: "—",
     plus: "Unlimited",
     explanation:
-      "Your status just changed to \"Request for Evidence\" and you don't know what that means, whether your timeline just reset, or what USCIS actually wants — that's exactly what this chat is for. Unlike the general Ask CaseWhy tool above, this one knows your actual tracked case — its live status, its history, its receipt-specific context — not just USCIS policy in the abstract. Ask in plain English and get an answer grounded in CaseWhy's own curated policy and case-law knowledge base and your specific tracked receipt, with visible citations you can check yourself, instead of a generic chatbot guessing. Plus unlocks unlimited questions about your own tracked case, so you can ask the moment you're anxious about one instead of rationing a handful a month.",
+      "Your status just changed to \"Request for Evidence\" and you don't know what that means, whether your timeline just reset, or what USCIS actually wants — that's exactly what this chat is for. Unlike the free, no-sign-in Ask CaseWhy tool on the Get Help page, this one knows your actual tracked case — its live status, its history, its receipt-specific context — not just USCIS policy in the abstract. Ask in plain English and get an answer grounded in CaseWhy's own curated policy and case-law knowledge base and your specific tracked receipt, with visible citations you can check yourself, instead of a generic chatbot guessing. Plus unlocks unlimited questions about your own tracked case, so you can ask the moment you're anxious about one instead of rationing a handful a month.",
   },
   {
     id: "explanation-depth",

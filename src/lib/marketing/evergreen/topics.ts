@@ -4,7 +4,7 @@
 // generate-weekday-evergreen.ts for the orchestration; this file is only
 // the per-weekday topic content.
 
-import { and, eq, gte, lt, ne } from "drizzle-orm";
+import { and, eq, gte, lt, ne, or, isNull } from "drizzle-orm";
 import type { getDb } from "@/lib/db/client";
 import { marketingQueue, newsItems } from "@/lib/db/schema";
 import type { EvergreenItemInput } from "../draft-evergreen-post";
@@ -114,6 +114,14 @@ function mondayOfWeek(date: Date): Date {
  */
 export async function buildRecapTopic(db: ReturnType<typeof getDb>, fridayDate: Date): Promise<EvergreenItemInput | null> {
   const weekStart = mondayOfWeek(fridayDate);
+  // A row's "which day this belongs to" is scheduledFor when set (the
+  // evergreen fallback -- which may have been queued well before its own
+  // target date, e.g. a whole week backfilled ahead of time for one
+  // Sunday-evening review) or createdAt otherwise (real news, always
+  // drafted same-day in real time by the reactive watcher, never
+  // scheduled for later). Filtering on createdAt alone would miss every
+  // backfilled evergreen row entirely, since its real insert time has
+  // nothing to do with the date it's scheduled for.
   const rows = await db
     .select({ destination: marketingQueue.destination })
     .from(marketingQueue)
@@ -122,8 +130,10 @@ export async function buildRecapTopic(db: ReturnType<typeof getDb>, fridayDate: 
         eq(marketingQueue.channel, "x"),
         eq(marketingQueue.mode, "auto_post"),
         ne(marketingQueue.status, "escalated"),
-        gte(marketingQueue.createdAt, weekStart),
-        lt(marketingQueue.createdAt, fridayDate)
+        or(
+          and(isNull(marketingQueue.scheduledFor), gte(marketingQueue.createdAt, weekStart), lt(marketingQueue.createdAt, fridayDate)),
+          and(gte(marketingQueue.scheduledFor, weekStart), lt(marketingQueue.scheduledFor, fridayDate))
+        )
       )
     );
 

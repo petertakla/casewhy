@@ -27,6 +27,12 @@ name: Cron
 # volume control); poll-policy-news at 30 min (the low end of round 90's
 # documented "every 30-60 min"); the rest match their own round's already-
 # documented cadence exactly.
+#
+# refresh-attorney-directory (round 117 monthly-automation follow-up) —
+# monthly, offset one day after generate-ops-tasks so its own anomaly
+# ops_tasks (see src/app/api/cron/refresh-attorney-directory/route.ts) show
+# up in a run where generate-ops-tasks hasn't just run too. State-bar
+# certification rosters don't change often enough to need weekly polling.
 
 on:
   schedule:
@@ -37,6 +43,7 @@ on:
     - cron: "0 12 * * 1"    # render-content-briefs — weekly, Monday 8:00 AM ET
     - cron: "0 13 * * 1"    # weekly-attribution-digest — weekly, Monday 9:00 AM ET
     - cron: "0 12 1 * *"    # generate-ops-tasks — monthly, 1st at 8:00 AM ET
+    - cron: "0 12 2 * *"    # refresh-attorney-directory — monthly, 2nd at 8:00 AM ET (offset a day from generate-ops-tasks so its own anomaly ops_tasks land in a clean run)
   workflow_dispatch: {} # manual run of every job at once, for testing — every route below is idempotent/safe to re-trigger
 
 jobs:
@@ -88,3 +95,10 @@ jobs:
     steps:
       - run: |
           curl -sf -X POST https://app.casewhy.com/api/cron/generate-ops-tasks -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"
+
+  refresh-attorney-directory:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 12 2 * *'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sf -X POST https://app.casewhy.com/api/cron/refresh-attorney-directory -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}" --max-time 280

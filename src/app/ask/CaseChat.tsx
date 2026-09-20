@@ -20,13 +20,6 @@ interface Message {
   content: string;
 }
 
-interface UsageStatus {
-  used: number;
-  limit: number | null;
-  remaining: number | null;
-  limitReached: boolean;
-}
-
 // Round 66 — the two quick-ask questions. The button label is the short,
 // consistent wording Peter specced; the message actually sent to the model
 // is deliberately fuller and differently-shaped for each, so the two
@@ -75,7 +68,6 @@ export function CaseChat({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [limitReached, setLimitReached] = useState(false);
-  const [usage, setUsage] = useState<UsageStatus | null>(null);
   // Deterministic per-case (see findRelevantPolicyContext), not per-question
   // — shown once, persistently, rather than attached to each reply, so it
   // doesn't look like it's the reason for an unrelated answer.
@@ -128,10 +120,7 @@ export function CaseChat({
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.limitReached) {
-          setLimitReached(true);
-          if (data.usage) setUsage(data.usage);
-        }
+        if (data.limitReached) setLimitReached(true);
         setError(typeof data.error === "string" ? data.error : es ? "Algo salió mal." : "Something went wrong.");
         return;
       }
@@ -140,14 +129,11 @@ export function CaseChat({
       if (Array.isArray(data.relatedPolicies)) {
         setRelatedPolicies(data.relatedPolicies);
       }
-      if (data.usage) {
-        setUsage(data.usage);
-        // The question that hits the cap still succeeds (the server only
-        // blocks the *next* attempt) — sync limitReached here too, not just
-        // on the eventual 402, so the upgrade message shows right after
-        // this reply lands instead of after a wasted extra attempt.
-        if (data.usage.limitReached) setLimitReached(true);
-      }
+      // The question that hits the cap still succeeds (the server only
+      // blocks the *next* attempt) — sync limitReached here too, not just on
+      // the eventual 402, so the upgrade message shows right after this
+      // reply lands instead of after a wasted extra attempt.
+      if (data.usage?.limitReached) setLimitReached(true);
     } catch {
       setError(es ? "Algo salió mal. Por favor intenta de nuevo." : "Something went wrong. Please try again.");
     } finally {
@@ -271,9 +257,7 @@ export function CaseChat({
         {limitReached && (
           <div className="mb-3 rounded-lg border border-brand-500/30 bg-brand-500/5 p-3 text-sm">
             <p className="font-medium text-foreground">
-              {es
-                ? `Has usado las ${usage?.limit ?? "tus"} preguntas gratuitas de este mes.`
-                : <>You&apos;ve used all {usage?.limit ?? "your free"} questions this month.</>}
+              {es ? "El chat de IA es una función de CaseWhy Plus." : "AI chat is a CaseWhy Plus feature."}
             </p>
             <p className="mt-1 text-muted">
               {es ? (
@@ -417,13 +401,6 @@ export function CaseChat({
             {es ? "Enviar" : "Send"}
           </PendingButton>
         </form>
-        {usage && usage.limit !== null && !limitReached && (
-          <p className="mt-2 text-xs text-muted">
-            {es
-              ? `${usage.remaining} de ${usage.limit} preguntas gratuitas restantes este mes.`
-              : `${usage.remaining} of ${usage.limit} free questions left this month.`}
-          </p>
-        )}
         <p className="mt-3 text-xs text-muted">
           {es ? (
             <>

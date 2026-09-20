@@ -149,6 +149,7 @@ function ExplanationBox({
   explanation,
   receiptNumber,
   alreadyTracked,
+  isPlus,
   es,
 }: {
   explanation: CaseExplanation;
@@ -159,6 +160,15 @@ function ExplanationBox({
    * not-yet-tracked lookup would otherwise get misrouted to the wrong case
    * instead of the one this citation is actually about. */
   alreadyTracked: boolean;
+  /** Round 125 — free tier gets the plain-language explanation in full
+   * (honest and complete on "what does this mean, should I be worried"),
+   * but not the deeper layer: next steps, cited policy background, and the
+   * quick-ask links into the now-Plus-only chat. Both tiers already get the
+   * same model call and the same relatedPolicies lookup (explainCaseStatus
+   * is unchanged) — this gates DISPLAY only, not generation, since the cost
+   * driver Peter's tightening is chat's unbounded per-question cost, not
+   * this fixed, already-runs-for-everyone explanation call. */
+  isPlus: boolean;
   es: boolean;
 }) {
   // Round 80 — explanation.explanation / .nextSteps and each policy's
@@ -186,7 +196,7 @@ function ExplanationBox({
           <p className="mt-1.5 text-sm text-foreground/90">
             {linkifyExplanation(explanation.explanation, explanation.relatedPolicies)}
           </p>
-          {explanation.nextSteps.length > 0 && (
+          {isPlus && explanation.nextSteps.length > 0 && (
             <ul className="mt-3 space-y-1.5 text-sm text-foreground/90">
               {explanation.nextSteps.map((step, i) => (
                 <li key={i} className="flex gap-2">
@@ -202,7 +212,7 @@ function ExplanationBox({
               ))}
             </ul>
           )}
-          {explanation.relatedPolicies.length > 0 && (
+          {isPlus && explanation.relatedPolicies.length > 0 && (
             <div className="mt-3 border-t border-brand-500/15 pt-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-muted">
                 {es ? "Antecedentes de política referenciados arriba" : "Policy background referenced above"}
@@ -241,6 +251,24 @@ function ExplanationBox({
                 ))}
               </ul>
             </div>
+          )}
+          {/* Round 125 — honest, not a dead end: only shown when there's
+              genuinely more depth this case has and Plus would surface,
+              never a generic "upgrade" nag on a case with nothing more to
+              add. */}
+          {!isPlus && (explanation.nextSteps.length > 0 || explanation.relatedPolicies.length > 0) && (
+            <p className="mt-3 border-t border-brand-500/15 pt-3 text-xs text-muted">
+              {es ? (
+                <>
+                  CaseWhy <PlusBadge size="sm" /> agrega próximos pasos y fuentes de política citadas para este
+                  estado.
+                </>
+              ) : (
+                <>
+                  CaseWhy <PlusBadge size="sm" /> adds next steps and cited policy sources for this status.
+                </>
+              )}
+            </p>
           )}
           <p className="mt-3 text-xs text-muted">
             {es ? (
@@ -381,6 +409,7 @@ function StatusCard({
           explanation={explanation}
           receiptNumber={status.receiptNumber}
           alreadyTracked={tracking?.alreadyTracked ?? false}
+          isPlus={isPlus}
           es={es}
         />
       )}

@@ -3,10 +3,12 @@ import { auth } from "@/lib/auth/server";
 import { getTrackedCases } from "@/app/dashboard/actions";
 import { CaseSwitcher } from "@/app/dashboard/CaseSwitcher";
 import { getCaseStatus, UscisApiError } from "@/lib/uscis/client";
+import { getSubscriptionTier } from "@/lib/billing/tier";
 import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { CaseChat, type QuickAskKind } from "./CaseChat";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PlusBadge } from "@/components/PlusBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -98,6 +100,79 @@ export default async function AskPage({
             </>
           )}
         </EmptyState>
+      </main>
+    );
+  }
+
+  // Round 125 — AI chat is now a Plus-only feature (paywall tightening,
+  // Peter's direct call), not a metered free perk. Gated here at the page
+  // level, before any case lookup or CaseChat render, rather than letting a
+  // free user type a question and only then hearing they're blocked — the
+  // /api/chat route still enforces this server-side too (defense in depth,
+  // same "layout is UX, the real boundary is elsewhere" pattern as round
+  // 98's admin gate).
+  const tier = await getSubscriptionTier(session.user.id);
+  if (tier !== "plus") {
+    return (
+      <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+        <LanguageSwitcher es={es} href={langHref} />
+        <h1 className="text-2xl font-bold tracking-tight">{es ? "Hacer una pregunta" : "Ask a question"}</h1>
+        <p className="mb-8 mt-2 text-muted">
+          {es
+            ? "Una forma conversacional de preguntar sobre tu caso, fundamentada en la base de conocimiento de políticas de CaseWhy."
+            : "A conversational way to ask about your case, grounded in CaseWhy's policy knowledge base."}
+        </p>
+        <div className="rounded-2xl border border-brand-500/30 bg-brand-500/5 p-8 text-center">
+          <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
+            CaseWhy <PlusBadge size="sm" />
+          </p>
+          <p className="mt-2 text-sm text-muted">
+            {es ? (
+              <>
+                El chat de IA es una función de CaseWhy Plus — cada respuesta está fundamentada en la propia
+                política de USCIS y en el recibo específico que estás siguiendo, no un chatbot genérico
+                adivinando.
+              </>
+            ) : (
+              <>
+                AI chat is a CaseWhy Plus feature — every answer is grounded in USCIS&apos;s own policy and
+                your specific tracked receipt, not a generic chatbot guessing.
+              </>
+            )}
+          </p>
+          <Link
+            href="/plus#ai-chat"
+            className="mt-4 inline-block rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+          >
+            {es ? "Ver CaseWhy Plus" : "See CaseWhy Plus"}
+          </Link>
+          {/* Round 125 follow-up (Cloud review) — a free user landing here
+              loses case-specific chat entirely; without this they're told
+              "no" with nowhere else to go. /get-help/ask is the separate,
+              always-free, no-sign-in-required general policy chat (3
+              questions, lifetime cap per IP, not case-grounded) -- a real
+              answer to "what does this mean" even without Plus, just not
+              one that knows this specific case. */}
+          <p className="mt-3 text-xs text-muted">
+            {es ? (
+              <>
+                ¿Solo tienes una pregunta general sobre políticas de USCIS?{" "}
+                <Link href="/get-help/ask?lang=es" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                  Pregúntale a CaseWhy
+                </Link>{" "}
+                sin necesidad de iniciar sesión.
+              </>
+            ) : (
+              <>
+                Just have a general USCIS policy question?{" "}
+                <Link href="/get-help/ask" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                  Ask CaseWhy
+                </Link>{" "}
+                without signing in.
+              </>
+            )}
+          </p>
+        </div>
       </main>
     );
   }

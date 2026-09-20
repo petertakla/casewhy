@@ -173,7 +173,7 @@ const GROUPS: FaqGroup[] = [
       {
         question: "¿Necesito una cuenta para hacer una pregunta?",
         plainText:
-          "No. Ask CaseWhy en la página de Obtener ayuda responde tres preguntas sin necesidad de iniciar sesión; después de eso, una cuenta gratuita le da tres preguntas de IA sobre su propio caso cada mes, y Plus las hace ilimitadas.",
+          "No. Ask CaseWhy en la página de Obtener ayuda responde tres preguntas sin necesidad de iniciar sesión. Preguntar sobre su propio caso rastreado es una función de CaseWhy Plus, con preguntas ilimitadas.",
         answer: (
           <>
             No. Ask CaseWhy en la página de{" "}
@@ -183,16 +183,19 @@ const GROUPS: FaqGroup[] = [
             >
               Obtener ayuda
             </Link>{" "}
-            responde tres preguntas sin necesidad de iniciar sesión; después de
-            eso, una cuenta gratuita le da tres preguntas de IA sobre su propio
-            caso cada mes, y Plus las hace ilimitadas.
+            responde tres preguntas sin necesidad de iniciar sesión. Preguntar
+            sobre su propio caso rastreado es una función de{" "}
+            <Link href="/es/plus" className="text-brand-600 hover:underline dark:text-brand-400">
+              CaseWhy Plus
+            </Link>
+            , con preguntas ilimitadas.
           </>
         ),
       },
       {
         question: "¿Qué tan precisas son las explicaciones de IA?",
         answer:
-          "Las explicaciones describen lo que un estado o proceso generalmente significa, basadas en materiales publicados por USCIS, y cada respuesta muestra la fuente de la que se elaboró. Pueden estar equivocadas o desactualizadas, y nunca conocen datos sobre su caso que USCIS no haya publicado. Si algo no le parece correcto, escriba a corrections@casewhy.com — una persona lee cada mensaje.",
+          "Las explicaciones describen lo que un estado o proceso generalmente significa, basadas en materiales publicados por USCIS. Toda cuenta recibe la explicación completa en lenguaje sencillo; CaseWhy Plus además muestra la fuente específica de la que se elaboró. Pueden estar equivocadas o desactualizadas, y nunca conocen datos sobre su caso que USCIS no haya publicado. Si algo no le parece correcto, escriba a corrections@casewhy.com — una persona lee cada mensaje.",
       },
       {
         question: "¿CaseWhy está disponible en español?",
@@ -226,14 +229,14 @@ const GROUPS: FaqGroup[] = [
       {
         question: "¿CaseWhy es realmente gratis?",
         plainText:
-          "CaseWhy tiene un nivel gratuito — hasta tres casos rastreados, una línea de tiempo de estado, explicaciones en lenguaje sencillo generadas por IA, y tres preguntas de IA sobre su caso cada mes — además de un nivel Plus opcional y de pago para rastrear más casos, preguntas ilimitadas y otras funciones adicionales (consulte la página de Plus para ver los precios actuales). Obtener ayuda — los directorios de CaseWhy de asistencia legal gratuita, representantes acreditados, abogados y otros recursos — es gratis para todos, siempre, sin importar la suscripción: sin tarifas, sin anuncios, sin costos ocultos.",
+          "CaseWhy tiene un nivel gratuito — hasta tres casos rastreados, una línea de tiempo de estado, y explicaciones en lenguaje sencillo generadas por IA — además de un nivel Plus opcional y de pago para rastrear más casos, chat de IA sobre su caso y otras funciones adicionales (consulte la página de Plus para ver los precios actuales). Obtener ayuda — los directorios de CaseWhy de asistencia legal gratuita, representantes acreditados, abogados y otros recursos — es gratis para todos, siempre, sin importar la suscripción: sin tarifas, sin anuncios, sin costos ocultos.",
         answer: (
           <>
             CaseWhy tiene un nivel gratuito — hasta tres casos rastreados, una
-            línea de tiempo de estado, explicaciones en lenguaje sencillo
-            generadas por IA, y tres preguntas de IA sobre su caso cada mes —
-            además de un nivel Plus opcional y de pago para rastrear más casos,
-            preguntas ilimitadas y otras funciones adicionales (consulte la{" "}
+            línea de tiempo de estado, y explicaciones en lenguaje sencillo
+            generadas por IA — además de un nivel Plus opcional y de pago para
+            rastrear más casos, chat de IA sobre su caso y otras funciones
+            adicionales (consulte la{" "}
             <Link
               href="/es/plus"
               className="text-brand-600 hover:underline dark:text-brand-400"

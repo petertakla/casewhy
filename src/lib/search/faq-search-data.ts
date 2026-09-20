@@ -97,7 +97,7 @@ export const FAQ_SEARCH_ENTRIES: FaqSearchEntry[] = [
     groupEs: "Ask CaseWhy y las explicaciones de IA",
     question: "How accurate are the AI explanations?",
     questionEs: "¿Qué tan precisas son las explicaciones de IA?",
-    snippet: "The explanations describe what a status or process generally means, drawn from USCIS's own published materials, and every answer shows its source.",
+    snippet: "The explanations describe what a status or process generally means, drawn from USCIS's own published materials. Plus additionally shows the source.",
     snippetEs: "Las explicaciones describen lo que un estado o proceso generalmente significa, basadas en materiales publicados por USCIS.",
   },
   {
@@ -113,8 +113,8 @@ export const FAQ_SEARCH_ENTRIES: FaqSearchEntry[] = [
     groupEs: "CaseWhy Plus",
     question: "Is CaseWhy really free?",
     questionEs: "¿CaseWhy es realmente gratis?",
-    snippet: "CaseWhy has a free tier — up to three tracked cases, a status timeline, AI-generated explanations, and three AI questions a month.",
-    snippetEs: "CaseWhy tiene un nivel gratuito — hasta tres casos rastreados, una línea de tiempo de estado, y tres preguntas de IA al mes.",
+    snippet: "CaseWhy has a free tier — up to three tracked cases, a status timeline, and AI-generated explanations.",
+    snippetEs: "CaseWhy tiene un nivel gratuito — hasta tres casos rastreados, una línea de tiempo de estado, y explicaciones generadas por IA.",
   },
   {
     group: "CaseWhy Plus",

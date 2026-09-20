@@ -187,7 +187,7 @@ const GROUPS: FaqGroup[] = [
       {
         question: "Do I need an account to ask a question?",
         plainText:
-          "No. Ask CaseWhy on the Get Help page answers three questions without any sign-in; after that, a free account gives you three AI questions about your own case each month, and Plus makes them unlimited.",
+          "No. Ask CaseWhy on the Get Help page answers three questions without any sign-in. Asking about your own tracked case is a CaseWhy Plus feature, with unlimited questions.",
         answer: (
           <>
             No. Ask CaseWhy on the{" "}
@@ -197,9 +197,12 @@ const GROUPS: FaqGroup[] = [
             >
               Get Help
             </Link>{" "}
-            page answers three questions without any sign-in; after that, a free
-            account gives you three AI questions about your own case each month,
-            and Plus makes them unlimited.
+            page answers three questions without any sign-in. Asking about your
+            own tracked case is a{" "}
+            <Link href="/plus" className="text-brand-600 hover:underline dark:text-brand-400">
+              CaseWhy Plus
+            </Link>{" "}
+            feature, with unlimited questions.
           </>
         ),
       },
@@ -213,7 +216,7 @@ const GROUPS: FaqGroup[] = [
         // 70's alias pipeline confirms it's a real, handled address).
         question: "How accurate are the AI explanations?",
         answer:
-          "The explanations describe what a status or process generally means, drawn from USCIS's own published materials, and every answer shows the source it was built from. They can be wrong or out of date, and they never know facts about your case that USCIS hasn't published. If something looks off, email corrections@casewhy.com — a person reads every message.",
+          "The explanations describe what a status or process generally means, drawn from USCIS's own published materials. Every account gets the complete plain-language explanation; CaseWhy Plus additionally shows the specific source it was built from. They can be wrong or out of date, and they never know facts about your case that USCIS hasn't published. If something looks off, email corrections@casewhy.com — a person reads every message.",
       },
       {
         // Corrected during round 104's verification pass: the draft
@@ -257,13 +260,13 @@ const GROUPS: FaqGroup[] = [
       {
         question: "Is CaseWhy really free?",
         plainText:
-          "CaseWhy has a free tier — up to three tracked cases, a status timeline, AI-generated plain-language explanations, and three AI questions about your case each month — plus an optional paid Plus tier for tracking more cases, unlimited questions, and other add-ons (see the Plus page for current pricing). Get Help — CaseWhy's directories of free legal aid, accredited representatives, attorneys, and other resources — is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost.",
+          "CaseWhy has a free tier — up to three tracked cases, a status timeline, and AI-generated plain-language explanations — plus an optional paid Plus tier for tracking more cases, AI chat about your case, and other add-ons (see the Plus page for current pricing). Get Help — CaseWhy's directories of free legal aid, accredited representatives, attorneys, and other resources — is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost.",
         answer: (
           <>
             CaseWhy has a free tier — up to three tracked cases, a status
-            timeline, AI-generated plain-language explanations, and three AI
-            questions about your case each month — plus an optional paid Plus
-            tier for tracking more cases, unlimited questions, and other add-ons
+            timeline, and AI-generated plain-language explanations — plus an
+            optional paid Plus tier for tracking more cases, AI chat about
+            your case, and other add-ons
             (see the{" "}
             <Link
               href="/plus"

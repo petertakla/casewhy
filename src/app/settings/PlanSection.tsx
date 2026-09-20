@@ -51,8 +51,8 @@ export async function PlanSection({ userId, es }: { userId: string; es: boolean 
         <div className="mt-2 rounded-xl border border-border bg-surface p-5">
           <p className="text-sm font-medium text-foreground">
             {es
-              ? `Gratis · ${TIER_LIMITS.free.maxCases} casos rastreados, ${TIER_LIMITS.free.chatQuestionsPerMonth} preguntas de IA al mes`
-              : `Free · ${TIER_LIMITS.free.maxCases} tracked cases, ${TIER_LIMITS.free.chatQuestionsPerMonth} AI questions a month`}
+              ? `Gratis · ${TIER_LIMITS.free.maxCases} casos rastreados`
+              : `Free · ${TIER_LIMITS.free.maxCases} tracked cases`}
           </p>
           <Link
             href="/plus"

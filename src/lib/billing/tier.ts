@@ -22,6 +22,12 @@
 // free questions/month was generous enough to undercut the same round's
 // "unlimited AI chat" upgrade pitch. Unrelated to maxCases above, which
 // stays at 3 per round 47.
+//
+// Round 125 — free-tier chat cap lowered 3 -> 0 (Peter's direct call, paywall
+// tightening pass): the signed-in "Ask a question" chat is now a Plus-only
+// feature, not a metered free perk. Unrelated to the separate, still-free
+// anonymous "Ask CaseWhy" on the Get Help page (src/lib/get-help/
+// anonymous-chat.ts), which has its own quota and isn't gated by this file.
 
 import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
@@ -36,7 +42,7 @@ export interface TierLimits {
 }
 
 export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
-  free: { maxCases: 3, chatQuestionsPerMonth: 3 },
+  free: { maxCases: 3, chatQuestionsPerMonth: 0 },
   plus: { maxCases: 10, chatQuestionsPerMonth: null },
 };
 

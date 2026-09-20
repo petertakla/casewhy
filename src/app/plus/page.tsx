@@ -40,12 +40,28 @@ interface PlusFeature {
 
 const PLUS_FEATURES: PlusFeature[] = [
   {
+    id: "general-ask-casewhy",
+    title: "Ask CaseWhy (general questions)",
+    free: "3, no sign-in",
+    plus: "3, no sign-in",
+    explanation:
+      "\"What does an RFE mean?\" \"How does adjustment of status work?\" — general USCIS-policy questions, not tied to any specific case, answered without an account. This is the same free tool on every tier, including for visitors who've never signed up: three questions, grounded in CaseWhy's own policy knowledge base, no case data involved at all. It's a different thing from the case-specific chat below, which knows your actual tracked case's live status and history.",
+  },
+  {
     id: "ai-chat",
-    title: "AI chat about your case",
-    free: "3 / month",
+    title: "AI chat about your specific case",
+    free: "—",
     plus: "Unlimited",
     explanation:
-      "Your status just changed to \"Request for Evidence\" and you don't know what that means, whether your timeline just reset, or what USCIS actually wants — that's exactly what the chat is for. Ask in plain English and get an answer grounded in CaseWhy's own curated policy and case-law knowledge base, with visible citations you can check yourself, instead of a generic chatbot guessing from general training data. On the free tier, 3 questions a month runs out fast — one real update to your case can easily produce three follow-up questions in a single evening, and then you're locked out until next month right when you need it most. Plus removes the limit entirely, so you can ask a question the moment you're anxious about one, not ration them.",
+      "Your status just changed to \"Request for Evidence\" and you don't know what that means, whether your timeline just reset, or what USCIS actually wants — that's exactly what this chat is for. Unlike the general Ask CaseWhy tool above, this one knows your actual tracked case — its live status, its history, its receipt-specific context — not just USCIS policy in the abstract. Ask in plain English and get an answer grounded in CaseWhy's own curated policy and case-law knowledge base and your specific tracked receipt, with visible citations you can check yourself, instead of a generic chatbot guessing. Plus unlocks unlimited questions about your own tracked case, so you can ask the moment you're anxious about one instead of rationing a handful a month.",
+  },
+  {
+    id: "explanation-depth",
+    title: "In-depth case explanations",
+    free: "Basics",
+    plus: "Full depth",
+    explanation:
+      "Every account, free or Plus, gets a complete, honest plain-language explanation of what a status means and whether there's cause for concern — that basic answer is never held back. Plus adds the layer on top: likely next steps specific to this case, cited policy background you can check yourself, and quick links into the escalation toolkit when a citation is relevant to a stall. Same underlying explanation, more of it surfaced.",
   },
   {
     id: "tracked-cases",

@@ -72,42 +72,13 @@ export default async function AskPage({
     );
   }
 
-  const trackedCasesList = await getTrackedCases(session.user.id);
-  if (trackedCasesList.length === 0) {
-    return (
-      <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
-        <LanguageSwitcher es={es} href={langHref} />
-        <h1 className="text-2xl font-bold tracking-tight">{es ? "Hacer una pregunta" : "Ask a question"}</h1>
-        <p className="mb-8 mt-2 text-muted">
-          {es
-            ? "Una forma conversacional de preguntar sobre tu caso, fundamentada en la base de conocimiento de políticas de CaseWhy."
-            : "A conversational way to ask about your case, grounded in CaseWhy's policy knowledge base."}
-        </p>
-        <EmptyState>
-          {es ? (
-            <>
-              <Link href="/dashboard?lang=es" className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
-                Rastrea un caso en tu panel
-              </Link>{" "}
-              primero, y luego regresa aquí para preguntar sobre él.
-            </>
-          ) : (
-            <>
-              <Link href="/dashboard" className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
-                Track a case on your dashboard
-              </Link>{" "}
-              first, then come back here to ask about it.
-            </>
-          )}
-        </EmptyState>
-      </main>
-    );
-  }
-
   // Round 125 — AI chat is now a Plus-only feature (paywall tightening,
-  // Peter's direct call), not a metered free perk. Gated here at the page
-  // level, before any case lookup or CaseChat render, rather than letting a
-  // free user type a question and only then hearing they're blocked — the
+  // Peter's direct call), not a metered free perk. Checked here, before the
+  // tracked-cases lookup, on purpose: with the old ordering a free user with
+  // no tracked cases yet was told "track a case, then come back here to ask
+  // about it" -- a real broken promise, since even once they did that
+  // they'd still hit the paywall. A free user now sees the Plus upsell
+  // immediately regardless of whether they have a case tracked. The
   // /api/chat route still enforces this server-side too (defense in depth,
   // same "layout is UX, the real boundary is elsewhere" pattern as round
   // 98's admin gate).
@@ -117,12 +88,7 @@ export default async function AskPage({
       <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
         <LanguageSwitcher es={es} href={langHref} />
         <h1 className="text-2xl font-bold tracking-tight">{es ? "Hacer una pregunta" : "Ask a question"}</h1>
-        <p className="mb-8 mt-2 text-muted">
-          {es
-            ? "Una forma conversacional de preguntar sobre tu caso, fundamentada en la base de conocimiento de políticas de CaseWhy."
-            : "A conversational way to ask about your case, grounded in CaseWhy's policy knowledge base."}
-        </p>
-        <div className="rounded-2xl border border-brand-500/30 bg-brand-500/5 p-8 text-center">
+        <div className="mt-6 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-8 text-center">
           <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
             CaseWhy <PlusBadge size="sm" />
           </p>
@@ -173,6 +139,38 @@ export default async function AskPage({
             )}
           </p>
         </div>
+      </main>
+    );
+  }
+
+  const trackedCasesList = await getTrackedCases(session.user.id);
+  if (trackedCasesList.length === 0) {
+    return (
+      <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+        <LanguageSwitcher es={es} href={langHref} />
+        <h1 className="text-2xl font-bold tracking-tight">{es ? "Hacer una pregunta" : "Ask a question"}</h1>
+        <p className="mb-8 mt-2 text-muted">
+          {es
+            ? "Una forma conversacional de preguntar sobre tu caso, fundamentada en la base de conocimiento de políticas de CaseWhy."
+            : "A conversational way to ask about your case, grounded in CaseWhy's policy knowledge base."}
+        </p>
+        <EmptyState>
+          {es ? (
+            <>
+              <Link href="/dashboard?lang=es" className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+                Rastrea un caso en tu panel
+              </Link>{" "}
+              primero, y luego regresa aquí para preguntar sobre él.
+            </>
+          ) : (
+            <>
+              <Link href="/dashboard" className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+                Track a case on your dashboard
+              </Link>{" "}
+              first, then come back here to ask about it.
+            </>
+          )}
+        </EmptyState>
       </main>
     );
   }

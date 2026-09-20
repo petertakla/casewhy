@@ -54,17 +54,27 @@ export default async function AskPage({
         <EmptyState>
           {es ? (
             <>
+              Chatear sobre tu caso específico rastreado es una función de CaseWhy Plus —{" "}
               <Link href="/auth/sign-in?lang=es" className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
-                Inicia sesión
+                inicia sesión
               </Link>{" "}
-              y rastrea un caso para empezar a hacer preguntas sobre él.
+              y suscríbete para empezar. ¿Solo tienes una pregunta general sobre políticas de USCIS?{" "}
+              <Link href="/get-help/ask?lang=es" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                Pregúntale a CaseWhy
+              </Link>{" "}
+              ahora mismo, sin necesidad de iniciar sesión.
             </>
           ) : (
             <>
+              Chatting about your own specific tracked case is a CaseWhy Plus feature —{" "}
               <Link href="/auth/sign-in" className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
-                Sign in
+                sign in
               </Link>{" "}
-              and track a case to start asking questions about it.
+              and subscribe to start. Just have a general USCIS policy question?{" "}
+              <Link href="/get-help/ask" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                Ask CaseWhy
+              </Link>{" "}
+              right now, no sign-in needed.
             </>
           )}
         </EmptyState>

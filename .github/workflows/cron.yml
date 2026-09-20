@@ -45,6 +45,14 @@ name: Cron
 # only job (nothing is ever scheduled for a weekend), and idempotent like
 # every other route here (only touches rows whose date has actually
 # arrived).
+#
+# refresh-community-org-directory / refresh-dso-directory /
+# refresh-pro-bono-representation (round 122 follow-up — built after the
+# Sep 20 Neon outage recovery surfaced that these three were the only Get
+# Help entity types still on a one-time point-in-time seed rather than
+# round 117's live-refresh treatment) — same monthly cadence as the other
+# two directory refreshes, each offset one more day (4th/5th/6th) so every
+# refresh's own anomaly ops_tasks land in their own clean run.
 
 on:
   schedule:
@@ -57,6 +65,9 @@ on:
     - cron: "0 12 1 * *"    # generate-ops-tasks — monthly, 1st at 8:00 AM ET
     - cron: "0 12 2 * *"    # refresh-attorney-directory — monthly, 2nd at 8:00 AM ET (offset a day from generate-ops-tasks so its own anomaly ops_tasks land in a clean run)
     - cron: "0 12 3 * *"    # refresh-doj-directories — monthly, 3rd at 8:00 AM ET
+    - cron: "0 12 4 * *"    # refresh-community-org-directory — monthly, 4th at 8:00 AM ET
+    - cron: "0 12 5 * *"    # refresh-dso-directory — monthly, 5th at 8:00 AM ET
+    - cron: "0 12 6 * *"    # refresh-pro-bono-representation — monthly, 6th at 8:00 AM ET
     - cron: "0 15 * * 1-5"  # post-scheduled — daily weekdays, 11:00 AM ET
   workflow_dispatch: {} # manual run of every job at once, for testing — every route below is idempotent/safe to re-trigger
 
@@ -123,6 +134,27 @@ jobs:
     steps:
       - run: |
           curl -sf -X POST https://app.casewhy.com/api/cron/refresh-doj-directories -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}" --max-time 280
+
+  refresh-community-org-directory:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 12 4 * *'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sf -X POST https://app.casewhy.com/api/cron/refresh-community-org-directory -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}" --max-time 280
+
+  refresh-dso-directory:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 12 5 * *'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sf -X POST https://app.casewhy.com/api/cron/refresh-dso-directory -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}" --max-time 280
+
+  refresh-pro-bono-representation:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 12 6 * *'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sf -X POST https://app.casewhy.com/api/cron/refresh-pro-bono-representation -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}" --max-time 280
 
   post-scheduled:
     if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 15 * * 1-5'

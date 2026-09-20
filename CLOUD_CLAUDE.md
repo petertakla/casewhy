@@ -3457,3 +3457,13 @@ All three wired into `.github/workflows/cron.yml` on `nextjs-app` (now the repo'
 ## CIGP (community orgs) monthly refresh automation — DONE, see round 122 follow-up above
 
 This was queued from round 117 through round 122; shipped as part of the round 122 follow-up entry above (`refresh-community-org-directory`, `src/lib/directories/cigp/`).
+
+## Queued follow-up, not started — code-level single point of failure audit
+
+Peter, Sep 20: asked for a single-point-of-failure audit "excluding 2FA" after the cloud session's own business-level audit (`claude/single-point-of-failure-audit.md`) — wants a technical/code-level pass distinct from that one (external-dependency severity ratings), covering things only visible by reading the actual codebase. Started, then explicitly deferred as a follow-up task rather than done inline. Partial findings already made, worth starting from:
+
+- **`src/lib/db/crypto.ts`** — `ENCRYPTION_KEY` is a single, unversioned AES-256-GCM key with no rotation support. If it's ever lost or rotated without first decrypting+re-encrypting every existing row, every `tracked_cases.receipt_number` becomes permanently, unrecoverably unreadable. More severe than most items on the business-level audit, and specific to this codebase — worth confirming this key is actually backed up somewhere durable outside Vercel's own env var store.
+- **`src/lib/db/client.ts`** — `getDb()`'s `pg.Pool` has no visible retry/circuit-breaker wrapper; not yet confirmed whether a transient connection blip surfaces as a clean user-facing error or an unhandled crash.
+- **Not yet checked**: `src/lib/uscis/`'s retry/timeout behavior, whether every cron route sharing one `ADMIN_DIAG_SECRET` is itself a SPOF (a leak or rotation breaks every scheduled job at once), AI Gateway model-string fallback behavior, and a broader sweep for non-null-asserted env vars (`process.env.X!`) that crash rather than degrade if unset.
+
+Also note: 2FA is confirmed OFF (not just missing recovery codes) on both Vercel and GitHub — checked directly, then put on hold by Peter. Don't re-raise unprompted; resume only if asked.

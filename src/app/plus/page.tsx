@@ -322,7 +322,7 @@ export default async function PlusPage({
             between plans later is prorated automatically.
           </p>
 
-          <div className="mt-8 grid grid-cols-1 gap-4 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6 sm:grid-cols-2">
+          <div className="mt-8 grid grid-cols-1 gap-4 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6 sm:grid-cols-3">
             <div>
               <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
                 Grounded in policy and your case, not guessing
@@ -335,6 +335,23 @@ export default async function PlusPage({
               </p>
               <a
                 href="#ai-chat"
+                className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
+              >
+                See how it works →
+              </a>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
+                Know the moment a case stalls
+              </p>
+              <p className="mt-1.5 text-sm text-muted">
+                CaseWhy flags a case that&apos;s gone unusually quiet against a
+                real USCIS benchmark — not a guess — so you find out the
+                moment it happens instead of noticing on your own months
+                later.
+              </p>
+              <a
+                href="#stalled-case-alert"
                 className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
               >
                 See how it works →

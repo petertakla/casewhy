@@ -329,7 +329,7 @@ export default async function PlusPageEs({
             automáticamente.
           </p>
 
-          <div className="mt-8 grid grid-cols-1 gap-4 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6 sm:grid-cols-2">
+          <div className="mt-8 grid grid-cols-1 gap-4 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6 sm:grid-cols-3">
             <div>
               <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
                 Fundamentado en política y en tu caso, no en suposiciones
@@ -342,6 +342,23 @@ export default async function PlusPageEs({
               </p>
               <a
                 href="#ai-chat"
+                className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
+              >
+                Ver cómo funciona →
+              </a>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
+                Sabe en el momento en que un caso se estanca
+              </p>
+              <p className="mt-1.5 text-sm text-muted">
+                CaseWhy marca un caso que se ha quedado inusualmente en
+                silencio frente a un punto de referencia real de USCIS — no
+                una suposición — para que te enteres en el momento en que
+                ocurre, en lugar de notarlo por tu cuenta meses después.
+              </p>
+              <a
+                href="#stalled-case-alert"
                 className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
               >
                 Ver cómo funciona →

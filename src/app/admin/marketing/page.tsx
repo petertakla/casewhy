@@ -211,6 +211,7 @@ export default async function MarketingQueueAdminPage({
                       guardrailNotes={row.guardrailNotes}
                       locale={row.locale}
                       mediaRefs={row.mediaRefs}
+                      scheduledFor={row.scheduledFor}
                       blogPost={
                         row.channel === "blog"
                           ? blogPostBySlug.get(row.destination.replace(/^\/updates\//, "")) ?? null

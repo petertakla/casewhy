@@ -21,6 +21,7 @@ export function MarketingQueueCard({
   locale,
   blogPost,
   mediaRefs,
+  scheduledFor,
 }: {
   id: string;
   /** Round 90 prep follow-up — "approved" reaches this card for real now (posting-paused, master switch off). Initializes the same compact "paused" summary a fresh approve click produces, so a page reload doesn't re-show the full editable draft for something already approved. */
@@ -37,11 +38,14 @@ export function MarketingQueueCard({
   blogPost?: UpdatePost | null;
   /** Round 91 — the rendered Gemini/Veo asset URL for pinterest/youtube/tiktok/instagram/facebook rows. Null for every other channel. */
   mediaRefs?: string | null;
+  /** Round 116 — set only by the evergreen weekday fallback. A future date means an approve click intentionally holds the post instead of firing it -- distinct from the master-switch-off "paused" case, which never has this set. */
+  scheduledFor?: Date | null;
 }) {
   const [text, setText] = useState(draftText ?? "");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState<string | null>(status === "approved" ? "paused" : null);
+  const isScheduledForFuture = Boolean(scheduledFor && scheduledFor.getTime() > Date.now());
+  const [done, setDone] = useState<string | null>(status === "approved" ? (isScheduledForFuture ? "scheduled" : "paused") : null);
 
   const isEscalationOnly = !draftText;
   const isBlog = channel === "blog";
@@ -93,7 +97,7 @@ export function MarketingQueueCard({
     // caught and fixed the same day).
     const result = await approveForAutoPost(id, text, channel);
     if (result.ok) {
-      setDone(result.posted ? "posted" : "paused");
+      setDone(result.posted ? "posted" : isScheduledForFuture ? "scheduled" : "paused");
     } else {
       setError(result.error);
       setPending(false);
@@ -110,6 +114,11 @@ export function MarketingQueueCard({
             <>
               {CHANNEL_LABELS[channel] ?? channel} — approved, <strong>posting paused</strong>. Will post once you
               turn posting on in Marketing settings.
+            </>
+          ) : done === "scheduled" ? (
+            <>
+              {CHANNEL_LABELS[channel] ?? channel} — approved, <strong>scheduled</strong> to post{" "}
+              {scheduledFor?.toLocaleString(undefined, { weekday: "long", month: "short", day: "numeric" })}.
             </>
           ) : (
             <>

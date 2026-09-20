@@ -37,6 +37,14 @@ name: Cron
 # refresh-doj-directories (round 117 monthly-automation follow-up, phase
 # 2) — same monthly cadence, offset one more day (3rd) so its own anomaly
 # ops_tasks land in their own clean run too.
+#
+# post-scheduled (round 116) — daily, weekdays, 11:00 AM ET. An hour after
+# the evergreen weekday fallback's own 10:00 AM ET scheduledFor, so a
+# post approved ahead of time on Sunday actually goes out that weekday
+# morning instead of the instant it was approved. Harmless as a weekday-
+# only job (nothing is ever scheduled for a weekend), and idempotent like
+# every other route here (only touches rows whose date has actually
+# arrived).
 
 on:
   schedule:
@@ -49,6 +57,7 @@ on:
     - cron: "0 12 1 * *"    # generate-ops-tasks — monthly, 1st at 8:00 AM ET
     - cron: "0 12 2 * *"    # refresh-attorney-directory — monthly, 2nd at 8:00 AM ET (offset a day from generate-ops-tasks so its own anomaly ops_tasks land in a clean run)
     - cron: "0 12 3 * *"    # refresh-doj-directories — monthly, 3rd at 8:00 AM ET
+    - cron: "0 15 * * 1-5"  # post-scheduled — daily weekdays, 11:00 AM ET
   workflow_dispatch: {} # manual run of every job at once, for testing — every route below is idempotent/safe to re-trigger
 
 jobs:
@@ -114,3 +123,10 @@ jobs:
     steps:
       - run: |
           curl -sf -X POST https://app.casewhy.com/api/cron/refresh-doj-directories -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}" --max-time 280
+
+  post-scheduled:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 15 * * 1-5'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sf -X POST https://app.casewhy.com/api/cron/post-scheduled -H "Authorization: Bearer ${{ secrets.ADMIN_DIAG_SECRET }}"

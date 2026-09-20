@@ -117,7 +117,7 @@ export async function approveForAutoPost(id: string, finalText: string, channel:
     .update(marketingQueue)
     .set({ status: "approved", draftText: finalText, reviewedAt: new Date(), reviewedBy: adminEmail })
     .where(eq(marketingQueue.id, id))
-    .returning({ destination: marketingQueue.destination, mediaRefs: marketingQueue.mediaRefs });
+    .returning({ destination: marketingQueue.destination, mediaRefs: marketingQueue.mediaRefs, scheduledFor: marketingQueue.scheduledFor });
 
   // Round 90 prep follow-up (Sep 18) — master switch, checked before
   // postQueueItem ever runs. Scoped to real third-party channels only --
@@ -129,6 +129,18 @@ export async function approveForAutoPost(id: string, finalText: string, channel:
   // (settings/actions.ts) posts every row left at "approved" the moment
   // Peter turns this on, so nothing needs a second manual click.
   if (channel !== "blog" && getPosterForChannel(channel) && !(await getSocialPostingEnabled())) {
+    revalidatePath("/admin/marketing");
+    revalidatePath("/admin/marketing/log");
+    return { ok: true, posted: false };
+  }
+
+  // Round 116 — evergreen weekday fallback content carries a future
+  // scheduledFor so a whole week can be approved in one Sunday-evening
+  // sitting without every post firing immediately. Same "stay approved,
+  // don't post yet" shape as the master-switch case above; /api/cron/
+  // post-scheduled (daily) posts it for real once the date arrives. News-
+  // watcher rows never set scheduledFor, so this never delays real news.
+  if (updated.scheduledFor && updated.scheduledFor.getTime() > Date.now()) {
     revalidatePath("/admin/marketing");
     revalidatePath("/admin/marketing/log");
     return { ok: true, posted: false };
@@ -148,7 +160,14 @@ export async function approveForAutoPost(id: string, finalText: string, channel:
 export async function flushApprovedQueueItems(): Promise<{ posted: number; failed: number }> {
   const db = getDb();
   const rows = await db
-    .select({ id: marketingQueue.id, channel: marketingQueue.channel, draftText: marketingQueue.draftText, mediaRefs: marketingQueue.mediaRefs, destination: marketingQueue.destination })
+    .select({
+      id: marketingQueue.id,
+      channel: marketingQueue.channel,
+      draftText: marketingQueue.draftText,
+      mediaRefs: marketingQueue.mediaRefs,
+      destination: marketingQueue.destination,
+      scheduledFor: marketingQueue.scheduledFor,
+    })
     .from(marketingQueue)
     .where(eq(marketingQueue.status, "approved"));
 
@@ -156,6 +175,11 @@ export async function flushApprovedQueueItems(): Promise<{ posted: number; faile
   let failed = 0;
   for (const row of rows) {
     if (row.channel === "blog") continue;
+    // Round 116 — a row still waiting on its own future scheduledFor isn't
+    // "paused on the switch," it's paused on its date; flipping the switch
+    // back on shouldn't fire it early. /api/cron/post-scheduled is what
+    // posts it once that date actually arrives.
+    if (row.scheduledFor && row.scheduledFor.getTime() > Date.now()) continue;
     const result = await postQueueItem(row.id, row.channel, row.draftText ?? "", row.mediaRefs, row.destination);
     if (result.ok && result.posted) posted++;
     else if (!result.ok) failed++;

@@ -1196,6 +1196,15 @@ export const marketingQueue = pgTable(
     // table rather than a news-item-only field.
     locale: text("locale").notNull().default("en"),
     status: marketingQueueStatusEnum("status").notNull().default("pending"),
+    // Round 116 — null for everything the reactive news watcher drafts
+    // (sourcing-over-speed means those should post as soon as approved,
+    // never delayed). Set only by the evergreen weekday fallback, so a
+    // whole week's worth of content can be approved in one Sunday-evening
+    // session without every post firing immediately: approveForAutoPost
+    // leaves a row with a future scheduledFor at "approved" instead of
+    // posting it, and /api/cron/post-scheduled (daily) posts anything
+    // approved whose scheduledFor has arrived.
+    scheduledFor: timestamp("scheduled_for", { withTimezone: true }),
     postedAt: timestamp("posted_at", { withTimezone: true }),
     postedUrl: text("posted_url"),
     // Filled later by a future attribution job (not this round) — clicks/

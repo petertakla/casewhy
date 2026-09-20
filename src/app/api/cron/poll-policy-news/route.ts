@@ -32,6 +32,7 @@ import { matchKbMemoIds } from "@/lib/marketing/news-watcher/kb-match";
 import { staleVisaBulletinDestination } from "@/lib/marketing/news-watcher/visa-bulletin-check";
 import { draftXThread, draftThreadsPost, draftFacebookPost, type DraftLocale } from "@/lib/marketing/draft-news-post";
 import { getSpanishSocialEnabled } from "@/lib/marketing/config";
+import { ensureEvergreenForDate } from "@/lib/marketing/evergreen/generate-weekday-evergreen";
 import { createHash } from "crypto";
 
 export const maxDuration = 60;
@@ -258,6 +259,11 @@ export async function POST(request: Request) {
     .from(newsItems)
     .where(sql`${newsItems.processedAt} IS NULL`);
 
+  // Round 116 — evergreen weekday fallback. Runs after the real-news
+  // drafting above so its own "did real news already post today" check
+  // (Mon/Thu only) sees this run's own inserts, not just a prior run's.
+  const evergreen = await ensureEvergreenForDate(db, new Date());
+
   return Response.json({
     itemsFound: items.length,
     newItemsFound,
@@ -270,5 +276,6 @@ export async function POST(request: Request) {
     sourceErrors,
     draftErrors,
     stoppedEarly,
+    evergreen,
   });
 }

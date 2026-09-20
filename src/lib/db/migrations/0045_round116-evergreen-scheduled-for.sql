@@ -1,0 +1,1 @@
+ALTER TABLE "marketing_queue" ADD COLUMN "scheduled_for" timestamp with time zone;

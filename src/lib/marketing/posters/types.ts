@@ -1,7 +1,9 @@
 // Round 89 — the common interface every real channel poster (rounds
 // 90-92: X/Threads/LinkedIn, Pinterest/YouTube/TikTok/Instagram, email)
-// implements. Only ever called from approveForAutoPost, on a real
-// approval click -- never from the polling/drafting path.
+// implements. Called from approveForAutoPost on a real approval click, or
+// (round 116) from /api/cron/post-scheduled once a previously-approved,
+// future-dated row's own scheduledFor arrives -- never from the polling/
+// drafting path itself.
 
 export interface MarketingPostItem {
   channel: string;

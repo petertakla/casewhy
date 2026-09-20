@@ -19,7 +19,12 @@ import { apiRequest } from "@/lib/http/apiRequest";
 // list here) is the whole point of this round's standing rule.
 const NAV_LINKS = [
   { href: "/dashboard", label: "Dashboard", labelEs: "Panel" },
-  { href: "/ask", label: "Ask a question", labelEs: "Hacer una pregunta" },
+  // Round 125 follow-up — relabeled from "Ask a question" (Peter found this
+  // live, confused with the always-free, no-sign-in general "Ask CaseWhy"
+  // tool the FAQ promises, which this nav item never actually led to). This
+  // link is the case-specific chat at /ask, Plus-only as of round 125 — the
+  // label now says so plainly instead of implying it's the same thing.
+  { href: "/ask", label: "Ask about my case", labelEs: "Preguntar sobre mi caso" },
   // Round 109 — label kept as plain "CaseWhy Plus" for anything reading
   // this list as data (e.g. a screen reader with CSS disabled); the badge
   // treatment is applied in renderNavLink() below, which special-cases

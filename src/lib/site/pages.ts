@@ -111,6 +111,16 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
     showInIndex: true,
     showInFooter: false,
     showInSitemapXml: true,
+    // Round 125 follow-up — Peter found this live: the FAQ promises a free,
+    // no-sign-in general question tool, but nothing in the main header nav
+    // actually led to it (only /get-help's own sub-chooser did). The nav's
+    // "Ask a question" item only ever pointed to the case-specific,
+    // now-Plus-only chat, so a reader following the FAQ's promise had no
+    // direct path from the nav. Added to the Resources dropdown so it's
+    // reachable from every page, not just /get-help.
+    showInHeaderMenu: true,
+    menuLabel: "Ask CaseWhy (free)",
+    menuLabelEs: "Pregúntale a CaseWhy (gratis)",
   },
   {
     href: "/attorneys",

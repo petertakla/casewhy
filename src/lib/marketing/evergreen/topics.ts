@@ -158,5 +158,6 @@ export async function buildRecapTopic(db: ReturnType<typeof getDb>, fridayDate: 
     sourceName: "CaseWhy weekly recap",
     // No sourceUrl -- this summarizes CaseWhy's own week of posts, not an
     // external primary source.
+    isRecap: true,
   };
 }

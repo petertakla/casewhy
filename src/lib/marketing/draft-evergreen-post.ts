@@ -30,6 +30,8 @@ export interface EvergreenItemInput {
   sourceName: string;
   /** Omitted for the Friday recap -- it summarizes CaseWhy's own week of posts, not an external primary source, so there's nothing to cite. */
   sourceUrl?: string;
+  /** Set only by buildRecapTopic. The Threads/Facebook format instructions ask for "one concrete detail" on a single topic, which a multi-topic recap can't satisfy -- caused a real, repeatable CANNOT_DRAFT on the Threads format until this loosened it to "briefly touch each topic" instead. */
+  isRecap?: boolean;
 }
 
 function baseInstructions(item: EvergreenItemInput): string {
@@ -91,9 +93,12 @@ Format: write 2 to 4 short posts (each under 260 characters, X/Twitter style) as
 }
 
 export async function draftEvergreenThreadsPost(item: EvergreenItemInput): Promise<EvergreenDraftResult | null> {
+  const format = item.isRecap
+    ? "write ONE post (under 480 characters, Threads style) briefly touching each topic listed in the facts, in order -- a recap, not a deep dive into any one of them."
+    : "write ONE longer post (under 480 characters, Threads style) covering the topic and one concrete procedural detail.";
   const instructions = `${baseInstructions(item)}
 
-Format: write ONE longer post (under 480 characters, Threads style) covering the topic and one concrete procedural detail. Output only the post text, nothing else.`;
+Format: ${format} Output only the post text, nothing else.`;
 
   const raw = await generateOnce(instructions, `Draft the Threads post now.`);
   if (raw.startsWith("CANNOT_DRAFT:")) return null;
@@ -104,9 +109,12 @@ Format: write ONE longer post (under 480 characters, Threads style) covering the
 }
 
 export async function draftEvergreenFacebookPost(item: EvergreenItemInput): Promise<EvergreenDraftResult | null> {
+  const format = item.isRecap
+    ? "write ONE Facebook Page post (under 800 characters) briefly covering each topic listed in the facts, in order -- a recap, not a deep dive into any one of them."
+    : "write ONE Facebook Page post (under 800 characters) covering the topic with enough concrete procedural detail to be genuinely useful on its own. Slightly more explanatory than a Threads post -- Facebook Page followers expect a bit more context.";
   const instructions = `${baseInstructions(item)}
 
-Format: write ONE Facebook Page post (under 800 characters) covering the topic with enough concrete procedural detail to be genuinely useful on its own. Slightly more explanatory than a Threads post -- Facebook Page followers expect a bit more context. Output only the post text, nothing else.`;
+Format: ${format} Output only the post text, nothing else.`;
 
   const raw = await generateOnce(instructions, `Draft the Facebook Page post now.`);
   if (raw.startsWith("CANNOT_DRAFT:")) return null;

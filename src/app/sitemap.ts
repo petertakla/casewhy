@@ -30,15 +30,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     p.hrefEs && p.hrefEs.startsWith("/") ? [p.href, p.hrefEs] : [p.href]
   );
 
-  const [attorneys, reps, legalAid, dsos, communityOrgs, proBono, updates] = await Promise.all([
-    getAttorneyDirectory(),
-    getAccreditedRepresentativeDirectory(),
-    getLegalAidDirectory(),
-    getDsoDirectory(),
-    getCommunityOrgDirectory(),
-    getProBonoRepresentationDirectory(),
-    getPublishedUpdates(),
-  ]);
+  // A DB outage shouldn't take the entire build down over a metadata route —
+  // degrade to static-only paths rather than failing the build/request.
+  let attorneys: Awaited<ReturnType<typeof getAttorneyDirectory>> = [];
+  let reps: Awaited<ReturnType<typeof getAccreditedRepresentativeDirectory>> = [];
+  let legalAid: Awaited<ReturnType<typeof getLegalAidDirectory>> = [];
+  let dsos: Awaited<ReturnType<typeof getDsoDirectory>> = [];
+  let communityOrgs: Awaited<ReturnType<typeof getCommunityOrgDirectory>> = [];
+  let proBono: Awaited<ReturnType<typeof getProBonoRepresentationDirectory>> = [];
+  let updates: Awaited<ReturnType<typeof getPublishedUpdates>> = [];
+  try {
+    [attorneys, reps, legalAid, dsos, communityOrgs, proBono, updates] = await Promise.all([
+      getAttorneyDirectory(),
+      getAccreditedRepresentativeDirectory(),
+      getLegalAidDirectory(),
+      getDsoDirectory(),
+      getCommunityOrgDirectory(),
+      getProBonoRepresentationDirectory(),
+      getPublishedUpdates(),
+    ]);
+  } catch (err) {
+    console.error("sitemap.xml: DB-dependent paths unavailable, falling back to static paths only", err);
+  }
 
   const entityPaths = [
     ...attorneys.map((a) => `/attorneys/${a.slug}`),

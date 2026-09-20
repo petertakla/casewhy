@@ -151,7 +151,7 @@ export const PUBLIC_HOWTO_ENTRIES: HelpEntry[] = [
     audience: "public",
     kind: "howto",
     steps: [
-      "CaseWhy automatically flags a case as outside USCIS's own normal processing time once it's waited longer than USCIS's published estimate for that form and office.",
+      "CaseWhy Plus automatically flags a case as outside USCIS's own normal processing time once it's waited longer than USCIS's published estimate for that form and office.",
       "At that point, the formal channels USCIS itself provides are: a USCIS e-Request, a congressional inquiry, or the CIS Ombudsman — CaseWhy shows these options directly on the case.",
       "Plus can draft those escalation letters for you, prefilled with your case's own details.",
     ],

@@ -74,10 +74,10 @@ const PLUS_FEATURES: PlusFeature[] = [
   {
     id: "stalled-case-alert",
     title: "Stalled-case alert",
-    free: "Included",
+    free: "—",
     plus: "Included",
     explanation:
-      "CaseWhy flags a case that's gone unusually quiet relative to a real benchmark — not a guess, but how long cases like yours typically take before the next real step. This alert itself is free on every tier, by design: knowing something might be stuck shouldn't be behind a paywall. It's the two escalation tools that follow a stall alert — representative lookup and letter drafting, both below — that are part of Plus, since acting on a stall (versus just being told about one) is where the real value is.",
+      "CaseWhy flags a case that's gone unusually quiet relative to a real benchmark — not a guess, but how long cases like yours typically take before the next real step. Plus unlocks the alert along with the two escalation tools that follow it — representative lookup and letter drafting, both below — so the moment you learn a case may be stuck, you already have real next steps in hand instead of just the news.",
   },
   {
     id: "representative-lookup",
@@ -245,14 +245,15 @@ export default async function PlusPage({
         CaseWhy <PlusBadge size="lg" />
       </h1>
       <p className="mb-2 mt-2 text-lg text-muted">
-        Unlimited, cited AI chat about your case — plus the escalation toolkit
-        for when it stalls. For you and your whole family.
+        Chat grounded in USCIS&apos;s own policy and your specific tracked
+        receipt — not a generic chatbot guessing — plus the escalation
+        toolkit for when it stalls. For you and your whole family.
       </p>
       <div className="mt-4">
         <ShareButton
           url="https://app.casewhy.com/plus"
           title="CaseWhy Plus"
-          text="Track your whole family's USCIS cases with unlimited AI chat about what's happening — CaseWhy Plus."
+          text="Track your whole family's USCIS cases with AI chat grounded in USCIS's own policy — not a generic chatbot guessing — CaseWhy Plus."
         />
       </div>
 
@@ -324,12 +325,13 @@ export default async function PlusPage({
           <div className="mt-8 grid grid-cols-1 gap-4 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6 sm:grid-cols-2">
             <div>
               <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
-                Unlimited questions, actually grounded
+                Grounded in policy and your case, not guessing
               </p>
               <p className="mt-1.5 text-sm text-muted">
-                Ask as many questions as you need, the moment your case changes.
-                Every answer cites CaseWhy&apos;s own USCIS policy knowledge
-                base — not a generic chatbot guessing.
+                Every answer is grounded in USCIS&apos;s own policy and your
+                specific tracked receipt — not a generic chatbot guessing.
+                Ask as many questions as you need, the moment your case
+                changes.
               </p>
               <a
                 href="#ai-chat"
@@ -389,10 +391,6 @@ export default async function PlusPage({
         ))}
       </div>
       <p className="mt-2 text-xs text-muted">
-        The stalled-case alert itself is always free — only the representative
-        lookup and letter drafting that follow it are part of CaseWhy Plus.
-      </p>
-      <p className="mt-1 text-xs text-muted">
         <Link
           href="/get-help"
           className="text-brand-600 hover:underline dark:text-brand-400"

@@ -81,10 +81,10 @@ const PLUS_FEATURES: PlusFeature[] = [
   {
     id: "stalled-case-alert",
     title: "Alerta de caso estancado",
-    free: "Incluido",
+    free: "—",
     plus: "Incluido",
     explanation:
-      "CaseWhy marca un caso que se ha quedado inusualmente en silencio en relación con un punto de referencia real — no una suposición, sino cuánto tiempo suelen tardar casos como el tuyo antes del siguiente paso real. Esta alerta en sí es gratuita en todos los niveles, por diseño: saber que algo podría estar estancado no debería estar detrás de un muro de pago. Son las dos herramientas de escalamiento que siguen a una alerta de estancamiento — búsqueda de representante y redacción de cartas, ambas abajo — las que forman parte de Plus, ya que actuar ante un estancamiento (en lugar de solo ser informado de uno) es donde está el verdadero valor.",
+      "CaseWhy marca un caso que se ha quedado inusualmente en silencio en relación con un punto de referencia real — no una suposición, sino cuánto tiempo suelen tardar casos como el tuyo antes del siguiente paso real. Plus desbloquea la alerta junto con las dos herramientas de escalamiento que la siguen — búsqueda de representante y redacción de cartas, ambas abajo — para que en el momento en que te enteres de que un caso podría estar estancado, ya tengas próximos pasos reales en mano, no solo la noticia.",
   },
   {
     id: "representative-lookup",
@@ -249,15 +249,16 @@ export default async function PlusPageEs({
         CaseWhy <PlusBadge size="lg" />
       </h1>
       <p className="mb-2 mt-2 text-lg text-muted">
-        Chat de IA ilimitado y con citas sobre tu caso — más el kit de
-        herramientas de escalamiento para cuando se estanca. Para ti y toda tu
-        familia.
+        Chat fundamentado en la propia política de USCIS y en el recibo
+        específico que estás siguiendo — no un chatbot genérico adivinando —
+        más el kit de herramientas de escalamiento para cuando se estanca.
+        Para ti y toda tu familia.
       </p>
       <div className="mt-4">
         <ShareButton
           url="https://app.casewhy.com/es/plus"
           title="CaseWhy Plus"
-          text="Rastrea los casos de USCIS de toda tu familia con chat de IA ilimitado sobre lo que está pasando — CaseWhy Plus."
+          text="Rastrea los casos de USCIS de toda tu familia con chat de IA fundamentado en la propia política de USCIS — no un chatbot genérico adivinando — CaseWhy Plus."
           es
         />
       </div>
@@ -331,13 +332,13 @@ export default async function PlusPageEs({
           <div className="mt-8 grid grid-cols-1 gap-4 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6 sm:grid-cols-2">
             <div>
               <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
-                Preguntas ilimitadas, realmente fundamentadas
+                Fundamentado en política y en tu caso, no en suposiciones
               </p>
               <p className="mt-1.5 text-sm text-muted">
-                Haz todas las preguntas que necesites, en el momento en que tu
-                caso cambie. Cada respuesta cita la propia base de conocimiento
-                de políticas de USCIS de CaseWhy — no un chatbot genérico
-                adivinando.
+                Cada respuesta está fundamentada en la propia política de
+                USCIS y en el recibo específico que estás siguiendo — no un
+                chatbot genérico adivinando. Haz todas las preguntas que
+                necesites, en el momento en que tu caso cambie.
               </p>
               <a
                 href="#ai-chat"
@@ -397,11 +398,6 @@ export default async function PlusPageEs({
         ))}
       </div>
       <p className="mt-2 text-xs text-muted">
-        La alerta de caso estancado siempre es gratuita — solo la búsqueda de
-        representante y la redacción de cartas que le siguen son parte de
-        CaseWhy Plus.
-      </p>
-      <p className="mt-1 text-xs text-muted">
         <Link
           href="/es/get-help"
           className="text-brand-600 hover:underline dark:text-brand-400"

@@ -138,7 +138,7 @@ const GROUPS: FaqGroup[] = [
         question:
           '¿Qué significa "Case Was Received", y qué es un caso estancado?',
         plainText:
-          '"Case Was Received" ("Su caso fue recibido") es el primer estado que muestra casi todo caso; confirma que USCIS tiene su solicitud y el pago, y nada más. Un caso pasa a estar "fuera del tiempo de procesamiento normal" cuando ha esperado más tiempo del que USCIS mismo publica para ese formulario y oficina — CaseWhy marca esto automáticamente en todos los niveles, y muestra los canales formales que se abren en ese momento (una USCIS e-Request, una consulta al Congreso, el Ombudsman de USCIS). Plus puede redactar esas cartas por usted.',
+          '"Case Was Received" ("Su caso fue recibido") es el primer estado que muestra casi todo caso; confirma que USCIS tiene su solicitud y el pago, y nada más. Un caso pasa a estar "fuera del tiempo de procesamiento normal" cuando ha esperado más tiempo del que USCIS mismo publica para ese formulario y oficina — CaseWhy Plus marca esto automáticamente y muestra los canales formales que se abren en ese momento (una USCIS e-Request, una consulta al Congreso, el Ombudsman de USCIS), y puede redactar esas cartas por usted.',
         answer: (
           <>
             &quot;Case Was Received&quot; (&quot;Su caso fue recibido&quot;) es
@@ -151,10 +151,10 @@ const GROUPS: FaqGroup[] = [
               &quot;fuera del tiempo de procesamiento normal&quot;
             </Link>{" "}
             cuando ha esperado más tiempo del que USCIS mismo publica para ese
-            formulario y oficina — CaseWhy marca esto automáticamente en todos
-            los niveles, y muestra los canales formales que se abren en ese
-            momento (una USCIS e-Request, una consulta al Congreso, el Ombudsman
-            de USCIS). Plus puede redactar esas cartas por usted. Vea también{" "}
+            formulario y oficina — CaseWhy Plus marca esto automáticamente y
+            muestra los canales formales que se abren en ese momento (una
+            USCIS e-Request, una consulta al Congreso, el Ombudsman de USCIS),
+            y puede redactar esas cartas por usted. Vea también{" "}
             <Link
               href="/updates/what-case-was-received-actually-means?lang=es"
               className="text-brand-600 hover:underline dark:text-brand-400"

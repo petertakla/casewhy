@@ -278,19 +278,21 @@ export function CaseChat({
             <p className="mt-1 text-muted">
               {es ? (
                 <>
-                  Obtén preguntas ilimitadas con{" "}
+                  Cada respuesta está fundamentada en la política real de USCIS y en el recibo específico que
+                  estás siguiendo — no es un chatbot genérico adivinando. Quita el límite con{" "}
                   <Link href="/plus#ai-chat" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
                     CaseWhy <PlusBadge size="sm" />
-                  </Link>{" "}
-                  — cada respuesta sigue fundamentada en la política real de USCIS, con citas.
+                  </Link>
+                  .
                 </>
               ) : (
                 <>
-                  Get unlimited questions with{" "}
+                  Every answer is grounded in USCIS&apos;s own policy and your specific tracked receipt — not a
+                  generic chatbot guessing. Remove the limit with{" "}
                   <Link href="/plus#ai-chat" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
                     CaseWhy <PlusBadge size="sm" />
-                  </Link>{" "}
-                  — every answer still grounded in real USCIS policy, with citations.
+                  </Link>
+                  .
                 </>
               )}
             </p>

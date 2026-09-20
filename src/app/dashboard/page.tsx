@@ -77,10 +77,11 @@ function statusTone(statusText: string): { dot: string; text: string; bg: string
 
 
 /**
- * CW-39, Part A — free on every tier. Surfaces a real delay honestly
- * regardless of payment; only the escalation tools that follow are
- * Plus-gated. See src/lib/escalation/stall-detector.ts for the (honestly
- * approximate — see its own comment) benchmark this uses.
+ * CW-39, Part A. Round 125 follow-up — Peter reversed the original "free on
+ * every tier" call; the alert itself is now Plus-gated too, not just the
+ * escalation tools that follow it (see isPlus check at the call site below).
+ * See src/lib/escalation/stall-detector.ts for the (honestly approximate —
+ * see its own comment) benchmark this uses.
  */
 function StalledCaseCard({
   daysSinceLastUpdate,
@@ -272,11 +273,18 @@ function StatusCard({
   status,
   explanation,
   tracking,
+  isPlus,
   es,
 }: {
   status: CaseStatus;
   explanation: CaseExplanation | null;
   es: boolean;
+  /** Round 125 follow-up — stalled-case alert is now gated to Plus (Peter's
+   * explicit call, reversing CW-39's original "free on every tier"
+   * decision). Kept as its own prop rather than folded into `tracking`
+   * since it also applies to the signed-out anonymous-lookup path, where
+   * `tracking` itself is null. */
+  isPlus: boolean;
   tracking: {
     signedIn: boolean;
     alreadyTracked: boolean;
@@ -382,7 +390,7 @@ function StatusCard({
           translated. */}
       <p className="mt-4 text-sm leading-relaxed text-foreground/90">{status.statusDescription}</p>
 
-      {stall.isStalled && stall.milestoneText && (
+      {stall.isStalled && stall.milestoneText && isPlus && (
         <StalledCaseCard daysSinceLastUpdate={stall.daysSinceLastUpdate} milestoneText={stall.milestoneText} es={es} />
       )}
 
@@ -601,6 +609,7 @@ export default async function DashboardPage({
               status={status}
               explanation={explanation}
               es={es}
+              isPlus={isPlus}
               tracking={{
                 signedIn: !!session?.user,
                 alreadyTracked: trackedCasesList.some((c) => c.receiptNumber === status.receiptNumber),

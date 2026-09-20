@@ -152,7 +152,7 @@ const GROUPS: FaqGroup[] = [
         question:
           'What does "Case Was Received" mean, and what\'s a stalled case?',
         plainText:
-          '"Case Was Received" is the first status almost every case shows; it confirms USCIS has your filing and fee, and nothing more. A case becomes "outside normal processing time" when it has waited longer than the time USCIS itself publishes for that form and office — CaseWhy flags this automatically on every tier, and shows the formal channels that open up at that point (a USCIS e-Request, a congressional inquiry, the CIS Ombudsman). Plus can draft those letters for you.',
+          '"Case Was Received" is the first status almost every case shows; it confirms USCIS has your filing and fee, and nothing more. A case becomes "outside normal processing time" when it has waited longer than the time USCIS itself publishes for that form and office — CaseWhy Plus flags this automatically and shows the formal channels that open up at that point (a USCIS e-Request, a congressional inquiry, the CIS Ombudsman), and can draft those letters for you.',
         answer: (
           <>
             &quot;Case Was Received&quot; is the first status almost every case
@@ -165,10 +165,10 @@ const GROUPS: FaqGroup[] = [
               &quot;outside normal processing time&quot;
             </Link>{" "}
             when it has waited longer than the time USCIS itself publishes for
-            that form and office — CaseWhy flags this automatically on every
-            tier, and shows the formal channels that open up at that point (a
-            USCIS e-Request, a congressional inquiry, the CIS Ombudsman). Plus
-            can draft those letters for you. See also{" "}
+            that form and office — CaseWhy Plus flags this automatically and
+            shows the formal channels that open up at that point (a USCIS
+            e-Request, a congressional inquiry, the CIS Ombudsman), and can
+            draft those letters for you. See also{" "}
             <Link
               href="/updates/what-case-was-received-actually-means"
               className="text-brand-600 hover:underline dark:text-brand-400"

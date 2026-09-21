@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { findPolicyMemoById } from "@/lib/kb/policy-memos";
 import { BackLink } from "@/components/BackLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PlusBadge } from "@/components/PlusBadge";
 import { isSpanishLocale } from "@/lib/i18n/locale";
 import { pageMetadata } from "@/lib/site/metadata";
 
@@ -198,6 +200,40 @@ export default async function PolicyMemoPage({
         {es ? "Fuente: " : "Source: "}
         {memo.sourceTitle}
       </p>
+
+      {/* Round 127 — the same two quick-ask questions the dashboard's
+          ExplanationBox offers for a matched policy citation, now also
+          reachable straight from the memo's own public permalink page.
+          No ?receipt= — /ask falls back to the signed-in user's first
+          tracked case when one isn't specified, and a signed-out or
+          free-tier visitor lands on /ask's own sign-in/Plus-upsell path,
+          which is the point: this is one of the more concrete reasons to
+          upgrade, worth surfacing everywhere a citation appears, not just
+          inside an already-tracked case. */}
+      <div className="mt-6 rounded-lg border border-brand-500/20 bg-brand-500/5 p-4">
+        <p className="text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
+          CaseWhy <PlusBadge size="sm" />
+        </p>
+        <p className="mt-1.5 text-sm text-muted">
+          {es
+            ? "Si estás rastreando un caso, obtén una respuesta fundamentada en esta política específica y en los hechos de tu caso."
+            : "If you're tracking a case, get an answer grounded in this specific policy and your case's own facts."}
+        </p>
+        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+          <Link
+            href={`/ask?link=${encodeURIComponent(`/policy/${memo.id}`)}&ask=applies${es ? "&lang=es" : ""}`}
+            className="text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
+          >
+            {es ? "¿Aplica a mi caso?" : "Does it apply to me?"}
+          </Link>
+          <Link
+            href={`/ask?link=${encodeURIComponent(`/policy/${memo.id}`)}&ask=explains${es ? "&lang=es" : ""}`}
+            className="text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
+          >
+            {es ? "¿Cómo aplica a mi caso?" : "How it applies to me?"}
+          </Link>
+        </div>
+      </div>
 
       <p className="mt-6 text-xs text-muted">
         {es ? (

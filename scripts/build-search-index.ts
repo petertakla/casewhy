@@ -21,6 +21,7 @@
 import { writeFileSync } from "fs";
 import { join } from "path";
 import { POLICY_MEMOS } from "../src/lib/kb/policy-memos";
+import { COURT_RULINGS } from "../src/lib/kb/court-rulings";
 import { PROCESSING_TIMES, FIELD_OFFICE_ONLY_FORMS } from "../src/lib/kb/processing-times";
 import { FAMILY_FINAL_ACTION, EMPLOYMENT_FINAL_ACTION, bulletinDateLabel } from "../src/lib/kb/visa-bulletin";
 import { PUBLIC_PAGES } from "../src/lib/site/pages";
@@ -85,6 +86,21 @@ function buildDocs(
       url: `/policy/${m.id}${es ? "?lang=es" : ""}`,
       keywords: m.memoNumber ?? "",
       locale: es && !hasEs ? "en" : locale,
+    });
+  }
+
+  // Court rulings (round 127) -- English-only content, same fallback shape
+  // as a policy memo without titleEs/summaryEs: included in both locale
+  // builds (marked locale: "en") so a Spanish-side search still finds it
+  // and tags it "(en inglés)", rather than being invisible to /es searches.
+  for (const r of COURT_RULINGS) {
+    docs.push({
+      type: "answer",
+      title: r.caseName,
+      snippet: r.summary.slice(0, 180),
+      url: `/court-rulings/${r.id}${es ? "?lang=es" : ""}`,
+      keywords: r.citationOrDocket,
+      locale: "en",
     });
   }
 

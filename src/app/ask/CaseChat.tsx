@@ -7,6 +7,9 @@ import { PendingButton } from "@/components/PendingButton";
 import { suggestedQuestions } from "@/lib/ai/suggested-questions";
 import { linkifyExplanation } from "@/lib/kb/linkify";
 import { apiRequest } from "@/lib/http/apiRequest";
+import { QUICK_ASK, type QuickAskKind } from "@/lib/ai/quick-ask";
+
+export type { QuickAskKind };
 
 interface RelatedPolicy {
   id: string;
@@ -19,32 +22,6 @@ interface Message {
   role: "user" | "assistant";
   content: string;
 }
-
-// Round 66 — the two quick-ask questions. The button label is the short,
-// consistent wording Peter specced; the message actually sent to the model
-// is deliberately fuller and differently-shaped for each, so the two
-// answers come back genuinely distinct (a relevance check vs. a concrete
-// effect-on-the-case explanation) rather than near-identical rewordings of
-// the same question. Round 80 — labelEs translates the button per the
-// task doc's explicit call-out; `message` (what's actually sent to the
-// model) stays English regardless of locale — it's the Track 2 prompt
-// text, not UI chrome.
-const QUICK_ASK = {
-  applies: {
-    label: "Does it apply to me?",
-    labelEs: "¿Aplica a mi caso?",
-    message:
-      "Does this specific policy or news item actually apply to my case? Answer yes, no, or uncertain based on my case's actual form type, status, and dates, and explain your reasoning — don't get into what it would mean for my case yet, just whether it applies.",
-  },
-  explains: {
-    label: "How it applies to me?",
-    labelEs: "¿Cómo aplica a mi caso?",
-    message:
-      "Assuming this does apply to my case, explain concretely how it affects my case specifically — what it changes about my expected next steps or timeline, not just whether it's relevant.",
-  },
-} as const;
-
-export type QuickAskKind = keyof typeof QUICK_ASK;
 
 export function CaseChat({
   receiptNumber,

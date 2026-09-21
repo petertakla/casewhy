@@ -268,7 +268,7 @@ function ExplanationBox({
                 ) : (
                   <>
                     CaseWhy <PlusBadge size="sm" /> adds next steps and instant answers to &quot;Does it apply to
-                    me?&quot; and &quot;How does it apply to me?&quot;, grounded in the specific USCIS policy that
+                    me?&quot; and &quot;How it applies to me?&quot;, grounded in the specific USCIS policy that
                     matches this status.
                   </>
                 )

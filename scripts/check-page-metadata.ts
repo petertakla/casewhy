@@ -36,6 +36,8 @@ const HREF_TO_FILE: Record<string, string> = {
   "/news/[id]": "src/app/news/[id]/page.tsx",
   "/policy": "src/app/policy/page.tsx",
   "/policy/[id]": "src/app/policy/[id]/page.tsx",
+  "/court-rulings": "src/app/court-rulings/page.tsx",
+  "/court-rulings/[id]": "src/app/court-rulings/[id]/page.tsx",
   "/attorneys": "src/app/attorneys/page.tsx",
   "/attorneys/[id]": "src/app/attorneys/[id]/page.tsx",
   "/attorneys/join": "src/app/attorneys/join/page.tsx",

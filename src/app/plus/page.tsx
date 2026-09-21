@@ -53,7 +53,7 @@ const PLUS_FEATURES: PlusFeature[] = [
     free: "Basics",
     plus: "Full depth",
     explanation:
-      "Every account, free or Plus, gets a complete, honest plain-language explanation of what a status means and whether there's cause for concern — that basic answer is never held back. Plus adds the layer on top: likely next steps specific to this case, cited policy background you can check yourself, and — when a real policy or court ruling matches your case's own facts — one-click answers to \"Does it apply to me?\" and \"How does it apply to me?\", grounded in that specific policy, not a generic guess. Same underlying explanation, more of it surfaced.",
+      "Every account, free or Plus, gets a complete, honest plain-language explanation of what a status means and whether there's cause for concern — that basic answer is never held back. Plus adds the layer on top: likely next steps specific to this case, cited policy background you can check yourself, and — when a real policy or court ruling matches your case's own facts — one-click answers to \"Does it apply to me?\" and \"How it applies to me?\", grounded in that specific policy, not a generic guess. Same underlying explanation, more of it surfaced.",
   },
   {
     id: "tracked-cases",
@@ -388,7 +388,7 @@ export default async function PlusPage({
               <p className="mt-1.5 text-sm text-muted">
                 When a real policy or court ruling matches your case&apos;s own
                 facts, get a one-click answer to &quot;Does it apply to
-                me?&quot; and &quot;How does it apply to me?&quot; — grounded
+                me?&quot; and &quot;How it applies to me?&quot; — grounded
                 in that specific policy, not a generic guess.
               </p>
               <a

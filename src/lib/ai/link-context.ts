@@ -1,17 +1,22 @@
 // Round 63 Part 4 — resolves a pasted link to CaseWhy's own already-vetted
 // content, server-side, never trusting client-supplied content for what a
-// link "contains." A pasted link only ever resolves to one of two things:
-// a policy memo (direct KB lookup, no fetch) or a news item (the same
-// feed-matched-and-extracted content the /news/[id] permalink itself
-// shows) — never an arbitrary external URL. This is the actual security
-// boundary for the whole feature: no fetch of user-supplied input, ever.
+// link "contains." A pasted link only ever resolves to one of a small,
+// known set of internal content types (never an arbitrary external URL) —
+// this is the actual security boundary for the whole feature: no fetch of
+// user-supplied input, ever.
+//
+// Round 127 — added court rulings (src/lib/kb/court-rulings.ts) alongside
+// policy memos, so the same "Does it apply to me?" / "How does it apply to
+// me?" quick-ask links work from a court-ruling permalink page too, not
+// just a policy-memo one.
 
 import { findPolicyMemoById } from "@/lib/kb/policy-memos";
+import { findCourtRulingById } from "@/lib/kb/court-rulings";
 import { findNewsItemById } from "@/lib/news/permalink";
 import { extractArticle } from "@/lib/news/extract-article";
 
 export interface LinkedContent {
-  kind: "policy" | "news";
+  kind: "policy" | "news" | "court";
   title: string;
   text: string;
 }
@@ -21,6 +26,7 @@ export interface LinkResolutionError {
 }
 
 const POLICY_PATH_RE = /^\/policy\/([^/?#]+)\/?$/;
+const COURT_RULING_PATH_RE = /^\/court-rulings\/([^/?#]+)\/?$/;
 const NEWS_PATH_RE = /^\/news\/([^/?#]+)\/?$/;
 
 /** Extracts a pathname from either a full URL or a bare path string, without throwing on malformed input. */
@@ -43,7 +49,7 @@ export async function resolveLinkedContent(
 ): Promise<LinkedContent | LinkResolutionError> {
   const pathname = extractPathname(input);
   if (!pathname) {
-    return { error: "Paste a link to one of CaseWhy's policy or news pages." };
+    return { error: "Paste a link to one of CaseWhy's policy, court-ruling, or news pages." };
   }
 
   const policyMatch = pathname.match(POLICY_PATH_RE);
@@ -56,6 +62,19 @@ export async function resolveLinkedContent(
       kind: "policy",
       title: memo.title,
       text: `${memo.summary} Current status: ${memo.currentStatus}`,
+    };
+  }
+
+  const courtMatch = pathname.match(COURT_RULING_PATH_RE);
+  if (courtMatch) {
+    const ruling = findCourtRulingById(courtMatch[1]);
+    if (!ruling) {
+      return { error: "That court ruling link doesn't match anything CaseWhy has." };
+    }
+    return {
+      kind: "court",
+      title: ruling.caseName,
+      text: `${ruling.summary} Current status: ${ruling.currentStatus}`,
     };
   }
 
@@ -72,7 +91,7 @@ export async function resolveLinkedContent(
     return { kind: "news", title: item.title, text: article.text };
   }
 
-  return { error: "Paste a link to one of CaseWhy's policy or news pages." };
+  return { error: "Paste a link to one of CaseWhy's policy, court-ruling, or news pages." };
 }
 
 export function isLinkResolutionError(value: LinkedContent | LinkResolutionError): value is LinkResolutionError {

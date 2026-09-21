@@ -6,6 +6,7 @@ import { getDsoDirectory } from "@/lib/dso/directory";
 import { getCommunityOrgDirectory } from "@/lib/community-orgs/directory";
 import { getProBonoRepresentationDirectory } from "@/lib/pro-bono-representation/directory";
 import { POLICY_MEMOS } from "@/lib/kb/policy-memos";
+import { COURT_RULINGS } from "@/lib/kb/court-rulings";
 import { getPublishedUpdates } from "@/lib/updates/updates";
 import { PUBLIC_PAGES } from "@/lib/site/pages";
 
@@ -63,6 +64,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const policyPaths = POLICY_MEMOS.map((memo) => `/policy/${memo.id}`);
+  const courtRulingPaths = COURT_RULINGS.map((ruling) => `/court-rulings/${ruling.id}`);
   // Round 108 — each post's own lastmod is now its real publishedAt
   // (America/New_York, set from the round-89 queue row's postedAt),
   // not the blanket "now" every other path below gets -- these are the
@@ -83,7 +85,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // no trailing slash; every other entry already had one via its own
     // leading `/`. Cosmetic-only fix, doesn't change the entry's own
     // deliberate inclusion despite being a redirect (see pages.ts).
-    ...[...staticPaths, ...entityPaths, ...policyPaths].map((path) => ({
+    ...[...staticPaths, ...entityPaths, ...policyPaths, ...courtRulingPaths].map((path) => ({
       url: path === "" ? `${BASE_URL}/` : `${BASE_URL}${path}`,
       lastModified,
     })),

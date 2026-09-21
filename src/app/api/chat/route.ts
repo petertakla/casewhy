@@ -6,8 +6,30 @@ import { getChatUsage, incrementChatUsage } from "@/lib/billing/chat-usage";
 import { getCaseStatus, UscisApiError } from "@/lib/uscis/client";
 import { chatAboutCase, type ChatMessage } from "@/lib/ai/chat";
 import { resolveLinkedContent, isLinkResolutionError } from "@/lib/ai/link-context";
+import { QUICK_ASK } from "@/lib/ai/quick-ask";
 
 const MAX_MESSAGE_LENGTH = 4000;
+
+// Round 127 — a guaranteed, code-appended disclaimer for the two quick-ask
+// questions, not left to chat.ts's SYSTEM_INSTRUCTIONS alone. The system
+// prompt is real guardrail work and stays in place, but a prompt is
+// something a model *usually* follows, not something that's guaranteed —
+// and this is exactly the fact pattern (a policy/court-ruling "does this
+// apply to me" answer) that a real UPL-risk review flagged as needing more
+// than "usually." Appending this deterministically, server-side, after the
+// model's own reply, means the disclaimer is on every one of these answers
+// regardless of what the model actually generated, the same "don't trust
+// the model for anything that can be guaranteed instead" discipline this
+// codebase already applies to citation matching (case-context.ts).
+// Plain text, not markdown — CaseChat.tsx renders a reply as plain text
+// (whitespace-pre-wrap + linkifyExplanation's term-linking only), it does
+// not parse markdown syntax, so this reads literally as typed here.
+const QUICK_ASK_DISCLAIMER =
+  "\n\nThis is general information based on your case's own facts, not a legal determination — only USCIS or a licensed immigration attorney can confirm how this actually applies to your case.";
+
+function isQuickAskMessage(content: string): boolean {
+  return content === QUICK_ASK.applies.message || content === QUICK_ASK.explains.message;
+}
 
 function isValidMessages(value: unknown): value is ChatMessage[] {
   return (
@@ -106,7 +128,9 @@ export async function POST(request: NextRequest) {
     const result = await chatAboutCase(status, messages, linkedContent);
     await incrementChatUsage(session.user.id);
     const updatedUsage = await getChatUsage(session.user.id, tier);
-    return NextResponse.json({ ...result, usage: updatedUsage });
+    const lastUserMessage = messages[messages.length - 1].content;
+    const reply = isQuickAskMessage(lastUserMessage) ? `${result.reply}${QUICK_ASK_DISCLAIMER}` : result.reply;
+    return NextResponse.json({ ...result, reply, usage: updatedUsage });
   } catch {
     return NextResponse.json(
       { error: "The assistant is temporarily unavailable. Please try again shortly." },

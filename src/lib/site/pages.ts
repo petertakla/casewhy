@@ -294,6 +294,29 @@ export const PUBLIC_PAGES: PublicPageEntry[] = [
     menuLabelEs: "Memorandos de política",
   },
   {
+    // Round 127 — the page's own chrome is bilingual (?lang=es works, same
+    // LanguageSwitcher pattern as /policy), but the case-specific ruling
+    // content itself is English-only this round (see /court-rulings/[id]'s
+    // own comment for the scoping call) — same "partial translation, not a
+    // total absence" shape /policy's own untranslated memo entries already
+    // use, not switcherExempt (that's for a page with no switcher at all).
+    // "Fallos judiciales" for the Spanish label, not "Decisiones
+    // judiciales" — matches the term the site's existing Spanish legal copy
+    // already uses (policy-memos.ts's own Spanish summaries consistently
+    // say "fallo" for a court ruling), not a plausible-sounding guess.
+    href: "/court-rulings",
+    hrefEs: "/court-rulings?lang=es",
+    label: "Immigration court rulings, explained",
+    labelEs: "Fallos judiciales de inmigración, explicados",
+    section: "Reference",
+    showInIndex: true,
+    showInFooter: true,
+    showInSitemapXml: true,
+    showInHeaderMenu: true,
+    menuLabel: "Court rulings",
+    menuLabelEs: "Fallos judiciales",
+  },
+  {
     href: "/updates",
     hrefEs: "/updates?lang=es",
     label: "Updates — the CaseWhy blog",

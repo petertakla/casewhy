@@ -14,6 +14,7 @@
 // not a hidden approximation.
 
 import type { CaseStatus } from "@/lib/uscis/client";
+import { stripNoticeHtml } from "@/lib/uscis/notice-text";
 
 export const MILESTONE_KEYWORDS = ["interview", "ceremony", "oath"];
 const STALL_THRESHOLD_DAYS = 90;
@@ -47,6 +48,11 @@ export function detectStalledCase(status: CaseStatus): StallResult {
   return {
     isStalled: daysSinceLastUpdate >= STALL_THRESHOLD_DAYS,
     daysSinceLastUpdate,
-    milestoneText: milestoneEntry.completed_text_en,
+    // Round 130 — StalledCaseCard shows this inside a quoted phrase
+    // ("...since '{milestoneText}'..."), where a stray embedded HTML anchor
+    // tag from USCIS's own raw text (see notice-text.tsx) would be an odd
+    // place for an inline link — stripped to clean text instead, same
+    // treatment as the email/push-notification surfaces.
+    milestoneText: stripNoticeHtml(milestoneEntry.completed_text_en),
   };
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getCaseStatus, UscisApiError, type CaseStatus } from "@/lib/uscis/client";
 import { recordCaseHistory } from "@/lib/uscis/check-status";
+import { renderNoticeText } from "@/lib/uscis/notice-text";
 import { explainCaseStatus, type CaseExplanation } from "@/lib/ai/explain";
 import { auth } from "@/lib/auth/server";
 import { getTrackedCases } from "./actions";
@@ -414,8 +415,10 @@ function StatusCard({
 
       {/* Round 80 — statusDescription and each history entry's
           completed_text_en are USCIS's own raw words, Track 2, never
-          translated. */}
-      <p className="mt-4 text-sm leading-relaxed text-foreground/90">{status.statusDescription}</p>
+          translated. Round 130 — some notice types embed a literal HTML
+          anchor tag in that raw text (see notice-text.tsx); renderNoticeText
+          turns it into a real link instead of showing the tag characters. */}
+      <p className="mt-4 text-sm leading-relaxed text-foreground/90">{renderNoticeText(status.statusDescription)}</p>
 
       {stall.isStalled && stall.milestoneText && isPlus && (
         <StalledCaseCard daysSinceLastUpdate={stall.daysSinceLastUpdate} milestoneText={stall.milestoneText} es={es} />
@@ -435,7 +438,7 @@ function StatusCard({
                   }`}
                 />
                 <span className="block font-mono text-xs text-muted">{entry.date}</span>
-                <span className="mt-0.5 block text-foreground/90">{entry.completed_text_en}</span>
+                <span className="mt-0.5 block text-foreground/90">{renderNoticeText(entry.completed_text_en)}</span>
               </li>
             ))}
           </ol>

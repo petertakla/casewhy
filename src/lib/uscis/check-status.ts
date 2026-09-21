@@ -9,6 +9,7 @@ import { getDb } from "@/lib/db/client";
 import { trackedCases, caseStatusHistory } from "@/lib/db/schema";
 import { encryptField, decryptField } from "@/lib/db/crypto";
 import { getCaseStatus, type CaseStatus } from "@/lib/uscis/client";
+import { stripNoticeHtml } from "@/lib/uscis/notice-text";
 import { sendStatusChangeEmail } from "@/lib/email/postmark";
 import { getStatusChangeEmailsEnabled } from "@/lib/settings/settings";
 import { sendPushToUser } from "@/lib/push/send";
@@ -126,7 +127,11 @@ export async function checkTrackedCaseNow(
         to: email,
         receiptNumber,
         statusText: status.statusText,
-        statusDescription: status.statusDescription,
+        // Round 130 — some notice types embed a literal HTML anchor tag in
+        // USCIS's own raw text; this is a plain-text email, so it can't
+        // render a real link — strip the tag, keeping the anchor's own
+        // visible text (already a readable URL in every case seen so far).
+        statusDescription: stripNoticeHtml(status.statusDescription),
       });
       notified = true;
     }
@@ -137,7 +142,9 @@ export async function checkTrackedCaseNow(
     // to check first.
     await sendPushToUser(row.userId, {
       title: `${status.formType} — ${status.statusText}`,
-      body: status.statusDescription,
+      // Round 130 — same embedded-HTML issue as the email above; a push
+      // notification body is plain text too.
+      body: stripNoticeHtml(status.statusDescription),
       url: `/dashboard?receipt=${encodeURIComponent(receiptNumber)}`,
     });
   }

@@ -4,6 +4,7 @@
 // duplicating this between the two.
 
 import type { CaseStatus } from "@/lib/uscis/client";
+import { stripNoticeHtml } from "@/lib/uscis/notice-text";
 import { findRelevantPolicyContext, type PolicyMemo } from "@/lib/kb/policy-memos";
 
 // Service center inferred from the receipt number's 3-letter prefix. This is
@@ -51,11 +52,19 @@ export function buildCaseContext(status: CaseStatus): CaseContext {
   const daysAtCurrentStatus = status.modifiedDate ? daysBetween(status.modifiedDate, today) : null;
   const daysSinceFiling = status.submittedDate ? daysBetween(status.submittedDate, today) : null;
 
-  const historyText = status.history.map((h) => h.completed_text_en).join(" ");
+  // Round 130 — some notice types embed a literal HTML anchor tag in
+  // USCIS's own raw text (see src/lib/uscis/notice-text.tsx); stripped here,
+  // at the source, so it never reaches the model's context (which could
+  // otherwise quote it back into its own explanation, a second real path to
+  // the same leak the dashboard/PDF/email fix addresses) or the deterministic
+  // policy-keyword matching below (statusKeywords are plain phrases, never
+  // meant to match inside a URL/tag fragment).
+  const statusDescription = stripNoticeHtml(status.statusDescription);
+  const historyText = status.history.map((h) => stripNoticeHtml(h.completed_text_en)).join(" ");
   const relatedPolicies = findRelevantPolicyContext({
     formType: status.formType,
     statusText: status.statusText,
-    statusDescription: status.statusDescription,
+    statusDescription,
     historyText,
     submittedDate: status.submittedDate,
   });
@@ -65,12 +74,12 @@ export function buildCaseContext(status: CaseStatus): CaseContext {
     center && `Processing center: ${center}`,
     status.submittedDate && `Filed: ${status.submittedDate}${daysSinceFiling !== null ? ` (${daysSinceFiling} days ago)` : ""}`,
     `Current status: ${status.statusText}`,
-    `Description: ${status.statusDescription}`,
+    `Description: ${statusDescription}`,
     status.modifiedDate &&
       `Status last updated: ${status.modifiedDate}${daysAtCurrentStatus !== null ? ` (${daysAtCurrentStatus} days ago)` : ""}`,
     status.history.length > 0 &&
       `Full status history for this case, each entry dated (order as returned by USCIS, not guaranteed chronological — read the dates):\n${status.history
-        .map((h) => `- ${h.date}: ${h.completed_text_en}`)
+        .map((h) => `- ${h.date}: ${stripNoticeHtml(h.completed_text_en)}`)
         .join("\n")}`,
     relatedPolicies.length > 0 &&
       `Possibly relevant policy background (this is general context that plausibly, not definitely, applies — USCIS's status text never confirms why a case is delayed, and there's no way to confirm a policy applies to this specific case, e.g. nationality is never known. If used, frame it explicitly as something the user could ask an attorney about — never state or imply it explains this case's status as fact):\n${relatedPolicies

@@ -6,6 +6,7 @@
 import { Document, Page, Text, View, StyleSheet, Link } from "@react-pdf/renderer";
 import type { CaseStatus } from "@/lib/uscis/client";
 import type { CaseExplanation } from "@/lib/ai/explain";
+import { parseNoticeText } from "@/lib/uscis/notice-text";
 
 const styles = StyleSheet.create({
   page: { padding: 40, fontSize: 10, fontFamily: "Helvetica", color: "#1a1a1a" },
@@ -43,6 +44,45 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
 });
+
+/**
+ * Round 130 — some notice types embed a literal HTML anchor tag in USCIS's
+ * own raw text (statusDescription / a history entry's completed_text_en —
+ * see notice-text.tsx's own header comment for how this was found and
+ * confirmed). Renders it as a real clickable link via react-pdf's own
+ * <Link>, same shared parse the web app's renderNoticeText uses, kept local
+ * to this file (rather than in the shared module) so its `style` args stay
+ * whatever type react-pdf's own StyleSheet.create() already inferred for
+ * `styles` above, instead of fighting react-pdf's own Style/SVGTextProps
+ * overload typing from outside this file.
+ */
+function NoticeText({
+  text,
+  textStyle,
+  linkStyle,
+}: {
+  text: string;
+  textStyle: (typeof styles)["paragraph"] | (typeof styles)["historyText"];
+  linkStyle: (typeof styles)["policyLink"];
+}) {
+  const segments = parseNoticeText(text);
+  if (segments.length === 1 && segments[0].type === "text") {
+    return <Text style={textStyle}>{text}</Text>;
+  }
+  return (
+    <Text style={textStyle}>
+      {segments.map((s, i) =>
+        s.type === "link" ? (
+          <Link key={i} src={s.href} style={linkStyle}>
+            {s.value}
+          </Link>
+        ) : (
+          s.value
+        )
+      )}
+    </Text>
+  );
+}
 
 export function CaseReportDocument({
   status,
@@ -84,7 +124,7 @@ export function CaseReportDocument({
 
         <Text style={styles.sectionLabel}>Current status</Text>
         <Text style={styles.statusPill}>{status.statusText}</Text>
-        <Text style={styles.paragraph}>{status.statusDescription}</Text>
+        <NoticeText text={status.statusDescription} textStyle={styles.paragraph} linkStyle={styles.policyLink} />
 
         {explanation && (
           <>
@@ -125,7 +165,7 @@ export function CaseReportDocument({
             {status.history.map((entry, i) => (
               <View key={i} style={styles.historyEntry}>
                 <Text style={styles.historyDate}>{entry.date}</Text>
-                <Text style={styles.historyText}>{entry.completed_text_en}</Text>
+                <NoticeText text={entry.completed_text_en} textStyle={styles.historyText} linkStyle={styles.policyLink} />
               </View>
             ))}
           </>

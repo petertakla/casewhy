@@ -129,6 +129,17 @@ const GROUPS: FaqGroup[] = [
     heading: "Tracking a case",
     faqs: [
       {
+        // Round 126 — added after Cloud found live testing that nothing on
+        // the app told a real user their case-status check was running
+        // against USCIS's sandbox environment, not production. This is the
+        // one live gap left after round 125's free/Plus tightening — flag
+        // for removal once USCIS grants production access, so this doesn't
+        // linger as stale text once it's resolved.
+        question: "Is case tracking checking my real, current USCIS case right now?",
+        answer:
+          "Not yet. Case-status checking currently runs against USCIS's sandbox (test) environment while USCIS reviews CaseWhy's production API access. A receipt number you enter today may return a sandbox-hours message, or test data that doesn't reflect your actual case. Everything else on CaseWhy — Get Help, this FAQ, the How-To guides, free Ask CaseWhy questions, and CaseWhy Plus — is fully live today. This answer will be updated the moment USCIS grants production access.",
+      },
+      {
         question: "Which USCIS cases can I track?",
         answer:
           "Any case that has a USCIS receipt number — the 13-character number on your I-797 notice, three letters followed by ten digits (for example IOE, MSC, EAC, WAC, LIN, SRC, NBC, YSC; CaseWhy accepts any valid receipt-number format, not only these examples). That covers family petitions (I-130), green card applications (I-485), naturalization (N-400), work permits (I-765), travel documents (I-131), removal of conditions (I-751), employer petitions (I-129, I-140), asylum (I-589), and DACA (I-821D), among others. If USCIS Case Status Online shows it, CaseWhy can track it.",

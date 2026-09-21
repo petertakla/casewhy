@@ -55,6 +55,21 @@ export function DashboardSearchArea({
 
   return (
     <>
+      {/* Round 126 — Cloud found this live: nothing on this page told a
+          signed-in user that case-status checking currently runs against
+          USCIS's sandbox (test) environment, not production, while USCIS's
+          production-access review is in progress. A real receipt number
+          entered today gets either an honest sandbox-hours error or, if the
+          sandbox happens to be up, test data with no relationship to the
+          person's actual case -- with nothing on the page saying so. Placed
+          above the input, not in a tooltip, so it's seen before typing, not
+          after. REMOVE THIS BLOCK once USCIS grants production access --
+          it should not linger as stale caveat text after that's resolved. */}
+      <div className="mb-3 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-xs text-amber-700 dark:text-amber-400">
+        {es
+          ? "La consulta de estado de casos funciona actualmente en el entorno de prueba (sandbox) de USCIS, no en producción, mientras USCIS revisa el acceso de producción de CaseWhy. Un resultado hoy puede no reflejar tu caso real todavía."
+          : "Case-status checking currently runs on USCIS's sandbox (test) environment, not production, while USCIS reviews CaseWhy's production API access. A result today may not yet reflect your real case."}
+      </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <div className="flex flex-col gap-3 sm:flex-row">
           {/* key forces a remount when the displayed receipt changes --

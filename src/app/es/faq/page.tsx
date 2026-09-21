@@ -115,6 +115,11 @@ const GROUPS: FaqGroup[] = [
     heading: "Rastrear un caso",
     faqs: [
       {
+        question: "¿El rastreo de casos está consultando mi caso real y actual de USCIS ahora mismo?",
+        answer:
+          "Todavía no. La consulta de estado de casos funciona actualmente en el entorno de prueba (sandbox) de USCIS, mientras USCIS revisa el acceso de producción de CaseWhy. Un número de recibo que ingrese hoy puede devolver un mensaje de horario del sandbox, o datos de prueba que no reflejan su caso real. Todo lo demás en CaseWhy — Obtener ayuda, estas Preguntas Frecuentes, las Guías de Cómo Hacerlo, las preguntas gratuitas de Ask CaseWhy y CaseWhy Plus — está completamente disponible hoy. Esta respuesta se actualizará en cuanto USCIS otorgue acceso de producción.",
+      },
+      {
         question: "¿Qué casos de USCIS puedo rastrear?",
         answer:
           "Cualquier caso que tenga un número de recibo de USCIS — el número de 13 caracteres en su aviso I-797, tres letras seguidas de diez dígitos (por ejemplo IOE, MSC, EAC, WAC, LIN, SRC, NBC, YSC; CaseWhy acepta cualquier número de recibo con formato válido, no solo estos ejemplos). Eso incluye peticiones familiares (I-130), solicitudes de residencia permanente (I-485), naturalización (N-400), permisos de trabajo (I-765), documentos de viaje (I-131), remoción de condiciones (I-751), peticiones de empleador (I-129, I-140), asilo (I-589) y DACA (I-821D), entre otros. Si USCIS Case Status Online lo muestra, CaseWhy puede rastrearlo.",

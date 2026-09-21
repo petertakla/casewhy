@@ -47,6 +47,14 @@ export const FAQ_SEARCH_ENTRIES: FaqSearchEntry[] = [
   {
     group: "Tracking a case",
     groupEs: "Rastrear un caso",
+    question: "Is case tracking checking my real, current USCIS case right now?",
+    questionEs: "¿El rastreo de casos está consultando mi caso real y actual de USCIS ahora mismo?",
+    snippet: "Not yet — case-status checking currently runs against USCIS's sandbox environment while production access is under review.",
+    snippetEs: "Todavía no — la consulta de estado funciona en el entorno de prueba de USCIS mientras se revisa el acceso de producción.",
+  },
+  {
+    group: "Tracking a case",
+    groupEs: "Rastrear un caso",
     question: "Which USCIS cases can I track?",
     questionEs: "¿Qué casos de USCIS puedo rastrear?",
     snippet: "Any case that has a USCIS receipt number — three letters followed by ten digits. Family petitions, green cards, naturalization, work permits, and more.",

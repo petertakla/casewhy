@@ -59,7 +59,7 @@ Receipt numbers are never written to logs in plaintext, for any response code.
 
 A tracked case stores an encrypted receipt number, case type, and last known status; `case_status_history` stores one row per USCIS history entry (service-center prefix only, never the full receipt number).[^9] The scheduled status-check job compares the freshly fetched status against the last known one and — only on a genuine change, never on the first check — sends a Postmark email and, if enabled, a push notification.[^10]
 
-Adding a case is a short signed-in flow; removing one is immediate and self-serve (`untrackCase()`, a real, ownership-checked delete).[^11] Free accounts can track up to 3 cases; the paid tier raises this in tiers up to a hard ceiling.[^12]
+Adding a case is a short signed-in flow; removing one is immediate and self-serve (`untrackCase()`, a real, ownership-checked delete).[^11] Free accounts get 3 receipt numbers for the life of the account — tracking one or just looking up its status both count against that cap, and untracking a case doesn't free a slot back up; the paid tier raises this in tiers up to a hard ceiling, with no lifetime limit.[^12]
 
 ---
 
@@ -97,7 +97,7 @@ Security headers — HSTS, a Content-Security-Policy, X-Content-Type-Options, X-
 
 ## Business and operations
 
-A free tier (3 tracked cases, 3 AI questions/month, full access to all reference data) and a paid "Plus" tier ($9.99/month, $39.99/6 months, or $69.99/year).[^29] **Nothing from the USCIS Case Status API is ever paywalled** — status checking is free at every tier; Plus adds more tracked cases, unlimited AI questions, on-demand checks, the document vault, and drafting tools. Billing runs on Stripe, currently in test mode — CaseWhy has processed no real production payments to date.[^30]
+A free tier (3 receipt numbers for the life of the account, sign-in required to look one up, full access to all reference data — plus a separate, always-free anonymous policy-question tool with its own lifetime cap per visitor, no account needed) and a paid "Plus" tier ($9.99/month, $39.99/6 months, or $69.99/year).[^29] **Nothing from the USCIS Case Status API is ever paywalled** — status checking is free at every tier; Plus adds more tracked cases, unlimited AI questions, on-demand checks, the document vault, and drafting tools. Billing runs on Stripe, currently in test mode — CaseWhy has processed no real production payments to date.[^30]
 
 Support runs through 13 real, monitored email aliases on the domain, including `security@`, `privacy@`, `legal@`, and `abuse@`.[^31] If production API access were ever revoked, CaseWhy has no scraping fallback and would show an honest degraded-service message rather than attempt an unauthorized alternative path to USCIS data.
 

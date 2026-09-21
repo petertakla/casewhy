@@ -1,20 +1,23 @@
-# CaseWhy — USCIS Torch Demo Script (target: 20 minutes inside the 30-minute Teams slot)
+# CaseWhy — USCIS Torch Demo Script (target: ~21 minutes inside the 30-minute Teams slot)
 
 Real format, confirmed against `developer.uscis.gov`: a 30-minute Microsoft Teams call, Wednesday or Thursday 1:00–2:00 PM ET, recorded, audio required. Peter attends alone — USCIS explicitly allows the primary business contact and the technical demo lead to be the same person. Results arrive by email within 2 business days; a fail routes to a 15-minute "Re-Demo Office Hours" on just the missed criteria.
 
 Shows USCIS's five real Case Status API criteria, in order: (1) data entry usability, (2) JSON payload conversion, (3) OAuth 2.0, (4) HTTPS response handling — success and error, message shown in the UI, (5) case status tracking. **File upload is a FOIA API criterion, not Case Status — deliberately not in this script.**
+
+**Round 130** — the actual USCIS API Demo Checklist (sent alongside the scheduling link, separate from and broader than the five numbered criteria above) adds real, distinct requirements this script now also covers: the browser's own DevTools Network tab specifically (Step 2), CaseWhy's own frontend/backend authentication as its own point, separate from USCIS OAuth (Step 1), and manually running the scheduled batch job live, showing both a success and an error response in the same run (new Step 6).
 
 ---
 
 ## Before the call
 
 1. **Confirm the `demo_id` step is already done and accepted by USCIS.** USCIS won't send the scheduler link until they've seen proof `demo_id` is wired in — that has to happen before this call can even be booked. See "demo_id setup," below.
-2. **Set up a dedicated demo account with no real PII** — a fresh sign-up, then upgrade it to Plus via `/plus` → Stripe Checkout using a Stripe test card (`4242 4242 4242 4242`, any future expiry/CVC) — billing is in test mode, so this is a real checkout with no real charge. Plus is needed so the on-demand check / request-preview / error-detail features are all available live. Track cases only under confirmed sandbox test receipt numbers (table at the bottom of this script). Do not use Peter's own real account or any account with a genuine tracked case.
-3. Have `docs/uscis/technical-brief.md` (PDF) and `docs/uscis/demo-qa.md` open or printed.
-4. Keep a second window open with a Cloud session signed in — if a question stumps you, type it in a few words; an answer comes back in under a minute, and you read it back.
-5. Confirm the sandbox is up before the call: it operates 7 AM–8 PM ET only. This call is scheduled 1–2 PM ET, inside that window, but re-check the same morning.
-6. **Rehearse the whole script once against the sandbox, with Code watching the logs, before the demo_id screenshot is even sent.** Not done as of this document being written — do this first.
-7. **Check `app.casewhy.com` loads normally right before the call** (`curl -I https://app.casewhy.com`, or just open it). Vercel's automatic bot/DDoS mitigation has tripped on this domain before from a burst of rapid API calls — exactly what rehearsing this script, or the call itself, looks like. If the site 403s with a "Security Checkpoint" page, run `vercel firewall system-mitigations pause` from a real terminal inside the `casewhy` project directory (it needs an interactive confirmation, so a Cloud session can't run it for you) and re-check.
+2. **Set up a dedicated demo account with no real PII** — a fresh sign-up, then upgrade it to Plus via `/plus` → Stripe Checkout using a Stripe test card (`4242 4242 4242 4242`, any future expiry/CVC) — billing is in test mode, so this is a real checkout with no real charge. Plus is needed so the on-demand check / request-preview / error-detail features are all available live. Track cases only under confirmed sandbox test receipt numbers (table at the bottom of this script) — including `EAC1111111111` specifically, the deliberate error case for Step 6. Do not use Peter's own real account or any account with a genuine tracked case.
+3. Have `docs/uscis/technical-brief.md` (PDF) and `docs/uscis/demo-qa.md` open or printed. **This is the entire fallback plan, and the only one.** Round 130 — no AI tool of any kind is part of this demo, in the meeting or anywhere else on the machine during it: not a live chat window, not a background assistant, nothing. If a question stumps you, pause, and read the answer from these two documents. That's the plan; there isn't a second one.
+4. Confirm the sandbox is up before the call: it operates 7 AM–8 PM ET only. This call is scheduled 1–2 PM ET, inside that window, but re-check the same morning.
+5. **Rehearse the whole script once against the sandbox, with Code watching the logs, before the demo_id screenshot is even sent.** Not done as of this document being written — do this first.
+6. **Check `app.casewhy.com` loads normally right before the call** (`curl -I https://app.casewhy.com`, or just open it). Vercel's automatic bot/DDoS mitigation has tripped on this domain before from a burst of rapid API calls — exactly what rehearsing this script, or the call itself, looks like. If the site 403s with a "Security Checkpoint" page, run `vercel firewall system-mitigations pause` from a real terminal inside the `casewhy` project directory (it needs an interactive confirmation, so a Cloud session can't run it for you) and re-check.
+7. **Export `ADMIN_DIAG_SECRET` in the terminal you'll use for Step 6 below, before the call starts** (`export ADMIN_DIAG_SECRET=<value from Vercel's production environment>`) — the live batch-job command references it as `$ADMIN_DIAG_SECRET` so nothing needs typing or pasting live; do this before screen sharing begins, not during.
+8. **Track `EAC1111111111` on the demo account ahead of time**, alongside the normal working cases — a real, well-formed, permanently-unrecognized receipt number (confirmed live: always a real USCIS `404`, "Case Status Online does not recognize the receipt number entered"). This is the deliberate, repeatable error case for Step 6.
 
 ## `demo_id` setup (must happen before the call can be scheduled)
 
@@ -31,17 +34,17 @@ Shows USCIS's five real Case Status API criteria, in order: (1) data entry usabi
 ### Step 1 — Sign in, show the interface (2 min)
 
 **Click:** Navigate to `app.casewhy.com`, sign in to the dedicated demo account (or show the sign-in flow live).
-**Say:** "This is CaseWhy, a case-status tracker. I'll walk through all five criteria: data entry, the JSON payload, OAuth 2.0, error handling, and case tracking."
+**Say:** "This is CaseWhy, a case-status tracker. I'll walk through all five criteria: data entry, the JSON payload, OAuth 2.0, error handling, and case tracking. One thing worth being explicit about here: this sign-in is our own app's authentication — a session with our own server, through Neon Auth — separate from the OAuth 2.0 flow our server itself uses to talk to USCIS, which I'll show in a minute. Two different authentication relationships: the browser to us, and us to USCIS."
 **Reviewer sees:** the dashboard; the receipt-number field's live format feedback (type a few characters, show the red/green indicator); the Spanish toggle; resize the window briefly to show mobile responsiveness.
-**Criterion:** #1, data entry usability.
+**Criterion:** #1, data entry usability, plus the checklist's separate "authentication between the frontend and backend of your application" line.
 **If it fails live:** if sign-in hangs, refresh once (a known-clean path from rehearsal). If the sandbox itself is down: "Here's a recording of this exact flow from rehearsal," and switch to it.
 
 ### Step 2 — Look up and track a case, show the JSON payload (4 min)
 
-**Click:** Enter `WAC9999999999` (I-751, confirmed sandbox test number) in the receipt field → click "Look up status." The result card appears with a "Track this case" button right under the status line. Click it (case type defaults to "Other," one click saves). Then click "Check now," then "Show technical details."
-**Say:** "Looking up a case is a real live call, but it doesn't save anything by itself — that's this separate 'Track this case' button, right here where you can't miss it. Every check converts to a real request — here's the exact JSON we send: method, URL, and headers, with the token redacted. This is generated by the same function that actually makes the call, not a separate description."
-**Reviewer sees:** the new case appear in the always-visible tracked-cases list on the left; the outbound request panel (method, URL, headers, including the `demo_id` header from the setup step above).
-**Criterion:** #1 (a real look-up-vs-save distinction, not a confusing overload) and #2, JSON payload conversion.
+**Click:** Open the browser's DevTools Network tab before submitting anything, and leave it visible. Enter `WAC9999999999` (I-751, confirmed sandbox test number) in the receipt field → click "Look up status." Point at the request that appears in the Network tab (a request to `app.casewhy.com`, our own server). Then look at the result card's "Track this case" button right under the status line. Click it (case type defaults to "Other," one click saves). Then click "Check now," then "Show technical details."
+**Say:** "Before I go further — the DevTools Network tab, since that's specifically asked for. You'll see the request from my browser to our own server here, but you will not see a request to USCIS's API directly in this tab, and that's deliberate, not a gap: our OAuth credentials and the USCIS call itself run entirely server-side, so they never reach the browser at all. What I can show you instead is the exact outbound request our server builds — same shape, same headers, generated by the identical function that makes the real call, not a separate description — right here in 'Show technical details.' Looking up a case is a real live call either way, but it doesn't save anything by itself — that's this separate 'Track this case' button, right here where you can't miss it."
+**Reviewer sees:** the browser-to-CaseWhy request in DevTools' Network tab; the new case appear in the always-visible tracked-cases list on the left; the outbound-to-USCIS request panel (method, URL, headers, including the `demo_id` header from the setup step above).
+**Criterion:** #1 (a real look-up-vs-save distinction, not a confusing overload), #2 (JSON payload conversion), and the checklist's Network-tab requirement.
 **If it fails live:** if `WAC9999999999` doesn't return a result (sandbox data can shift), use `WAC0000000001` as backup — both are on CaseWhy's own confirmed-working list.
 
 ### Step 3 — OAuth 2.0 (2 min)
@@ -67,7 +70,20 @@ Shows USCIS's five real Case Status API criteria, in order: (1) data entry usabi
 **Criterion:** #5, case status tracking.
 **If it fails live:** if the pre-tracked case shows only one history entry, describe the notification mechanism directly rather than forcing an empty view to look busy.
 
-### Step 6 — Close (2 min)
+### Step 6 — Batch job, run live (3 min)
+
+**Before this step:** `ADMIN_DIAG_SECRET` already exported in this terminal (prep step 7, above), `EAC1111111111` already tracked on the demo account (prep step 8, above) alongside the normal working cases. Terminal window visible on the shared screen, large enough to read.
+**Click:** Run this exact command, live:
+```
+curl -X POST https://app.casewhy.com/api/cron/check-status \
+  -H "Authorization: Bearer $ADMIN_DIAG_SECRET"
+```
+**Say, before running it:** "This is the scheduled job that checks every tracked case — it runs automatically once a day, every day; I'm triggering it by hand right now, outside its normal schedule, so you can see it live rather than take my word for it. It's the same authenticated call our external scheduler makes, just run manually." **Say, reading the JSON response:** "`checked` is how many went through cleanly — that's the success case. `errors` is where a per-case failure shows up without taking down the rest of the run — that entry right there is `EAC1111111111`, a receipt number I deliberately tracked because it's not a real case, so it reliably 404s every time — that's not a bug, it's the error path working exactly as designed, and it's isolated: the other case still gets checked and counted in `checked`, not swallowed by the one that failed."
+**Reviewer sees:** the raw JSON response in the terminal — `checked`, `notified`, `errors` (containing the real USCIS 404 for `EAC1111111111`), `stoppedEarly`, `remaining`.
+**Criterion:** the checklist's batch-update requirement — manually run, live, success and error both shown in the same run.
+**If it fails live:** if the response's `errors` array is empty (the demo account's tracked cases somehow don't include `EAC1111111111` — a setup miss, not a live failure), say so plainly and re-add the case via the dashboard on screen, then re-run the command once tracked.
+
+### Step 7 — Close (2 min)
 
 **Say:** "Everything I've shown is in the technical brief we sent ahead of this call, with the exact file and function for every claim. Happy to go deeper on anything, live or in a follow-up."
 
@@ -81,9 +97,10 @@ Shows USCIS's five real Case Status API criteria, in order: (1) data entry usabi
 | `WAC9999999999` | I-751 | Case Was Received At My Local Office | Added live, Step 2 |
 | `WAC0000000001` | I-751 | Case Was Transferred | Backup for Step 2 |
 | `EAC0000099999` | — | Deliberately unknown (real 404) | Step 4 |
+| `EAC1111111111` | — | Deliberately unknown (real 404, verified live round 130) | Pre-tracked, Step 6's batch-job error case |
 | `AB12345` | — | Deliberately malformed (real 422, client-side feedback only) | Step 4 |
 
-All five are from CaseWhy's own confirmed-working sandbox pool — no real PII, no real cases, on the whole call.
+All six are real sandbox behavior, confirmed live — either from CaseWhy's own confirmed-working pool, or a deliberately unrecognized/malformed number chosen specifically to reproduce a real USCIS error on demand. No real PII, no real cases, on the whole call.
 
 ## Real-time fallback rule, for anything not covered above
 

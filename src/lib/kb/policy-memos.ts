@@ -441,14 +441,14 @@ export const POLICY_MEMOS: PolicyMemo[] = [
     summary:
       "USCIS implemented a revised civics test on December 1, 2020 as part of a routine decennial review — expanding the question bank from 100 to 128 questions, the number asked during the interview from 10 to 20, and the number of correct answers needed to pass from 6 to 12. After finding the new test's development process, content, and rollout schedule may have created unintended barriers to naturalization, USCIS reverted to the longer-standing 2008 version (100 questions, 10 asked, 6 correct to pass) for any applicant filing on or after March 1, 2021. Applicants who filed between December 1, 2020 and February 28, 2021 and hadn't yet had their initial interview by mid-April 2021 could choose either version.",
     currentStatus:
-      "The 2008-version civics test (100 questions, 10 asked, 6 correct needed) is the current operative standard for the N-400 civics requirement.",
+      "Superseded — see the 2025 Naturalization Civics Test entry below. The 2008-version test governed from March 1, 2021 until it was itself replaced for applicants filing on or after October 20, 2025.",
     sourceTitle: "USCIS: USCIS Reverts to the 2008 Version of the Naturalization Civics Test",
     sourceUrl: "https://www.uscis.gov/archive/uscis-reverts-to-the-2008-version-of-the-naturalization-civics-test",
     titleEs: "La prueba de civismo para la naturalización vuelve a la versión de 2008",
     summaryEs:
       "USCIS implementó una prueba de civismo revisada el 1 de diciembre de 2020 como parte de una revisión decenal de rutina — ampliando el banco de preguntas de 100 a 128, el número de preguntas formuladas durante la entrevista de 10 a 20, y el número de respuestas correctas necesarias para aprobar de 6 a 12. Tras determinar que el proceso de desarrollo, el contenido y el calendario de implementación de la nueva prueba podrían haber creado barreras no intencionadas a la naturalización, USCIS volvió a la versión de 2008, de más larga data (100 preguntas, 10 formuladas, 6 correctas para aprobar), para cualquier solicitante que presentara su solicitud a partir del 1 de marzo de 2021. Los solicitantes que presentaron su solicitud entre el 1 de diciembre de 2020 y el 28 de febrero de 2021 y que aún no habían tenido su entrevista inicial a mediados de abril de 2021 podían elegir cualquiera de las dos versiones.",
     currentStatusEs:
-      "La prueba de civismo de la versión de 2008 (100 preguntas, 10 formuladas, 6 correctas necesarias) es el estándar vigente actualmente para el requisito de civismo del N-400.",
+      "Reemplazada — vea la entrada de la Prueba de Civismo 2025 más abajo. La prueba de la versión 2008 rigió desde el 1 de marzo de 2021 hasta que fue reemplazada, a su vez, para los solicitantes que presentaran su solicitud a partir del 20 de octubre de 2025.",
   },
   {
     id: "circumvention-of-lawful-pathways-2023",
@@ -545,14 +545,14 @@ export const POLICY_MEMOS: PolicyMemo[] = [
     summary:
       "USCIS issued policy guidance (PA-2021-08) on May 27, 2021 clarifying that an applicant who was automatically or unknowingly registered to vote through a state DMV's motor-voter process — without ever actually voting, and without intending to falsely claim citizenship — should not be found to lack good moral character or be inadmissible for it on that basis alone. This reversed a stricter, more literal reading applied under the prior administration.",
     currentStatus:
-      "This is the current operative standard for this specific, narrow fact pattern. It doesn't excuse actual unlawful voting or a knowing false claim to citizenship — both remain serious grounds a case-specific attorney consultation is warranted for, not something this app can assess.",
+      "Superseded — see the August 2025 good moral character/voter registration entry below, which rescinds this 2021 guidance and takes a stricter view.",
     sourceTitle: "USCIS: Naturalization Eligibility and Voter Registration Through a State's Benefit Application Process",
     sourceUrl: "https://www.uscis.gov/policy-manual/volume-12-part-f-chapter-1",
     titleEs: "Buen carácter moral — el registro de votante no intencional en el DMV no se usa en su contra",
     summaryEs:
       "USCIS emitió una orientación de política (PA-2021-08) el 27 de mayo de 2021 aclarando que un solicitante que fue registrado para votar de forma automática o sin saberlo a través del proceso de 'motor-voter' del DMV de un estado — sin haber votado realmente, y sin intención de reclamar falsamente la ciudadanía — no debería ser considerado carente de buen carácter moral ni inadmisible únicamente por eso. Esto revirtió una interpretación más estricta y literal aplicada bajo la administración anterior.",
     currentStatusEs:
-      "Este es el estándar vigente actualmente para este patrón de hechos específico y limitado. No excusa el voto ilegal real ni una reclamación falsa y consciente de ciudadanía — ambos siguen siendo motivos serios que ameritan consultar a un abogado sobre el caso específico, algo que esta aplicación no puede evaluar.",
+      "Reemplazada — vea la entrada de agosto de 2025 sobre buen carácter moral/registro de votante más abajo, que deroga esta orientación de 2021 y adopta una postura más estricta.",
   },
   {
     id: "n400-neighborhood-investigations-resumed-2025",
@@ -574,6 +574,74 @@ export const POLICY_MEMOS: PolicyMemo[] = [
       "El director de USCIS, Edlow, emitió un memorando de política el 22 de agosto de 2025 que revive las investigaciones personales ('de vecindario') bajo la sección 335(a) de la INA — una herramienta discrecional, sin uso desde 1991, que permite a USCIS entrevistar a vecinos, empleadores u otras personas de la comunidad de un solicitante para ayudar a corroborar la residencia, el buen carácter moral y otros factores de elegibilidad para la naturalización, cubriendo al menos los 5 años previos a la presentación. USCIS formalizó esto en el Manual de Políticas vigente desde el 25 de agosto de 2026, pasando de exonerar automáticamente estas investigaciones a decidir caso por caso.",
     currentStatusEs:
       "Una investigación de vecindario, cuando se utiliza, es una herramienta discrecional de corroboración entre varias en las que puede apoyarse un oficial — no indica por sí sola un problema con una solicitud, y la mayoría de los solicitantes seguirán sin tener una. No existe una forma publicada y confiable de predecir de antemano si a un caso específico se le realizará una.",
+  },
+  // Round 126 follow-up, fourth pass — Peter pointed directly at USCIS's
+  // own Policy Manual updates archive (uscis.gov/policy-manual/updates),
+  // asking for the ones relevant to CaseWhy's supported forms specifically
+  // -- not a copy of the whole manual. Fetched that real archive page and
+  // cross-checked candidates against form types this app actually tracks.
+  // Two of these directly supersede entries already in this file above --
+  // both of those entries' currentStatus fields were corrected to point
+  // here rather than left reading as still-current, which they no longer
+  // are.
+  {
+    id: "n400-civics-test-2025",
+    kind: "memo",
+    title: "2025 Naturalization Civics Test",
+    datePublished: "2025-09-18",
+    effectiveFrom: "2025-10-20",
+    formTypes: ["N-400"],
+    statusKeywords: [],
+    summary:
+      "USCIS published a Federal Register notice on September 18, 2025 implementing a new civics test for applicants filing on or after October 20, 2025: 20 questions drawn from a 128-question bank (up from 10 of 100 under the 2008 version), with 12 correct answers needed to pass (up from 6). Over three-quarters of the questions carry over from the short-lived 2020 version, with revised wording on a handful of items. As under the 2008 version, an officer stops the test the moment an applicant has clearly passed (12 correct) or failed (9 incorrect), rather than always asking all 20.",
+    currentStatus:
+      "This is the current operative standard for any N-400 filed on or after October 20, 2025. An application filed before that date is tested under the 2008 version (see that entry above) regardless of when the interview itself happens.",
+    sourceTitle: "Federal Register: Notice of Implementation of 2025 Naturalization Civics Test",
+    sourceUrl: "https://www.federalregister.gov/documents/2025/09/18/2025-18050/notice-of-implementation-of-2025-naturalization-civics-test",
+    titleEs: "Prueba de civismo para la naturalización de 2025",
+    summaryEs:
+      "USCIS publicó un aviso en el Federal Register el 18 de septiembre de 2025 implementando una nueva prueba de civismo para solicitantes que presenten su solicitud a partir del 20 de octubre de 2025: 20 preguntas extraídas de un banco de 128 (antes 10 de 100 bajo la versión de 2008), con 12 respuestas correctas necesarias para aprobar (antes 6). Más de las tres cuartas partes de las preguntas provienen de la versión de 2020, de corta duración, con redacción revisada en algunas de ellas. Al igual que bajo la versión de 2008, un oficial detiene la prueba en el momento en que un solicitante claramente aprueba (12 correctas) o reprueba (9 incorrectas), en lugar de formular siempre las 20 preguntas.",
+    currentStatusEs:
+      "Este es el estándar vigente actualmente para cualquier N-400 presentado a partir del 20 de octubre de 2025. Una solicitud presentada antes de esa fecha se evalúa bajo la versión de 2008 (vea esa entrada más arriba), sin importar cuándo ocurra la entrevista en sí.",
+  },
+  {
+    id: "n400-gmc-voter-registration-2025-tightening",
+    kind: "memo",
+    title: "Good Moral Character, Voter Registration, and False Citizenship Claims — 2025 Tightening",
+    datePublished: "2025-08-29",
+    memoNumber: "PA-2025-20",
+    formTypes: ["N-400"],
+    statusKeywords: ["good moral character", "voter registration", "unlawful voting", "false claim"],
+    summary:
+      "USCIS issued PA-2025-20 on August 29, 2025, rescinding the 2021 guidance above (and a related 2023 update) and taking a stricter view of false citizenship claims made during voter registration, unlawful voter registration, and unlawful voting in naturalization adjudications, as part of implementing recent executive orders emphasizing election-integrity review.",
+    currentStatus:
+      "This is the current operative standard, replacing the 2021 guidance's narrower carve-out for unintentional DMV registration. Never assess how a specific fact pattern would be treated under this standard — that's an attorney question, not something this app's general explanation can safely narrow down.",
+    sourceTitle: "USCIS Policy Manual: Good Moral Character, Unlawful Voting, and False Claim to Citizenship",
+    sourceUrl: "https://www.uscis.gov/sites/default/files/document/policy-manual-updates/20250829-VoterRegistrationGMC.pdf",
+    titleEs: "Buen carácter moral, registro de votante y reclamaciones falsas de ciudadanía — endurecimiento de 2025",
+    summaryEs:
+      "USCIS emitió el PA-2025-20 el 29 de agosto de 2025, derogando la orientación de 2021 mencionada arriba (y una actualización relacionada de 2023) y adoptando una postura más estricta sobre las reclamaciones falsas de ciudadanía hechas durante el registro de votantes, el registro ilegal para votar, y el voto ilegal en las adjudicaciones de naturalización, como parte de la implementación de órdenes ejecutivas recientes que enfatizan la revisión de la integridad electoral.",
+    currentStatusEs:
+      "Este es el estándar vigente actualmente, que reemplaza la excepción más limitada de la orientación de 2021 para el registro no intencional en el DMV. Nunca debe evaluarse cómo se trataría un patrón de hechos específico bajo este estándar — eso es una pregunta para un abogado, no algo que la explicación general de esta aplicación pueda determinar con seguridad.",
+  },
+  {
+    id: "n600-custody-requirements-2024",
+    kind: "memo",
+    title: "Legal and Physical Custody Requirements for Acquiring Citizenship Through a Parent",
+    datePublished: "2024-11-19",
+    formTypes: ["N-600"],
+    statusKeywords: ["custody", "acquisition", "derivation"],
+    summary:
+      "USCIS issued a policy alert on November 19, 2024 clarifying legal and physical custody for a child acquiring citizenship through a U.S.-citizen parent under INA 320 (acquisition) and 322 (naturalization on a child's behalf), plus derivation under the pre-Child Citizenship Act former INA 321. It recognizes legal custody based on uncontested, actual custody even without a specific court order, clarifies how a retroactive (nunc pro tunc) custody-order correction is treated, and clarifies when USCIS will recognize a private custody agreement. Physical custody is defined simply as the child residing with the U.S.-citizen parent.",
+    currentStatus:
+      "This is the current operative standard, effective immediately upon issuance and applied to cases pending on or after November 19, 2024. It doesn't change who qualifies for acquisition versus derivation (see the N-600 reference entry above) — only how USCIS evaluates whether the custody element of either pathway is met.",
+    sourceTitle: "USCIS: USCIS Updates Guidance on Determining Custody for Children Acquiring U.S. Citizenship",
+    sourceUrl: "https://www.uscis.gov/newsroom/alerts/uscis-updates-guidance-on-determining-custody-for-children-acquiring-us-citizenship",
+    titleEs: "Requisitos de custodia legal y física para adquirir la ciudadanía a través de un padre o madre",
+    summaryEs:
+      "USCIS emitió una alerta de política el 19 de noviembre de 2024 aclarando la custodia legal y física para un menor que adquiere la ciudadanía a través de un padre o madre ciudadano estadounidense bajo la sección 320 de la INA (adquisición) y la 322 (naturalización en nombre de un menor), además de la derivación bajo la anterior sección 321 de la INA (previa a la Ley de Ciudadanía Infantil). Reconoce la custodia legal basada en custodia real y no disputada incluso sin una orden judicial específica, aclara cómo se trata una corrección retroactiva (nunc pro tunc) de una orden de custodia, y aclara cuándo USCIS reconocerá un acuerdo privado de custodia. La custodia física se define simplemente como que el menor resida con el padre o madre ciudadano estadounidense.",
+    currentStatusEs:
+      "Este es el estándar vigente actualmente, efectivo de inmediato desde su emisión y aplicado a casos pendientes a partir del 19 de noviembre de 2024. No cambia quién califica para adquisición frente a derivación (vea la entrada de referencia del N-600 más arriba) — solo cómo evalúa USCIS si se cumple el elemento de custodia de cualquiera de las dos vías.",
   },
 ];
 

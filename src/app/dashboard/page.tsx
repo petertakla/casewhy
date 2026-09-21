@@ -258,14 +258,27 @@ function ExplanationBox({
               add. */}
           {!isPlus && (explanation.nextSteps.length > 0 || explanation.relatedPolicies.length > 0) && (
             <p className="mt-3 border-t border-brand-500/15 pt-3 text-xs text-muted">
-              {es ? (
+              {explanation.relatedPolicies.length > 0 ? (
+                es ? (
+                  <>
+                    CaseWhy <PlusBadge size="sm" /> agrega próximos pasos y respuestas instantáneas a &quot;¿Aplica a
+                    mi caso?&quot; y &quot;¿Cómo aplica a mi caso?&quot;, fundamentadas en la política de USCIS
+                    específica que coincide con este estado.
+                  </>
+                ) : (
+                  <>
+                    CaseWhy <PlusBadge size="sm" /> adds next steps and instant answers to &quot;Does it apply to
+                    me?&quot; and &quot;How does it apply to me?&quot;, grounded in the specific USCIS policy that
+                    matches this status.
+                  </>
+                )
+              ) : es ? (
                 <>
-                  CaseWhy <PlusBadge size="sm" /> agrega próximos pasos y fuentes de política citadas para este
-                  estado.
+                  CaseWhy <PlusBadge size="sm" /> agrega próximos pasos para este estado.
                 </>
               ) : (
                 <>
-                  CaseWhy <PlusBadge size="sm" /> adds next steps and cited policy sources for this status.
+                  CaseWhy <PlusBadge size="sm" /> adds next steps for this status.
                 </>
               )}
             </p>

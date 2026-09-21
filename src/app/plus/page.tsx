@@ -53,7 +53,7 @@ const PLUS_FEATURES: PlusFeature[] = [
     free: "Basics",
     plus: "Full depth",
     explanation:
-      "Every account, free or Plus, gets a complete, honest plain-language explanation of what a status means and whether there's cause for concern — that basic answer is never held back. Plus adds the layer on top: likely next steps specific to this case, cited policy background you can check yourself, and quick links into the escalation toolkit when a citation is relevant to a stall. Same underlying explanation, more of it surfaced.",
+      "Every account, free or Plus, gets a complete, honest plain-language explanation of what a status means and whether there's cause for concern — that basic answer is never held back. Plus adds the layer on top: likely next steps specific to this case, cited policy background you can check yourself, and — when a real policy or court ruling matches your case's own facts — one-click answers to \"Does it apply to me?\" and \"How does it apply to me?\", grounded in that specific policy, not a generic guess. Same underlying explanation, more of it surfaced.",
   },
   {
     id: "tracked-cases",
@@ -330,7 +330,7 @@ export default async function PlusPage({
             between plans later is prorated automatically.
           </p>
 
-          <div className="mt-8 grid grid-cols-1 gap-4 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6 sm:grid-cols-3">
+          <div className="mt-8 grid grid-cols-1 gap-4 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6 sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
                 Grounded in policy and your case, not guessing
@@ -376,6 +376,23 @@ export default async function PlusPage({
               </p>
               <a
                 href="#escalation-letters"
+                className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
+              >
+                See how it works →
+              </a>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
+                &quot;Does this apply to me?&quot; — answered
+              </p>
+              <p className="mt-1.5 text-sm text-muted">
+                When a real policy or court ruling matches your case&apos;s own
+                facts, get a one-click answer to &quot;Does it apply to
+                me?&quot; and &quot;How does it apply to me?&quot; — grounded
+                in that specific policy, not a generic guess.
+              </p>
+              <a
+                href="#explanation-depth"
                 className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
               >
                 See how it works →

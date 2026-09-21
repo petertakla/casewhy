@@ -60,7 +60,7 @@ const PLUS_FEATURES: PlusFeature[] = [
     free: "Lo básico",
     plus: "A fondo",
     explanation:
-      "Toda cuenta, gratuita o Plus, recibe una explicación completa y honesta en lenguaje sencillo de lo que significa un estado y si hay motivo de preocupación — esa respuesta básica nunca se retiene. Plus agrega la capa adicional: próximos pasos probables específicos de este caso, antecedentes de política citados que puedes verificar tú mismo, y enlaces rápidos al kit de herramientas de escalamiento cuando una cita es relevante para un estancamiento. La misma explicación subyacente, con más de ella visible.",
+      "Toda cuenta, gratuita o Plus, recibe una explicación completa y honesta en lenguaje sencillo de lo que significa un estado y si hay motivo de preocupación — esa respuesta básica nunca se retiene. Plus agrega la capa adicional: próximos pasos probables específicos de este caso, antecedentes de política citados que puedes verificar tú mismo, y — cuando una política real o un fallo judicial coincide con los hechos propios de tu caso — respuestas con un clic a \"¿Aplica a mi caso?\" y \"¿Cómo aplica a mi caso?\", fundamentadas en esa política específica, no en una suposición genérica. La misma explicación subyacente, con más de ella visible.",
   },
   {
     id: "tracked-cases",
@@ -337,7 +337,7 @@ export default async function PlusPageEs({
             automáticamente.
           </p>
 
-          <div className="mt-8 grid grid-cols-1 gap-4 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6 sm:grid-cols-3">
+          <div className="mt-8 grid grid-cols-1 gap-4 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6 sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
                 Fundamentado en política y en tu caso, no en suposiciones
@@ -383,6 +383,24 @@ export default async function PlusPageEs({
               </p>
               <a
                 href="#escalation-letters"
+                className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
+              >
+                Ver cómo funciona →
+              </a>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
+                &quot;¿Aplica a mi caso?&quot; — respondido
+              </p>
+              <p className="mt-1.5 text-sm text-muted">
+                Cuando una política real o un fallo judicial coincide con los
+                hechos propios de tu caso, obtén una respuesta con un clic a
+                &quot;¿Aplica a mi caso?&quot; y &quot;¿Cómo aplica a mi
+                caso?&quot; — fundamentada en esa política específica, no en
+                una suposición genérica.
+              </p>
+              <a
+                href="#explanation-depth"
                 className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
               >
                 Ver cómo funciona →

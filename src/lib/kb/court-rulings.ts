@@ -15,16 +15,22 @@
 //
 // Scope kept to real rulings relevant to case types CaseWhy actually
 // supports (see policy-memos.ts's own scope note) -- not a comprehensive
-// immigration-law casebook. Three of these are the same real rulings
+// immigration-law casebook. Four of these are the same real rulings
 // already referenced in prose inside POLICY_MEMOS entries (the DACA and
-// Circumvention of Lawful Pathways litigation) -- promoted to their own
-// permalinks here and cross-linked, rather than existing only as an
-// unlinkable mention.
+// Circumvention of Lawful Pathways litigation, and pm-602-0194's own
+// mention of its June 2026 vacatur) -- promoted to their own permalinks
+// here and cross-linked, rather than existing only as an unlinkable mention.
 //
 // Hand-maintained, not an automated pipeline, per Peter's own explicit
 // scoping call -- same starting point as POLICY_MEMOS (3 entries) and
 // NEWS_SOURCES both began as a small hand-edited list. If this should
 // auto-update later, that's a follow-up round, not assumed here.
+//
+// Round 127 follow-up (same day) -- Peter supplied three more research
+// leads (two pasted case summaries, one live news item on third-country
+// removal). Same independent-verification discipline as the first pass:
+// each was re-confirmed via live search against a primary source/docket
+// before being added, not trusted as pasted. 10 entries total.
 
 export interface CourtRuling {
   id: string;
@@ -144,6 +150,63 @@ export const COURT_RULINGS: CourtRuling[] = [
     sourceTitle: "Justia: Trump v. Hawaii, 585 U.S. 667 (2018)",
     sourceUrl: "https://supreme.justia.com/cases/federal/us/585/17-965/",
     relatedPolicyMemoId: "pm-602-0194-high-risk-hold",
+  },
+  {
+    // Round 127 follow-up — Peter's research lead. This is the actual
+    // ruling policy-memos.ts's own pm-602-0194-high-risk-hold entry already
+    // describes in prose ("a Rhode Island court vacated them outright on
+    // June 5, 2026") but had no permalink for until now.
+    id: "dorcas-v-uscis-2026",
+    caseName: "Dorcas International Institute of Rhode Island v. United States Citizenship and Immigration Services",
+    citationOrDocket: "No. 1:26-cv-00132-JJM-PAS (D.R.I.)",
+    court: "U.S. District Court for the District of Rhode Island",
+    decidedDate: "2026-06-05",
+    formTypes: "*",
+    summary:
+      "Chief Judge John J. McConnell Jr. vacated four related USCIS policies — including PM-602-0194's automatic hold on final decisions for pending benefit applications (naturalization, family- and employment-based petitions, adjustment of status, work permits, and asylum) from nationals of about 39 countries designated \"high-risk.\" The court held USCIS exceeded its statutory authority, failed to adequately explain the change in policy, and relied on pretextual national-security justifications — a straightforward Administrative Procedure Act violation, not a ruling on immigration policy merits.",
+    currentStatus:
+      "The government appealed to the First Circuit (No. 26-1703); a stay of the vacatur pending appeal was denied on July 15, 2026, so the vacatur remains in effect. The district court separately had to order the government to show compliance after finding the holds were still being applied six days after the original order. Relief has generally applied to certified classes/plaintiffs rather than automatically to every case nationwide, so this app can't confirm from the status API alone whether a specific case has actually resumed normal processing.",
+    sourceTitle: "USCIS: Court Order on Hold Policies",
+    sourceUrl: "https://www.uscis.gov/newsroom/alerts/court-order-on-hold-policies",
+    relatedPolicyMemoId: "pm-602-0194-high-risk-hold",
+  },
+  {
+    // Round 127 follow-up — Peter's research lead. A separate policy from
+    // pm-602-0194 above: this one is the State Department's own consular
+    // immigrant-visa-issuance suspension, not a USCIS domestic-adjudication
+    // hold, so it gets its own entry rather than sharing relatedPolicyMemoId
+    // with the USCIS hold policy above -- conflating the two would misstate
+    // which agency's policy this ruling actually addressed.
+    id: "clinic-v-rubio-2026",
+    caseName: "Catholic Legal Immigration Network, Inc. v. Rubio",
+    citationOrDocket: "No. 1:26-cv-00858 (S.D.N.Y.)",
+    court: "U.S. District Court for the Southern District of New York",
+    decidedDate: "2026-08-21",
+    formTypes: ["I-130", "I-140"],
+    summary:
+      "Effective January 21, 2026, the State Department paused issuing immigrant visas — the visa issued abroad after an underlying petition like Form I-130 or I-140 is approved and the case reaches the National Visa Center — to nationals of 75 countries, citing concern that immigrants from those countries were at high risk of relying on U.S. public benefits. Judge Jeannette A. Vargas held the blanket, nationality-wide suspension exceeded the State Department's statutory authority and violated the Immigration and Nationality Act's bar on nationality-based discrimination in immigrant-visa issuance, since it overrode the case-by-case discretion the statute assigns to individual consular officers.",
+    currentStatus:
+      "The court ordered the government to submit a sworn compliance status report; the government acknowledged more than 43,000 immigrant-visa applications had been denied solely under the vacated policy. The State Department confirmed as of late August 2026 that the pause is no longer in effect, though this app can't confirm whether a specific pending case's consular processing has actually resumed as a result.",
+    sourceTitle: "U.S. Department of State: Immigrant Visa Processing Updates for Nationalities at High Risk of U.S. Public Benefits Reliance (Aug 28, 2026)",
+    sourceUrl:
+      "https://travel.state.gov/content/travel/en/News/visas-news/immigrant-visa-processing-updates-for-nationalities-at-high-risk-of-public-benefits-usage.html",
+  },
+  {
+    // Round 127 follow-up — Peter's third research lead (a live news item,
+    // decided within days of this round). No existing POLICY_MEMOS entry
+    // covers third-country removal, so this stands with no relatedPolicyMemoId.
+    id: "dvd-v-dhs-2026",
+    caseName: "D.V.D. v. Department of Homeland Security",
+    citationOrDocket: "No. 26-1212 (1st Cir.)",
+    court: "U.S. Court of Appeals for the First Circuit",
+    decidedDate: "2026-09-18",
+    formTypes: ["I-589"],
+    summary:
+      "DHS policies issued in March and July 2025 let the agency remove a noncitizen with a final removal order to a \"third country\" — one neither named in their removal order nor previously disclosed to them in writing — without adequate notice or a meaningful chance to raise a fear of persecution or torture there first. On February 25, 2026, the district court (Judge Brian Murphy, D. Mass.) set the policy aside as unlawful. The First Circuit's ruling largely upheld that decision, holding that noncitizens must get a genuinely \"meaningful\" opportunity to raise safety concerns before removal to a country outside their original case, and questioning the government's reliance on unverified \"blanket assurances\" from receiving countries.",
+    currentStatus:
+      "The government is expected to seek further review (rehearing en banc or the Supreme Court); no such review has been decided as of this writing, so whether these protections hold or narrow further remains open. This ruling is about the notice and process due before a third-country removal, not the merits of any individual's underlying asylum or Convention Against Torture claim — whether it affects a specific pending case depends closely on that case's own removal history, an attorney question this app can't resolve.",
+    sourceTitle: "Justia: D.V.D. v. Department of Homeland Security, No. 26-1212 (1st Cir. 2026)",
+    sourceUrl: "https://law.justia.com/cases/federal/appellate-courts/ca1/26-1212/26-1212-2026-09-18.html",
   },
 ];
 

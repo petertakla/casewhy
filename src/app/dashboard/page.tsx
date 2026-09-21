@@ -323,12 +323,12 @@ function StatusCard({
   es: boolean;
   /** Round 125 follow-up — stalled-case alert is now gated to Plus (Peter's
    * explicit call, reversing CW-39's original "free on every tier"
-   * decision). Kept as its own prop rather than folded into `tracking`
-   * since it also applies to the signed-out anonymous-lookup path, where
-   * `tracking` itself is null. */
+   * decision). Kept as its own prop rather than folded into `tracking`. */
   isPlus: boolean;
+  /** Round 129 — case-status lookup is signed-in-only now, so this is never
+   * null (there's no more signed-out anonymous-lookup path for it to be
+   * null on — see DashboardPage's own sign-in gate above). */
   tracking: {
-    signedIn: boolean;
     alreadyTracked: boolean;
     trackedCaseId?: string;
     lastCheckedAt?: Date | null;
@@ -344,7 +344,7 @@ function StatusCard({
      * than a flat-tier cap — changes TrackCaseButton's message to "contact
      * us" instead of "upgrade to Plus." */
     isPlusHardCeiling: boolean;
-  } | null;
+  };
 }) {
   const tone = statusTone(status.statusText);
   const stall = detectStalledCase(status);
@@ -373,50 +373,34 @@ function StatusCard({
           action buried below the explanation/history, a user (or a USCIS
           reviewer) scanning the top of the card had no visible way to
           actually track what they just looked up. */}
-      {tracking && (
-        <div className="mt-3">
-          {tracking.signedIn ? (
-            <>
-              <TrackCaseButton
-                receiptNumber={status.receiptNumber}
-                trackedCaseId={tracking.trackedCaseId}
-                alreadyTracked={tracking.alreadyTracked}
-                atCap={tracking.atCap}
-                maxCases={tracking.maxCases}
-                plusMaxCases={TIER_LIMITS.plus.maxCases}
-                willQueueForReview={tracking.willQueueForReview}
-                isPlusHardCeiling={tracking.isPlusHardCeiling}
-                es={es}
-              />
-              {tracking.alreadyTracked && tracking.trackedCaseId && (
-                <>
-                  <CheckNowButton
-                    trackedCaseId={tracking.trackedCaseId}
-                    lastCheckedAt={tracking.lastCheckedAt ?? null}
-                    canCheckNow={tracking.canCheckNow}
-                    es={es}
-                  />
-                  <DownloadReportLink
-                    receiptNumber={status.receiptNumber}
-                    canDownload={tracking.canDownloadReport}
-                    es={es}
-                  />
-                </>
-              )}
-            </>
-          ) : (
-            <p className="text-xs text-muted">
-              <Link
-                href={es ? `/auth/sign-in?lang=es&receipt=${encodeURIComponent(status.receiptNumber)}` : `/auth/sign-in?receipt=${encodeURIComponent(status.receiptNumber)}`}
-                className="font-semibold text-brand-600 dark:text-brand-400 hover:underline"
-              >
-                {es ? "Inicia sesión" : "Sign in"}
-              </Link>{" "}
-              {es ? "para guardar este caso." : "to save this case."}
-            </p>
-          )}
-        </div>
-      )}
+      <div className="mt-3">
+        <TrackCaseButton
+          receiptNumber={status.receiptNumber}
+          trackedCaseId={tracking.trackedCaseId}
+          alreadyTracked={tracking.alreadyTracked}
+          atCap={tracking.atCap}
+          maxCases={tracking.maxCases}
+          plusMaxCases={TIER_LIMITS.plus.maxCases}
+          willQueueForReview={tracking.willQueueForReview}
+          isPlusHardCeiling={tracking.isPlusHardCeiling}
+          es={es}
+        />
+        {tracking.alreadyTracked && tracking.trackedCaseId && (
+          <>
+            <CheckNowButton
+              trackedCaseId={tracking.trackedCaseId}
+              lastCheckedAt={tracking.lastCheckedAt ?? null}
+              canCheckNow={tracking.canCheckNow}
+              es={es}
+            />
+            <DownloadReportLink
+              receiptNumber={status.receiptNumber}
+              canDownload={tracking.canDownloadReport}
+              es={es}
+            />
+          </>
+        )}
+      </div>
 
       {explanation && (
         <ExplanationBox
@@ -532,20 +516,80 @@ export default async function DashboardPage({
   const es = await isSpanishLocale(lang);
   const { data: session } = await auth.getSession();
 
-  let trackedCasesList: Awaited<ReturnType<typeof getTrackedCases>> = [];
-  let maxCases = TIER_LIMITS.free.maxCases;
-  let canCheckNow = false;
-  let isPlus = false;
-  let effectiveMaxCases = TIER_LIMITS.plus.maxCases;
-  let lifetimeCount = 0;
-  if (session?.user) {
-    trackedCasesList = await getTrackedCases(session.user.id);
-    const details = await getSubscriptionDetails(session.user.id);
-    isPlus = details.tier === "plus";
-    maxCases = TIER_LIMITS[details.tier].maxCases;
-    effectiveMaxCases = details.effectiveMaxCases;
-    canCheckNow = isPlus;
+  // Round 129 — case-status lookup is signed-in-only now, full stop. This
+  // reverses a previously real, documented feature ("any receipt number can
+  // be looked up without signing in") — Peter's explicit, deliberate call,
+  // not a bug fix. Checked here, before anything else on this page, so a
+  // signed-out request never reaches getCaseStatus() at all: not hidden by
+  // conditional JSX further down, genuinely unreachable code for this
+  // request (the real server-side enforcement point, not just a hidden
+  // form in front of a still-live endpoint). Applies identically whether or
+  // not ?receipt= is present, so a signed-out visitor landing directly on a
+  // shared /dashboard?receipt=X link gets the same explanation, not a bare
+  // redirect that leaks nothing about why — matching /ask's own signed-out
+  // pattern (round 125) rather than /settings' hard redirect, since unlike
+  // /settings this page is explicitly taking away behavior that used to
+  // work, and that needs explaining, not just gating.
+  if (!session?.user) {
+    const signUpHref = receipt
+      ? `/auth/sign-up?receipt=${encodeURIComponent(receipt)}${es ? "&lang=es" : ""}`
+      : es
+        ? "/auth/sign-up?lang=es"
+        : "/auth/sign-up";
+    const signInHref = receipt
+      ? `/auth/sign-in?receipt=${encodeURIComponent(receipt)}${es ? "&lang=es" : ""}`
+      : es
+        ? "/auth/sign-in?lang=es"
+        : "/auth/sign-in";
+    return (
+      <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+        <LanguageSwitcher es={es} href={localeToggleHref("/dashboard", { receipt }, es)} />
+        <h1 className="text-2xl font-bold tracking-tight">{es ? "Tu caso" : "Your case"}</h1>
+        <p className="mb-8 mt-2 text-muted">
+          {es
+            ? "Ingresa tu número de recibo de USCIS para ver su estado actual."
+            : "Enter your USCIS receipt number to see its current status."}
+        </p>
+        <div className="rounded-2xl border border-dashed border-border-strong p-8 text-center">
+          <p className="text-sm text-muted">
+            {es ? (
+              <>
+                Consultar el estado de un caso ahora requiere una cuenta gratuita de CaseWhy —{" "}
+                <Link href={signUpHref} className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+                  crea una cuenta gratuita
+                </Link>{" "}
+                o{" "}
+                <Link href={signInHref} className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+                  inicia sesión
+                </Link>{" "}
+                para consultar tu caso.
+              </>
+            ) : (
+              <>
+                Looking up a case&apos;s status now requires a free CaseWhy account —{" "}
+                <Link href={signUpHref} className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+                  create a free account
+                </Link>{" "}
+                or{" "}
+                <Link href={signInHref} className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+                  sign in
+                </Link>{" "}
+                to check your case.
+              </>
+            )}
+          </p>
+        </div>
+      </main>
+    );
   }
+
+  const trackedCasesList = await getTrackedCases(session.user.id);
+  const details = await getSubscriptionDetails(session.user.id);
+  const isPlus = details.tier === "plus";
+  const maxCases = TIER_LIMITS[details.tier].maxCases;
+  const effectiveMaxCases = details.effectiveMaxCases;
+  const canCheckNow = isPlus;
+  let lifetimeCount = 0;
 
   // An explicit ?receipt= search always wins (ad-hoc lookup); otherwise fall
   // back to the signed-in user's first tracked case, if any (CW-36: could
@@ -563,7 +607,7 @@ export default async function DashboardPage({
   // is always allowed — this only blocks a genuinely new receipt once all 3
   // lifetime slots are used, and untracking a case never frees one back up.
   let lifetimeCapReached = false;
-  if (session?.user && !isPlus) {
+  if (!isPlus) {
     if (receiptNumber && !isPendingReview) {
       const check = await checkAndRecordFreeLifetimeLookup(session.user.id, receiptNumber);
       lifetimeCapReached = !check.allowed;
@@ -650,15 +694,13 @@ export default async function DashboardPage({
   // currently-tracked count: those diverge the moment a case is untracked
   // (a currently-tracked count of 0 would otherwise misleadingly read as
   // "3 slots free" when the account may have already used its lifetime cap).
-  const caseCountLabel = session?.user
-    ? isPlus
-      ? es
-        ? `${trackedCasesList.length} caso${trackedCasesList.length === 1 ? "" : "s"} rastreado${trackedCasesList.length === 1 ? "" : "s"} · Plus`
-        : `${trackedCasesList.length} case${trackedCasesList.length === 1 ? "" : "s"} tracked · Plus`
-      : es
-        ? `${lifetimeCount} de ${maxCases} búsquedas de por vida usadas`
-        : `${lifetimeCount} of ${maxCases} lifetime lookups used`
-    : null;
+  const caseCountLabel = isPlus
+    ? es
+      ? `${trackedCasesList.length} caso${trackedCasesList.length === 1 ? "" : "s"} rastreado${trackedCasesList.length === 1 ? "" : "s"} · Plus`
+      : `${trackedCasesList.length} case${trackedCasesList.length === 1 ? "" : "s"} tracked · Plus`
+    : es
+      ? `${lifetimeCount} de ${maxCases} búsquedas de por vida usadas`
+      : `${lifetimeCount} of ${maxCases} lifetime lookups used`;
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
@@ -712,7 +754,6 @@ export default async function DashboardPage({
               es={es}
               isPlus={isPlus}
               tracking={{
-                signedIn: !!session?.user,
                 alreadyTracked: trackedCasesList.some((c) => c.receiptNumber === status.receiptNumber),
                 trackedCaseId: trackedCasesList.find((c) => c.receiptNumber === status.receiptNumber)?.id,
                 lastCheckedAt: trackedCasesList.find((c) => c.receiptNumber === status.receiptNumber)?.lastCheckedAt,

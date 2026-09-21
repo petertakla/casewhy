@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { useIsSpanish } from "@/lib/i18n/use-is-spanish";
@@ -14,6 +14,22 @@ const MIN_PASSWORD_LENGTH = 8;
 function SignUpForm() {
   const router = useRouter();
   const es = useIsSpanish();
+  // Round 129 — the sign-in-required dashboard gate can now send a
+  // signed-out visitor here with their receipt still in the URL; carry it
+  // through to /dashboard after account creation, same pattern sign-in's
+  // own dashboardHref already uses (auth/sign-in/page.tsx), so creating an
+  // account doesn't lose the receipt the visitor was just looking at.
+  const searchParams = useSearchParams();
+  const receipt = searchParams.get("receipt");
+  const dashboardParams = new URLSearchParams();
+  if (es) dashboardParams.set("lang", "es");
+  if (receipt) dashboardParams.set("receipt", receipt);
+  const dashboardHref = dashboardParams.size > 0 ? `/dashboard?${dashboardParams.toString()}` : "/dashboard";
+  const signInHref = receipt
+    ? `/auth/sign-in?receipt=${encodeURIComponent(receipt)}${es ? "&lang=es" : ""}`
+    : es
+      ? "/auth/sign-in?lang=es"
+      : "/auth/sign-in";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -43,7 +59,7 @@ function SignUpForm() {
         setErrorMessage(error.message || (es ? "Algo salió mal al crear tu cuenta." : "Something went wrong creating your account."));
         return;
       }
-      router.push(es ? "/dashboard?lang=es" : "/dashboard");
+      router.push(dashboardHref);
     } catch {
       setStatus("error");
       setErrorMessage(es ? "Algo salió mal al crear tu cuenta. Por favor intenta de nuevo." : "Something went wrong creating your account. Please try again.");
@@ -122,13 +138,13 @@ function SignUpForm() {
             <p className="text-center text-xs text-muted">
               {es ? (
                 <>¿Ya tienes una cuenta?{" "}
-                  <Link href="/auth/sign-in?lang=es" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                  <Link href={signInHref} className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
                     Iniciar sesión
                   </Link>
                 </>
               ) : (
                 <>Already have an account?{" "}
-                  <Link href="/auth/sign-in" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                  <Link href={signInHref} className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
                     Sign in
                   </Link>
                 </>

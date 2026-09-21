@@ -20,6 +20,7 @@ export const PUBLIC_HOWTO_ENTRIES: HelpEntry[] = [
     kind: "howto",
     href: "/dashboard",
     steps: [
+      "Sign in or create a free CaseWhy account — looking up a case's status requires a signed-in account.",
       "Find your 13-character receipt number on your I-797 notice — three letters followed by ten digits (for example IOE, MSC, EAC, WAC, LIN, SRC, NBC, YSC).",
       "Enter it on the Dashboard and submit — CaseWhy looks up the current status directly from USCIS.",
       "Click \"Track this case\" to save it. Once tracked, CaseWhy checks it automatically once a day (Plus adds an on-demand \"Check now\" button) and keeps a full status history.",

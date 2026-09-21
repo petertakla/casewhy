@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { subscriptions } from "@/lib/db/schema";
 import { TIER_LIMITS } from "@/lib/billing/tier";
+import { getFreeLifetimeLookupCount } from "@/lib/billing/receipt-lookups";
 import { getLiveSubscriptionDetail } from "@/lib/billing/live-subscription";
 import { PlusBadge } from "@/components/PlusBadge";
 
@@ -45,14 +46,19 @@ export async function PlanSection({ userId, es }: { userId: string; es: boolean 
   const tier = row?.tier ?? "free";
 
   if (tier !== "plus") {
+    // Round 128 — the free-tier cap is a lifetime distinct-receipt ledger
+    // now, not a currently-tracked count (see receipt-lookups.ts), so this
+    // shows how much of the account's lifetime allowance is used, not how
+    // many cases happen to be tracked right now.
+    const lifetimeCount = await getFreeLifetimeLookupCount(userId);
     return (
       <section className="mb-8">
         <h2 className="text-sm font-semibold uppercase tracking-widest text-muted">{es ? "Plan" : "Plan"}</h2>
         <div className="mt-2 rounded-xl border border-border bg-surface p-5">
           <p className="text-sm font-medium text-foreground">
             {es
-              ? `Gratis · ${TIER_LIMITS.free.maxCases} casos rastreados`
-              : `Free · ${TIER_LIMITS.free.maxCases} tracked cases`}
+              ? `Gratis · ${lifetimeCount} de ${TIER_LIMITS.free.maxCases} búsquedas de por vida usadas`
+              : `Free · ${lifetimeCount} of ${TIER_LIMITS.free.maxCases} lifetime lookups used`}
           </p>
           <Link
             href="/plus"

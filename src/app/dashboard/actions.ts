@@ -7,6 +7,7 @@ import { getDb } from "@/lib/db/client";
 import { trackedCases } from "@/lib/db/schema";
 import { encryptField, decryptField } from "@/lib/db/crypto";
 import { getSubscriptionTier, getSubscriptionDetails, TIER_LIMITS, PLUS_HARD_CEILING_MAX_CASES } from "@/lib/billing/tier";
+import { checkAndRecordFreeLifetimeLookup } from "@/lib/billing/receipt-lookups";
 import { UscisApiError, extractUscisErrorMessage, describeCaseStatusRequest } from "@/lib/uscis/client";
 import { checkTrackedCaseNow } from "@/lib/uscis/check-status";
 import { CASE_TYPES } from "@/lib/kb/case-type-timeline";
@@ -191,12 +192,16 @@ export async function trackCase(receiptNumber: string, caseType: string): Promis
     return;
   }
 
-  const maxCases = TIER_LIMITS[tier].maxCases;
-  if (existing.length >= maxCases) {
-    // A plain Error, not a custom class — "use server" files may only
-    // export async functions, so a thrown error class can't live here.
+  // Round 128 — free tier's cap is a lifetime distinct-receipt ledger, not
+  // a currently-tracked-row count: untracking a case never frees up a new
+  // slot, and this same ledger also gates ad-hoc lookups on /dashboard (see
+  // checkAndRecordFreeLifetimeLookup's own comment and dashboard/page.tsx).
+  // A plain Error, not a custom class — "use server" files may only export
+  // async functions, so a thrown error class can't live here.
+  const { allowed } = await checkAndRecordFreeLifetimeLookup(session.user.id, receiptNumber);
+  if (!allowed) {
     throw new Error(
-      `You're tracking the maximum of ${maxCases} case${maxCases === 1 ? "" : "s"} on your current plan.`
+      `You've used all ${TIER_LIMITS.free.maxCases} of your free account's lifetime case lookups. Upgrade to CaseWhy Plus to track and look up more.`
     );
   }
 

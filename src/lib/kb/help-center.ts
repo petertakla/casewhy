@@ -36,7 +36,7 @@ export const HELP_KNOWLEDGE: HelpKnowledgeEntry[] = [
     // TrackCaseButton.tsx: the search box's own placeholder text and the
     // button's real cap-reached copy.
     answer:
-      "On the Dashboard, look up a receipt number in the search box, then click \"Track this case\" on the result to save it. Repeat for each additional case. The free tier tracks up to 3 cases at once; CaseWhy Plus tracks up to 10.",
+      "On the Dashboard, look up a receipt number in the search box, then click \"Track this case\" on the result to save it. Repeat for each additional case. The free tier gets 3 receipt numbers for the life of the account — tracking or just looking one up both count, and untracking one doesn't free up a new slot; CaseWhy Plus tracks up to 10 cases with no lifetime limit.",
   },
   {
     id: "remove-a-case",

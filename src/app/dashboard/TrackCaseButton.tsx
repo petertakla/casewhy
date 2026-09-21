@@ -118,19 +118,21 @@ export function TrackCaseButton({
       <p className="text-xs text-muted">
         {es ? (
           <>
-            Estás rastreando el máximo de {maxCases} caso{maxCases === 1 ? "" : "s"} de tu
-            plan. Deja de rastrear uno para agregar este, o{" "}
+            Tu cuenta gratuita ya usó sus {maxCases} búsquedas de por vida — rastrear o
+            consultar un número de recibo, ambas cuentan, y dejar de rastrear uno no libera un
+            lugar nuevo.{" "}
             <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
-              actualiza a CaseWhy <PlusBadge size="sm" />
+              Actualiza a CaseWhy <PlusBadge size="sm" />
             </Link>{" "}
             para hasta {plusMaxCases} casos.
           </>
         ) : (
           <>
-            You&apos;re tracking the maximum of {maxCases} case{maxCases === 1 ? "" : "s"} on your
-            plan. Untrack one to add this, or{" "}
+            Your free account has already used its {maxCases} lifetime lookups — tracking or
+            checking a receipt number&apos;s status both count, and untracking one doesn&apos;t
+            free up a new slot.{" "}
             <Link href="/plus" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
-              upgrade to CaseWhy <PlusBadge size="sm" />
+              Upgrade to CaseWhy <PlusBadge size="sm" />
             </Link>{" "}
             for up to {plusMaxCases} cases.
           </>

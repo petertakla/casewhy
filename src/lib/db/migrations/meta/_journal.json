@@ -330,6 +330,13 @@
       "when": 1789874722110,
       "tag": "0046_round119-ops-console",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1789993007645,
+      "tag": "0047_round128-receipt-lifetime-cap",
+      "breakpoints": true
     }
   ]
 }

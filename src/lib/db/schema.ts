@@ -41,6 +41,28 @@ export const trackedCases = pgTable(
   (table) => [index("tracked_cases_user_id_idx").on(table.userId)]
 );
 
+// Round 128 — free tier's cap is 3 distinct receipt numbers for the life of
+// the account, not 3 *currently tracked*: untracking a case used to free up
+// a new slot (cycle through unlimited different receipts), and an ad-hoc
+// `/dashboard?receipt=` lookup was never gated at all, tracked or not. One
+// row per distinct receipt a free account has ever tracked OR looked up —
+// never deleted, including when the matching tracked_cases row is untracked
+// (see src/lib/billing/receipt-lookups.ts). Plus is unlimited and never
+// writes here.
+export const receiptLookups = pgTable(
+  "receipt_lookups",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id").notNull(),
+    // AES-256-GCM ciphertext (base64) — same convention as tracked_cases.receiptNumber.
+    receiptNumber: text("receipt_number").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("receipt_lookups_user_id_idx").on(table.userId)]
+);
+
 export const subscriptionTierEnum = pgEnum("subscription_tier", ["free", "plus"]);
 
 // Per-account subscription tier (CW-35/36 packaging — see CLOUD_CLAUDE.md

@@ -65,10 +65,10 @@ const PLUS_FEATURES: PlusFeature[] = [
   {
     id: "tracked-cases",
     title: "Casos rastreados (familia)",
-    free: "3",
+    free: "3, de por vida",
     plus: "Ilimitado",
     explanation:
-      "Una cuenta gratuita rastrea hasta 3 casos — suficiente para la mayoría de las personas, pero los hogares más grandes o complejos necesitan más: el I-485 de tu cónyuge junto al tuyo, los casos derivados de tus hijos, o los padres a quienes ayudas con un N-400 que entiendes mejor que ellos. Plus ofrece seguimiento ilimitado de casos para tu familia — sin límite fijo — para que todo el hogar viva bajo un solo inicio de sesión en lugar de que cada quien cree cuentas separadas (y suscripciones separadas) solo para ver su propio estado. Cada caso obtiene su propia experiencia completa de CaseWhy — su propio historial de estado, sus propias explicaciones de IA, su propia bóveda de documentos — y puedes cambiar entre ellos con un solo clic, sin tener que volver a ingresarlos desde cero. Rastrear más de 10 casos a la vez es lo suficientemente inusual como para que pidamos una revisión rápida y única antes de que se active — la mayoría de los hogares nunca ven este paso, y es una revisión, no un rechazo.",
+      "Una cuenta gratuita recibe 3 números de recibo para toda la vida de la cuenta — rastrear uno o simplemente consultar su estado cuentan igual, y dejar de rastrear un caso no libera un lugar nuevo. Suficiente para un solo caso sencillo, pero los hogares más grandes o complejos necesitan más: el I-485 de tu cónyuge junto al tuyo, los casos derivados de tus hijos, o los padres a quienes ayudas con un N-400 que entiendes mejor que ellos. Plus ofrece seguimiento ilimitado de casos para tu familia — sin límite fijo, sin límite de por vida — para que todo el hogar viva bajo un solo inicio de sesión en lugar de que cada quien cree cuentas separadas (y suscripciones separadas) solo para ver su propio estado. Cada caso obtiene su propia experiencia completa de CaseWhy — su propio historial de estado, sus propias explicaciones de IA, su propia bóveda de documentos — y puedes cambiar entre ellos con un solo clic, sin tener que volver a ingresarlos desde cero. Rastrear más de 10 casos a la vez es lo suficientemente inusual como para que pidamos una revisión rápida y única antes de que se active — la mayoría de los hogares nunca ven este paso, y es una revisión, no un rechazo.",
   },
   {
     id: "on-demand-checks",

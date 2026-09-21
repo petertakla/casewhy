@@ -5,6 +5,7 @@ import { explainCaseStatus, type CaseExplanation } from "@/lib/ai/explain";
 import { auth } from "@/lib/auth/server";
 import { getTrackedCases } from "./actions";
 import { getSubscriptionDetails, TIER_LIMITS, PLUS_HARD_CEILING_MAX_CASES } from "@/lib/billing/tier";
+import { checkAndRecordFreeLifetimeLookup, getFreeLifetimeLookupCount } from "@/lib/billing/receipt-lookups";
 import { isSpanishLocale } from "@/lib/i18n/locale";
 import { localeToggleHref } from "@/lib/i18n/locale-href";
 import { TrackCaseButton } from "./TrackCaseButton";
@@ -496,6 +497,32 @@ function PendingReviewCard({ receiptNumber, es }: { receiptNumber: string; es: b
   );
 }
 
+/**
+ * Round 128 — shown instead of a live status lookup once a free-tier
+ * account's lifetime cap is reached and this is a genuinely new receipt
+ * number (never tracked or looked up before on this account). Deliberately
+ * never calls getCaseStatus() for a blocked receipt — that's the whole
+ * point of the gate, not something enforced only when clicking "Track."
+ */
+function LifetimeCapCard({ receiptNumber, maxCases, es }: { receiptNumber: string; maxCases: number; es: boolean }) {
+  return (
+    <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6">
+      <p className="font-mono text-xs uppercase tracking-widest text-muted">{receiptNumber}</p>
+      <p className="mt-2 text-sm font-semibold text-amber-600 dark:text-amber-400">
+        {es ? "Límite de por vida alcanzado" : "Lifetime limit reached"}
+      </p>
+      <p className="mt-1.5 text-sm text-foreground/90">
+        {es
+          ? `Tu cuenta gratuita ya usó sus ${maxCases} búsquedas de por vida — rastrear o consultar el estado de un número de recibo, ambas cuentan. Este es un número de recibo nuevo para tu cuenta.`
+          : `Your free account has already used its ${maxCases} lifetime lookups — tracking or checking a receipt number's status both count. This is a new receipt number for your account.`}
+      </p>
+      <Link href="/plus" className="mt-2 inline-block text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400">
+        {es ? "Actualiza a CaseWhy Plus para más →" : "Upgrade to CaseWhy Plus for more →"}
+      </Link>
+    </div>
+  );
+}
+
 export default async function DashboardPage({
   searchParams,
 }: {
@@ -510,6 +537,7 @@ export default async function DashboardPage({
   let canCheckNow = false;
   let isPlus = false;
   let effectiveMaxCases = TIER_LIMITS.plus.maxCases;
+  let lifetimeCount = 0;
   if (session?.user) {
     trackedCasesList = await getTrackedCases(session.user.id);
     const details = await getSubscriptionDetails(session.user.id);
@@ -526,13 +554,33 @@ export default async function DashboardPage({
   const trackedMatch = trackedCasesList.find((c) => c.receiptNumber === receiptNumber);
   const isPendingReview = trackedMatch?.status === "pending_review";
 
+  // Round 128 — free tier's lifetime cap (3 distinct receipt numbers ever,
+  // tracking or ad-hoc lookup together) is enforced here, before any USCIS
+  // call — not just inside trackCase(). An ad-hoc `?receipt=` lookup used
+  // to be completely unmetered even on a free account; this closes that gap
+  // the same way trackCase() itself now does (see actions.ts). A receipt
+  // already in the account's lifetime ledger (tracked or looked up before)
+  // is always allowed — this only blocks a genuinely new receipt once all 3
+  // lifetime slots are used, and untracking a case never frees one back up.
+  let lifetimeCapReached = false;
+  if (session?.user && !isPlus) {
+    if (receiptNumber && !isPendingReview) {
+      const check = await checkAndRecordFreeLifetimeLookup(session.user.id, receiptNumber);
+      lifetimeCapReached = !check.allowed;
+      lifetimeCount = check.lifetimeCount;
+    } else {
+      lifetimeCount = await getFreeLifetimeLookupCount(session.user.id);
+    }
+  }
+
   let status: CaseStatus | null = null;
   let explanation: CaseExplanation | null = null;
   let errorMessage: string | null = null;
 
   // Round 46 — never fetch a live status for a case pending review; that's
-  // the actual gate, not just the cron job's own polling.
-  if (receiptNumber && !isPendingReview) {
+  // the actual gate, not just the cron job's own polling. Round 128 — also
+  // never fetch one once the free-tier lifetime cap blocks this receipt.
+  if (receiptNumber && !isPendingReview && !lifetimeCapReached) {
     try {
       status = await getCaseStatus(receiptNumber);
       try {
@@ -577,11 +625,15 @@ export default async function DashboardPage({
 
   // Round 46 — Plus is gated-unlimited: fully blocked only at the 25-case
   // hard ceiling, not at the 10-case auto-approved band (that band queues
-  // for review instead, see willQueueForReview below). Free tier keeps its
-  // original flat-cap behavior.
+  // for review instead, see willQueueForReview below). Round 128 — free
+  // tier's cap is now the lifetime ledger check above, not a currently-
+  // tracked-row count (lifetimeCapReached is only ever true here when
+  // status was never fetched at all, so this mainly stays correct for any
+  // future code path that reaches TrackCaseButton without going through
+  // the lookup gate above).
   const atCap = isPlus
     ? trackedCasesList.length >= PLUS_HARD_CEILING_MAX_CASES
-    : trackedCasesList.length >= maxCases;
+    : lifetimeCapReached;
   const willQueueForReview =
     isPlus &&
     trackedCasesList.length >= effectiveMaxCases &&
@@ -594,14 +646,18 @@ export default async function DashboardPage({
   // account was on. This line (free: "N of M tracked"; Plus: "N tracked ·
   // Plus") is the dashboard's own piece of that; Settings/plus carry the
   // rest (round 114 follow-up, Finding 2).
+  // Round 128 — free tier's label now shows lifetime lookups used, not
+  // currently-tracked count: those diverge the moment a case is untracked
+  // (a currently-tracked count of 0 would otherwise misleadingly read as
+  // "3 slots free" when the account may have already used its lifetime cap).
   const caseCountLabel = session?.user
     ? isPlus
       ? es
         ? `${trackedCasesList.length} caso${trackedCasesList.length === 1 ? "" : "s"} rastreado${trackedCasesList.length === 1 ? "" : "s"} · Plus`
         : `${trackedCasesList.length} case${trackedCasesList.length === 1 ? "" : "s"} tracked · Plus`
       : es
-        ? `${trackedCasesList.length} de ${maxCases} casos rastreados`
-        : `${trackedCasesList.length} of ${maxCases} cases tracked`
+        ? `${lifetimeCount} de ${maxCases} búsquedas de por vida usadas`
+        : `${lifetimeCount} of ${maxCases} lifetime lookups used`
     : null;
 
   return (
@@ -646,6 +702,9 @@ export default async function DashboardPage({
 
         <div className="mt-6">
           {isPendingReview && receiptNumber && <PendingReviewCard receiptNumber={receiptNumber} es={es} />}
+          {lifetimeCapReached && receiptNumber && !isPendingReview && (
+            <LifetimeCapCard receiptNumber={receiptNumber} maxCases={maxCases} es={es} />
+          )}
           {status && (
             <StatusCard
               status={status}

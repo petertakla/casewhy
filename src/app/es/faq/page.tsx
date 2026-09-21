@@ -137,7 +137,7 @@ const GROUPS: FaqGroup[] = [
       {
         question: "¿Puedo rastrear el caso de un familiar?",
         answer:
-          "Sí — el nivel gratuito rastrea hasta tres casos, y Plus rastrea hasta diez (con más disponibles a solicitud). Necesitará el número de recibo de su aviso. Rastree únicamente casos que tiene derecho a ver; CaseWhy muestra el mismo estado público que USCIS le mostraría a cualquier persona con ese número.",
+          "Sí — una cuenta gratuita recibe tres números de recibo para toda la vida de la cuenta (rastrear uno o simplemente consultar su estado cuentan igual), y Plus rastrea hasta diez sin límite de por vida (con más disponibles a solicitud). Necesitará el número de recibo de su aviso. Rastree únicamente casos que tiene derecho a ver; CaseWhy muestra el mismo estado público que USCIS le mostraría a cualquier persona con ese número.",
       },
       {
         question:
@@ -234,13 +234,15 @@ const GROUPS: FaqGroup[] = [
       {
         question: "¿CaseWhy es realmente gratis?",
         plainText:
-          "CaseWhy tiene un nivel gratuito — hasta tres casos rastreados, una línea de tiempo de estado, y explicaciones en lenguaje sencillo generadas por IA — además de un nivel Plus opcional y de pago para rastrear más casos, chat de IA sobre su caso y otras funciones adicionales (consulte la página de Plus para ver los precios actuales). Obtener ayuda — los directorios de CaseWhy de asistencia legal gratuita, representantes acreditados, abogados y otros recursos — es gratis para todos, siempre, sin importar la suscripción: sin tarifas, sin anuncios, sin costos ocultos.",
+          "CaseWhy tiene un nivel gratuito — tres números de recibo para toda la vida de la cuenta (rastrear uno o simplemente consultar su estado cuentan igual), una línea de tiempo de estado, y explicaciones en lenguaje sencillo generadas por IA — además de un nivel Plus opcional y de pago para rastrear más casos sin límite de por vida, chat de IA sobre su caso y otras funciones adicionales (consulte la página de Plus para ver los precios actuales). Obtener ayuda — los directorios de CaseWhy de asistencia legal gratuita, representantes acreditados, abogados y otros recursos — es gratis para todos, siempre, sin importar la suscripción: sin tarifas, sin anuncios, sin costos ocultos.",
         answer: (
           <>
-            CaseWhy tiene un nivel gratuito — hasta tres casos rastreados, una
-            línea de tiempo de estado, y explicaciones en lenguaje sencillo
-            generadas por IA — además de un nivel Plus opcional y de pago para
-            rastrear más casos, chat de IA sobre su caso y otras funciones
+            CaseWhy tiene un nivel gratuito — tres números de recibo para
+            toda la vida de la cuenta (rastrear uno o simplemente consultar
+            su estado cuentan igual), una línea de tiempo de estado, y
+            explicaciones en lenguaje sencillo generadas por IA — además de
+            un nivel Plus opcional y de pago para rastrear más casos sin
+            límite de por vida, chat de IA sobre su caso y otras funciones
             adicionales (consulte la{" "}
             <Link
               href="/es/plus"

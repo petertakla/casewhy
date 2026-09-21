@@ -157,7 +157,7 @@ const GROUPS: FaqGroup[] = [
       {
         question: "Can I track a family member's case?",
         answer:
-          "Yes — the free tier tracks up to three cases, and Plus tracks up to ten (with more available on request). You'll need the receipt number from their notice. Track only cases you're entitled to see; CaseWhy shows the same public status USCIS would show anyone with that number.",
+          "Yes — a free account gets three receipt numbers for the life of the account (tracking or just looking one up both count, and untracking a case doesn't free up a new slot), and Plus tracks up to ten with no lifetime limit (more available on request). You'll need the receipt number from their notice. Track only cases you're entitled to see; CaseWhy shows the same public status USCIS would show anyone with that number.",
       },
       {
         question:
@@ -271,12 +271,14 @@ const GROUPS: FaqGroup[] = [
       {
         question: "Is CaseWhy really free?",
         plainText:
-          "CaseWhy has a free tier — up to three tracked cases, a status timeline, and AI-generated plain-language explanations — plus an optional paid Plus tier for tracking more cases, AI chat about your case, and other add-ons (see the Plus page for current pricing). Get Help — CaseWhy's directories of free legal aid, accredited representatives, attorneys, and other resources — is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost.",
+          "CaseWhy has a free tier — three receipt numbers for the life of the account (tracking or just looking one up both count), a status timeline, and AI-generated plain-language explanations — plus an optional paid Plus tier for tracking more cases with no lifetime limit, AI chat about your case, and other add-ons (see the Plus page for current pricing). Get Help — CaseWhy's directories of free legal aid, accredited representatives, attorneys, and other resources — is free to everyone, always, regardless of subscription: no fees, no ads, no hidden cost.",
         answer: (
           <>
-            CaseWhy has a free tier — up to three tracked cases, a status
-            timeline, and AI-generated plain-language explanations — plus an
-            optional paid Plus tier for tracking more cases, AI chat about
+            CaseWhy has a free tier — three receipt numbers for the life of
+            the account (tracking or just looking one up both count), a
+            status timeline, and AI-generated plain-language explanations —
+            plus an optional paid Plus tier for tracking more cases with no
+            lifetime limit, AI chat about
             your case, and other add-ons
             (see the{" "}
             <Link

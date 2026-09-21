@@ -27,7 +27,22 @@ export interface PolicyMemo {
   id: string;
   title: string;
   memoNumber?: string;
-  datePublished: string; // ISO date the policy was issued/announced
+  /**
+   * Round 126 follow-up — Peter caught this live on /policy: 8 of the 11
+   * entries are evergreen "how this form generally works" reference
+   * explainers, not tied to any single dated announcement, but every entry
+   * shared the same required datePublished field -- all 8 were stamped
+   * with a placeholder "2026-01-01" as if USCIS had issued them all on one
+   * day. The page displayed and sorted by that literally, so it read as
+   * "several memos from Jan 2026, then a cliff down to one from 2021" --
+   * a display artifact, not a real historical gap. "memo" = a genuine
+   * dated policy announcement (datePublished is real and meaningful,
+   * shown and sorted chronologically). "reference" = an evergreen
+   * explainer (datePublished is a filler value, never shown to a reader --
+   * see /policy/page.tsx, which renders a "Reference" label instead).
+   */
+  kind: "memo" | "reference";
+  datePublished: string; // ISO date the policy was issued/announced — meaningful only when kind is "memo"
   /**
    * Case-status text/description/history substrings (lowercase) that make
    * this entry plausibly relevant. An empty array means "always relevant
@@ -62,6 +77,7 @@ export interface PolicyMemo {
 export const POLICY_MEMOS: PolicyMemo[] = [
   {
     id: "pm-602-0194-high-risk-hold",
+    kind: "memo",
     title: "Hold and Review of Benefit Applications from Additional High-Risk Countries",
     memoNumber: "PM-602-0194",
     datePublished: "2026-01-01",
@@ -88,6 +104,7 @@ export const POLICY_MEMOS: PolicyMemo[] = [
   },
   {
     id: "public-charge-2026",
+    kind: "memo",
     title: "2026 Public Charge Inadmissibility Guidance",
     datePublished: "2026-07-16",
     effectiveFrom: "2026-09-18",
@@ -108,6 +125,7 @@ export const POLICY_MEMOS: PolicyMemo[] = [
   },
   {
     id: "rfe-noid-adjudicative-principles",
+    kind: "memo",
     title: "When USCIS Issues a Request for Evidence vs. Denies Outright",
     datePublished: "2021-06-09",
     formTypes: "*",
@@ -136,6 +154,7 @@ export const POLICY_MEMOS: PolicyMemo[] = [
   // particular status update.
   {
     id: "i90-green-card-renewal",
+    kind: "reference",
     title: "I-90 Green Card Renewal/Replacement — What Changes and What Doesn't",
     datePublished: "2026-01-01",
     formTypes: ["I-90"],
@@ -155,6 +174,7 @@ export const POLICY_MEMOS: PolicyMemo[] = [
   },
   {
     id: "i131-travel-document-abandonment",
+    kind: "reference",
     title: "I-131 Travel Documents — the Advance Parole Abandonment Risk",
     datePublished: "2026-01-01",
     formTypes: ["I-131"],
@@ -173,6 +193,7 @@ export const POLICY_MEMOS: PolicyMemo[] = [
   },
   {
     id: "n600-certificate-of-citizenship",
+    kind: "reference",
     title: "N-600 Certificate of Citizenship — Acquisition vs. Derivation",
     datePublished: "2026-01-01",
     formTypes: ["N-600"],
@@ -191,6 +212,7 @@ export const POLICY_MEMOS: PolicyMemo[] = [
   },
   {
     id: "i765-employment-authorization",
+    kind: "reference",
     title: "I-765 Employment Authorization — the Eligibility Category Matters",
     datePublished: "2026-01-01",
     formTypes: ["I-765"],
@@ -213,6 +235,7 @@ export const POLICY_MEMOS: PolicyMemo[] = [
   // already serves).
   {
     id: "i129-h1b-portability",
+    kind: "reference",
     title: "I-129 Nonimmigrant Worker Petitions — H-1B Portability and Its Limits",
     datePublished: "2026-01-01",
     formTypes: ["I-129"],
@@ -231,6 +254,7 @@ export const POLICY_MEMOS: PolicyMemo[] = [
   },
   {
     id: "i751-removing-conditions-deadline",
+    kind: "reference",
     title: "I-751 — the 90-Day Filing Window and What Happens If You Miss It",
     datePublished: "2026-01-01",
     formTypes: ["I-751"],
@@ -258,6 +282,7 @@ export const POLICY_MEMOS: PolicyMemo[] = [
   // real guardrail-test transcripts.
   {
     id: "i589-asylum-basics",
+    kind: "reference",
     title: "I-589 Asylum — Filing Deadline, Affirmative vs. Defensive, and Work Authorization Timing",
     datePublished: "2026-01-01",
     formTypes: ["I-589"],
@@ -276,6 +301,7 @@ export const POLICY_MEMOS: PolicyMemo[] = [
   },
   {
     id: "i821d-daca-current-status",
+    kind: "reference",
     title: "I-821D DACA — Renewals Only, Litigation Status Genuinely Unresolved",
     datePublished: "2026-01-01",
     formTypes: ["I-821D"],

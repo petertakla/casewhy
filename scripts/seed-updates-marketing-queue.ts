@@ -4,6 +4,18 @@
 // src/lib/updates/updates.ts). Safe to re-run: onConflictDoNothing keyed
 // on the (channel, destination) unique constraint, same pattern as
 // seed-email-alias-configs.ts.
+//
+// Round 126 follow-up — round 90 widened marketing_queue's real unique
+// constraint from (channel, destination) to (channel, destination, locale)
+// (a later Spanish draft for the same item needs to coexist with the
+// English one), but this script's onConflictDoNothing target was never
+// updated to match. Postgres's ON CONFLICT can only target a constraint
+// that actually exists, so every run since round 90 has thrown
+// "there is no unique or exclusion constraint matching the ON CONFLICT
+// specification" instead of silently no-op'ing on a re-run as intended --
+// found live when round 122's database rebuild wiped every queue row and
+// this script was needed to restore the 5 blog posts. Fixed to the real
+// 3-column constraint.
 
 import fs from "fs";
 import path from "path";
@@ -34,7 +46,7 @@ async function main() {
   });
 
   await db.insert(marketingQueue).values(rows).onConflictDoNothing({
-    target: [marketingQueue.channel, marketingQueue.destination],
+    target: [marketingQueue.channel, marketingQueue.destination, marketingQueue.locale],
   });
   console.log(`Seeded ${rows.length} blog queue rows (existing ones left untouched).`);
   process.exit(0);

@@ -162,9 +162,15 @@ export default async function PolicyMemoPage({
       <div className="mt-6 space-y-4 rounded-xl border border-border bg-surface p-5 text-sm">
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-muted">
-            {es ? "Publicado" : "Published"}
+            {memo.kind === "reference" ? (es ? "Tipo" : "Type") : es ? "Publicado" : "Published"}
           </p>
-          <p className="mt-1">{memo.datePublished}</p>
+          <p className="mt-1">
+            {memo.kind === "reference"
+              ? es
+                ? "Guía de referencia — no vinculada a un anuncio de política con fecha específica"
+                : "Reference guide — not tied to a single dated policy announcement"
+              : memo.datePublished}
+          </p>
         </div>
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-muted">

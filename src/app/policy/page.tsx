@@ -68,9 +68,17 @@ export default async function PolicyIndexPage({
 }) {
   const { lang } = await searchParams;
   const es = await isSpanishLocale(lang);
-  const memos = [...POLICY_MEMOS].sort((a, b) =>
+  // Round 126 follow-up — split by kind rather than one chronological list.
+  // Sorting reference entries (no real datePublished) into the same
+  // datePublished-descending sort as real dated memos was what produced
+  // the misleading "several from Jan 2026, then a cliff to 2021" read —
+  // see the kind field's own comment in policy-memos.ts.
+  const datedMemos = POLICY_MEMOS.filter((m) => m.kind === "memo").sort((a, b) =>
     a.datePublished < b.datePublished ? 1 : -1,
   );
+  const referenceEntries = [...POLICY_MEMOS]
+    .filter((m) => m.kind === "reference")
+    .sort((a, b) => (es && a.titleEs ? a.titleEs : a.title).localeCompare(es && b.titleEs ? b.titleEs : b.title));
 
   return (
     <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
@@ -115,8 +123,11 @@ export default async function PolicyIndexPage({
         isSpanish={es}
       />
 
-      <div className="space-y-4">
-        {memos.map((memo) => {
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-widest text-muted">
+        {es ? "Memorandos y fallos con fecha" : "Dated memos & rulings"}
+      </h2>
+      <div className="mb-10 space-y-4">
+        {datedMemos.map((memo) => {
           const title = es && memo.titleEs ? memo.titleEs : memo.title;
           const untranslated = es && !memo.titleEs;
           return (
@@ -127,6 +138,39 @@ export default async function PolicyIndexPage({
             >
               <p className="text-xs font-semibold uppercase tracking-widest text-muted">
                 {formatDate(memo.datePublished, es)}
+                {memo.memoNumber && <span> · {memo.memoNumber}</span>}
+              </p>
+              <p className="mt-1.5 font-semibold text-foreground">
+                {title}
+                {untranslated && (
+                  <span className="font-normal text-muted"> (en inglés)</span>
+                )}
+              </p>
+            </Link>
+          );
+        })}
+      </div>
+
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-widest text-muted">
+        {es ? "Guías de referencia por formulario" : "Form reference guides"}
+      </h2>
+      <p className="mb-4 text-xs text-muted">
+        {es
+          ? "Cómo funciona cada formulario en general — no vinculado a un anuncio de política con fecha específica."
+          : "How each form generally works — not tied to a single dated policy announcement."}
+      </p>
+      <div className="space-y-4">
+        {referenceEntries.map((memo) => {
+          const title = es && memo.titleEs ? memo.titleEs : memo.title;
+          const untranslated = es && !memo.titleEs;
+          return (
+            <Link
+              key={memo.id}
+              href={es ? `/policy/${memo.id}?lang=es` : `/policy/${memo.id}`}
+              className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
+            >
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+                {es ? "Referencia" : "Reference"}
                 {memo.memoNumber && <span> · {memo.memoNumber}</span>}
               </p>
               <p className="mt-1.5 font-semibold text-foreground">

@@ -318,6 +318,94 @@ export const POLICY_MEMOS: PolicyMemo[] = [
     currentStatusEs:
       "El estatus legal de DACA está siendo activamente disputado. El Quinto Circuito dictaminó el 17 de enero de 2025 (Texas v. United States) que la acción diferida en sí misma — la protección contra la deportación — es constitucional y puede aplicarse a nivel nacional, pero que el componente de autorización de empleo de DACA podría ser ilegal y separable del resto del programa. El caso fue devuelto al tribunal de distrito (juez Hanen) para que emita una orden modificada; al momento de escribir esto, no se ha emitido ninguna orden modificada — la cuestión de la autorización de empleo sigue genuinamente sin resolverse, no está decidida en ningún sentido. La medida cautelar reducida de ese fallo se aplica únicamente a Texas. Aproximadamente 120,000 solicitudes de renovación de DACA estaban pendientes a mediados de 2026, la cifra más alta registrada — existe un riesgo real de que la protección o autorización de empleo de un beneficiario venza entre ciclos de renovación, sin que sea culpa suya. Nunca debe predecirse cómo o cuándo se resolverá el litigio.",
   },
+  // Round 126 follow-up — Peter's own direct ask after the kind-field fix:
+  // 11 entries reading as "one memo from 2021, then a jump to 2026" wasn't
+  // just a display bug, it was genuinely thin real coverage. These 4 are
+  // real, well-documented USCIS/DHS rules with verified dates and sources
+  // (Federal Register / USCIS.gov, cross-checked via live search rather
+  // than recalled from training data alone, since accuracy here is a real
+  // legal-content stake, not a nice-to-have) — chosen specifically to fill
+  // 2022-2025 with genuine history, not filler, and to connect directly to
+  // form types and topics CaseWhy already covers.
+  {
+    id: "public-charge-2022-original-rule",
+    kind: "memo",
+    title: "The 2022 Public Charge Rule That 2026's Guidance Rescinded",
+    datePublished: "2022-09-09",
+    effectiveFrom: "2022-12-23",
+    formTypes: ["I-485"],
+    statusKeywords: ["public charge", "affidavit of support", "form i-864"],
+    summary:
+      "DHS published a final rule on September 9, 2022 (effective/applied to filings on or after December 23, 2022) restoring the historical, narrower understanding of 'public charge' that had been in place for decades before a 2019 rule change: an officer could weigh only cash assistance for income maintenance and long-term institutionalization at government expense, not supplemental benefits like Medicaid or SNAP, alongside the five statutory factors and the Form I-864 affidavit of support.",
+    currentStatus:
+      "This 2022 framework was itself rescinded by the 2026 public charge guidance above, which took a broader view of which benefits an officer may weigh. An I-485 case's own filing date determines which framework actually applied to it — the two entries together are the real history, not a single static rule.",
+    sourceTitle: "USCIS: DHS's Public Charge Final Rule Goes into Effect on Dec. 23",
+    sourceUrl: "https://www.uscis.gov/newsroom/alerts/dhss-public-charge-final-rule-goes-into-effect-on-dec-23",
+    titleEs: "La regla de carga pública de 2022 que la orientación de 2026 derogó",
+    summaryEs:
+      "DHS publicó una regla final el 9 de septiembre de 2022 (vigente para solicitudes presentadas a partir del 23 de diciembre de 2022) que restauró la comprensión histórica y más limitada de 'carga pública' vigente durante décadas antes de un cambio de regla de 2019: un oficial solo podía considerar la asistencia en efectivo para mantenimiento de ingresos y la internación institucional de largo plazo a expensas del gobierno, no beneficios complementarios como Medicaid o SNAP, junto con los cinco factores legales y la declaración jurada de patrocinio del Formulario I-864.",
+    currentStatusEs:
+      "Este marco de 2022 fue a su vez derogado por la orientación de carga pública de 2026 mencionada arriba, que adoptó una visión más amplia de qué beneficios puede considerar un oficial. La fecha de presentación propia de un caso I-485 determina cuál marco realmente se le aplicó — las dos entradas juntas son la historia real, no una regla estática única.",
+  },
+  {
+    id: "i140-premium-processing-expansion-2023",
+    kind: "memo",
+    title: "Premium Processing Expanded to All EB-1C and EB-2 NIW I-140 Petitions",
+    datePublished: "2023-01-12",
+    effectiveFrom: "2023-01-30",
+    formTypes: ["I-140"],
+    statusKeywords: ["premium processing"],
+    summary:
+      "USCIS announced on January 12, 2023 the final phase of a multi-year expansion of premium processing (a paid option for a guaranteed 45-day decision or refund) to Form I-140 immigrant worker petitions, effective January 30, 2023: EB-1C multinational executive/manager petitions and EB-2 National Interest Waiver petitions became eligible, including brand-new (not just previously-filed) petitions in both categories for the first time.",
+    currentStatus:
+      "Premium processing is an optional, separately-filed, paid upgrade (Form I-907) — it changes how fast USCIS must respond, not the substantive eligibility standard a petition is judged against. A petition without premium processing filed follows USCIS's regular, non-guaranteed processing time for its service center and category.",
+    sourceTitle: "USCIS: Final Phase of Premium Processing Expansion for EB-1 and EB-2 Form I-140 Petitions",
+    sourceUrl: "https://www.uscis.gov/newsroom/alerts/uscis-announces-final-phase-of-premium-processing-expansion-for-eb-1-and-eb-2-form-i-140-petitions",
+    titleEs: "El procesamiento premium se amplía a todas las peticiones I-140 EB-1C y EB-2 NIW",
+    summaryEs:
+      "El 12 de enero de 2023, USCIS anunció la fase final de una expansión de varios años del procesamiento premium (una opción de pago que garantiza una decisión en 45 días o un reembolso) para las peticiones de trabajador inmigrante del Formulario I-140, vigente desde el 30 de enero de 2023: las peticiones EB-1C de ejecutivo/gerente multinacional y las peticiones EB-2 de exención por interés nacional (NIW) pasaron a ser elegibles, incluyendo por primera vez peticiones completamente nuevas (no solo las ya presentadas) en ambas categorías.",
+    currentStatusEs:
+      "El procesamiento premium es una mejora opcional, pagada y presentada por separado (Formulario I-907) — cambia la rapidez con la que USCIS debe responder, no el estándar sustantivo de elegibilidad con el que se evalúa una petición. Una petición sin procesamiento premium sigue el tiempo de procesamiento regular y no garantizado de USCIS para su centro de servicio y categoría.",
+  },
+  {
+    id: "ead-automatic-extension-540-days",
+    kind: "memo",
+    title: "EAD Automatic Extension Increased to 540 Days, Then Made Permanent",
+    datePublished: "2024-04-08",
+    formTypes: ["I-765"],
+    statusKeywords: ["automatic extension", "540 days", "ead extension"],
+    summary:
+      "A temporary final rule effective April 8, 2024 increased the automatic extension period for a timely-filed Employment Authorization Document (EAD) renewal from up to 180 days to up to 540 days, for renewal applications filed on or after October 27, 2023 (if still pending April 8, 2024) through September 30, 2025. DHS made this 540-day extension permanent in a final rule published December 13, 2024, so it did not lapse when the temporary rule's own window closed.",
+    currentStatus:
+      "As of this writing, a covered, timely-filed I-765 renewal still automatically extends the prior EAD's validity for up to 540 days from its printed expiration date, without waiting for approval — but a separate DHS rule published October 30, 2025 ends this practice going forward for renewal applications filed on or after that date. Which rule actually governs a specific case depends on exactly when its I-765 was filed; never assume the 540-day extension applies without checking the filing date against these cutoffs.",
+    sourceTitle: "USCIS: Final Rule Permanently Increases Automatic Extension of Employment Authorization and/or EADs",
+    sourceUrl: "https://www.uscis.gov/archive/automatic-employment-authorization-document-ead-extension",
+    titleEs: "La extensión automática del EAD aumenta a 540 días y luego se vuelve permanente",
+    summaryEs:
+      "Una regla final temporal vigente desde el 8 de abril de 2024 aumentó el período de extensión automática para una renovación oportuna del Documento de Autorización de Empleo (EAD) de hasta 180 días a hasta 540 días, para solicitudes de renovación presentadas a partir del 27 de octubre de 2023 (si aún estaban pendientes el 8 de abril de 2024) hasta el 30 de septiembre de 2025. DHS hizo permanente esta extensión de 540 días mediante una regla final publicada el 13 de diciembre de 2024, por lo que no caducó cuando cerró la ventana de la propia regla temporal.",
+    currentStatusEs:
+      "Al momento de escribir esto, una renovación I-765 cubierta y presentada a tiempo todavía extiende automáticamente la validez del EAD anterior hasta por 540 días desde su fecha de vencimiento impresa, sin esperar la aprobación — pero una regla separada de DHS publicada el 30 de octubre de 2025 termina esta práctica en adelante para las solicitudes de renovación presentadas a partir de esa fecha. Cuál regla realmente aplica a un caso específico depende exactamente de cuándo se presentó su I-765 — nunca debe suponerse que aplica la extensión de 540 días sin verificar la fecha de presentación contra estos plazos.",
+  },
+  {
+    id: "h1b-modernization-rule-2025",
+    kind: "memo",
+    title: "H-1B Modernization Final Rule",
+    datePublished: "2024-12-18",
+    effectiveFrom: "2025-01-17",
+    formTypes: ["I-129"],
+    statusKeywords: ["h-1b", "specialty occupation", "site visit"],
+    summary:
+      "DHS published a final rule on December 18, 2024 (effective January 17, 2025) modernizing the H-1B specialty-occupation program: it revises the definition of 'specialty occupation' to clarify that a range of qualifying degree fields is acceptable as long as each is directly related to the job's duties, codifies USCIS's authority to conduct site visits (including of third-party worksites) and to deny or revoke a petition when an employer refuses one, and extends automatic cap-gap employment authorization for F-1 students changing to H-1B status. A separate, earlier January 2024 rule (part of the same modernization effort) tied H-1B lottery registration to a unique passport or travel-document number specifically to curb one person from having multiple registrations submitted on their behalf.",
+    currentStatus:
+      "This is the current operative standard for H-1B specialty-occupation determinations, site visits, and cap-gap timing. It does not change AC21 portability itself (see the I-129 entry above) — the two operate alongside each other.",
+    sourceTitle: "USCIS: DHS Strengthens H-1B Program, Allowing U.S. Employers to More Quickly Fill Critical Jobs",
+    sourceUrl: "https://www.uscis.gov/newsroom/news-releases/dhs-strengthens-h-1b-program-allowing-us-employers-to-more-quickly-fill-critical-jobs",
+    titleEs: "Regla final de modernización del H-1B",
+    summaryEs:
+      "DHS publicó una regla final el 18 de diciembre de 2024 (vigente desde el 17 de enero de 2025) que moderniza el programa de ocupación especializada H-1B: revisa la definición de 'ocupación especializada' para aclarar que una variedad de campos de estudio calificados es aceptable siempre que cada uno esté directamente relacionado con las funciones del puesto, formaliza la autoridad de USCIS para realizar visitas de inspección (incluso a lugares de trabajo de terceros) y para denegar o revocar una petición cuando un empleador se niega a una, y extiende la autorización automática de empleo por vacío de vigencia (cap-gap) para estudiantes F-1 que cambian a estatus H-1B. Una regla separada y anterior de enero de 2024 (parte del mismo esfuerzo de modernización) vinculó el registro de la lotería H-1B a un número único de pasaporte o documento de viaje específicamente para evitar que una persona tuviera múltiples registros presentados en su nombre.",
+    currentStatusEs:
+      "Este es el estándar vigente actualmente para las determinaciones de ocupación especializada H-1B, las visitas de inspección y el momento del cap-gap. No cambia la portabilidad bajo AC21 en sí misma (vea la entrada I-129 de arriba) — ambas operan en conjunto.",
+  },
 ];
 
 function textMatches(memo: PolicyMemo, haystack: string): boolean {

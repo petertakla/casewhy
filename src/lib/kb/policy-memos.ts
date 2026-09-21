@@ -488,6 +488,93 @@ export const POLICY_MEMOS: PolicyMemo[] = [
     currentStatusEs:
       "Este es el estándar vigente actualmente. Que se exonere una entrevista refleja que el oficial consideró el caso claro a partir del expediente escrito, no una aprobación de menor peso o confianza que una que pasó por entrevista.",
   },
+  // Round 126 follow-up, third pass — Peter pasted a categorized list from
+  // an external AI-search tool as research leads, not facts to trust
+  // directly (an AI summary can misstate a date or memo name) -- each of
+  // these 4 was independently re-verified via live search against USCIS.gov/
+  // AILA/the Federal Register before being trusted enough to write down.
+  // Chosen for real relevance to CaseWhy's own supported form types (H-2A,
+  // TPS, SIJ, and USRAP leads from that same list were skipped as out of
+  // scope -- CaseWhy doesn't track those form types).
+  {
+    id: "h1b-employer-employee-memos-rescinded-2020",
+    kind: "memo",
+    title: "USCIS Rescinds the Neufeld and Contracts/Itineraries H-1B Memos",
+    datePublished: "2020-06-17",
+    formTypes: ["I-129"],
+    statusKeywords: ["employer-employee", "itinerary", "third-party worksite"],
+    summary:
+      "Following a May 2020 settlement in ITServe Alliance v. Cissna, USCIS rescinded two restrictive H-1B policy memos on June 17, 2020: the 2010 'Neufeld memo,' which had set a stricter test for proving an employer-employee relationship (especially for third-party/consulting placements), and a 2018 memo requiring detailed itineraries and end-client contracts for the full requested validity period. USCIS can no longer deny a case based solely on those rescinded standards.",
+    currentStatus:
+      "This is the current operative standard — an employer-employee relationship for H-1B purposes is evaluated under the regulatory definition and general adjudication standards, not the rescinded memos' stricter tests. A case's own status text or history referencing a request for contracts, work orders, or itinerary detail can still reflect an officer's independent evidence request under current rules, not a revival of the rescinded policies.",
+    sourceTitle: "USCIS: Questions & Answers: Memoranda on Establishing the Employer-Employee Relationship in H-1B Petitions",
+    sourceUrl: "https://www.uscis.gov/archive/questions-answers-memoranda-on-establishing-the-employer-employee-relationship-in-h-1b-petitions",
+    titleEs: "USCIS deroga los memorandos Neufeld y de contratos/itinerarios para el H-1B",
+    summaryEs:
+      "Tras un acuerdo de mayo de 2020 en el caso ITServe Alliance v. Cissna, USCIS derogó dos memorandos de política restrictivos sobre el H-1B el 17 de junio de 2020: el 'memo Neufeld' de 2010, que había establecido una prueba más estricta para demostrar una relación empleador-empleado (especialmente para colocaciones de consultoría o con terceros), y un memo de 2018 que exigía itinerarios detallados y contratos con el cliente final para todo el período de validez solicitado. USCIS ya no puede denegar un caso basándose únicamente en esos estándares derogados.",
+    currentStatusEs:
+      "Este es el estándar vigente actualmente — una relación empleador-empleado para fines del H-1B se evalúa bajo la definición reglamentaria y los estándares generales de adjudicación, no bajo las pruebas más estrictas de los memorandos derogados. Que el texto de estado o el historial de un caso mencione una solicitud de contratos, órdenes de trabajo o detalles del itinerario todavía puede reflejar una solicitud de evidencia independiente del oficial bajo las reglas actuales, no un resurgimiento de las políticas derogadas.",
+  },
+  {
+    id: "reproduced-signature-flexibility-permanent-2022",
+    kind: "memo",
+    title: "Scanned/Reproduced Signatures Made a Permanent Policy",
+    datePublished: "2022-07-25",
+    formTypes: "*",
+    statusKeywords: [],
+    summary:
+      "USCIS first allowed scanned, faxed, or photocopied reproductions of an original handwritten signature on benefit forms and documents starting March 21, 2020, as a COVID-19 flexibility (a purely electronic signature like DocuSign didn't qualify). On July 25, 2022, USCIS made this reproduced-signature flexibility permanent policy rather than letting it expire with the pandemic emergency. The filer must still keep the original signed document, since USCIS can request it at any time.",
+    currentStatus:
+      "This remains the current policy — a reproduced signature on an original handwritten signature is acceptable indefinitely, not just during a declared emergency. This is a separate, narrower thing than other COVID-era flexibilities (like extra response time for RFEs) that USCIS ended March 23, 2023 — a case's own filing shouldn't be assumed to have gotten both just because one is mentioned.",
+    sourceTitle: "USCIS: USCIS Extends COVID-19-Related Flexibilities",
+    sourceUrl: "https://www.uscis.gov/newsroom/alerts/uscis-extends-covid-19-related-flexibilities",
+    titleEs: "Las firmas escaneadas/reproducidas se convierten en política permanente",
+    summaryEs:
+      "USCIS permitió por primera vez reproducciones escaneadas, enviadas por fax o fotocopiadas de una firma manuscrita original en formularios y documentos de beneficios a partir del 21 de marzo de 2020, como una flexibilidad por COVID-19 (una firma puramente electrónica como DocuSign no calificaba). El 25 de julio de 2022, USCIS convirtió esta flexibilidad de firma reproducida en política permanente en lugar de dejarla expirar junto con la emergencia por la pandemia. El solicitante debe conservar el documento original firmado, ya que USCIS puede solicitarlo en cualquier momento.",
+    currentStatusEs:
+      "Esta sigue siendo la política vigente — una firma reproducida sobre una firma manuscrita original es aceptable de manera indefinida, no solo durante una emergencia declarada. Esto es algo distinto y más limitado que otras flexibilidades de la era COVID (como tiempo adicional para responder a una RFE) que USCIS terminó el 23 de marzo de 2023 — no debe suponerse que un caso recibió ambas solo porque se menciona una de ellas.",
+  },
+  {
+    id: "n400-gmc-voter-registration-2021",
+    kind: "memo",
+    title: "Good Moral Character — Unintentional DMV Voter Registration Isn't Held Against You",
+    datePublished: "2021-05-27",
+    memoNumber: "PA-2021-08",
+    formTypes: ["N-400"],
+    statusKeywords: ["good moral character", "voter registration", "unlawful voting"],
+    summary:
+      "USCIS issued policy guidance (PA-2021-08) on May 27, 2021 clarifying that an applicant who was automatically or unknowingly registered to vote through a state DMV's motor-voter process — without ever actually voting, and without intending to falsely claim citizenship — should not be found to lack good moral character or be inadmissible for it on that basis alone. This reversed a stricter, more literal reading applied under the prior administration.",
+    currentStatus:
+      "This is the current operative standard for this specific, narrow fact pattern. It doesn't excuse actual unlawful voting or a knowing false claim to citizenship — both remain serious grounds a case-specific attorney consultation is warranted for, not something this app can assess.",
+    sourceTitle: "USCIS: Naturalization Eligibility and Voter Registration Through a State's Benefit Application Process",
+    sourceUrl: "https://www.uscis.gov/policy-manual/volume-12-part-f-chapter-1",
+    titleEs: "Buen carácter moral — el registro de votante no intencional en el DMV no se usa en su contra",
+    summaryEs:
+      "USCIS emitió una orientación de política (PA-2021-08) el 27 de mayo de 2021 aclarando que un solicitante que fue registrado para votar de forma automática o sin saberlo a través del proceso de 'motor-voter' del DMV de un estado — sin haber votado realmente, y sin intención de reclamar falsamente la ciudadanía — no debería ser considerado carente de buen carácter moral ni inadmisible únicamente por eso. Esto revirtió una interpretación más estricta y literal aplicada bajo la administración anterior.",
+    currentStatusEs:
+      "Este es el estándar vigente actualmente para este patrón de hechos específico y limitado. No excusa el voto ilegal real ni una reclamación falsa y consciente de ciudadanía — ambos siguen siendo motivos serios que ameritan consultar a un abogado sobre el caso específico, algo que esta aplicación no puede evaluar.",
+  },
+  {
+    id: "n400-neighborhood-investigations-resumed-2025",
+    kind: "memo",
+    title: "USCIS Resumes Neighborhood Investigations for Naturalization",
+    datePublished: "2025-08-22",
+    memoNumber: "PM-602-0189",
+    effectiveFrom: "2026-08-25",
+    formTypes: ["N-400"],
+    statusKeywords: ["investigation", "neighborhood"],
+    summary:
+      "USCIS Director Edlow issued a policy memorandum on August 22, 2025 reviving personal ('neighborhood') investigations under INA 335(a) — a discretionary tool, unused since 1991, letting USCIS interview neighbors, employers, or others in an applicant's community to help corroborate residency, good moral character, and other naturalization eligibility factors, covering at least the 5 years before filing. USCIS formalized this in the Policy Manual effective August 25, 2026, moving from automatically waiving these investigations to deciding case-by-case.",
+    currentStatus:
+      "A neighborhood investigation, when used, is one discretionary corroboration tool among several an officer may draw on — it doesn't by itself indicate a problem with an application, and most applicants still won't have one conducted. There's no published, reliable way to predict in advance whether a specific case will get one.",
+    sourceTitle: "USCIS Policy Manual: Investigations and Examinations for Naturalization Eligibility",
+    sourceUrl: "https://www.uscis.gov/sites/default/files/document/policy-manual-updates/20260825-InvestigationsForNatzEligibility.pdf",
+    titleEs: "USCIS reanuda las investigaciones de vecindario para la naturalización",
+    summaryEs:
+      "El director de USCIS, Edlow, emitió un memorando de política el 22 de agosto de 2025 que revive las investigaciones personales ('de vecindario') bajo la sección 335(a) de la INA — una herramienta discrecional, sin uso desde 1991, que permite a USCIS entrevistar a vecinos, empleadores u otras personas de la comunidad de un solicitante para ayudar a corroborar la residencia, el buen carácter moral y otros factores de elegibilidad para la naturalización, cubriendo al menos los 5 años previos a la presentación. USCIS formalizó esto en el Manual de Políticas vigente desde el 25 de agosto de 2026, pasando de exonerar automáticamente estas investigaciones a decidir caso por caso.",
+    currentStatusEs:
+      "Una investigación de vecindario, cuando se utiliza, es una herramienta discrecional de corroboración entre varias en las que puede apoyarse un oficial — no indica por sí sola un problema con una solicitud, y la mayoría de los solicitantes seguirán sin tener una. No existe una forma publicada y confiable de predecir de antemano si a un caso específico se le realizará una.",
+  },
 ];
 
 function textMatches(memo: PolicyMemo, haystack: string): boolean {

@@ -406,6 +406,88 @@ export const POLICY_MEMOS: PolicyMemo[] = [
     currentStatusEs:
       "Este es el estándar vigente actualmente para las determinaciones de ocupación especializada H-1B, las visitas de inspección y el momento del cap-gap. No cambia la portabilidad bajo AC21 en sí misma (vea la entrada I-129 de arriba) — ambas operan en conjunto.",
   },
+  // Round 126 follow-up, second pass — Peter: "there must be more policies
+  // than 15... do a deeper search." 4 more real, verified entries,
+  // deliberately chosen to cover a form type with zero prior dated memo
+  // (N-400) and to add real dated history behind two form types that
+  // previously only had an undated reference entry (I-589, I-751).
+  {
+    id: "uscis-fee-rule-2024",
+    kind: "memo",
+    title: "2024 USCIS Fee Schedule — the First Increase Since 2016",
+    datePublished: "2024-01-31",
+    effectiveFrom: "2024-04-01",
+    formTypes: "*",
+    statusKeywords: [],
+    summary:
+      "USCIS published a final rule on January 31, 2024 (effective April 1, 2024) adjusting most immigration and naturalization benefit-request fees — the first broad fee increase since 2016. Increases varied significantly by form and category, with employment-based petitions seeing some of the largest jumps; a limited number of humanitarian-related fees stayed flat or were reduced. Applications postmarked or e-filed on or after April 1, 2024 are charged the new fee; the H-1B registration fee itself was a narrow, timing-driven exception that didn't increase for the FY2025 lottery.",
+    currentStatus:
+      "The April 2024 fee schedule is the current one. A case filed before April 1, 2024 was correctly charged the prior, lower fee at the time — a fee difference alone doesn't indicate anything about a case's status or progress.",
+    sourceTitle: "USCIS: Frequently Asked Questions on the USCIS Fee Rule",
+    sourceUrl: "https://www.uscis.gov/archive/frequently-asked-questions-on-the-uscis-fee-rule",
+    titleEs: "El calendario de tarifas de USCIS de 2024 — el primer aumento desde 2016",
+    summaryEs:
+      "USCIS publicó una regla final el 31 de enero de 2024 (vigente desde el 1 de abril de 2024) que ajustó la mayoría de las tarifas de solicitudes de beneficios de inmigración y naturalización — el primer aumento amplio desde 2016. Los aumentos variaron significativamente según el formulario y la categoría, y las peticiones basadas en empleo tuvieron algunos de los mayores incrementos; un número limitado de tarifas relacionadas con asuntos humanitarios se mantuvo igual o se redujo. Las solicitudes con matasellos o presentadas electrónicamente a partir del 1 de abril de 2024 se cobran con la nueva tarifa; la tarifa de registro para la lotería H-1B fue una excepción puntual relacionada con el calendario y no aumentó para la lotería del año fiscal 2025.",
+    currentStatusEs:
+      "El calendario de tarifas de abril de 2024 es el vigente actualmente. Un caso presentado antes del 1 de abril de 2024 fue cobrado correctamente con la tarifa anterior y más baja en ese momento — una diferencia de tarifa por sí sola no indica nada sobre el estatus o el progreso de un caso.",
+  },
+  {
+    id: "n400-civics-test-2021-reversion",
+    kind: "memo",
+    title: "Naturalization Civics Test Reverted to the 2008 Version",
+    datePublished: "2021-03-01",
+    formTypes: ["N-400"],
+    statusKeywords: [],
+    summary:
+      "USCIS implemented a revised civics test on December 1, 2020 as part of a routine decennial review — expanding the question bank from 100 to 128 questions, the number asked during the interview from 10 to 20, and the number of correct answers needed to pass from 6 to 12. After finding the new test's development process, content, and rollout schedule may have created unintended barriers to naturalization, USCIS reverted to the longer-standing 2008 version (100 questions, 10 asked, 6 correct to pass) for any applicant filing on or after March 1, 2021. Applicants who filed between December 1, 2020 and February 28, 2021 and hadn't yet had their initial interview by mid-April 2021 could choose either version.",
+    currentStatus:
+      "The 2008-version civics test (100 questions, 10 asked, 6 correct needed) is the current operative standard for the N-400 civics requirement.",
+    sourceTitle: "USCIS: USCIS Reverts to the 2008 Version of the Naturalization Civics Test",
+    sourceUrl: "https://www.uscis.gov/archive/uscis-reverts-to-the-2008-version-of-the-naturalization-civics-test",
+    titleEs: "La prueba de civismo para la naturalización vuelve a la versión de 2008",
+    summaryEs:
+      "USCIS implementó una prueba de civismo revisada el 1 de diciembre de 2020 como parte de una revisión decenal de rutina — ampliando el banco de preguntas de 100 a 128, el número de preguntas formuladas durante la entrevista de 10 a 20, y el número de respuestas correctas necesarias para aprobar de 6 a 12. Tras determinar que el proceso de desarrollo, el contenido y el calendario de implementación de la nueva prueba podrían haber creado barreras no intencionadas a la naturalización, USCIS volvió a la versión de 2008, de más larga data (100 preguntas, 10 formuladas, 6 correctas para aprobar), para cualquier solicitante que presentara su solicitud a partir del 1 de marzo de 2021. Los solicitantes que presentaron su solicitud entre el 1 de diciembre de 2020 y el 28 de febrero de 2021 y que aún no habían tenido su entrevista inicial a mediados de abril de 2021 podían elegir cualquiera de las dos versiones.",
+    currentStatusEs:
+      "La prueba de civismo de la versión de 2008 (100 preguntas, 10 formuladas, 6 correctas necesarias) es el estándar vigente actualmente para el requisito de civismo del N-400.",
+  },
+  {
+    id: "circumvention-of-lawful-pathways-2023",
+    kind: "memo",
+    title: "The Circumvention of Lawful Pathways Asylum Rule — In Effect, Then Expired, Then Vacated",
+    datePublished: "2023-05-11",
+    formTypes: ["I-589"],
+    statusKeywords: ["credible fear", "lawful pathways", "asylum ineligib"],
+    summary:
+      "DHS and DOJ's Circumvention of Lawful Pathways rule took effect May 11, 2023 (published May 16, 2023): a noncitizen who entered at the southwest border between ports of entry, or without a pre-scheduled appointment, was presumed ineligible for asylum unless they'd applied for and been denied protection in a country they transited through, subject to exceptions (unaccompanied children, certain medical or safety emergencies, a scheduled appointment, among others). It was written to sunset after 24 months.",
+    currentStatus:
+      "The rule expired on its own terms on May 11, 2025 — anyone entering after that date is no longer subject to it. For someone who entered between May 11, 2023 and May 11, 2025, a federal court (Judge Tigar, N.D. Cal.) separately reaffirmed on May 7, 2026 an earlier order vacating the rule nationwide as unlawful, meaning agencies and immigration judges should no longer hold a border crossing during that window against an asylum applicant's eligibility under this rule — unless a higher court stays that order. Whether a specific pending case is actually being handled consistently with that ruling isn't something this app can confirm.",
+    sourceTitle: "Federal Register: Circumvention of Lawful Pathways",
+    sourceUrl: "https://www.federalregister.gov/documents/2023/05/16/2023-10146/circumvention-of-lawful-pathways",
+    titleEs: "La regla de asilo de Vías Legales — vigente, luego vencida, luego anulada",
+    summaryEs:
+      "La regla de Circumvention of Lawful Pathways (Vías Legales) de DHS y DOJ entró en vigor el 11 de mayo de 2023 (publicada el 16 de mayo de 2023): a un extranjero que ingresara por la frontera suroeste entre puertos de entrada, o sin una cita programada previamente, se le presumía inelegible para el asilo a menos que hubiera solicitado y se le hubiera negado protección en un país por el que transitó, con excepciones (menores no acompañados, ciertas emergencias médicas o de seguridad, una cita programada, entre otras). Fue redactada para vencer después de 24 meses.",
+    currentStatusEs:
+      "La regla venció por sus propios términos el 11 de mayo de 2025 — cualquier persona que ingrese después de esa fecha ya no está sujeta a ella. Para quien ingresó entre el 11 de mayo de 2023 y el 11 de mayo de 2025, un tribunal federal (el juez Tigar, del Distrito Norte de California) reafirmó por separado el 7 de mayo de 2026 una orden anterior que anulaba la regla a nivel nacional por considerarla ilegal, lo que significa que las agencias y los jueces de inmigración ya no deberían usar un cruce fronterizo durante ese período en contra de la elegibilidad de asilo de un solicitante bajo esta regla — a menos que un tribunal superior suspenda esa orden. Esta aplicación no puede confirmar si un caso pendiente específico realmente se está manejando de forma consistente con ese fallo.",
+  },
+  {
+    id: "i751-interview-waiver-risk-based-2022",
+    kind: "memo",
+    title: "I-751 Interview Waivers — USCIS Shifts to a Risk-Based Approach",
+    datePublished: "2022-04-07",
+    formTypes: ["I-751"],
+    statusKeywords: ["interview waived", "interview waiver"],
+    summary:
+      "USCIS updated its Policy Manual on April 7, 2022, replacing 2018 guidance with a risk-based approach to waiving the interview otherwise required for a joint Form I-751. An officer may waive the interview when the evidence sufficiently establishes the marriage's bona fides, any required joint-filing waiver is clearly eligible, nothing suggests fraud or misrepresentation in the supporting documents, the facts aren't complex, and there's no disqualifying criminal history.",
+    currentStatus:
+      "This is the current operative standard. An interview being waived reflects that the officer found the case clear-cut on the paper record, not a lesser or lower-confidence approval than one that went through an interview.",
+    sourceTitle: "USCIS: USCIS Revises Interview Waiver Guidance for Form I-751",
+    sourceUrl: "https://www.uscis.gov/news/alerts/uscis-revises-interview-waiver-guidance-form-i-751",
+    titleEs: "Exenciones de entrevista para el I-751 — USCIS adopta un enfoque basado en riesgo",
+    summaryEs:
+      "USCIS actualizó su Manual de Políticas el 7 de abril de 2022, reemplazando la orientación de 2018 con un enfoque basado en riesgo para exonerar la entrevista que de otro modo se requiere para un Formulario I-751 conjunto. Un oficial puede exonerar la entrevista cuando la evidencia establece suficientemente la buena fe del matrimonio, cualquier exención de presentación conjunta requerida es claramente elegible, nada sugiere fraude o falsedad en los documentos de respaldo, los hechos no son complejos, y no existe un historial penal descalificante.",
+    currentStatusEs:
+      "Este es el estándar vigente actualmente. Que se exonere una entrevista refleja que el oficial consideró el caso claro a partir del expediente escrito, no una aprobación de menor peso o confianza que una que pasó por entrevista.",
+  },
 ];
 
 function textMatches(memo: PolicyMemo, haystack: string): boolean {

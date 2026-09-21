@@ -42,6 +42,7 @@ const FIXTURE_TO_FILE: Record<string, string> = {
   "/visa-bulletin": "src/app/visa-bulletin/page.tsx",
   "/news": "src/app/news/page.tsx",
   "/policy": "src/app/policy/page.tsx",
+  "/court-rulings": "src/app/court-rulings/page.tsx",
   "/updates": "src/app/updates/page.tsx",
   "/faq": "src/app/faq/page.tsx",
   "/sitemap": "src/app/sitemap/page.tsx",
@@ -51,6 +52,7 @@ const FIXTURE_TO_FILE: Record<string, string> = {
 // row of that type, so checking the template once covers all of them.
 const DYNAMIC_TEMPLATES: Record<string, string> = {
   "/policy/[id]": "src/app/policy/[id]/page.tsx",
+  "/court-rulings/[id]": "src/app/court-rulings/[id]/page.tsx",
   "/updates/[slug]": "src/app/updates/[slug]/page.tsx",
   "/attorneys/[id]": "src/app/attorneys/[id]/page.tsx",
   "/accredited-representatives/[slug]": "src/app/accredited-representatives/[slug]/page.tsx",

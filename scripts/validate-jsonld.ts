@@ -16,6 +16,7 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { POLICY_MEMOS } from "../src/lib/kb/policy-memos";
+import { COURT_RULINGS } from "../src/lib/kb/court-rulings";
 import { organizationJsonLd, websiteJsonLd } from "../src/lib/seo/organization-jsonld";
 
 let failures = 0;
@@ -59,6 +60,34 @@ for (const memo of POLICY_MEMOS) {
   });
 }
 
+// Court ruling FAQPage + BreadcrumbList (src/app/court-rulings/[id]/page.tsx)
+for (const ruling of COURT_RULINGS) {
+  checkJsonLd(`FAQPage:court:${ruling.id}`, {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: `What did the court decide in ${ruling.caseName}?`,
+        acceptedAnswer: { "@type": "Answer", text: ruling.summary },
+      },
+      {
+        "@type": "Question",
+        name: `What is the current status of ${ruling.caseName}?`,
+        acceptedAnswer: { "@type": "Answer", text: ruling.currentStatus },
+      },
+    ],
+  });
+  checkJsonLd(`BreadcrumbList:court:${ruling.id}`, {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Court rulings", item: "https://app.casewhy.com/court-rulings" },
+      { "@type": "ListItem", position: 2, name: ruling.caseName, item: `https://app.casewhy.com/court-rulings/${ruling.id}` },
+    ],
+  });
+}
+
 // Article + BreadcrumbList for every /updates post that exists on disk
 // (src/app/updates/[slug]/page.tsx) -- checked regardless of its
 // marketing_queue approval status, since a bad frontmatter field would
@@ -96,6 +125,8 @@ if (failures > 0) {
   console.error(`\n${failures} JSON-LD block(s) failed validation.`);
   process.exit(1);
 } else {
-  console.log(`All JSON-LD blocks validated (${POLICY_MEMOS.length} policy memos, updates posts checked).`);
+  console.log(
+    `All JSON-LD blocks validated (${POLICY_MEMOS.length} policy memos, ${COURT_RULINGS.length} court rulings, updates posts checked).`
+  );
   process.exit(0);
 }

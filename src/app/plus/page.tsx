@@ -350,6 +350,23 @@ export default async function PlusPage({
             </div>
             <div>
               <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
+                &quot;Does this apply to me?&quot; — answered
+              </p>
+              <p className="mt-1.5 text-sm text-muted">
+                When a real policy or court ruling matches your case&apos;s own
+                facts, get a one-click answer to &quot;Does it apply to
+                me?&quot; and &quot;How it applies to me?&quot; — grounded
+                in that specific policy, not a generic guess.
+              </p>
+              <a
+                href="#explanation-depth"
+                className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
+              >
+                See how it works →
+              </a>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
                 Know the moment a case stalls
               </p>
               <p className="mt-1.5 text-sm text-muted">
@@ -376,23 +393,6 @@ export default async function PlusPage({
               </p>
               <a
                 href="#escalation-letters"
-                className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
-              >
-                See how it works →
-              </a>
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
-                &quot;Does this apply to me?&quot; — answered
-              </p>
-              <p className="mt-1.5 text-sm text-muted">
-                When a real policy or court ruling matches your case&apos;s own
-                facts, get a one-click answer to &quot;Does it apply to
-                me?&quot; and &quot;How it applies to me?&quot; — grounded
-                in that specific policy, not a generic guess.
-              </p>
-              <a
-                href="#explanation-depth"
                 className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
               >
                 See how it works →

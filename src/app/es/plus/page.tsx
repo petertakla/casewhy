@@ -357,6 +357,24 @@ export default async function PlusPageEs({
             </div>
             <div>
               <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
+                &quot;¿Aplica a mi caso?&quot; — respondido
+              </p>
+              <p className="mt-1.5 text-sm text-muted">
+                Cuando una política real o un fallo judicial coincide con los
+                hechos propios de tu caso, obtén una respuesta con un clic a
+                &quot;¿Aplica a mi caso?&quot; y &quot;¿Cómo aplica a mi
+                caso?&quot; — fundamentada en esa política específica, no en
+                una suposición genérica.
+              </p>
+              <a
+                href="#explanation-depth"
+                className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
+              >
+                Ver cómo funciona →
+              </a>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
                 Sabe en el momento en que un caso se estanca
               </p>
               <p className="mt-1.5 text-sm text-muted">
@@ -383,24 +401,6 @@ export default async function PlusPageEs({
               </p>
               <a
                 href="#escalation-letters"
-                className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
-              >
-                Ver cómo funciona →
-              </a>
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">
-                &quot;¿Aplica a mi caso?&quot; — respondido
-              </p>
-              <p className="mt-1.5 text-sm text-muted">
-                Cuando una política real o un fallo judicial coincide con los
-                hechos propios de tu caso, obtén una respuesta con un clic a
-                &quot;¿Aplica a mi caso?&quot; y &quot;¿Cómo aplica a mi
-                caso?&quot; — fundamentada en esa política específica, no en
-                una suposición genérica.
-              </p>
-              <a
-                href="#explanation-depth"
                 className="mt-2 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
               >
                 Ver cómo funciona →

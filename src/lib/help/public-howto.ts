@@ -42,6 +42,21 @@ export const PUBLIC_HOWTO_ENTRIES: HelpEntry[] = [
   },
   // -- Using CaseWhy --
   {
+    id: "save-to-device",
+    title: "How to save CaseWhy on your device",
+    group: "Using CaseWhy",
+    audience: "public",
+    kind: "howto",
+    href: "/settings",
+    steps: [
+      "On iPhone or iPad: open CaseWhy in Safari, tap the Share icon, then \"Add to Home Screen.\" Safari doesn't support push notifications in a regular browser tab, so this step is required before iOS alerts will work.",
+      "On Android: open CaseWhy in Chrome, tap the menu (⋮), then \"Add to Home Screen\" or \"Install app\" if Chrome offers it directly.",
+      "On a computer: look for an install icon in the address bar in Chrome or Edge, or use the browser's menu for an \"Install CaseWhy…\" option.",
+      "However you add it, CaseWhy opens like a regular app from its own icon — no App Store or Play Store listing needed.",
+    ],
+    notes: ["Once it's on your device, Settings walks you through turning on push notifications."],
+  },
+  {
     id: "ask-casewhy",
     title: "How to ask a question with Ask CaseWhy",
     group: "Using CaseWhy",

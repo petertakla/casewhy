@@ -5,20 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>For Employers & Global Mobility Teams | CaseWhy Hub</title>
 <meta name="description" content="Help shape CaseWhy's upcoming team feature for employers sponsoring visas and green cards.">
-<link rel="canonical" href="https://casewhyhub.com/employers">
-<meta property="og:type" content="website">
-<meta property="og:title" content="For Employers & Global Mobility Teams | CaseWhy Hub">
-<meta property="og:description" content="Help shape CaseWhy's upcoming team feature for employers sponsoring visas and green cards.">
-<meta property="og:url" content="https://casewhyhub.com/employers">
-<meta property="og:site_name" content="CaseWhy Hub">
-<meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://casewhyhub.com/og-default.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="For Employers & Global Mobility Teams | CaseWhy Hub">
-<meta name="twitter:description" content="Help shape CaseWhy's upcoming team feature for employers sponsoring visas and green cards.">
-<meta name="twitter:image" content="https://casewhyhub.com/og-default.png">
+<link rel="canonical" href="https://casewhyhub.com/uscis/employers">
 <link rel="icon" href="/brand/icon-192.png">
 <link rel="icon" href="/brand/icon-512.png" sizes="512x512">
 <link rel="apple-touch-icon" href="/brand/apple-icon.png">
@@ -63,20 +50,30 @@
   nav.main{display:flex;align-items:center;gap:16px;font-size:0.88rem;font-weight:600;flex-wrap:wrap;}
   nav.main a{color:var(--muted);text-decoration:none;}
   nav.main a:hover{color:var(--foreground);}
+  nav.main .line-switch{display:inline-flex;gap:2px;background:var(--surface-2);border-radius:9px;padding:3px;}
+  nav.main .line-switch a{padding:5px 12px;border-radius:6px;color:#4b5563;}
+  @media (prefers-color-scheme: dark){ nav.main .line-switch a{color:var(--muted);} }
+  nav.main .line-switch a[aria-current="page"]{background:var(--surface);color:var(--foreground);box-shadow:0 1px 2px rgba(0,0,0,0.06);}
+  nav.main a.shared-link{padding-left:2px;}
+  nav.main a[aria-current="page"]:not(.line-switch a){color:var(--foreground);text-decoration:underline;text-underline-offset:3px;}
   nav.main a.site-link{color:var(--brand-600);border-left:1px solid var(--border);padding-left:16px;}
   @media (prefers-color-scheme: dark){ nav.main a.site-link{color:var(--brand-400);} }
   main{padding:56px 0 80px;}
   .eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--brand-600);}
   @media (prefers-color-scheme: dark){ .eyebrow{color:var(--brand-400);} }
+  .eyebrow a{color:inherit;text-decoration:underline;text-underline-offset:2px;}
   h1{font-size:2.2rem;margin:10px 0 14px;letter-spacing:-0.02em;line-height:1.15;}
   h2{font-size:1.3rem;margin:36px 0 12px;letter-spacing:-0.01em;}
   .sub{color:var(--muted);font-size:1.05rem;max-width:680px;}
   .free-line{margin-top:18px;font-size:0.92rem;font-weight:600;color:var(--foreground);}
   .disclaimer{margin-top:20px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);padding:16px 18px;font-size:0.88rem;color:var(--foreground);}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:48px;}
+  .cards.lines{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
   .card{border:1px solid var(--border);background:var(--surface);border-radius:16px;padding:24px;text-decoration:none;color:inherit;transition:border-color .15s;}
   .card:hover{border-color:var(--border-strong);}
   .card h2{margin:0 0 8px;font-size:1.1rem;}
+  .card .tagline{margin:0 0 10px;font-size:0.85rem;font-weight:700;color:var(--brand-600);}
+  @media (prefers-color-scheme: dark){ .card .tagline{color:var(--brand-400);} }
   .card p{margin:0;color:var(--muted);font-size:0.9rem;}
   .card .arrow{margin-top:14px;font-weight:700;color:var(--brand-600);font-size:0.88rem;}
   @media (prefers-color-scheme: dark){ .card .arrow{color:var(--brand-400);} }
@@ -115,6 +112,20 @@
   .copy-btn:hover{border-color:var(--brand-500);}
   .kit-snippet{position:absolute;left:-9999px;opacity:0;}
   .kit-disclaimer{margin-top:20px;font-size:0.8rem;color:var(--muted);}
+  .tiers{margin-top:24px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));}
+  .tier{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:22px;}
+  .tier h3{margin:0 0 4px;font-size:1.02rem;}
+  .tier .price{font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--brand-600);margin:0 0 10px;}
+  @media (prefers-color-scheme: dark){ .tier .price{color:var(--brand-400);} }
+  .tier p{margin:0;color:var(--muted);font-size:0.88rem;}
+  a.cta{display:inline-block;margin-top:14px;padding:13px 26px;border-radius:10px;background:var(--brand-600);color:#fff !important;font-weight:700;text-decoration:none;font-size:0.98rem;}
+  a.cta:hover{background:#164a8c;}
+  .preview-card{margin:14px 0 20px;border:1px solid var(--border);background:var(--surface);border-radius:12px;padding:16px 18px;max-width:360px;}
+  .preview-card .state{font-family:'JetBrains Mono',monospace;font-size:0.75rem;font-weight:700;color:var(--brand-600);}
+  @media (prefers-color-scheme: dark){ .preview-card .state{color:var(--brand-400);} }
+  .preview-card .name{font-weight:700;margin-top:4px;}
+  .preview-card .firm{color:var(--muted);font-size:0.9rem;}
+  .preview-card .focus{font-size:0.82rem;color:var(--muted);margin-top:4px;}
   footer{border-top:1px solid var(--border);padding:32px 0;font-size:0.85rem;color:var(--muted);}
   footer .wrap{display:flex;flex-direction:column;gap:6px;}
   footer a{color:var(--muted);}
@@ -126,14 +137,14 @@
   footer .coming{margin-top:10px;font-size:0.8rem;font-style:italic;}
 </style>
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebPage","name":"For Employers & Global Mobility Teams | CaseWhy Hub","url":"https://casewhyhub.com/employers","isPartOf":{"@type":"WebSite","name":"CaseWhy Hub","url":"https://casewhyhub.com"}}
+  {"@context":"https://schema.org","@type":"WebPage","name":"For Employers & Global Mobility Teams | CaseWhy Hub","url":"https://casewhyhub.com/uscis/employers","isPartOf":{"@type":"WebSite","name":"CaseWhy Hub","url":"https://casewhyhub.com"}}
   </script>
 </head>
 <body>
 
 <header>
   <div class="wrap">
-    <a class="logo" href="https://www.casewhy.com?utm_source=hub&utm_medium=header">
+    <a class="logo" href="/">
       <img src="/brand/mark.svg" alt="">
       <span class="lockup">
         <span class="name">Case<span>Why</span> Hub</span>
@@ -141,13 +152,13 @@
       </span>
     </a>
     <nav class="main">
-      <a href="/">Hub</a>
-      <a href="/attorneys">Attorneys</a>
-      <a href="/organizations">Organizations</a>
-      <a href="/employers" aria-current="page">Employers</a>
-      <a href="/caseworkers">Caseworkers</a>
-      <a href="/schools">Schools</a>
-      <a href="/press">Press</a>
+      <span class="line-switch">
+        <a href="/uscis" aria-current="page">USCIS</a>
+        <a href="/appeals">Appeals</a>
+      </span>
+      <a class="shared-link" href="/press">Press</a>
+      <a class="shared-link" href="/resources">Resources</a>
+      <a class="shared-link" href="/brand">Brand</a>
       <a class="site-link" href="https://www.casewhy.com?utm_source=hub&utm_medium=header">casewhy.com ↗</a>
     </nav>
   </div>
@@ -207,10 +218,11 @@
 
 <footer>
   <div class="wrap">
-    <p class="app-line">CaseWhy — the app: <a href="https://www.casewhy.com?utm_source=hub&utm_medium=footer">casewhy.com</a> · Get Help: <a href="https://app.casewhy.com/get-help?utm_source=hub&utm_medium=footer">app.casewhy.com/get-help</a></p>
+    <p class="app-line">CaseWhy — the USCIS tracker: <a href="https://www.casewhy.com?utm_source=hub&utm_medium=footer">casewhy.com</a> · CaseWhy Appeals: <a href="https://appeals.casewhy.com?utm_source=hub&utm_medium=footer">appeals.casewhy.com</a> · Get Help: <a href="https://app.casewhy.com/get-help?utm_source=hub&utm_medium=footer">app.casewhy.com/get-help</a></p>
     <p>CaseWhy LLC, 7901 4th St N, Ste 300, St. Petersburg, FL 33702, US</p>
     <div class="links">
       <a href="/resources">Resources</a>
+      <a href="/brand">Brand</a>
       <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>
       <a href="mailto:terms@casewhy.com">terms@casewhy.com</a>
     </div>

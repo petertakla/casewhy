@@ -1,0 +1,29 @@
+{
+  "redirects": [
+    {
+      "source": "/attorneys",
+      "destination": "/uscis/attorneys",
+      "permanent": true
+    },
+    {
+      "source": "/organizations",
+      "destination": "/uscis/organizations",
+      "permanent": true
+    },
+    {
+      "source": "/employers",
+      "destination": "/uscis/employers",
+      "permanent": true
+    },
+    {
+      "source": "/caseworkers",
+      "destination": "/uscis/caseworkers",
+      "permanent": true
+    },
+    {
+      "source": "/schools",
+      "destination": "/uscis/schools",
+      "permanent": true
+    }
+  ]
+}

@@ -6,17 +6,34 @@
 // site (Vercel serves the committed HTML directly), so this script is run
 // manually — the same reason build-search-index.ts (round 110) exists as
 // a script rather than a framework build hook, just without a framework
-// here to hook into. Run: node scripts/generate.mjs from the repo root.
+// here to hook into.
+//
+// Track H (Sep 27, 2026) — the hub gained a line dimension. `pages.json`
+// now has `lines[]` (one home page per product line, e.g. /uscis, /appeals),
+// `pages[]` (audience pages nested under a line, e.g. /appeals/counselors),
+// and `companyPages[]` (line-spanning pages: /press, /resources, /brand).
+// The nav is line-aware: a compact global header (line switch + the three
+// shared pages) rather than every audience page appearing in the top nav —
+// each line's own home page is where its audience pages are listed as
+// cards, so the header doesn't have to carry 10+ links.
+//
+// Run: node scripts/generate.mjs from the repo root.
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 
-const { pages } = JSON.parse(readFileSync(join(__dirname, "pages.json"), "utf8"));
+const { lines, pages, companyPages, redirects } = JSON.parse(
+  readFileSync(join(__dirname, "pages.json"), "utf8")
+);
 const partnerKit = readFileSync(join(__dirname, "content", "_partner-kit.html"), "utf8");
+
+function lineOf(id) {
+  return lines.find((l) => l.id === id);
+}
 
 const CSS = `
   :root{
@@ -56,20 +73,30 @@ const CSS = `
   nav.main{display:flex;align-items:center;gap:16px;font-size:0.88rem;font-weight:600;flex-wrap:wrap;}
   nav.main a{color:var(--muted);text-decoration:none;}
   nav.main a:hover{color:var(--foreground);}
+  nav.main .line-switch{display:inline-flex;gap:2px;background:var(--surface-2);border-radius:9px;padding:3px;}
+  nav.main .line-switch a{padding:5px 12px;border-radius:6px;color:#4b5563;}
+  @media (prefers-color-scheme: dark){ nav.main .line-switch a{color:var(--muted);} }
+  nav.main .line-switch a[aria-current="page"]{background:var(--surface);color:var(--foreground);box-shadow:0 1px 2px rgba(0,0,0,0.06);}
+  nav.main a.shared-link{padding-left:2px;}
+  nav.main a[aria-current="page"]:not(.line-switch a){color:var(--foreground);text-decoration:underline;text-underline-offset:3px;}
   nav.main a.site-link{color:var(--brand-600);border-left:1px solid var(--border);padding-left:16px;}
   @media (prefers-color-scheme: dark){ nav.main a.site-link{color:var(--brand-400);} }
   main{padding:56px 0 80px;}
   .eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--brand-600);}
   @media (prefers-color-scheme: dark){ .eyebrow{color:var(--brand-400);} }
+  .eyebrow a{color:inherit;text-decoration:underline;text-underline-offset:2px;}
   h1{font-size:2.2rem;margin:10px 0 14px;letter-spacing:-0.02em;line-height:1.15;}
   h2{font-size:1.3rem;margin:36px 0 12px;letter-spacing:-0.01em;}
   .sub{color:var(--muted);font-size:1.05rem;max-width:680px;}
   .free-line{margin-top:18px;font-size:0.92rem;font-weight:600;color:var(--foreground);}
   .disclaimer{margin-top:20px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);padding:16px 18px;font-size:0.88rem;color:var(--foreground);}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:48px;}
+  .cards.lines{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
   .card{border:1px solid var(--border);background:var(--surface);border-radius:16px;padding:24px;text-decoration:none;color:inherit;transition:border-color .15s;}
   .card:hover{border-color:var(--border-strong);}
   .card h2{margin:0 0 8px;font-size:1.1rem;}
+  .card .tagline{margin:0 0 10px;font-size:0.85rem;font-weight:700;color:var(--brand-600);}
+  @media (prefers-color-scheme: dark){ .card .tagline{color:var(--brand-400);} }
   .card p{margin:0;color:var(--muted);font-size:0.9rem;}
   .card .arrow{margin-top:14px;font-weight:700;color:var(--brand-600);font-size:0.88rem;}
   @media (prefers-color-scheme: dark){ .card .arrow{color:var(--brand-400);} }
@@ -108,6 +135,20 @@ const CSS = `
   .copy-btn:hover{border-color:var(--brand-500);}
   .kit-snippet{position:absolute;left:-9999px;opacity:0;}
   .kit-disclaimer{margin-top:20px;font-size:0.8rem;color:var(--muted);}
+  .tiers{margin-top:24px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));}
+  .tier{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:22px;}
+  .tier h3{margin:0 0 4px;font-size:1.02rem;}
+  .tier .price{font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--brand-600);margin:0 0 10px;}
+  @media (prefers-color-scheme: dark){ .tier .price{color:var(--brand-400);} }
+  .tier p{margin:0;color:var(--muted);font-size:0.88rem;}
+  a.cta{display:inline-block;margin-top:14px;padding:13px 26px;border-radius:10px;background:var(--brand-600);color:#fff !important;font-weight:700;text-decoration:none;font-size:0.98rem;}
+  a.cta:hover{background:#164a8c;}
+  .preview-card{margin:14px 0 20px;border:1px solid var(--border);background:var(--surface);border-radius:12px;padding:16px 18px;max-width:360px;}
+  .preview-card .state{font-family:'JetBrains Mono',monospace;font-size:0.75rem;font-weight:700;color:var(--brand-600);}
+  @media (prefers-color-scheme: dark){ .preview-card .state{color:var(--brand-400);} }
+  .preview-card .name{font-weight:700;margin-top:4px;}
+  .preview-card .firm{color:var(--muted);font-size:0.9rem;}
+  .preview-card .focus{font-size:0.82rem;color:var(--muted);margin-top:4px;}
   footer{border-top:1px solid var(--border);padding:32px 0;font-size:0.85rem;color:var(--muted);}
   footer .wrap{display:flex;flex-direction:column;gap:6px;}
   footer a{color:var(--muted);}
@@ -119,17 +160,26 @@ const CSS = `
   footer .coming{margin-top:10px;font-size:0.8rem;font-style:italic;}
 `;
 
-function header(currentId) {
-  const navItems = pages
-    .filter((p) => p.inNav)
+// currentLineId: which line-switch entry (if any) is active. currentSharedId:
+// which of press/resources/brand (if any) is active. Both are null on the
+// root and on a plain audience page (whose own eyebrow, not the header,
+// says which line it belongs to).
+function header(currentLineId, currentSharedId) {
+  const lineLinks = lines
+    .map(
+      (l) =>
+        `        <a href="${l.path}"${l.id === currentLineId ? ' aria-current="page"' : ""}>${l.navLabel}</a>`
+    )
+    .join("\n");
+  const sharedLinks = companyPages
     .map(
       (p) =>
-        `      <a href="${p.path}"${p.id === currentId ? ' aria-current="page"' : ""}>${p.navLabel}</a>`
+        `      <a class="shared-link" href="${p.path}"${p.id === currentSharedId ? ' aria-current="page"' : ""}>${p.navLabel}</a>`
     )
     .join("\n");
   return `<header>
   <div class="wrap">
-    <a class="logo" href="https://www.casewhy.com?utm_source=hub&utm_medium=header">
+    <a class="logo" href="/">
       <img src="/brand/mark.svg" alt="">
       <span class="lockup">
         <span class="name">Case<span>Why</span> Hub</span>
@@ -137,8 +187,10 @@ function header(currentId) {
       </span>
     </a>
     <nav class="main">
-      <a href="/">Hub</a>
-${navItems}
+      <span class="line-switch">
+${lineLinks}
+      </span>
+${sharedLinks}
       <a class="site-link" href="https://www.casewhy.com?utm_source=hub&utm_medium=header">casewhy.com ↗</a>
     </nav>
   </div>
@@ -148,10 +200,11 @@ ${navItems}
 function footer() {
   return `<footer>
   <div class="wrap">
-    <p class="app-line">CaseWhy — the app: <a href="https://www.casewhy.com?utm_source=hub&utm_medium=footer">casewhy.com</a> · Get Help: <a href="https://app.casewhy.com/get-help?utm_source=hub&utm_medium=footer">app.casewhy.com/get-help</a></p>
+    <p class="app-line">CaseWhy — the USCIS tracker: <a href="https://www.casewhy.com?utm_source=hub&utm_medium=footer">casewhy.com</a> · CaseWhy Appeals: <a href="https://appeals.casewhy.com?utm_source=hub&utm_medium=footer">appeals.casewhy.com</a> · Get Help: <a href="https://app.casewhy.com/get-help?utm_source=hub&utm_medium=footer">app.casewhy.com/get-help</a></p>
     <p>CaseWhy LLC, 7901 4th St N, Ste 300, St. Petersburg, FL 33702, US</p>
     <div class="links">
       <a href="/resources">Resources</a>
+      <a href="/brand">Brand</a>
       <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>
       <a href="mailto:terms@casewhy.com">terms@casewhy.com</a>
     </div>
@@ -173,17 +226,17 @@ const COPY_SCRIPT = `<script>
   });
 </script>`;
 
-function page(p) {
-  let body = readFileSync(join(__dirname, "content", `${p.id}.html`), "utf8");
+function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, currentLineId, currentSharedId, extraJsonLd }) {
+  let body = bodyOverride !== undefined ? bodyOverride : readFileSync(join(__dirname, "content", `${contentId}.html`), "utf8");
   if (body.includes("{{PARTNER_KIT}}")) {
-    body = body.replace("{{PARTNER_KIT}}", partnerKit.replaceAll("{{PAGE_ID}}", p.id));
+    body = body.replace("{{PARTNER_KIT}}", partnerKit.replaceAll("{{PAGE_ID}}", contentId));
   }
   const needsCopyScript = body.includes("copy-btn") || partnerKit.includes("copy-btn");
   const jsonLd =
-    p.id === "press"
-      ? "" // Organization JSON-LD is inline in content/press.html itself
+    extraJsonLd === false
+      ? ""
       : `  <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebPage","name":${JSON.stringify(p.titleTag)},"url":"https://casewhyhub.com${p.path}","isPartOf":{"@type":"WebSite","name":"CaseWhy Hub","url":"https://casewhyhub.com"}}
+  {"@context":"https://schema.org","@type":"WebPage","name":${JSON.stringify(titleTag)},"url":"https://casewhyhub.com${path}","isPartOf":{"@type":"WebSite","name":"CaseWhy Hub","url":"https://casewhyhub.com"}}
   </script>\n`;
 
   return `<!DOCTYPE html>
@@ -191,9 +244,9 @@ function page(p) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${p.titleTag}</title>
-<meta name="description" content="${p.description}">
-<link rel="canonical" href="https://casewhyhub.com${p.path}">
+<title>${titleTag}</title>
+<meta name="description" content="${description}">
+<link rel="canonical" href="https://casewhyhub.com${path}">
 <link rel="icon" href="/brand/icon-192.png">
 <link rel="icon" href="/brand/icon-512.png" sizes="512x512">
 <link rel="apple-touch-icon" href="/brand/apple-icon.png">
@@ -204,7 +257,7 @@ function page(p) {
 ${jsonLd}</head>
 <body>
 
-${header(p.id)}
+${header(currentLineId, currentSharedId)}
 
 <main class="wrap">
 ${body}
@@ -218,8 +271,52 @@ ${needsCopyScript ? "\n" + COPY_SCRIPT : ""}
 }
 
 function homePage() {
-  const cards = pages
-    .filter((p) => p.inNav)
+  const lineCards = lines
+    .map(
+      (l) => `    <a class="card" href="${l.path}">
+      <h2>${l.rootCardTitle}</h2>
+      <p class="tagline">${l.rootCardTagline}</p>
+      <p>${l.rootCardDesc}</p>
+      <p class="arrow">Learn more →</p>
+    </a>`
+    )
+    .join("\n");
+  const sharedCards = companyPages
+    .map(
+      (p) => `    <a class="card" href="${p.path}">
+      <h2>${p.navLabel}</h2>
+      <p>${p.description}</p>
+      <p class="arrow">Learn more →</p>
+    </a>`
+    )
+    .join("\n");
+  const body = `  <p class="eyebrow">CaseWhy Hub</p>
+  <h1>Partner with CaseWhy</h1>
+  <p class="sub">CaseWhy LLC is a Florida company building free-first tools that explain government and insurance letters. <strong>CaseWhy</strong> is the free USCIS case-status tracker; <strong>CaseWhy Appeals</strong> explains, writes, and tracks every Medicare appeal. Pick your line below.</p>
+  <p class="free-line">Every listing described here is free — no fees, no ads, ever.</p>
+
+  <div class="cards lines">
+${lineCards}
+  </div>
+
+  <h2>Shared, across every line</h2>
+  <div class="cards">
+${sharedCards}
+  </div>`;
+  return pageHtml({
+    path: "/",
+    titleTag: "CaseWhy Hub — Partner with CaseWhy",
+    description:
+      "Partner with CaseWhy: the free USCIS case-status tracker, and CaseWhy Appeals, the Medicare appeals engine. Free listings and professional seats, line by line.",
+    body,
+    currentLineId: null,
+    currentSharedId: null,
+  });
+}
+
+function linePage(line) {
+  const audiencePages = pages.filter((p) => p.line === line.id && p.inLineNav);
+  const cards = audiencePages
     .map(
       (p) => `    <a class="card" href="${p.path}">
       <h2>${p.cardTitle}</h2>
@@ -228,62 +325,83 @@ function homePage() {
     </a>`
     )
     .join("\n");
-  const body = `  <p class="eyebrow">CaseWhy Hub</p>
-  <h1>Partner with CaseWhy</h1>
-  <p class="sub">CaseWhy is a free USCIS case-status tracker used by immigrants and their families to understand what's actually happening with their case. This is where attorneys, legal aid organizations, schools, congressional offices, journalists, and employers connect with CaseWhy — as a free founding-partner listing, or as a partner in what we build next.</p>
-  <p class="free-line">Every listing described here is free — no fees, no ads, ever.</p>
+  let body = readFileSync(join(__dirname, "content", `${line.content}.html`), "utf8");
+  body = body.replace("{{AUDIENCE_CARDS}}", `<div class="cards">\n${cards}\n  </div>`);
+  return pageHtml({
+    path: line.path,
+    titleTag: line.titleTag,
+    description: line.description,
+    body,
+    currentLineId: line.id,
+    currentSharedId: null,
+  });
+}
 
-  <div class="cards">
-${cards}
-  </div>`;
-  const jsonLd = `  <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebPage","name":"CaseWhy Hub — Partner with CaseWhy","url":"https://casewhyhub.com/","isPartOf":{"@type":"WebSite","name":"CaseWhy Hub","url":"https://casewhyhub.com"}}
-  </script>
-`;
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CaseWhy Hub — Partner with CaseWhy</title>
-<meta name="description" content="Free listings and partnership programs for immigration attorneys, legal aid organizations, schools, congressional offices, press, and employers — from CaseWhy, the free USCIS case-status tracker.">
-<link rel="canonical" href="https://casewhyhub.com/">
-<link rel="icon" href="/brand/icon-192.png">
-<link rel="icon" href="/brand/icon-512.png" sizes="512x512">
-<link rel="apple-touch-icon" href="/brand/apple-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-<style>${CSS}</style>
-${jsonLd}</head>
-<body>
+// --- write everything ---
 
-${header(null)}
+function writePage(relPath, html) {
+  const dir = join(ROOT, relPath.replace(/^\//, ""));
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "index.html"), html);
+  console.log("wrote", relPath);
+}
 
-<main class="wrap">
-${body}
-</main>
+writePage("/", homePage());
 
-${footer()}
-
-</body>
-</html>
-`;
+for (const line of lines) {
+  writePage(line.path, linePage(line));
 }
 
 for (const p of pages) {
-  const dir = join(ROOT, p.id);
-  writeFileSync(join(dir, "index.html"), page(p));
-  console.log("wrote", p.path);
+  const line = lineOf(p.line);
+  writePage(
+    p.path,
+    pageHtml({
+      path: p.path,
+      titleTag: p.titleTag,
+      description: p.description,
+      contentId: p.content,
+      currentLineId: line.id,
+      currentSharedId: null,
+      extraJsonLd: p.content !== "press" && p.content !== "appeals-press", // Organization JSON-LD is inline in those content files themselves
+    })
+  );
 }
-writeFileSync(join(ROOT, "index.html"), homePage());
-console.log("wrote /");
 
-const sitemapUrls = ["/", ...pages.map((p) => p.path)]
-  .map((u) => `  <url><loc>https://casewhyhub.com${u === "/" ? "/" : u}</loc></url>`)
+for (const p of companyPages) {
+  writePage(
+    p.path,
+    pageHtml({
+      path: p.path,
+      titleTag: p.titleTag,
+      description: p.description,
+      contentId: p.content,
+      currentLineId: null,
+      currentSharedId: p.id,
+    })
+  );
+}
+
+const allUrls = [
+  "/",
+  ...lines.map((l) => l.path),
+  ...pages.map((p) => p.path),
+  ...companyPages.map((p) => p.path),
+];
+const sitemapUrls = allUrls
+  .map((u) => `  <url><loc>https://casewhyhub.com${u}</loc></url>`)
   .join("\n");
 writeFileSync(
   join(ROOT, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls}\n</urlset>\n`
 );
 console.log("wrote sitemap.xml");
+
+// vercel.json's redirects, generated from the same registry so the table
+// tested in scripts/verify.mjs and the table actually serving 301s can't
+// drift apart.
+const vercelJson = {
+  redirects: redirects.map((r) => ({ source: r.from, destination: r.to, permanent: true })),
+};
+writeFileSync(join(ROOT, "vercel.json"), JSON.stringify(vercelJson, null, 2) + "\n");
+console.log("wrote vercel.json");

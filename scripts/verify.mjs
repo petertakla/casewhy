@@ -5,7 +5,7 @@
 // *generated, committed* HTML/JSON so a real drift between pages.json and
 // the files on disk fails loudly. Exits non-zero on any failure.
 
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -119,6 +119,38 @@ for (const path of [
 ]) {
   const html = read(path);
   check(`${path} does not contain the founder's last name`, html !== null && !html.includes(bannedLastName));
+}
+
+// Sep 29, 2026 — the Desk resource library is referenced from the public
+// hub but deliberately NOT exposed. Two rules to hold, both enforced here
+// rather than by eye, plus the asset-provenance rule.
+console.log("\n== Desk resource library: teased, never exposed ==");
+const AUDIENCE = ["/appeals/advocates", "/appeals/counselors", "/appeals/attorneys", "/appeals/facilities", "/appeals/ombudsman"];
+for (const path of AUDIENCE) {
+  const html = read(path);
+  check(`${path} mentions the resource library`, html !== null && /resource library/i.test(html));
+}
+// No page anywhere under the hub may link to, or name, the gated route.
+for (const path of ["/", ...lines.map((l) => l.path), ...pages.map((p) => p.path), ...companyPages.map((p) => p.path)]) {
+  const html = read(path);
+  check(`${path} does not link to or name /desk/resources`, html !== null && !/desk\/resources/i.test(html));
+}
+
+console.log("\n== Reused diagram: served locally, and only the cleared one ==");
+const advocatesHtml = read("/appeals/advocates");
+check("/appeals/advocates embeds the URL-pattern diagram from this repo's own /images/", advocatesHtml !== null && advocatesHtml.includes('src="/images/link-your-records-url-pattern.webp"'));
+check("the diagram file exists on disk", existsSync(join(ROOT, "images/link-your-records-url-pattern.webp")));
+check("the diagram is not hot-linked from the Appeals app or its storage", advocatesHtml !== null && !/appeals\.casewhy\.com[^"']*\.(webp|png|jpe?g)/i.test(advocatesHtml) && !/blob\.vercel-storage\.com/i.test(advocatesHtml));
+// The two items Peter cleared for the gated Desk library ONLY must never
+// reach this repo's public assets, in any form.
+const FORBIDDEN = ["Central_Command", "Central Command", "Blueprint", "blueprint", "Roadmap", "roadmap"];
+const assetNames = existsSync(join(ROOT, "images")) ? readdirSync(join(ROOT, "images")) : [];
+for (const term of FORBIDDEN) {
+  check(`no public asset name contains "${term}"`, !assetNames.some((f) => f.includes(term)));
+}
+for (const path of AUDIENCE) {
+  const html = read(path);
+  check(`${path} does not reference the Blueprint or roadmap materials`, html !== null && !/central[ _]command|blueprint|roadmap/i.test(html));
 }
 
 console.log(`\n${failures === 0 ? "All checks passed." : `${failures} check(s) FAILED.`}`);

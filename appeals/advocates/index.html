@@ -82,6 +82,12 @@
   ul.checklist li::before{content:"—";position:absolute;left:0;color:var(--brand-500);}
   ul.checklist li strong{color:var(--foreground);}
   .planned-note{font-size:0.82rem;color:var(--muted);font-style:italic;margin-top:-4px;margin-bottom:20px;}
+  /* Sep 29, 2026 — the one reused Desk-library diagram. Bounded so a
+     wide illustration never blows out the reading column, and never
+     scrolls the page sideways on a phone. */
+  figure.diagram{margin:16px 0 20px;}
+  figure.diagram img{display:block;width:100%;max-width:100%;height:auto;border:1px solid var(--border);border-radius:10px;}
+  figure.diagram figcaption{font-size:0.82rem;color:var(--muted);margin-top:8px;}
   .types{margin-top:24px;display:grid;gap:16px;}
   .type-card{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:22px;}
   .type-card h2{margin:0 0 6px;font-size:1.1rem;}
@@ -172,6 +178,7 @@
 
   <h2>The professional seat</h2>
   <p>Unlimited cases, letters cited to the rule, both deadlines computed automatically, and the Appeal Tracker per case.</p>
+  <p>Once your seat is live you also get the resource library — written guides, a video walkthrough, and audio explainers — so you can get your practice running on it quickly.</p>
 
   <h2>The founding-advocate pilot</h2>
   <p>Twenty free seats through February 28, 2027, for independent and board-certified patient advocates and aging life care managers who'll give feedback and join a monthly call. After the pilot, the professional seat is $99 a month, unlimited cases.</p>
@@ -189,6 +196,11 @@
   <h2>Link it to your records</h2>
   <p>Each case in CaseWhy Appeals has a copyable link you paste into the notes or custom field of your own system — Clio, LegalServer, a CRM, or a spreadsheet. Each case also has a field for the link back to your own record, so you can open your system from CaseWhy Appeals in one click. No integration work, no password shared with us — two free-text fields.</p>
   <p><a href="https://appeals.casewhy.com/desk/getting-started/link-your-records?utm_source=hub&utm_medium=referral&utm_campaign=advocates&utm_content=appeals">Read the one-page explainer, with tips for Clio, LegalServer, a CRM, and a spreadsheet →</a></p>
+  <figure class="diagram">
+    <img src="/images/link-your-records-url-pattern.webp" width="1600" height="893" loading="lazy" decoding="async"
+         alt="Two steps for linking your own system to CaseWhy Appeals. Step one, isolate the record ID: open a client in your system and find the unique ID in the URL, for example https://your-system.com/matters/8842. Step two, replace that ID with a {reference} placeholder, keeping the rest of the URL intact, giving https://your-system.com/matters/{reference}. A pattern must contain exactly one {reference} placeholder. Examples: Clio .../matters/8842 becomes .../matters/{reference}; Salesforce .../Case/500XXXXX/view becomes .../Case/{reference}/view; another CRM .../id=999 becomes .../id={reference}. If you use Excel or Google Sheets no pattern is needed, the reference alone is enough. Links open only if you are signed into your own system in the same browser.">
+    <figcaption>The URL pattern in practice — the same one-page explainer advocates get inside the Desk.</figcaption>
+  </figure>
 
   <a class="cta" href="https://appeals.casewhy.com/for-advocates?utm_source=hub&utm_medium=referral&utm_campaign=advocates&utm_content=appeals">Request a seat →</a>
 

@@ -24,6 +24,22 @@ Peter shared the actual chat transcript with his LLC formation service, Sep 8: t
 
 **Why this matters right now:** it directly affects the attorney-email-campaign sub-project (see below) — CAN-SPAM requires a real physical mailing address in every commercial email, and "CaseWhy LLC" doesn't legally exist yet to put on one. Don't block round 28 (the `/attorneys/join` landing page) or the list-sourcing/domain-setup legwork on this — just don't send the actual campaign until there's a real address to put in it (the LLC's registered address once formed, or an interim stand-in Peter explicitly chooses, e.g. a PO box).
 
+> ### ✅ RESOLVED Sep 29, 2026 — the address exists; the campaign is no longer gated on it
+>
+> Observed directly while taking the Appeals line's Stripe account live (session in `~/appeals`, Sep 29): the live Stripe account **`acct_1UJ1d2DS5MXKQW6U` ("CaseWhy LLC")** completed full business verification — business type *Registered business → Single-member LLC*, plus **Tax details**, **Business details** and **Account representative** all checked off, and its Account status page now reads *"No active tasks to complete"* with **Payments and Payouts Active**. Payouts are linked to AMERICAN EXPRESS NATIONAL BANK ••••2470.
+>
+> The business address on file is:
+>
+> **CaseWhy LLC · 7901 4th Street North, Ste 300 · St. Petersburg, FL 33702**
+>
+> That satisfies CAN-SPAM's physical-address requirement, so **the attorney email campaign's address blocker is cleared** — use that address in the footer of every commercial send. No PO-box stand-in is needed.
+>
+> **Scope of the claim, stated precisely:** what was verified is that *Stripe* completed KYC on the entity, which for a US registered business requires a real EIN and matches against records. The Florida Sunbiz registration itself was **not** independently checked in that session, and this note does not assert a filing date. If the registered-agent address differs from the Stripe business address above, Peter should confirm which one belongs in the email footer before the first send.
+>
+> **Still open from the Sep 8 note above, deliberately not resolved here:** the flagged discrepancy about round 13 (USCIS live billing) having been marked DONE while other sections gated Stripe live keys on LLC confirmation. Today's work was the *Appeals* Stripe account only; nothing was checked about what the USCIS line's billing has been running under. That remains Peter's to confirm.
+>
+> **Cross-line note:** the Appeals side needs the identical footer address. Its Advocate Channel Plan Track H sends wave-1 cold email to a few thousand public-directory addresses via the Gmail API from `info@casewhy.com` (never Postmark — its terms forbid cold outreach — and never `appeals@`, whose sender reputation carries the transactional reminders). Same address, same CAN-SPAM requirement, same suppression-list discipline.
+
 ## Get Help directory work, Sep 8 (cloud session) — three tasks ready, all mirrored into this repo
 
 Three new pieces of work, ready to pick up (after round 26, or in parallel if convenient — none of these block or are blocked by push notifications):

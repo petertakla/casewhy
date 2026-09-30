@@ -153,6 +153,23 @@ for (const path of AUDIENCE) {
   check(`${path} does not reference the Blueprint or roadmap materials`, html !== null && !/central[ _]command|blueprint|roadmap/i.test(html));
 }
 
+// ---- the outbound product link follows the LINE you're reading ----
+//
+// Sep 30, 2026. It was hardcoded to casewhy.com on every page, so an
+// advocate on /appeals/* was pointed at the USCIS tracker as "the
+// product". Each line now names its own; Appeals points at the /desk
+// landing page, the professional front door these pages are selling.
+const linkOf = (html) => (html.match(/class="site-link" href="([^"?]*)/) ?? [])[1];
+for (const path of ["/appeals", "/appeals/advocates", "/appeals/facilities", "/appeals/attorneys", "/appeals/counselors", "/appeals/ombudsman", "/appeals/press"]) {
+  const html = read(path);
+  check(`${path} header points at the Desk landing page, not the USCIS tracker`, linkOf(html ?? "") === "https://appeals.casewhy.com/desk");
+}
+for (const path of ["/uscis", "/uscis/attorneys", "/uscis/employers"]) {
+  const html = read(path);
+  check(`${path} header still points at casewhy.com`, linkOf(html ?? "") === "https://www.casewhy.com");
+}
+check("the footer reaches the Desk from every page", (read("/appeals") ?? "").includes("appeals.casewhy.com/desk?utm_source=hub&utm_medium=footer"));
+
 // ---- pricing: withdrawn offers stay withdrawn, live numbers stay live ----
 //
 // Sep 30, 2026. This hub was still advertising "twenty free seats through

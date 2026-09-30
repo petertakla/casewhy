@@ -169,7 +169,18 @@ const CSS = `
 // which of press/resources/brand (if any) is active. Both are null on the
 // root and on a plain audience page (whose own eyebrow, not the header,
 // says which line it belongs to).
+// Sep 30, 2026 — the outbound product link is per LINE, not global.
+// It was hardcoded to casewhy.com on every page, so an advocate reading
+// /appeals/* was offered the USCIS tracker as "the product" — the wrong
+// one for their line. Each line now names its own: USCIS keeps
+// casewhy.com; Appeals points at the new /desk landing page, which is the
+// professional front door this hub's appeals pages are selling. Pages
+// that span both lines (the hub home, /press, /resources, /brand) keep
+// casewhy.com as the neutral default.
+const DEFAULT_SITE_LINK = { href: "https://www.casewhy.com", label: "casewhy.com" };
+
 function header(currentLineId, currentSharedId) {
+  const siteLink = lines.find((l) => l.id === currentLineId)?.siteLink ?? DEFAULT_SITE_LINK;
   const lineLinks = lines
     .map(
       (l) =>
@@ -196,7 +207,7 @@ function header(currentLineId, currentSharedId) {
 ${lineLinks}
       </span>
 ${sharedLinks}
-      <a class="site-link" href="https://www.casewhy.com?utm_source=hub&utm_medium=header">casewhy.com ↗</a>
+      <a class="site-link" href="${siteLink.href}?utm_source=hub&utm_medium=header">${siteLink.label} ↗</a>
     </nav>
   </div>
 </header>`;
@@ -205,7 +216,7 @@ ${sharedLinks}
 function footer() {
   return `<footer>
   <div class="wrap">
-    <p class="app-line">CaseWhy — the USCIS tracker: <a href="https://www.casewhy.com?utm_source=hub&utm_medium=footer">casewhy.com</a> · CaseWhy Appeals: <a href="https://appeals.casewhy.com?utm_source=hub&utm_medium=footer">appeals.casewhy.com</a> · Get Help: <a href="https://app.casewhy.com/get-help?utm_source=hub&utm_medium=footer">app.casewhy.com/get-help</a></p>
+    <p class="app-line">CaseWhy — the USCIS tracker: <a href="https://www.casewhy.com?utm_source=hub&utm_medium=footer">casewhy.com</a> · CaseWhy Appeals: <a href="https://appeals.casewhy.com?utm_source=hub&utm_medium=footer">appeals.casewhy.com</a> · Appeals Desk: <a href="https://appeals.casewhy.com/desk?utm_source=hub&utm_medium=footer">appeals.casewhy.com/desk</a> · Get Help: <a href="https://app.casewhy.com/get-help?utm_source=hub&utm_medium=footer">app.casewhy.com/get-help</a></p>
     <p>CaseWhy LLC, 7901 4th St N, Ste 300, St. Petersburg, FL 33702, US</p>
     <div class="links">
       <a href="/resources">Resources</a>

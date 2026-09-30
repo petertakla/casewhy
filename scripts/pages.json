@@ -5,6 +5,10 @@
       "id": "uscis",
       "path": "/uscis",
       "navLabel": "USCIS",
+      "siteLink": {
+        "href": "https://www.casewhy.com",
+        "label": "casewhy.com"
+      },
       "content": "uscis",
       "titleTag": "CaseWhy — Partner with the Free USCIS Case-Status Tracker | CaseWhy Hub",
       "description": "Free listings and partnership programs for immigration attorneys, legal aid organizations, schools, congressional offices, press, and employers — from CaseWhy, the free USCIS case-status tracker.",
@@ -17,6 +21,10 @@
       "id": "appeals",
       "path": "/appeals",
       "navLabel": "Appeals",
+      "siteLink": {
+        "href": "https://appeals.casewhy.com/desk",
+        "label": "appeals.casewhy.com/desk"
+      },
       "content": "appeals",
       "titleTag": "CaseWhy Appeals — Partner with the Medicare Appeals Engine | CaseWhy Hub",
       "description": "Free and professional seats for patient advocates, SHIP counselors, elder-law attorneys, facilities, and long-term care ombudsman programs — from CaseWhy Appeals, the Medicare appeals engine that works alongside what you already use.",
@@ -27,32 +35,221 @@
     }
   ],
   "pages": [
-    { "id": "uscis-attorneys", "line": "uscis", "path": "/uscis/attorneys", "content": "attorneys", "navLabel": "Attorneys", "inLineNav": true, "cardTitle": "Attorneys", "cardDesc": "A free, non-exclusive founding-partner listing in CaseWhy's immigration attorney directory.", "titleTag": "For Immigration Attorneys — Free Directory Listing | CaseWhy Hub", "description": "Join 272 board-certified immigration attorneys already listed free in CaseWhy's directory. No fee, no exclusivity, ever." },
-    { "id": "uscis-organizations", "line": "uscis", "path": "/uscis/organizations", "content": "organizations", "navLabel": "Organizations", "inLineNav": true, "cardTitle": "Organizations", "cardDesc": "Legal aid, accredited representatives, and community organizations — claim or correct your listing.", "titleTag": "For Legal Aid & Community Organizations | CaseWhy Hub", "description": "Claim or correct your free listing in CaseWhy's directories for legal aid, accredited representatives, pro bono programs, and community organizations." },
-    { "id": "uscis-employers", "line": "uscis", "path": "/uscis/employers", "content": "employers", "navLabel": "Employers", "inLineNav": true, "cardTitle": "Employers", "cardDesc": "Tell us what your HR or global mobility team needs from CaseWhy — we're building this next.", "titleTag": "For Employers & Global Mobility Teams | CaseWhy Hub", "description": "Help shape CaseWhy's upcoming team feature for employers sponsoring visas and green cards." },
-    { "id": "uscis-caseworkers", "line": "uscis", "path": "/uscis/caseworkers", "content": "caseworkers", "navLabel": "Caseworkers", "inLineNav": true, "cardTitle": "Caseworkers", "cardDesc": "Free reference pages and an escalation-path explainer for congressional constituent-services staff.", "titleTag": "For Congressional Caseworkers | CaseWhy Hub", "description": "Free, non-partisan reference pages for congressional caseworkers — status explanations, processing times, and the formal escalation path for a stalled case." },
-    { "id": "uscis-schools", "line": "uscis", "path": "/uscis/schools", "content": "schools", "navLabel": "Schools", "inLineNav": true, "cardTitle": "Schools", "cardDesc": "Something free to hand F-1/OPT students who ask what their USCIS status means.", "titleTag": "For International Student Offices (DSOs) | CaseWhy Hub", "description": "Free status explanations, OPT processing times, and a resources-page snippet for international student offices." },
-    { "id": "uscis-press", "line": "uscis", "path": "/uscis/press", "content": "press", "navLabel": "Press", "inLineNav": true, "cardTitle": "Press", "cardDesc": "The founder story, product facts, and sourced backlog research for reporters.", "titleTag": "Press & Research — CaseWhy | CaseWhy Hub", "description": "CaseWhy's founder story, product facts, and sourced USCIS backlog research for journalists and researchers." },
-    { "id": "uscis-resources", "line": "uscis", "path": "/uscis/resources", "content": "resources", "navLabel": "Resources", "inLineNav": false, "cardTitle": "Resources", "cardDesc": "A one-pager, logos, boilerplate, and a website snippet — everything a partner needs.", "titleTag": "Partner Resources — CaseWhy | CaseWhy Hub", "description": "Download CaseWhy's one-pager, logo pack, and boilerplate, or copy a snippet for your own resources page." },
-
-    { "id": "appeals-advocates", "line": "appeals", "path": "/appeals/advocates", "content": "appeals-advocates", "navLabel": "Advocates", "inLineNav": true, "cardTitle": "Advocates & care managers", "cardDesc": "The professional seat, what it costs, and linking cases back to your own records.", "titleTag": "For Patient Advocates & Aging Life Care Managers | CaseWhy Hub", "description": "A professional seat in CaseWhy Appeals for independent and board-certified patient advocates and aging life care managers — first 3 cases free, then pay per case or a monthly plan." },
-    { "id": "appeals-counselors", "line": "appeals", "path": "/appeals/counselors", "content": "appeals-counselors", "navLabel": "Counselors", "inLineNav": true, "cardTitle": "SHIP & SHINE counselors", "cardDesc": "A free counselor seat, forever, plus free pages to hand out today.", "titleTag": "For SHIP & SHINE Counselors | CaseWhy Hub", "description": "A free, permanent counselor seat in CaseWhy Appeals for SHIP and SHINE counselors, plus free pages you can hand a client today." },
-    { "id": "appeals-attorneys", "line": "appeals", "path": "/appeals/attorneys", "content": "appeals-attorneys", "navLabel": "Attorneys", "inLineNav": true, "cardTitle": "Elder-law & legal aid attorneys", "cardDesc": "The professional seat for firms, a free seat for legal aid, and the higher-level forms filled.", "titleTag": "For Elder-Law & Legal Aid Attorneys | CaseWhy Hub", "description": "CaseWhy Appeals for elder-law and legal-aid attorneys: OMHA-100 filled, the good-cause package, and a free seat for legal aid." },
-    { "id": "appeals-facilities", "line": "appeals", "path": "/appeals/facilities", "content": "appeals-facilities", "navLabel": "Facilities", "inLineNav": true, "cardTitle": "Home health, hospice & SNFs", "cardDesc": "Why a family's fast appeal is in your interest, and one-sheets with a QR code for the floor.", "titleTag": "For Home Health Agencies, Hospices & SNFs | CaseWhy Hub", "description": "One-sheets and a per-site license for home health agencies, hospices, and independent skilled nursing facilities." },
-    { "id": "appeals-ombudsman", "line": "appeals", "path": "/appeals/ombudsman", "content": "appeals-ombudsman", "navLabel": "Ombudsman", "inLineNav": true, "cardTitle": "Long-term care ombudsman programs", "cardDesc": "A free program seat, observation-status and discharge content, and a state-program template letter.", "titleTag": "For Long-Term Care Ombudsman Programs | CaseWhy Hub", "description": "A free, permanent program seat in CaseWhy Appeals for long-term care ombudsman programs." },
-    { "id": "appeals-press", "line": "appeals", "path": "/appeals/press", "content": "appeals-press", "navLabel": "Press", "inLineNav": true, "cardTitle": "Press", "cardDesc": "The appeal paradox, sourced, plus product facts and the founder's own story.", "titleTag": "Press & Research — CaseWhy Appeals | CaseWhy Hub", "description": "CaseWhy Appeals product facts, the sourced appeal-paradox figures, and the founder's story for journalists and researchers." },
-    { "id": "appeals-resources", "line": "appeals", "path": "/appeals/resources", "content": "appeals-resources", "navLabel": "Resources", "inLineNav": false, "cardTitle": "Resources", "cardDesc": "A one-pager, a UTM-tagged snippet, the logo pack, and the notice one-sheets.", "titleTag": "Partner Resources — CaseWhy Appeals | CaseWhy Hub", "description": "Download CaseWhy Appeals' one-pager, logo pack, boilerplate, and notice one-sheets." }
+    {
+      "id": "uscis-attorneys",
+      "line": "uscis",
+      "path": "/uscis/attorneys",
+      "content": "attorneys",
+      "navLabel": "Attorneys",
+      "inLineNav": true,
+      "cardTitle": "Attorneys",
+      "cardDesc": "A free, non-exclusive founding-partner listing in CaseWhy's immigration attorney directory.",
+      "titleTag": "For Immigration Attorneys — Free Directory Listing | CaseWhy Hub",
+      "description": "Join 272 board-certified immigration attorneys already listed free in CaseWhy's directory. No fee, no exclusivity, ever."
+    },
+    {
+      "id": "uscis-organizations",
+      "line": "uscis",
+      "path": "/uscis/organizations",
+      "content": "organizations",
+      "navLabel": "Organizations",
+      "inLineNav": true,
+      "cardTitle": "Organizations",
+      "cardDesc": "Legal aid, accredited representatives, and community organizations — claim or correct your listing.",
+      "titleTag": "For Legal Aid & Community Organizations | CaseWhy Hub",
+      "description": "Claim or correct your free listing in CaseWhy's directories for legal aid, accredited representatives, pro bono programs, and community organizations."
+    },
+    {
+      "id": "uscis-employers",
+      "line": "uscis",
+      "path": "/uscis/employers",
+      "content": "employers",
+      "navLabel": "Employers",
+      "inLineNav": true,
+      "cardTitle": "Employers",
+      "cardDesc": "Tell us what your HR or global mobility team needs from CaseWhy — we're building this next.",
+      "titleTag": "For Employers & Global Mobility Teams | CaseWhy Hub",
+      "description": "Help shape CaseWhy's upcoming team feature for employers sponsoring visas and green cards."
+    },
+    {
+      "id": "uscis-caseworkers",
+      "line": "uscis",
+      "path": "/uscis/caseworkers",
+      "content": "caseworkers",
+      "navLabel": "Caseworkers",
+      "inLineNav": true,
+      "cardTitle": "Caseworkers",
+      "cardDesc": "Free reference pages and an escalation-path explainer for congressional constituent-services staff.",
+      "titleTag": "For Congressional Caseworkers | CaseWhy Hub",
+      "description": "Free, non-partisan reference pages for congressional caseworkers — status explanations, processing times, and the formal escalation path for a stalled case."
+    },
+    {
+      "id": "uscis-schools",
+      "line": "uscis",
+      "path": "/uscis/schools",
+      "content": "schools",
+      "navLabel": "Schools",
+      "inLineNav": true,
+      "cardTitle": "Schools",
+      "cardDesc": "Something free to hand F-1/OPT students who ask what their USCIS status means.",
+      "titleTag": "For International Student Offices (DSOs) | CaseWhy Hub",
+      "description": "Free status explanations, OPT processing times, and a resources-page snippet for international student offices."
+    },
+    {
+      "id": "uscis-press",
+      "line": "uscis",
+      "path": "/uscis/press",
+      "content": "press",
+      "navLabel": "Press",
+      "inLineNav": true,
+      "cardTitle": "Press",
+      "cardDesc": "The founder story, product facts, and sourced backlog research for reporters.",
+      "titleTag": "Press & Research — CaseWhy | CaseWhy Hub",
+      "description": "CaseWhy's founder story, product facts, and sourced USCIS backlog research for journalists and researchers."
+    },
+    {
+      "id": "uscis-resources",
+      "line": "uscis",
+      "path": "/uscis/resources",
+      "content": "resources",
+      "navLabel": "Resources",
+      "inLineNav": false,
+      "cardTitle": "Resources",
+      "cardDesc": "A one-pager, logos, boilerplate, and a website snippet — everything a partner needs.",
+      "titleTag": "Partner Resources — CaseWhy | CaseWhy Hub",
+      "description": "Download CaseWhy's one-pager, logo pack, and boilerplate, or copy a snippet for your own resources page."
+    },
+    {
+      "id": "appeals-advocates",
+      "line": "appeals",
+      "path": "/appeals/advocates",
+      "content": "appeals-advocates",
+      "navLabel": "Advocates",
+      "inLineNav": true,
+      "cardTitle": "Advocates & care managers",
+      "cardDesc": "The professional seat, what it costs, and linking cases back to your own records.",
+      "titleTag": "For Patient Advocates & Aging Life Care Managers | CaseWhy Hub",
+      "description": "A professional seat in CaseWhy Appeals for independent and board-certified patient advocates and aging life care managers — first 3 cases free, then pay per case or a monthly plan."
+    },
+    {
+      "id": "appeals-counselors",
+      "line": "appeals",
+      "path": "/appeals/counselors",
+      "content": "appeals-counselors",
+      "navLabel": "Counselors",
+      "inLineNav": true,
+      "cardTitle": "SHIP & SHINE counselors",
+      "cardDesc": "A free counselor seat, forever, plus free pages to hand out today.",
+      "titleTag": "For SHIP & SHINE Counselors | CaseWhy Hub",
+      "description": "A free, permanent counselor seat in CaseWhy Appeals for SHIP and SHINE counselors, plus free pages you can hand a client today."
+    },
+    {
+      "id": "appeals-attorneys",
+      "line": "appeals",
+      "path": "/appeals/attorneys",
+      "content": "appeals-attorneys",
+      "navLabel": "Attorneys",
+      "inLineNav": true,
+      "cardTitle": "Elder-law & legal aid attorneys",
+      "cardDesc": "The professional seat for firms, a free seat for legal aid, and the higher-level forms filled.",
+      "titleTag": "For Elder-Law & Legal Aid Attorneys | CaseWhy Hub",
+      "description": "CaseWhy Appeals for elder-law and legal-aid attorneys: OMHA-100 filled, the good-cause package, and a free seat for legal aid."
+    },
+    {
+      "id": "appeals-facilities",
+      "line": "appeals",
+      "path": "/appeals/facilities",
+      "content": "appeals-facilities",
+      "navLabel": "Facilities",
+      "inLineNav": true,
+      "cardTitle": "Home health, hospice & SNFs",
+      "cardDesc": "Why a family's fast appeal is in your interest, and one-sheets with a QR code for the floor.",
+      "titleTag": "For Home Health Agencies, Hospices & SNFs | CaseWhy Hub",
+      "description": "One-sheets and a per-site license for home health agencies, hospices, and independent skilled nursing facilities."
+    },
+    {
+      "id": "appeals-ombudsman",
+      "line": "appeals",
+      "path": "/appeals/ombudsman",
+      "content": "appeals-ombudsman",
+      "navLabel": "Ombudsman",
+      "inLineNav": true,
+      "cardTitle": "Long-term care ombudsman programs",
+      "cardDesc": "A free program seat, observation-status and discharge content, and a state-program template letter.",
+      "titleTag": "For Long-Term Care Ombudsman Programs | CaseWhy Hub",
+      "description": "A free, permanent program seat in CaseWhy Appeals for long-term care ombudsman programs."
+    },
+    {
+      "id": "appeals-press",
+      "line": "appeals",
+      "path": "/appeals/press",
+      "content": "appeals-press",
+      "navLabel": "Press",
+      "inLineNav": true,
+      "cardTitle": "Press",
+      "cardDesc": "The appeal paradox, sourced, plus product facts and the founder's own story.",
+      "titleTag": "Press & Research — CaseWhy Appeals | CaseWhy Hub",
+      "description": "CaseWhy Appeals product facts, the sourced appeal-paradox figures, and the founder's story for journalists and researchers."
+    },
+    {
+      "id": "appeals-resources",
+      "line": "appeals",
+      "path": "/appeals/resources",
+      "content": "appeals-resources",
+      "navLabel": "Resources",
+      "inLineNav": false,
+      "cardTitle": "Resources",
+      "cardDesc": "A one-pager, a UTM-tagged snippet, the logo pack, and the notice one-sheets.",
+      "titleTag": "Partner Resources — CaseWhy Appeals | CaseWhy Hub",
+      "description": "Download CaseWhy Appeals' one-pager, logo pack, boilerplate, and notice one-sheets."
+    }
   ],
   "companyPages": [
-    { "id": "press", "path": "/press", "content": "company-press", "navLabel": "Press", "titleTag": "Press — CaseWhy | CaseWhy Hub", "description": "Press contacts and research for every CaseWhy line: the free USCIS case-status tracker and CaseWhy Appeals, the Medicare appeals engine." },
-    { "id": "resources", "path": "/resources", "content": "company-resources", "navLabel": "Resources", "titleTag": "Partner Resources — CaseWhy | CaseWhy Hub", "description": "Partner resource kits for every CaseWhy line: the free USCIS case-status tracker and CaseWhy Appeals, the Medicare appeals engine." },
-    { "id": "brand", "path": "/brand", "content": "brand", "navLabel": "Brand", "titleTag": "Brand — CaseWhy | CaseWhy Hub", "description": "CaseWhy's logo pack and usage rules — one copy, shared by every line." }
+    {
+      "id": "press",
+      "path": "/press",
+      "content": "company-press",
+      "navLabel": "Press",
+      "titleTag": "Press — CaseWhy | CaseWhy Hub",
+      "description": "Press contacts and research for every CaseWhy line: the free USCIS case-status tracker and CaseWhy Appeals, the Medicare appeals engine."
+    },
+    {
+      "id": "resources",
+      "path": "/resources",
+      "content": "company-resources",
+      "navLabel": "Resources",
+      "titleTag": "Partner Resources — CaseWhy | CaseWhy Hub",
+      "description": "Partner resource kits for every CaseWhy line: the free USCIS case-status tracker and CaseWhy Appeals, the Medicare appeals engine."
+    },
+    {
+      "id": "brand",
+      "path": "/brand",
+      "content": "brand",
+      "navLabel": "Brand",
+      "titleTag": "Brand — CaseWhy | CaseWhy Hub",
+      "description": "CaseWhy's logo pack and usage rules — one copy, shared by every line."
+    }
   ],
   "redirects": [
-    { "from": "/attorneys", "to": "/uscis/attorneys" },
-    { "from": "/organizations", "to": "/uscis/organizations" },
-    { "from": "/employers", "to": "/uscis/employers" },
-    { "from": "/caseworkers", "to": "/uscis/caseworkers" },
-    { "from": "/schools", "to": "/uscis/schools" }
+    {
+      "from": "/attorneys",
+      "to": "/uscis/attorneys"
+    },
+    {
+      "from": "/organizations",
+      "to": "/uscis/organizations"
+    },
+    {
+      "from": "/employers",
+      "to": "/uscis/employers"
+    },
+    {
+      "from": "/caseworkers",
+      "to": "/uscis/caseworkers"
+    },
+    {
+      "from": "/schools",
+      "to": "/uscis/schools"
+    }
   ]
 }

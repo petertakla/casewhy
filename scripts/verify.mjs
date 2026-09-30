@@ -153,5 +153,48 @@ for (const path of AUDIENCE) {
   check(`${path} does not reference the Blueprint or roadmap materials`, html !== null && !/central[ _]command|blueprint|roadmap/i.test(html));
 }
 
+// ---- pricing: withdrawn offers stay withdrawn, live numbers stay live ----
+//
+// Sep 30, 2026. This hub was still advertising "twenty free seats through
+// February 28, 2027… then $99 a month, unlimited cases" across five
+// appeals pages, weeks after Peter withdrew the founding pilot and the
+// seat cap outright. The appeals repo has a guard that refuses to let that
+// copy return; it cannot see this repo, which is exactly why the promise
+// survived here. This is that guard's other half.
+const pricingJson = JSON.parse(readFileSync(join(__dirname, "pricing.json"), "utf8"));
+const APPEALS_PAGES = ["/appeals", "/appeals/advocates", "/appeals/facilities", "/appeals/attorneys", "/appeals/press"];
+const WITHDRAWN = [/founding[- ]advocate/i, /founding pilot/i, /founding facilities/i, /twenty free seats/i, /February 28, 2027/i, /Feb 28, 2027/i, /Pricing (is being|set once)/i];
+
+for (const path of APPEALS_PAGES) {
+  const html = read(path);
+  check(`${path} exists`, html !== null);
+  if (!html) continue;
+  for (const re of WITHDRAWN) {
+    check(`${path} does not advertise the withdrawn offer (${re.source})`, !re.test(html));
+  }
+  // "unlimited cases" is TRUE for the permanently-free segments and FALSE
+  // for every paid one, so it is only forbidden where a price is quoted.
+  if (/\$\d/.test(html)) {
+    check(`${path} makes no "unlimited cases" claim beside a price`, !/unlimited cases/i.test(html));
+  }
+}
+
+// Every monthly price a page states must be one the billing module
+// actually charges. Catches a hand-edited number that drifts from
+// pricing.json — the failure this whole indirection exists to prevent.
+const realMonthly = new Set();
+for (const plans of Object.values(pricingJson.lanes)) for (const p of plans) realMonthly.add(p.monthlyUsd);
+for (const path of ["/appeals/advocates", "/appeals/facilities"]) {
+  const html = read(path);
+  if (!html) continue;
+  const quoted = [...html.matchAll(/\$(\d+)\s*\/\s*month/g)].map((m) => Number(m[1]));
+  check(`${path} quotes at least one real monthly price`, quoted.length > 0);
+  for (const n of new Set(quoted)) {
+    check(`${path}: $${n}/month is a price the billing module actually charges`, realMonthly.has(n));
+  }
+}
+check(`the free-trial count on the pages matches pricing.json (${pricingJson.freeTrialCases})`,
+  (read("/appeals/advocates") ?? "").includes(`first ${pricingJson.freeTrialCases} cases are free`));
+
 console.log(`\n${failures === 0 ? "All checks passed." : `${failures} check(s) FAILED.`}`);
 process.exit(failures === 0 ? 0 : 1);

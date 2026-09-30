@@ -135,6 +135,11 @@ const CSS = `
   .copy-btn:hover{border-color:var(--brand-500);}
   .kit-snippet{position:absolute;left:-9999px;opacity:0;}
   .kit-disclaimer{margin-top:20px;font-size:0.8rem;color:var(--muted);}
+  /* Sep 29's diagram styles, moved here Sep 30 — they had been hand-added
+     to one generated page's <style>, so regenerating dropped them. */
+  figure.diagram{margin:16px 0 20px;}
+  figure.diagram img{display:block;width:100%;max-width:100%;height:auto;border:1px solid var(--border);border-radius:10px;}
+  figure.diagram figcaption{font-size:0.82rem;color:var(--muted);margin-top:8px;}
   .tiers{margin-top:24px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));}
   .tier{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:22px;}
   .tier h3{margin:0 0 4px;font-size:1.02rem;}
@@ -226,8 +231,71 @@ const COPY_SCRIPT = `<script>
   });
 </script>`;
 
+// ---- pricing, rendered from scripts/pricing.json ----------------------
+//
+// Sep 30, 2026. The hub was advertising a WITHDRAWN offer — "twenty free
+// seats through February 28, 2027… then $99 a month, unlimited cases" —
+// across five appeals pages, weeks after Peter removed the founding pilot
+// and the seat cap outright. The appeals repo has a guard test that
+// refuses to let that copy come back; it cannot see this repo, so the
+// promise stayed live on the public web here.
+//
+// Hand-typed prices in five files is how that happens. So pricing.json is
+// EXPORTED from the appeals repo's own src/lib/desk/pricing.ts — the same
+// module that meters and bills — and pages carry a {{PRICING:<lane>}}
+// placeholder instead of numbers. Re-export and re-run this script after
+// any pricing change; verify.mjs fails if a page states a number that
+// isn't in the JSON.
+const pricing = JSON.parse(readFileSync(join(__dirname, "pricing.json"), "utf8"));
+
+const LANE_LABELS = {
+  advocate: { unit: "per seat", noun: "advocate, care-manager and attorney seats" },
+  "facility:snf": { unit: "per site", noun: "skilled nursing facilities" },
+  "facility:home_health": { unit: "per site", noun: "home health agencies" },
+  "facility:hospice": { unit: "per site", noun: "hospices" },
+};
+
+/** "$19 a case for the first 8 each month, $15 for 9-25, then $12." */
+function ladderProse(tiers) {
+  const parts = [];
+  let from = 1;
+  tiers.forEach((t, i) => {
+    const last = i === tiers.length - 1;
+    if (last || t.upTo === null) parts.push(`then $${t.perCaseUsd}`);
+    else if (i === 0) parts.push(`$${t.perCaseUsd} a case for the first ${t.upTo} each month`);
+    else parts.push(`$${t.perCaseUsd} for ${from}-${t.upTo}`);
+    from = (t.upTo ?? from) + 1;
+  });
+  return parts.join(", ") + ".";
+}
+
+function planCard(plan, unit) {
+  const price = plan.monthlyUsd === 0 ? `$0 / month ${unit}` : `$${plan.monthlyUsd} / month ${unit}`;
+  const detail =
+    plan.monthlyUsd === 0
+      ? `No monthly fee, no commitment. ${ladderProse(plan.tiers)}`
+      : `${plan.includedCases} cases included each month, then $${plan.tiers[plan.tiers.length - 1].perCaseUsd} a case.`;
+  return `    <div class="tier">
+      <h3>${plan.label}</h3>
+      <p class="price">${price}</p>
+      <p>${detail}</p>
+    </div>`;
+}
+
+function pricingHtml(lane) {
+  const plans = pricing.lanes[lane];
+  if (!plans) throw new Error(`[generate] unknown pricing lane "${lane}" — check scripts/pricing.json`);
+  const { unit } = LANE_LABELS[lane];
+  const cards = plans.map((p) => planCard(p, unit)).join("\n");
+  const trial = `  <p class="planned-note">Your first ${pricing.freeTrialCases} cases are free, whichever plan you're on. New ${LANE_LABELS[lane].noun} start on ${plans[0].label} — no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>`;
+  return `  <div class="tiers">\n${cards}\n  </div>\n${trial}`;
+}
+
 function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, currentLineId, currentSharedId, extraJsonLd }) {
   let body = bodyOverride !== undefined ? bodyOverride : readFileSync(join(__dirname, "content", `${contentId}.html`), "utf8");
+  for (const m of [...body.matchAll(/\{\{PRICING:([a-z_:]+)\}\}/g)]) {
+    body = body.replace(m[0], pricingHtml(m[1]));
+  }
   if (body.includes("{{PARTNER_KIT}}")) {
     body = body.replace("{{PARTNER_KIT}}", partnerKit.replaceAll("{{PAGE_ID}}", contentId));
   }

@@ -1,0 +1,190 @@
+{
+  "generatedFrom": "appeals src/lib/desk/pricing.ts",
+  "freeTrialCases": 3,
+  "lanes": {
+    "advocate": [
+      {
+        "id": "volume",
+        "label": "Volume",
+        "monthlyUsd": 0,
+        "includedCases": 0,
+        "tiers": [
+          {
+            "upTo": 8,
+            "perCaseUsd": 19
+          },
+          {
+            "upTo": 25,
+            "perCaseUsd": 15
+          },
+          {
+            "upTo": null,
+            "perCaseUsd": 12
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "label": "Standard",
+        "monthlyUsd": 99,
+        "includedCases": 8,
+        "tiers": [
+          {
+            "upTo": 8,
+            "perCaseUsd": 0
+          },
+          {
+            "upTo": null,
+            "perCaseUsd": 15
+          }
+        ]
+      },
+      {
+        "id": "growth",
+        "label": "Growth",
+        "monthlyUsd": 249,
+        "includedCases": 25,
+        "tiers": [
+          {
+            "upTo": 25,
+            "perCaseUsd": 0
+          },
+          {
+            "upTo": null,
+            "perCaseUsd": 12
+          }
+        ]
+      }
+    ],
+    "facility:snf": [
+      {
+        "id": "volume",
+        "label": "Volume",
+        "monthlyUsd": 0,
+        "includedCases": 0,
+        "tiers": [
+          {
+            "upTo": 25,
+            "perCaseUsd": 25
+          },
+          {
+            "upTo": 60,
+            "perCaseUsd": 20
+          },
+          {
+            "upTo": null,
+            "perCaseUsd": 16
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "label": "Standard",
+        "monthlyUsd": 499,
+        "includedCases": 25,
+        "tiers": [
+          {
+            "upTo": 25,
+            "perCaseUsd": 0
+          },
+          {
+            "upTo": null,
+            "perCaseUsd": 20
+          }
+        ]
+      },
+      {
+        "id": "growth",
+        "label": "Growth",
+        "monthlyUsd": 999,
+        "includedCases": 60,
+        "tiers": [
+          {
+            "upTo": 60,
+            "perCaseUsd": 0
+          },
+          {
+            "upTo": null,
+            "perCaseUsd": 16
+          }
+        ]
+      }
+    ],
+    "facility:home_health": [
+      {
+        "id": "volume",
+        "label": "Volume",
+        "monthlyUsd": 0,
+        "includedCases": 0,
+        "tiers": [
+          {
+            "upTo": 15,
+            "perCaseUsd": 19
+          },
+          {
+            "upTo": 40,
+            "perCaseUsd": 15
+          },
+          {
+            "upTo": null,
+            "perCaseUsd": 12
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "label": "Standard",
+        "monthlyUsd": 249,
+        "includedCases": 15,
+        "tiers": [
+          {
+            "upTo": 15,
+            "perCaseUsd": 0
+          },
+          {
+            "upTo": null,
+            "perCaseUsd": 15
+          }
+        ]
+      },
+      {
+        "id": "growth",
+        "label": "Growth",
+        "monthlyUsd": 599,
+        "includedCases": 40,
+        "tiers": [
+          {
+            "upTo": 40,
+            "perCaseUsd": 0
+          },
+          {
+            "upTo": null,
+            "perCaseUsd": 12
+          }
+        ]
+      }
+    ],
+    "facility:hospice": [
+      {
+        "id": "volume",
+        "label": "Volume",
+        "monthlyUsd": 0,
+        "includedCases": 0,
+        "tiers": [
+          {
+            "upTo": 8,
+            "perCaseUsd": 19
+          },
+          {
+            "upTo": 25,
+            "perCaseUsd": 15
+          },
+          {
+            "upTo": null,
+            "perCaseUsd": 12
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -112,6 +112,11 @@
   .copy-btn:hover{border-color:var(--brand-500);}
   .kit-snippet{position:absolute;left:-9999px;opacity:0;}
   .kit-disclaimer{margin-top:20px;font-size:0.8rem;color:var(--muted);}
+  /* Sep 29's diagram styles, moved here Sep 30 — they had been hand-added
+     to one generated page's <style>, so regenerating dropped them. */
+  figure.diagram{margin:16px 0 20px;}
+  figure.diagram img{display:block;width:100%;max-width:100%;height:auto;border:1px solid var(--border);border-radius:10px;}
+  figure.diagram figcaption{font-size:0.82rem;color:var(--muted);margin-top:8px;}
   .tiers{margin-top:24px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));}
   .tier{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:22px;}
   .tier h3{margin:0 0 4px;font-size:1.02rem;}
@@ -177,7 +182,7 @@
   <ul class="checklist">
     <li><strong>What it is:</strong> a web app at appeals.casewhy.com that explains a Medicare denial notice in plain language with the rule cited, computes both appeal deadlines, writes the appeal letter, fills the CMS forms for that level, and tracks the case through every level up to the Medicare Appeals Council.</li>
     <li><strong>Coverage:</strong> every Medicare appeal type — Medicare Advantage, Part D, Original Medicare, premiums (IRMAA and late-enrollment penalties), enrollment, and PACE. See <a href="https://appeals.casewhy.com/coverage?utm_source=hub&utm_medium=referral&utm_campaign=press&utm_content=appeals">the full coverage map</a>.</li>
-    <li><strong>Professional seats:</strong> free, permanently, for SHIP/SHINE counselors, long-term care ombudsman programs, legal aid, and nonprofit staff; $99/month per seat for independent advocates, care managers, and attorneys (free through the founding pilot, to Feb. 28, 2027); a per-site license for facilities.</li>
+    <li><strong>Professional seats:</strong> free, permanently, for SHIP/SHINE counselors, long-term care ombudsman programs, legal aid, and nonprofit staff. For independent advocates, care managers and attorneys: the first 3 cases free, then pay-per-case with no monthly fee, or a monthly plan at higher volume. Facilities are licensed per site, priced separately for skilled nursing, home health and hospice.</li>
     <li><strong>Data:</strong> no client identity is ever stored — a client is a label and a reference number the professional chooses.</li>
     <li><strong>Company:</strong> CaseWhy LLC, St. Petersburg, Florida, founded 2026. No outside funding.</li>
   </ul>

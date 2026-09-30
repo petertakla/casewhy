@@ -112,6 +112,11 @@
   .copy-btn:hover{border-color:var(--brand-500);}
   .kit-snippet{position:absolute;left:-9999px;opacity:0;}
   .kit-disclaimer{margin-top:20px;font-size:0.8rem;color:var(--muted);}
+  /* Sep 29's diagram styles, moved here Sep 30 — they had been hand-added
+     to one generated page's <style>, so regenerating dropped them. */
+  figure.diagram{margin:16px 0 20px;}
+  figure.diagram img{display:block;width:100%;max-width:100%;height:auto;border:1px solid var(--border);border-radius:10px;}
+  figure.diagram figcaption{font-size:0.82rem;color:var(--muted);margin-top:8px;}
   .tiers{margin-top:24px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));}
   .tier{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:22px;}
   .tier h3{margin:0 0 4px;font-size:1.02rem;}
@@ -196,14 +201,14 @@
       <p>For SHIP and SHINE counselors, long-term care ombudsman programs, legal aid, and nonprofit staff — with attribution, forever, no renewal.</p>
     </div>
     <div class="tier">
-      <h3>Professional</h3>
-      <p class="price">Free through the founding pilot (to Feb 28, 2027), then $99/month per seat</p>
-      <p>For independent advocates, care managers, and attorneys in private practice. Unlimited cases.</p>
+      <h3>Professional seat</h3>
+      <p class="price">First 3 cases free, then from $12/case</p>
+      <p>For independent advocates, care managers, and attorneys in private practice. Pay per case with no monthly fee, or take a monthly plan once your volume makes it cheaper &mdash; <a href="/appeals/advocates">see the seat pricing</a>.</p>
     </div>
     <div class="tier">
       <h3>Per-site license</h3>
-      <p class="price">Pricing set once the founding facilities are on</p>
-      <p>For home health agencies, hospices, and independent skilled nursing facilities — one license per site.</p>
+      <p class="price">First 3 cases free, then from $12/case</p>
+      <p>For home health agencies, hospices, and independent skilled nursing facilities &mdash; one licence per site, unlimited staff, priced by facility type. <a href="/appeals/facilities">See facility pricing</a>.</p>
     </div>
   </div>
 
@@ -214,7 +219,7 @@
   <div class="cards">
     <a class="card" href="/appeals/advocates">
       <h2>Advocates & care managers</h2>
-      <p>The professional seat, the founding-advocate pilot, and linking cases back to your own records.</p>
+      <p>The professional seat, what it costs, and linking cases back to your own records.</p>
       <p class="arrow">Learn more →</p>
     </a>
     <a class="card" href="/appeals/counselors">

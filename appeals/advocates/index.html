@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>For Patient Advocates & Aging Life Care Managers | CaseWhy Hub</title>
-<meta name="description" content="A professional seat in CaseWhy Appeals for independent and board-certified patient advocates and aging life care managers — free through the founding pilot.">
+<meta name="description" content="A professional seat in CaseWhy Appeals for independent and board-certified patient advocates and aging life care managers — first 3 cases free, then pay per case or a monthly plan.">
 <link rel="canonical" href="https://casewhyhub.com/appeals/advocates">
 <link rel="icon" href="/brand/icon-192.png">
 <link rel="icon" href="/brand/icon-512.png" sizes="512x512">
@@ -82,12 +82,6 @@
   ul.checklist li::before{content:"—";position:absolute;left:0;color:var(--brand-500);}
   ul.checklist li strong{color:var(--foreground);}
   .planned-note{font-size:0.82rem;color:var(--muted);font-style:italic;margin-top:-4px;margin-bottom:20px;}
-  /* Sep 29, 2026 — the one reused Desk-library diagram. Bounded so a
-     wide illustration never blows out the reading column, and never
-     scrolls the page sideways on a phone. */
-  figure.diagram{margin:16px 0 20px;}
-  figure.diagram img{display:block;width:100%;max-width:100%;height:auto;border:1px solid var(--border);border-radius:10px;}
-  figure.diagram figcaption{font-size:0.82rem;color:var(--muted);margin-top:8px;}
   .types{margin-top:24px;display:grid;gap:16px;}
   .type-card{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:22px;}
   .type-card h2{margin:0 0 6px;font-size:1.1rem;}
@@ -118,6 +112,11 @@
   .copy-btn:hover{border-color:var(--brand-500);}
   .kit-snippet{position:absolute;left:-9999px;opacity:0;}
   .kit-disclaimer{margin-top:20px;font-size:0.8rem;color:var(--muted);}
+  /* Sep 29's diagram styles, moved here Sep 30 — they had been hand-added
+     to one generated page's <style>, so regenerating dropped them. */
+  figure.diagram{margin:16px 0 20px;}
+  figure.diagram img{display:block;width:100%;max-width:100%;height:auto;border:1px solid var(--border);border-radius:10px;}
+  figure.diagram figcaption{font-size:0.82rem;color:var(--muted);margin-top:8px;}
   .tiers{margin-top:24px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));}
   .tier{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:22px;}
   .tier h3{margin:0 0 4px;font-size:1.02rem;}
@@ -177,11 +176,34 @@
   <div class="disclaimer">CaseWhy Appeals is not affiliated with or endorsed by Medicare, CMS, or any health plan, and is not a law firm.</div>
 
   <h2>The professional seat</h2>
-  <p>Unlimited cases, letters cited to the rule, both deadlines computed automatically, and the Appeal Tracker per case.</p>
+  <p>Letters cited to the rule, both deadlines computed automatically, and the Appeal Tracker per case — one seat per advocate, priced on the cases you actually work.</p>
+
+  <!-- Sep 30, 2026 — restored INTO THIS SOURCE FILE. The Sep 29 commit
+       added the resource-library line by hand-editing the GENERATED
+       HTML and never touching this file, so the next generate.mjs run
+       silently reverted it. verify.mjs caught that the moment it
+       happened, which is exactly what it is for. Edit content here. -->
   <p>Once your seat is live you also get the resource library — written guides, a video walkthrough, and audio explainers — so you can get your practice running on it quickly.</p>
 
-  <h2>The founding-advocate pilot</h2>
-  <p>Twenty free seats through February 28, 2027, for independent and board-certified patient advocates and aging life care managers who'll give feedback and join a monthly call. After the pilot, the professional seat is $99 a month, unlimited cases.</p>
+  <h2>What a seat costs</h2>
+  <div class="tiers">
+    <div class="tier">
+      <h3>Volume</h3>
+      <p class="price">$0 / month per seat</p>
+      <p>No monthly fee, no commitment. $19 a case for the first 8 each month, $15 for 9-25, then $12.</p>
+    </div>
+    <div class="tier">
+      <h3>Standard</h3>
+      <p class="price">$99 / month per seat</p>
+      <p>8 cases included each month, then $15 a case.</p>
+    </div>
+    <div class="tier">
+      <h3>Growth</h3>
+      <p class="price">$249 / month per seat</p>
+      <p>25 cases included each month, then $12 a case.</p>
+    </div>
+  </div>
+  <p class="planned-note">Your first 3 cases are free, whichever plan you're on. New advocate, care-manager and attorney seats start on Volume — no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>
 
   <h2>What "alongside" means, concretely</h2>
   <ul class="checklist">
@@ -196,6 +218,7 @@
   <h2>Link it to your records</h2>
   <p>Each case in CaseWhy Appeals has a copyable link you paste into the notes or custom field of your own system — Clio, LegalServer, a CRM, or a spreadsheet. Each case also has a field for the link back to your own record, so you can open your system from CaseWhy Appeals in one click. No integration work, no password shared with us — two free-text fields.</p>
   <p><a href="https://appeals.casewhy.com/desk/getting-started/link-your-records?utm_source=hub&utm_medium=referral&utm_campaign=advocates&utm_content=appeals">Read the one-page explainer, with tips for Clio, LegalServer, a CRM, and a spreadsheet →</a></p>
+
   <figure class="diagram">
     <img src="/images/link-your-records-url-pattern.webp" width="1600" height="893" loading="lazy" decoding="async"
          alt="Two steps for linking your own system to CaseWhy Appeals. Step one, isolate the record ID: open a client in your system and find the unique ID in the URL, for example https://your-system.com/matters/8842. Step two, replace that ID with a {reference} placeholder, keeping the rest of the URL intact, giving https://your-system.com/matters/{reference}. A pattern must contain exactly one {reference} placeholder. Examples: Clio .../matters/8842 becomes .../matters/{reference}; Salesforce .../Case/500XXXXX/view becomes .../Case/{reference}/view; another CRM .../id=999 becomes .../id={reference}. If you use Excel or Google Sheets no pattern is needed, the reference alone is enough. Links open only if you are signed into your own system in the same browser.">

@@ -112,6 +112,11 @@
   .copy-btn:hover{border-color:var(--brand-500);}
   .kit-snippet{position:absolute;left:-9999px;opacity:0;}
   .kit-disclaimer{margin-top:20px;font-size:0.8rem;color:var(--muted);}
+  /* Sep 29's diagram styles, moved here Sep 30 — they had been hand-added
+     to one generated page's <style>, so regenerating dropped them. */
+  figure.diagram{margin:16px 0 20px;}
+  figure.diagram img{display:block;width:100%;max-width:100%;height:auto;border:1px solid var(--border);border-radius:10px;}
+  figure.diagram figcaption{font-size:0.82rem;color:var(--muted);margin-top:8px;}
   .tiers{margin-top:24px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));}
   .tier{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:22px;}
   .tier h3{margin:0 0 4px;font-size:1.02rem;}
@@ -178,7 +183,64 @@
   <p class="planned-note">Printable one-sheets with a QR code for the business office or nursing station are on the way — not live yet.</p>
 
   <h2>Per-site license</h2>
-  <p>For your business office or social worker to hand every family the same starting point. Pricing is being set once the founding facilities are on — write in below and we'll follow up.</p>
+  <p>One licence covers the whole site — every nurse, social worker and business-office staffer, one shared counter. Priced by what your building actually is, because the appeal pattern genuinely differs between them.</p>
+
+  <h3>Skilled nursing</h3>
+  <div class="tiers">
+    <div class="tier">
+      <h3>Volume</h3>
+      <p class="price">$0 / month per site</p>
+      <p>No monthly fee, no commitment. $25 a case for the first 25 each month, $20 for 26-60, then $16.</p>
+    </div>
+    <div class="tier">
+      <h3>Standard</h3>
+      <p class="price">$499 / month per site</p>
+      <p>25 cases included each month, then $20 a case.</p>
+    </div>
+    <div class="tier">
+      <h3>Growth</h3>
+      <p class="price">$999 / month per site</p>
+      <p>60 cases included each month, then $16 a case.</p>
+    </div>
+  </div>
+  <p class="planned-note">Your first 3 cases are free, whichever plan you're on. New skilled nursing facilities start on Volume — no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>
+
+  <h3>Home health</h3>
+  <div class="tiers">
+    <div class="tier">
+      <h3>Volume</h3>
+      <p class="price">$0 / month per site</p>
+      <p>No monthly fee, no commitment. $19 a case for the first 15 each month, $15 for 16-40, then $12.</p>
+    </div>
+    <div class="tier">
+      <h3>Standard</h3>
+      <p class="price">$249 / month per site</p>
+      <p>15 cases included each month, then $15 a case.</p>
+    </div>
+    <div class="tier">
+      <h3>Growth</h3>
+      <p class="price">$599 / month per site</p>
+      <p>40 cases included each month, then $12 a case.</p>
+    </div>
+  </div>
+  <p class="planned-note">Your first 3 cases are free, whichever plan you're on. New home health agencies start on Volume — no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>
+
+  <h3>Hospice</h3>
+  <p>Hospice is pay-per-case only. That is a deliberate choice, not a missing option: hospice is a per-diem election rather than an admission gate, and there is no sourced Medicare Advantage denial rate for it the way there is for skilled nursing and home health — so there was no responsible way to size a monthly included-case allowance. If real usage later shows one, we'll add it.</p>
+  <div class="tiers">
+    <div class="tier">
+      <h3>Volume</h3>
+      <p class="price">$0 / month per site</p>
+      <p>No monthly fee, no commitment. $19 a case for the first 8 each month, $15 for 9-25, then $12.</p>
+    </div>
+  </div>
+  <p class="planned-note">Your first 3 cases are free, whichever plan you're on. New hospices start on Volume — no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>
+
+  <!-- Sep 30, 2026 — restored INTO THIS SOURCE FILE. The Sep 29 commit
+       added the resource-library line by hand-editing the GENERATED
+       HTML and never touching this file, so the next generate.mjs run
+       silently reverted it. verify.mjs caught that the moment it
+       happened, which is exactly what it is for. Edit content here. -->
   <p>A licensed site also gets the resource library — written guides, a video walkthrough, and audio explainers — so the staff handing these out can get up to speed quickly.</p>
 
   <a class="cta" href="mailto:appeals-help@casewhy.com?subject=Facility%20per-site%20license">Ask for the sheets →</a>

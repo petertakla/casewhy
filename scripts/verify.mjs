@@ -83,13 +83,22 @@ console.log("\n== 'Every Medicare appeal' claim is never a bare assertion ==");
 // 26 shipping. Round 26 IS live (appeals.casewhy.com/coverage returns 200
 // as of this build — checked live, not assumed from the task doc). So the
 // gate here isn't "only one page may say it" but "any page that says it
-// must link real, checkable evidence (/coverage), not just assert it."
+// must show real, checkable evidence, not just assert it."
+//
+// WIDENED Oct 2, 2026: naming all six appeal types IN THE PAGE now counts as
+// evidence, alongside a link to /coverage. The link used to be the only
+// accepted proof, which forced /appeals to send advocates into the consumer
+// app — where the family header pitches Appeals Plus at a professional. Naming
+// the six inline is strictly better evidence than a link anyway: the reader
+// sees the answer instead of being sent to find it.
+const SIX_PACKS = ["Medicare Advantage", "Part D", "Original Medicare", "premiums", "enrollment", "PACE"];
+const namesAllSixPacks = (html) => SIX_PACKS.every((p) => html.includes(p));
 for (const path of ["/appeals", ...pages.filter((p) => p.line === "appeals").map((p) => p.path)]) {
   const html = read(path);
   const claims = html.toLowerCase().includes("every medicare appeal");
   check(
-    `${path}: "every Medicare appeal" claim, if present, links /coverage as evidence`,
-    !claims || html.includes("/coverage")
+    `${path}: "every Medicare appeal" claim, if present, shows evidence (names all six packs, or links /coverage)`,
+    !claims || namesAllSixPacks(html) || html.includes("/coverage")
   );
 }
 
@@ -218,6 +227,51 @@ check("/appeals/facilities/hospice explains why there is no monthly plan", /deli
 const hospiceMonthly = [...hospice.matchAll(/\$(\d+)\s*\/\s*month/g)].map((m) => Number(m[1]));
 check(`/appeals/facilities/hospice offers no paid monthly plan (found ${JSON.stringify(hospiceMonthly)})`,
   hospiceMonthly.every((n) => n === 0));
+
+// ADVOCATE-FACING PAGES MUST NOT SEND A VISITOR INTO THE CONSUMER APP.
+//
+// Found live Oct 2, 2026, twice. /appeals' own sub-heading linked "the coverage
+// map" at appeals.casewhy.com/coverage — a page that renders the FAMILY header
+// ("Appeals Plus", "Start your case") because it genuinely serves both
+// audiences and cannot be given advocate chrome by path without breaking it for
+// families. A signed-in advocate is now handled by identity (the Appeals app
+// suppresses family chrome for any Desk seat holder), but an ANONYMOUS visitor
+// arriving from this hub has no seat to read, and that is exactly who reads a
+// partner site.
+//
+// So the fix is here, at the link: /appeals now names all six appeal types in
+// its own bullet list and does not send anyone to /coverage to find them.
+//
+// /appeals/press is deliberately exempt: it already names the six types inline,
+// and a journalist seeing the consumer product is reporting on it, not being
+// mis-sold to.
+const CONSUMER_APP_PAGES = ["/coverage", "/plus", "/tracker", "/forms"];
+
+// TWO PAGES ARE EXEMPT, AND BOTH FOR A STATED REASON — not to make the check
+// pass. The rule being enforced is "an advocate-facing page must not send the
+// ADVOCATE into the consumer app to learn about the product". It is not "no
+// consumer URL may ever appear".
+//
+//   appeals-counselors — its whole section is headed "Free pages you can hand
+//     out today". Those links exist for the counselor to GIVE A FAMILY, and a
+//     family seeing the family chrome is exactly right. Caught as a false
+//     positive by this check on the day it was written, and exempted rather
+//     than "fixed" by mangling a correct page.
+//   appeals-press — names all six appeal types inline already, and a
+//     journalist looking at the consumer product is reporting on it, not being
+//     mis-sold to.
+//
+// Any NEW page is covered by default. Adding an exemption means adding a line
+// here and a reason, which is the point.
+const CONSUMER_LINK_EXEMPT = new Set(["appeals-press", "appeals-counselors"]);
+for (const page of ["/appeals", ...pages.filter((p) => p.line === "appeals" && !CONSUMER_LINK_EXEMPT.has(p.id)).map((p) => p.path)]) {
+  const html = read(page);
+  if (!html) continue;
+  for (const consumer of CONSUMER_APP_PAGES) {
+    check(`${page} does not send an advocate to the consumer ${consumer} page`,
+      !html.includes(`appeals.casewhy.com${consumer}?`) && !html.includes(`appeals.casewhy.com${consumer}"`));
+  }
+}
 
 // NO HUB PAGE MAY LINK TO A SIGNED-IN-ONLY DESTINATION.
 //

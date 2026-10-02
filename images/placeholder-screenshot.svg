@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Placeholder for a product screenshot that has not been taken yet">
+  <rect width="1600" height="900" fill="#f4f5f7"/>
+  <rect x="2" y="2" width="1596" height="896" fill="none" stroke="#c7ccd4" stroke-width="4" stroke-dasharray="18 14"/>
+  <g fill="#8b93a1" font-family="system-ui, -apple-system, Segoe UI, sans-serif" text-anchor="middle">
+    <text x="800" y="420" font-size="44" font-weight="600" fill="#5b6472">Screenshot placeholder</text>
+    <text x="800" y="482" font-size="28">This image has not been taken yet.</text>
+    <text x="800" y="528" font-size="24">The alt text on this element describes exactly what it should show.</text>
+  </g>
+</svg>

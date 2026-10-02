@@ -196,12 +196,50 @@ for (const path of APPEALS_PAGES) {
   }
 }
 
+// The facilities chooser no longer prices anything itself — so assert it
+// LINKS to all three settings. Without this, the split could silently lose a
+// setting and the only symptom would be a page nobody can reach.
+const facilitiesChooser = read("/appeals/facilities");
+for (const sub of ["/appeals/facilities/skilled-nursing", "/appeals/facilities/home-health", "/appeals/facilities/hospice"]) {
+  check(`/appeals/facilities links to ${sub}`, facilitiesChooser !== null && facilitiesChooser.includes(`href="${sub}"`));
+  check(`${sub} exists`, read(sub) !== null);
+  check(`${sub} links back to the chooser`, (read(sub) ?? "").includes('href="/appeals/facilities"'));
+}
+
+// Hospice is pay-per-case ON PURPOSE (no sourced MA denial rate to size a
+// monthly allowance against). Asserting it states that reason, not just that
+// it omits a monthly price, so the omission can never read as an oversight.
+const hospice = read("/appeals/facilities/hospice") ?? "";
+check("/appeals/facilities/hospice explains why there is no monthly plan", /deliberate choice, not a missing option/i.test(hospice));
+// NOT "no monthly price" — the first version of this assertion said that and
+// failed a correct page. The hospice lane has one plan and the generator
+// renders it "$0 / month", which is accurate for pay-per-case. The real claim
+// is that there is no PAID monthly tier.
+const hospiceMonthly = [...hospice.matchAll(/\$(\d+)\s*\/\s*month/g)].map((m) => Number(m[1]));
+check(`/appeals/facilities/hospice offers no paid monthly plan (found ${JSON.stringify(hospiceMonthly)})`,
+  hospiceMonthly.every((n) => n === 0));
+
+// PLACEHOLDER SCREENSHOTS. Three pages ship a placeholder until Peter takes
+// the real images. Asserted so they are visible in CI rather than quietly
+// shipping forever: when the real file lands, this check is what tells you the
+// placeholder is gone.
+const placeholderPages = ["/appeals/facilities/skilled-nursing", "/appeals/facilities/home-health", "/appeals/facilities/hospice", "/appeals/care-managers"];
+const stillPlaceholder = placeholderPages.filter((p) => (read(p) ?? "").includes("placeholder-screenshot.svg"));
+check("the placeholder graphic exists on disk", existsSync(join(ROOT, "images/placeholder-screenshot.svg")));
+check(`every placeholder is labelled as one (${stillPlaceholder.length} page(s) awaiting a real screenshot)`,
+  stillPlaceholder.every((p) => /PLACEHOLDER/.test(read(p) ?? "")));
+
 // Every monthly price a page states must be one the billing module
 // actually charges. Catches a hand-edited number that drifts from
 // pricing.json — the failure this whole indirection exists to prevent.
 const realMonthly = new Set();
 for (const plans of Object.values(pricingJson.lanes)) for (const p of plans) realMonthly.add(p.monthlyUsd);
-for (const path of ["/appeals/advocates", "/appeals/facilities"]) {
+// Sep 30 -> Oct 1, 2026: /appeals/facilities became a CHOOSER and the three
+// per-setting pages below now carry the real tables. This list follows the
+// prices rather than being relaxed — a page that quotes a monthly figure the
+// billing module does not charge is the exact drift this indirection exists to
+// catch, and there are now four such pages instead of two.
+for (const path of ["/appeals/advocates", "/appeals/facilities/skilled-nursing", "/appeals/facilities/home-health", "/appeals/care-managers"]) {
   const html = read(path);
   if (!html) continue;
   const quoted = [...html.matchAll(/\$(\d+)\s*\/\s*month/g)].map((m) => Number(m[1]));

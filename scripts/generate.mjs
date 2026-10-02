@@ -298,7 +298,21 @@ function pricingHtml(lane) {
   if (!plans) throw new Error(`[generate] unknown pricing lane "${lane}" — check scripts/pricing.json`);
   const { unit } = LANE_LABELS[lane];
   const cards = plans.map((p) => planCard(p, unit)).join("\n");
-  const trial = `  <p class="planned-note">Your first ${pricing.freeTrialCases} cases are free, whichever plan you're on. New ${LANE_LABELS[lane].noun} start on ${plans[0].label} — no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>`;
+  // THE TRAILING SENTENCE DEPENDS ON WHETHER A MONTHLY PLAN EXISTS TO MOVE TO.
+  //
+  // Found by the Oct 2 site audit: the hospice page spent a whole section
+  // explaining, deliberately, that there is NO monthly plan for hospice — and
+  // then this shared sentence promised "you can move to a monthly plan whenever
+  // your volume makes it cheaper" directly underneath it. Copy-pasted from the
+  // lanes that do have Standard/Growth tiers.
+  //
+  // Keyed off the DATA (does this lane have a plan with a monthly fee?) rather
+  // than special-cased to hospice, so any future single-plan lane is correct the
+  // day it is added instead of inheriting the same contradiction.
+  const hasMonthlyPlan = plans.some((p) => p.monthlyUsd > 0);
+  const trial = hasMonthlyPlan
+    ? `  <p class="planned-note">Your first ${pricing.freeTrialCases} cases are free, whichever plan you're on. New ${LANE_LABELS[lane].noun} start on ${plans[0].label} — no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>`
+    : `  <p class="planned-note">Your first ${pricing.freeTrialCases} cases are free. Every ${LANE_LABELS[lane].noun.replace(/s$/, "")} runs on the same ${plans[0].label} pricing above — there is no monthly plan to switch to (see why, above).</p>`;
   return `  <div class="tiers">\n${cards}\n  </div>\n${trial}`;
 }
 
@@ -372,7 +386,7 @@ function homePage() {
   const body = `  <p class="eyebrow">CaseWhy Hub</p>
   <h1>Partner with CaseWhy</h1>
   <p class="sub">CaseWhy LLC is a Florida company building free-first tools that explain government and insurance letters. <strong>CaseWhy</strong> is the free USCIS case-status tracker; <strong>CaseWhy Appeals</strong> explains, writes, and tracks every Medicare appeal. Pick your line below.</p>
-  <p class="free-line">Every listing described here is free — no fees, no ads, ever.</p>
+  <p class="free-line">This directory is free to be listed in — no fees, no ads, ever. CaseWhy is free to use; CaseWhy Appeals is free for SHIP and SHINE counselors, ombudsman programs, legal aid and nonprofit staff, and otherwise starts with 3 free cases.</p>
 
   <div class="cards lines">
 ${lineCards}

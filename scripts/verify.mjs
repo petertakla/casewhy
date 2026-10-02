@@ -219,15 +219,20 @@ const hospiceMonthly = [...hospice.matchAll(/\$(\d+)\s*\/\s*month/g)].map((m) =>
 check(`/appeals/facilities/hospice offers no paid monthly plan (found ${JSON.stringify(hospiceMonthly)})`,
   hospiceMonthly.every((n) => n === 0));
 
-// PLACEHOLDER SCREENSHOTS. Three pages ship a placeholder until Peter takes
-// the real images. Asserted so they are visible in CI rather than quietly
-// shipping forever: when the real file lands, this check is what tells you the
-// placeholder is gone.
-const placeholderPages = ["/appeals/facilities/skilled-nursing", "/appeals/facilities/home-health", "/appeals/facilities/hospice", "/appeals/care-managers"];
-const stillPlaceholder = placeholderPages.filter((p) => (read(p) ?? "").includes("placeholder-screenshot.svg"));
-check("the placeholder graphic exists on disk", existsSync(join(ROOT, "images/placeholder-screenshot.svg")));
-check(`every placeholder is labelled as one (${stillPlaceholder.length} page(s) awaiting a real screenshot)`,
-  stillPlaceholder.every((p) => /PLACEHOLDER/.test(read(p) ?? "")));
+// SCREENSHOTS STILL PENDING — tracked in CI without being shown to a visitor.
+//
+// These pages used to RENDER a "PLACEHOLDER — real screenshot to come" caption.
+// The Oct 2 site audit caught that a facility decision-maker reading the page
+// sees it, and it reads as an apology. Loud-in-CI was the right instinct; a
+// public sales page was the wrong place for it. The brief now lives in an HTML
+// comment (renders nothing) and is counted here, so the work stays tracked
+// while a visitor just sees a page with no image.
+const screenshotPages = ["/appeals/facilities/skilled-nursing", "/appeals/facilities/home-health", "/appeals/facilities/hospice", "/appeals/care-managers"];
+const pendingShots = screenshotPages.filter((p) => (read(p) ?? "").includes("SCREENSHOT PENDING"));
+check(`no page shows a visible placeholder caption (${pendingShots.length} screenshot(s) pending, tracked in comments)`,
+  screenshotPages.every((p) => !/PLACEHOLDER\s*[—-]\s*the/i.test(read(p) ?? "")));
+check("no page still renders the placeholder graphic",
+  screenshotPages.every((p) => !(read(p) ?? "").includes('src="/images/placeholder-screenshot.svg"')));
 
 // Every monthly price a page states must be one the billing module
 // actually charges. Catches a hand-edited number that drifts from

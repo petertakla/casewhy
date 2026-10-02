@@ -219,6 +219,17 @@ const hospiceMonthly = [...hospice.matchAll(/\$(\d+)\s*\/\s*month/g)].map((m) =>
 check(`/appeals/facilities/hospice offers no paid monthly plan (found ${JSON.stringify(hospiceMonthly)})`,
   hospiceMonthly.every((n) => n === 0));
 
+// FOOTER HELP LINKS — one per product line.
+//
+// Oct 2 audit: the footer's "Get Help" is the immigration attorney/legal-aid
+// finder and serves ONLY the USCIS line, but read as product-neutral — which is
+// exactly what made the missing Appeals-side contact invisible. It is now
+// labelled "USCIS help" and sits beside an Appeals one.
+const homeHtml = read("/") ?? "";
+check("the footer offers USCIS help, labelled as such", /USCIS help:/.test(homeHtml));
+check("the footer offers Appeals help", homeHtml.includes("mailto:appeals-help@casewhy.com"));
+check("no footer help link reads as product-neutral", !/>Get Help:/.test(homeHtml));
+
 // SCREENSHOTS STILL PENDING — tracked in CI without being shown to a visitor.
 //
 // These pages used to RENDER a "PLACEHOLDER — real screenshot to come" caption.

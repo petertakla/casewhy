@@ -343,5 +343,70 @@ for (const path of ["/appeals/advocates", "/appeals/facilities/skilled-nursing",
 check(`the free-trial count on the pages matches pricing.json (${pricingJson.freeTrialCases})`,
   (read("/appeals/advocates") ?? "").includes(`first ${pricingJson.freeTrialCases} cases are free`));
 
+// ---------------------------------------------------------------------------
+// THE FOUNDER STORY ON THE APPEALS LINE IS NOT A PERSONAL FAMILY CLAIM.
+//
+// Oct 2, 2026 audit, item 8. The Appeals pages claimed Peter built the product
+// because his "own family's Medicare letters" were impossible to understand.
+// Peter confirmed that is false — it was carried over from the USCIS line, where
+// the family story is TRUE, and the build spec had actually asked for it
+// verbatim. So correcting the spec is not sufficient protection: the spec was
+// the source of the error, and a future rebuild from a future spec could
+// reintroduce it the same way.
+//
+// This check is deliberately asymmetric. It bans the family claim ONLY on the
+// Appeals pages, and says nothing about the USCIS pages — /press and /resources
+// correctly say Peter's own family's naturalization cases, which is his real
+// story and must keep being tellable. A blanket ban on "own family" across the
+// site would delete a true claim to protect against a false one.
+//
+// It also fires on the first-person QUOTE specifically, because that is what
+// makes this worse than loose marketing copy: it is attributed to a named real
+// person, and /appeals/press is built to be repeated by journalists.
+console.log("\n== Appeals-line founder story makes no personal family claim ==");
+// THE BAN AND THE PRESERVE HALVES READ DIFFERENT THINGS, DELIBERATELY.
+//
+// Content files ship verbatim, HTML comments included — the first version of
+// this check failed on my own explanatory comment, which carried the banned
+// phrase and was being published into the live page source. My first fix was to
+// strip comments before matching, and that was wrong: a mutation that hid the
+// false claim inside a comment then SURVIVED. A claim in a shipped comment is
+// still published, just to anyone who views source.
+//
+// So the ban reads the RAW bytes — nothing anywhere in what we ship may make the
+// claim, comments included. The preserve checks read VISIBLE text only, because
+// a true story buried in a comment is not actually being told. (The build note
+// that caused all this now lives here in verify.mjs, which ships to nobody.)
+const visible = (html) => html.replace(/<!--[\s\S]*?-->/g, "");
+// Newline-tolerant: the phrase can wrap across lines in the rendered output, and
+// a regex with a literal space would miss it.
+const FAMILY_CLAIM = /own family'?s[\s\S]{0,80}?\b(Medicare|denial)/i;
+for (const path of ["/appeals", "/appeals/press"]) {
+  const html = read(path);
+  if (!html) continue;
+  check(`${path} does not claim Peter's own family's Medicare letters, anywhere in the shipped source`,
+    !FAMILY_CLAIM.test(html));
+}
+// And the replacement is actually present, not merely the false line removed —
+// deleting the paragraph would pass a ban-only check while leaving the page with
+// no "why this exists" at all.
+const appealsHtml = visible(read("/appeals") ?? "");
+check("/appeals still states a why, grounded in the USCIS origin",
+  /starting with USCIS case letters/i.test(appealsHtml));
+// Word-bounded. Without \b, "1 in 900" satisfies /1 in 9/ — a mutation that
+// corrupted the statistic to a nonsense figure passed this check on its first
+// run. The anecdote was replaced BY this statistic, so a wrong number here is
+// not a cosmetic slip; it is the page's only remaining claim.
+check("/appeals keeps the appeal-paradox statistic that replaced the anecdote",
+  /\b1 in 9\b/.test(appealsHtml) && /\b8 in 10\b/.test(appealsHtml));
+// THE USCIS LINE'S TRUE STORY MUST SURVIVE THIS CHANGE — and this check was
+// pointed at the wrong page first. /press is the line-spanning company page;
+// the USCIS press kit that actually tells the naturalization story is
+// /uscis/press. A ban-plus-preserve pair is only meaningful if the preserve half
+// reads the page that really holds the thing being preserved.
+const uscisPress = visible(read("/uscis/press") ?? "");
+check("/uscis/press still tells the TRUE naturalization family story",
+  /own family'?s[\s\S]{0,40}?naturalization/i.test(uscisPress));
+
 console.log(`\n${failures === 0 ? "All checks passed." : `${failures} check(s) FAILED.`}`);
 process.exit(failures === 0 ? 0 : 1);

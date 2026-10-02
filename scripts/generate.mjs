@@ -154,6 +154,8 @@ const CSS = `
   .preview-card .name{font-weight:700;margin-top:4px;}
   .preview-card .firm{color:var(--muted);font-size:0.9rem;}
   .preview-card .focus{font-size:0.82rem;color:var(--muted);margin-top:4px;}
+  .soon{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--brand-50,#eef2ff);color:var(--brand-600,#4f46e5);font-size:0.7rem;font-weight:600;letter-spacing:0.02em;text-transform:uppercase;vertical-align:middle;}
+  @media (prefers-color-scheme: dark){ .soon{background:rgba(99,102,241,0.15);color:var(--brand-400,#818cf8);} }
   footer{border-top:1px solid var(--border);padding:32px 0;font-size:0.85rem;color:var(--muted);}
   footer .wrap{display:flex;flex-direction:column;gap:6px;}
   footer a{color:var(--muted);}

@@ -219,6 +219,28 @@ const hospiceMonthly = [...hospice.matchAll(/\$(\d+)\s*\/\s*month/g)].map((m) =>
 check(`/appeals/facilities/hospice offers no paid monthly plan (found ${JSON.stringify(hospiceMonthly)})`,
   hospiceMonthly.every((n) => n === 0));
 
+// NO HUB PAGE MAY LINK TO A SIGNED-IN-ONLY DESTINATION.
+//
+// Found live Oct 2, 2026: /appeals/advocates and /appeals/care-managers both
+// linked "Read the one-page explainer" at
+// appeals.casewhy.com/desk/getting-started/link-your-records, which sits behind
+// the Desk seat gate and 307s to sign-in. The hub is a PARTNER ACQUISITION
+// site — every visitor is by definition someone who does not have an account
+// yet, so a seat-gated link is a wall placed exactly where the proof should be.
+// Repointed at /for-advocates/how-to#system-of-record, which is public, carries
+// advocate chrome, and already contains the same Clio/Salesforce patterns.
+//
+// /desk and /desk/signin are the legitimate exceptions: they are the front
+// doors, and a visitor is meant to arrive at them without an account.
+const SEAT_GATED_PREFIXES = ["/desk/getting-started", "/desk/clients", "/desk/cases", "/desk/settings", "/desk/billing", "/desk/resources"];
+for (const page of ["/appeals", ...pages.filter((p) => p.line === "appeals").map((p) => p.path)]) {
+  const html = read(page);
+  if (!html) continue;
+  for (const gated of SEAT_GATED_PREFIXES) {
+    check(`${page} does not link to the signed-in-only ${gated}`, !html.includes(`appeals.casewhy.com${gated}`));
+  }
+}
+
 // FOOTER HELP LINKS — one per product line.
 //
 // Oct 2 audit: the footer's "Get Help" is the immigration attorney/legal-aid

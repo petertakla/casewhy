@@ -158,6 +158,16 @@
   .trial-note{margin:16px 0 24px;padding:14px 18px;border:1px solid var(--border);border-left:4px solid var(--brand-600);border-radius:12px;background:var(--surface-2);color:var(--foreground);font-size:0.95rem;}
   .trial-note strong{font-weight:700;}
   @media (prefers-color-scheme: dark){ .trial-note{border-left-color:var(--brand-400);} }
+  /* The demo strip (SYNC_0036). Sits under the intro on the chooser page and
+     is the only call-to-action above the two cards, so it reads as an offer
+     rather than a third option competing with them — a tinted band with one
+     button, not a card. */
+  .demo-strip{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin:28px 0 8px;padding:16px 20px;border:1px solid var(--border);border-left:4px solid var(--brand-600);border-radius:12px;background:var(--surface-2);}
+  .demo-strip p{margin:0;font-size:0.95rem;}
+  @media (prefers-color-scheme: dark){ .demo-strip{border-left-color:var(--brand-400);} }
+  a.demo-btn{flex-shrink:0;display:inline-block;padding:10px 20px;border-radius:9px;background:var(--brand-600);color:#fff !important;font-weight:700;text-decoration:none;font-size:0.92rem;}
+  a.demo-btn:hover{background:#164a8c;}
+  .demo-inline{margin:10px 0 18px;font-size:0.92rem;font-weight:600;}
   /* The SNF two-card chooser (SYNC_0025). Reuses .cards/.card; these add the
      kicker, the stat box and the per-card source line. Cards are <a>, so the
      whole card is the target, not just the arrow. */
@@ -313,6 +323,7 @@
        The figures are seeded sample data. References are room and file
        numbers because desk_clients cannot hold a name; the line under the
        table is the product stating its own constraint, not marketing copy. -->
+  <p class="demo-inline"><a href="https://appeals.casewhy.com/desk/demo?flow=admission&amp;utm_source=hub&amp;utm_medium=referral">Try it with sample cases &rarr;</a></p>
   <figure class="diagram">
     <img src="/images/appeals-desk-snf-admission-denials.webp" width="1006" height="812" loading="lazy" decoding="async"
          alt="The CaseWhy Appeals Desk case board filtered by the tag &quot;admission denied&quot;. Columns: your reference, tags, coverage, level, days left, and next step. Eight open admission-denial cases. FILE-2350, tagged admission denied and IRE, Medicare Advantage, Level 2 Independent Review Entity, 7 days left, next step wait for the decision. ADM-541, tagged admission denied and expedited, Level 1 ask the plan to reconsider, 14 days left, next step gather what goes with it. ADM-534, 21 days left, next step decide who acts. ADM-527, tagged prior auth, 33 days left, next step send it. ADM-512, tagged prior auth, 44 days left, next step gather what goes with it. ADM-501, tagged rehab, 51 days left, next step get the letter. ADM-519, 58 days left, next step decide who acts. ADM-488, tagged new, 63 days left, next step know your deadline. A line below the table reads: no client names are stored here, your reference and tags are how you find a case.">

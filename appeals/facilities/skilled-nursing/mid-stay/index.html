@@ -158,6 +158,16 @@
   .trial-note{margin:16px 0 24px;padding:14px 18px;border:1px solid var(--border);border-left:4px solid var(--brand-600);border-radius:12px;background:var(--surface-2);color:var(--foreground);font-size:0.95rem;}
   .trial-note strong{font-weight:700;}
   @media (prefers-color-scheme: dark){ .trial-note{border-left-color:var(--brand-400);} }
+  /* The demo strip (SYNC_0036). Sits under the intro on the chooser page and
+     is the only call-to-action above the two cards, so it reads as an offer
+     rather than a third option competing with them — a tinted band with one
+     button, not a card. */
+  .demo-strip{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin:28px 0 8px;padding:16px 20px;border:1px solid var(--border);border-left:4px solid var(--brand-600);border-radius:12px;background:var(--surface-2);}
+  .demo-strip p{margin:0;font-size:0.95rem;}
+  @media (prefers-color-scheme: dark){ .demo-strip{border-left-color:var(--brand-400);} }
+  a.demo-btn{flex-shrink:0;display:inline-block;padding:10px 20px;border-radius:9px;background:var(--brand-600);color:#fff !important;font-weight:700;text-decoration:none;font-size:0.92rem;}
+  a.demo-btn:hover{background:#164a8c;}
+  .demo-inline{margin:10px 0 18px;font-size:0.92rem;font-weight:600;}
   /* The SNF two-card chooser (SYNC_0025). Reuses .cards/.card; these add the
      kicker, the stat box and the per-card source line. Cards are <a>, so the
      whole card is the target, not just the arrow. */
@@ -253,6 +263,7 @@
 
   <h2>What the building sees</h2>
   <p>One board for the whole facility, sorted by what runs out first. A reference and a tag are how a case is found — the resident's name is never typed in, so nothing identifying is stored here at all.</p>
+  <p class="demo-inline"><a href="https://appeals.casewhy.com/desk/demo?flow=mid-stay&amp;utm_source=hub&amp;utm_medium=referral">Try it with sample cases &rarr;</a></p>
 
   <!-- Added Oct 2, 2026, replacing the pending-screenshot note that stood in
        for it. (Phrased so it does not re-trip verify.mjs's own pending counter,

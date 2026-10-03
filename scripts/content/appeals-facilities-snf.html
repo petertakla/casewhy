@@ -14,6 +14,25 @@
 
        The SNF outreach email's one link still points HERE, unchanged for
        Oct 13 (SYNC_0025 section 2.1). This page is the chooser it lands on. -->
+  <!-- DEMO STRIP. Wording approved by Peter Oct 3 ("2. approve", SYNC_0036
+       section 2) and published only now, because chat's gate 2 says the strip
+       ships only once the demo is live so no button points at nothing. It is
+       live: /desk/demo answers, provisions a sandbox with no login, and tears
+       itself down.
+
+       EVERY WORD HERE IS CHECKED AGAINST THE BUILD, which is chat's gate 1:
+         · "no signup"       — no login, no password, no email asked for
+         · "nothing to enter" — there is no upload and no form in the demo at all
+         · "sample SNF cases" — cloned fixtures, room and file references only
+
+       Absolute and UTM-tagged because this is a cross-domain hop; the
+       forward-utm script rewrites utm_source for a visitor who arrived from
+       the campaign, so a demo opened from the email is attributable to it. -->
+  <div class="demo-strip">
+    <p><strong>Try the live demo</strong> &mdash; sample SNF cases, no signup, nothing to enter.</p>
+    <a class="demo-btn" href="https://appeals.casewhy.com/desk/demo?utm_source=hub&amp;utm_medium=referral">Open the demo &rarr;</a>
+  </div>
+
   <p class="chooser-lead"><strong>Medicare Advantage plans can deny your residents at two points. Pick the one in front of you.</strong></p>
 
   <div class="cards chooser">

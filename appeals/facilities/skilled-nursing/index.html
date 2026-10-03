@@ -158,6 +158,16 @@
   .trial-note{margin:16px 0 24px;padding:14px 18px;border:1px solid var(--border);border-left:4px solid var(--brand-600);border-radius:12px;background:var(--surface-2);color:var(--foreground);font-size:0.95rem;}
   .trial-note strong{font-weight:700;}
   @media (prefers-color-scheme: dark){ .trial-note{border-left-color:var(--brand-400);} }
+  /* The demo strip (SYNC_0036). Sits under the intro on the chooser page and
+     is the only call-to-action above the two cards, so it reads as an offer
+     rather than a third option competing with them — a tinted band with one
+     button, not a card. */
+  .demo-strip{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin:28px 0 8px;padding:16px 20px;border:1px solid var(--border);border-left:4px solid var(--brand-600);border-radius:12px;background:var(--surface-2);}
+  .demo-strip p{margin:0;font-size:0.95rem;}
+  @media (prefers-color-scheme: dark){ .demo-strip{border-left-color:var(--brand-400);} }
+  a.demo-btn{flex-shrink:0;display:inline-block;padding:10px 20px;border-radius:9px;background:var(--brand-600);color:#fff !important;font-weight:700;text-decoration:none;font-size:0.92rem;}
+  a.demo-btn:hover{background:#164a8c;}
+  .demo-inline{margin:10px 0 18px;font-size:0.92rem;font-weight:600;}
   /* The SNF two-card chooser (SYNC_0025). Reuses .cards/.card; these add the
      kicker, the stat box and the per-card source line. Cards are <a>, so the
      whole card is the target, not just the arrow. */
@@ -241,6 +251,25 @@
 
        The SNF outreach email's one link still points HERE, unchanged for
        Oct 13 (SYNC_0025 section 2.1). This page is the chooser it lands on. -->
+  <!-- DEMO STRIP. Wording approved by Peter Oct 3 ("2. approve", SYNC_0036
+       section 2) and published only now, because chat's gate 2 says the strip
+       ships only once the demo is live so no button points at nothing. It is
+       live: /desk/demo answers, provisions a sandbox with no login, and tears
+       itself down.
+
+       EVERY WORD HERE IS CHECKED AGAINST THE BUILD, which is chat's gate 1:
+         · "no signup"       — no login, no password, no email asked for
+         · "nothing to enter" — there is no upload and no form in the demo at all
+         · "sample SNF cases" — cloned fixtures, room and file references only
+
+       Absolute and UTM-tagged because this is a cross-domain hop; the
+       forward-utm script rewrites utm_source for a visitor who arrived from
+       the campaign, so a demo opened from the email is attributable to it. -->
+  <div class="demo-strip">
+    <p><strong>Try the live demo</strong> &mdash; sample SNF cases, no signup, nothing to enter.</p>
+    <a class="demo-btn" href="https://appeals.casewhy.com/desk/demo?utm_source=hub&amp;utm_medium=referral">Open the demo &rarr;</a>
+  </div>
+
   <p class="chooser-lead"><strong>Medicare Advantage plans can deny your residents at two points. Pick the one in front of you.</strong></p>
 
   <div class="cards chooser">

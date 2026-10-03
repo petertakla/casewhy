@@ -146,6 +146,18 @@
   .preview-card .focus{font-size:0.82rem;color:var(--muted);margin-top:4px;}
   .soon{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--brand-50,#eef2ff);color:var(--brand-600,#4f46e5);font-size:0.7rem;font-weight:600;letter-spacing:0.02em;text-transform:uppercase;vertical-align:middle;}
   @media (prefers-color-scheme: dark){ .soon{background:rgba(99,102,241,0.15);color:var(--brand-400,#818cf8);} }
+  /* THE FREE-TRIAL LINE IS AN OFFER, NOT A CAVEAT. Oct 3 2026, Peter: "this
+     is not very visible". It was rendered as .planned-note — 0.82rem, muted,
+     italic, with a negative top margin — which is the strongest thing on a
+     pricing section styled like the weakest.
+
+     It needed its own class rather than a restyle of .planned-note, because
+     that class does double duty across the site: it also carries genuine
+     caveats ("None of this exists yet", "on the way — not live yet", "doesn't
+     fill it yet"). Promoting those would have been exactly backwards. */
+  .trial-note{margin:16px 0 24px;padding:14px 18px;border:1px solid var(--border);border-left:4px solid var(--brand-600);border-radius:12px;background:var(--surface-2);color:var(--foreground);font-size:0.95rem;}
+  .trial-note strong{font-weight:700;}
+  @media (prefers-color-scheme: dark){ .trial-note{border-left-color:var(--brand-400);} }
   /* The SNF two-card chooser (SYNC_0025). Reuses .cards/.card; these add the
      kicker, the stat box and the per-card source line. Cards are <a>, so the
      whole card is the target, not just the arrow. */
@@ -253,7 +265,7 @@
       <p>40 cases included each month, then $12 a case.</p>
     </div>
   </div>
-  <p class="planned-note">Your first 3 cases are free, whichever plan you're on. New home health agencies start on Volume — no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>
+  <p class="trial-note"><strong>Your first 3 cases are free, whichever plan you're on.</strong> New home health agencies start on Volume — no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>
 
   <a class="cta" href="mailto:appeals-help@casewhy.com?subject=Home%20health%20per-site%20license">Ask about a licence →</a>
 

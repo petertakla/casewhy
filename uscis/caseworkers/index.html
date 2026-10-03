@@ -332,5 +332,30 @@
     });
   });
 </script>
+
+<script>
+  // FORWARD THE ARRIVING CAMPAIGN'S UTM TAGS — forward-utm
+  //
+  // Every onward link on this site hardcodes utm_source=hub. That is right for
+  // a visitor who found the hub on their own, and wrong for one who arrived
+  // from a tagged campaign: appeals.casewhy.com would record "hub" and the
+  // campaign would be indistinguishable from organic traffic. This site is
+  // static and records nothing itself, so the tags have to survive the hop or
+  // they are lost entirely.
+  //
+  // Arrived with no utm_source -> nothing changes, "hub" stands.
+  (function () {
+    var incoming = new URLSearchParams(location.search);
+    if (!incoming.get('utm_source')) return;
+    var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+    document.querySelectorAll('a[href*="appeals.casewhy.com"]').forEach(function (a) {
+      try {
+        var u = new URL(a.href);
+        keys.forEach(function (k) { var v = incoming.get(k); if (v) u.searchParams.set(k, v); });
+        a.href = u.toString();
+      } catch (e) { /* a malformed href stays exactly as authored */ }
+    });
+  })();
+</script>
 </body>
 </html>

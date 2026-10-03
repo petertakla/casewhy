@@ -146,6 +146,20 @@
   .preview-card .focus{font-size:0.82rem;color:var(--muted);margin-top:4px;}
   .soon{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--brand-50,#eef2ff);color:var(--brand-600,#4f46e5);font-size:0.7rem;font-weight:600;letter-spacing:0.02em;text-transform:uppercase;vertical-align:middle;}
   @media (prefers-color-scheme: dark){ .soon{background:rgba(99,102,241,0.15);color:var(--brand-400,#818cf8);} }
+  /* The SNF two-card chooser (SYNC_0025). Reuses .cards/.card; these add the
+     kicker, the stat box and the per-card source line. Cards are <a>, so the
+     whole card is the target, not just the arrow. */
+  .chooser-lead{margin-top:36px;font-size:1.05rem;}
+  .cards.chooser{margin-top:18px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));}
+  .cards.chooser .card{display:flex;flex-direction:column;}
+  .card .kicker{font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--brand-600);margin:0 0 10px;}
+  @media (prefers-color-scheme: dark){ .card .kicker{color:var(--brand-400);} }
+  .card .statbox{margin:14px 0 0;padding:12px 14px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);}
+  .card .statbox p{margin:0;font-size:0.86rem;}
+  .card .statbox strong{color:var(--foreground);}
+  .cards.chooser .card .arrow{margin-top:auto;padding-top:14px;}
+  .card .cardsource{margin-top:10px;font-size:0.74rem;font-style:italic;color:var(--muted);}
+  .crosslink{margin-top:14px;font-size:0.9rem;}
   /* Tables. Added Oct 3 2026 for the SNF admission-denial section's
      two-step appeal clock — the first table on this site. Wrapped in
      .table-scroll so a five-column table scrolls inside its own box on a

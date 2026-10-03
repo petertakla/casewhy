@@ -233,6 +233,40 @@
       }
     },
     {
+      "id": "appeals-facilities-snf-admission",
+      "line": "appeals",
+      "path": "/appeals/facilities/skilled-nursing/admission",
+      "content": "appeals-facilities-snf-admission",
+      "navLabel": "Admission denials",
+      "inLineNav": false,
+      "cardTitle": "Admission denials",
+      "cardDesc": "When a plan refuses the admission before the resident arrives.",
+      "titleTag": "SNF Admission Denials — Medicare Advantage Appeals | CaseWhy Hub",
+      "description": "A Medicare Advantage plan can refuse a skilled nursing admission before the resident arrives. 95% of the appeals that were filed were overturned. The notice, the 65-day clock, the letter, and CMS-1696.",
+      "ogImage": {
+        "url": "https://casewhyhub.com/images/appeals-desk-snf-admission-denials.webp",
+        "width": 1006,
+        "height": 812
+      }
+    },
+    {
+      "id": "appeals-facilities-snf-mid-stay",
+      "line": "appeals",
+      "path": "/appeals/facilities/skilled-nursing/mid-stay",
+      "content": "appeals-facilities-snf-mid-stay",
+      "navLabel": "Mid-stay cut-offs",
+      "inLineNav": false,
+      "cardTitle": "Mid-stay cut-offs",
+      "cardDesc": "When a plan ends a resident's covered stay.",
+      "titleTag": "When Medicare Advantage Ends a Resident's Stay — SNF Fast Appeals | CaseWhy Hub",
+      "description": "A NOMNC gives a resident's family until noon the day before coverage ends to ask for a fast QIO review. CaseWhy Appeals explains the notice, writes the request, and tracks the clock.",
+      "ogImage": {
+        "url": "https://casewhyhub.com/images/appeals-desk-snf-board.webp",
+        "width": 989,
+        "height": 740
+      }
+    },
+    {
       "id": "appeals-facilities-home-health",
       "line": "appeals",
       "path": "/appeals/facilities/home-health",

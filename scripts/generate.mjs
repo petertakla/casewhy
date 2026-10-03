@@ -156,6 +156,20 @@ const CSS = `
   .preview-card .focus{font-size:0.82rem;color:var(--muted);margin-top:4px;}
   .soon{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--brand-50,#eef2ff);color:var(--brand-600,#4f46e5);font-size:0.7rem;font-weight:600;letter-spacing:0.02em;text-transform:uppercase;vertical-align:middle;}
   @media (prefers-color-scheme: dark){ .soon{background:rgba(99,102,241,0.15);color:var(--brand-400,#818cf8);} }
+  /* Tables. Added Oct 3 2026 for the SNF admission-denial section's
+     two-step appeal clock — the first table on this site. Wrapped in
+     .table-scroll so a five-column table scrolls inside its own box on a
+     phone instead of making the whole page scroll sideways. */
+  .table-scroll{overflow-x:auto;margin:16px 0 20px;-webkit-overflow-scrolling:touch;}
+  table.clock-table{border-collapse:collapse;width:100%;min-width:620px;font-size:0.88rem;}
+  table.clock-table th,table.clock-table td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top;}
+  table.clock-table thead th{background:var(--surface-2);font-size:0.78rem;letter-spacing:0.03em;text-transform:uppercase;color:var(--muted);}
+  table.clock-table tbody td:first-child{font-weight:600;white-space:nowrap;}
+  main.wrap ul{margin:12px 0 16px;padding-left:22px;color:var(--muted);}
+  main.wrap ul li{margin-bottom:7px;}
+  main.wrap ul li strong{color:var(--foreground);}
+  h3{margin:22px 0 6px;font-size:1.02rem;}
+  p.sources{font-size:0.8rem;color:var(--muted);font-style:italic;margin-top:18px;}
   footer{border-top:1px solid var(--border);padding:32px 0;font-size:0.85rem;color:var(--muted);}
   footer .wrap{display:flex;flex-direction:column;gap:6px;}
   footer a{color:var(--muted);}
@@ -245,6 +259,38 @@ const COPY_SCRIPT = `<script>
   });
 </script>`;
 
+// FORWARD THE ARRIVING CAMPAIGN'S UTM TAGS — forward-utm
+//
+// Every onward link on this site hardcodes utm_source=hub. That is right for a
+// visitor who found the hub on their own, and wrong for one who arrived from a
+// tagged campaign: appeals.casewhy.com would record "hub" and the campaign
+// would be indistinguishable from organic traffic. This site is static and
+// records nothing itself, so the tags have to survive the hop or they are lost
+// entirely.
+//
+// Arrived with no utm_source -> nothing changes, "hub" stands.
+//
+// LIVES HERE, IN THE GENERATOR, and that is the whole point. It was first
+// added Oct 2 by hand-editing all 24 built pages, which is the same mistake
+// the Sep 30 note above the diagram styles records: the next `node
+// scripts/generate.mjs` would have silently deleted it from every page, and
+// the campaign's attribution with it. Anything that belongs on every page
+// belongs in this file.
+const FORWARD_UTM_SCRIPT = `<script>
+  (function () {
+    var incoming = new URLSearchParams(location.search);
+    if (!incoming.get('utm_source')) return;
+    var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+    document.querySelectorAll('a[href*="appeals.casewhy.com"]').forEach(function (a) {
+      try {
+        var u = new URL(a.href);
+        keys.forEach(function (k) { var v = incoming.get(k); if (v) u.searchParams.set(k, v); });
+        a.href = u.toString();
+      } catch (e) { /* a malformed href stays exactly as authored */ }
+    });
+  })();
+</script>`;
+
 // ---- pricing, rendered from scripts/pricing.json ----------------------
 //
 // Sep 30, 2026. The hub was advertising a WITHDRAWN offer — "twenty free
@@ -319,7 +365,57 @@ function pricingHtml(lane) {
   return `  <div class="tiers">\n${cards}\n  </div>\n${trial}`;
 }
 
-function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, currentLineId, currentSharedId, extraJsonLd }) {
+// OPEN GRAPH AND TWITTER CARD TAGS — on every page, from the generator.
+//
+// Without these, a hub link pasted into Slack, LinkedIn, iMessage or an email
+// client previews as a bare URL. That matters most for exactly the pages the
+// October campaign points at.
+//
+// LIVES HERE FOR THE SAME REASON AS FORWARD_UTM_SCRIPT. These tags were lost
+// in the /uscis + /appeals restructure and restored Oct 2 by hand-editing all
+// 24 built pages. The source was never touched, so the next regeneration
+// would have deleted them again and nobody would have noticed until a link
+// previewed bare somewhere public. Third instance of the same mistake on this
+// site; the diagram-styles note from Sep 30 was the first.
+//
+// og:image defaults to the site card and is overridden per page by an
+// `ogImage` entry in pages.json — a page with its own screenshot should
+// preview with it.
+const DEFAULT_OG = { url: "https://casewhyhub.com/og-default.png", width: 1200, height: 630 };
+
+/** Attribute-safe. The titles in pages.json contain "&" ("Patient Advocates &
+ *  Aging Life Care Managers"), and a bare ampersand inside an attribute is
+ *  invalid HTML even where parsers forgive it. The Oct 2 hand-written tags
+ *  wrote "&amp;", so escaping here also keeps the regenerated output
+ *  byte-identical to what was verified live rather than quietly changing 8
+ *  pages. (`<title>` has always emitted a raw "&"; left alone — not a
+ *  regression either way, and not this change's business.) */
+function escAttr(v) {
+  return String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function socialMeta({ path, titleTag, description, ogImage }) {
+  const img = ogImage ?? DEFAULT_OG;
+  titleTag = escAttr(titleTag);
+  description = escAttr(description);
+  return [
+    `<meta property="og:type" content="website">`,
+    `<meta property="og:title" content="${titleTag}">`,
+    `<meta property="og:description" content="${description}">`,
+    `<meta property="og:url" content="https://casewhyhub.com${path}">`,
+    `<meta property="og:site_name" content="CaseWhy Hub">`,
+    `<meta property="og:locale" content="en_US">`,
+    `<meta property="og:image" content="${img.url}">`,
+    `<meta property="og:image:width" content="${img.width}">`,
+    `<meta property="og:image:height" content="${img.height}">`,
+    `<meta name="twitter:card" content="summary_large_image">`,
+    `<meta name="twitter:title" content="${titleTag}">`,
+    `<meta name="twitter:description" content="${description}">`,
+    `<meta name="twitter:image" content="${img.url}">`,
+  ].join("\n");
+}
+
+function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, currentLineId, currentSharedId, extraJsonLd, ogImage }) {
   let body = bodyOverride !== undefined ? bodyOverride : readFileSync(join(__dirname, "content", `${contentId}.html`), "utf8");
   for (const m of [...body.matchAll(/\{\{PRICING:([a-z_:]+)\}\}/g)]) {
     body = body.replace(m[0], pricingHtml(m[1]));
@@ -343,6 +439,7 @@ function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, 
 <title>${titleTag}</title>
 <meta name="description" content="${description}">
 <link rel="canonical" href="https://casewhyhub.com${path}">
+${socialMeta({ path, titleTag, description, ogImage })}
 <link rel="icon" href="/brand/icon-192.png">
 <link rel="icon" href="/brand/icon-512.png" sizes="512x512">
 <link rel="apple-touch-icon" href="/brand/apple-icon.png">
@@ -361,6 +458,7 @@ ${body}
 
 ${footer()}
 ${needsCopyScript ? "\n" + COPY_SCRIPT : ""}
+${FORWARD_UTM_SCRIPT}
 </body>
 </html>
 `;
@@ -459,6 +557,7 @@ for (const p of pages) {
       contentId: p.content,
       currentLineId: line.id,
       currentSharedId: null,
+      ogImage: p.ogImage,
       extraJsonLd: p.content !== "press" && p.content !== "appeals-press", // Organization JSON-LD is inline in those content files themselves
     })
   );
@@ -474,6 +573,7 @@ for (const p of companyPages) {
       contentId: p.content,
       currentLineId: null,
       currentSharedId: p.id,
+      ogImage: p.ogImage,
     })
   );
 }

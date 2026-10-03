@@ -146,6 +146,20 @@
   .preview-card .focus{font-size:0.82rem;color:var(--muted);margin-top:4px;}
   .soon{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--brand-50,#eef2ff);color:var(--brand-600,#4f46e5);font-size:0.7rem;font-weight:600;letter-spacing:0.02em;text-transform:uppercase;vertical-align:middle;}
   @media (prefers-color-scheme: dark){ .soon{background:rgba(99,102,241,0.15);color:var(--brand-400,#818cf8);} }
+  /* Tables. Added Oct 3 2026 for the SNF admission-denial section's
+     two-step appeal clock — the first table on this site. Wrapped in
+     .table-scroll so a five-column table scrolls inside its own box on a
+     phone instead of making the whole page scroll sideways. */
+  .table-scroll{overflow-x:auto;margin:16px 0 20px;-webkit-overflow-scrolling:touch;}
+  table.clock-table{border-collapse:collapse;width:100%;min-width:620px;font-size:0.88rem;}
+  table.clock-table th,table.clock-table td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top;}
+  table.clock-table thead th{background:var(--surface-2);font-size:0.78rem;letter-spacing:0.03em;text-transform:uppercase;color:var(--muted);}
+  table.clock-table tbody td:first-child{font-weight:600;white-space:nowrap;}
+  main.wrap ul{margin:12px 0 16px;padding-left:22px;color:var(--muted);}
+  main.wrap ul li{margin-bottom:7px;}
+  main.wrap ul li strong{color:var(--foreground);}
+  h3{margin:22px 0 6px;font-size:1.02rem;}
+  p.sources{font-size:0.8rem;color:var(--muted);font-style:italic;margin-top:18px;}
   footer{border-top:1px solid var(--border);padding:32px 0;font-size:0.85rem;color:var(--muted);}
   footer .wrap{display:flex;flex-direction:column;gap:6px;}
   footer a{color:var(--muted);}
@@ -245,18 +259,7 @@
     });
   });
 </script>
-
 <script>
-  // FORWARD THE ARRIVING CAMPAIGN'S UTM TAGS — forward-utm
-  //
-  // Every onward link on this site hardcodes utm_source=hub. That is right for
-  // a visitor who found the hub on their own, and wrong for one who arrived
-  // from a tagged campaign: appeals.casewhy.com would record "hub" and the
-  // campaign would be indistinguishable from organic traffic. This site is
-  // static and records nothing itself, so the tags have to survive the hop or
-  // they are lost entirely.
-  //
-  // Arrived with no utm_source -> nothing changes, "hub" stands.
   (function () {
     var incoming = new URLSearchParams(location.search);
     if (!incoming.get('utm_source')) return;

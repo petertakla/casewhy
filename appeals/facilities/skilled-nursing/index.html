@@ -146,6 +146,20 @@
   .preview-card .focus{font-size:0.82rem;color:var(--muted);margin-top:4px;}
   .soon{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--brand-50,#eef2ff);color:var(--brand-600,#4f46e5);font-size:0.7rem;font-weight:600;letter-spacing:0.02em;text-transform:uppercase;vertical-align:middle;}
   @media (prefers-color-scheme: dark){ .soon{background:rgba(99,102,241,0.15);color:var(--brand-400,#818cf8);} }
+  /* Tables. Added Oct 3 2026 for the SNF admission-denial section's
+     two-step appeal clock — the first table on this site. Wrapped in
+     .table-scroll so a five-column table scrolls inside its own box on a
+     phone instead of making the whole page scroll sideways. */
+  .table-scroll{overflow-x:auto;margin:16px 0 20px;-webkit-overflow-scrolling:touch;}
+  table.clock-table{border-collapse:collapse;width:100%;min-width:620px;font-size:0.88rem;}
+  table.clock-table th,table.clock-table td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top;}
+  table.clock-table thead th{background:var(--surface-2);font-size:0.78rem;letter-spacing:0.03em;text-transform:uppercase;color:var(--muted);}
+  table.clock-table tbody td:first-child{font-weight:600;white-space:nowrap;}
+  main.wrap ul{margin:12px 0 16px;padding-left:22px;color:var(--muted);}
+  main.wrap ul li{margin-bottom:7px;}
+  main.wrap ul li strong{color:var(--foreground);}
+  h3{margin:22px 0 6px;font-size:1.02rem;}
+  p.sources{font-size:0.8rem;color:var(--muted);font-style:italic;margin-top:18px;}
   footer{border-top:1px solid var(--border);padding:32px 0;font-size:0.85rem;color:var(--muted);}
   footer .wrap{display:flex;flex-direction:column;gap:6px;}
   footer a{color:var(--muted);}
@@ -197,6 +211,7 @@
   <h2>Why this is your problem too</h2>
   <p>An appeal that succeeds keeps a resident in a covered bed while it is decided. An appeal that is never filed ends the stay on schedule. Your census, your discharge planning, and your relationship with the family all sit on the same side of that outcome as the family does.</p>
 
+
   <h2>What the building sees</h2>
   <p>One board for the whole facility, sorted by what runs out first. A reference and a tag are how a case is found — the resident's name is never typed in, so nothing identifying is stored here at all.</p>
 
@@ -218,6 +233,95 @@
          alt="The CaseWhy Appeals Desk case board for a skilled nursing facility. Columns: your reference, tags, coverage, level, days left, and next step. Seven open cases sorted by urgency. RM-204, tagged NOMNC and urgent, Medicare Advantage, Level 1 ask the plan to reconsider, 5h left shown in red, next step send it. RM-118, tagged NOMNC, Medicare Advantage, Level 1, 30h left, next step get the letter. RM-311-B, tagged NOMNC and therapy, Original Medicare, fast-track review the QIO's initial decision, 3d left, next step call your BFCC-QIO before the deadline. RM-402, tagged NOMNC and readmit, Medicare Advantage, Level 1, 3d left, next step know your deadline. RM-127, tagged observation, Original Medicare, reconsideration after an observation-status decision, 4d left, next step decide who acts. FILE-2291, tagged IRE and filed, Medicare Advantage, Level 2 Independent Review Entity, 11d left, next step wait for the decision. FILE-2304, tagged IRE and awaiting, Medicare Advantage, Level 2, 26d left, next step gather what goes with it. A line below the table reads: no client names are stored here, your reference and tags are how you find a case.">
     <figcaption>The Appeals Desk board, with sample cases. Anything inside a day is counted in hours and marked — a NOMNC due at noon tomorrow reads “30h”, not “2 days”.</figcaption>
   </figure>
+
+  <!-- SECOND USE CASE — admission / prior-authorisation denials.
+       Wording APPROVED by Peter Oct 3, 2026 ("approved"); the record is
+       SYNC_0019 and the copy doc appeals-followup-snf-landing-admission-denial-copy.md.
+       Publication was gated on two checks, both now done:
+         1. the synthetic end-to-end test of a pre-service SNF denial
+            (test:snf-admission, 13 checks) passes, including that BOTH clocks
+            compute for this notice -- the one claim below the test did not
+            originally cover;
+         2. C2C Innovative Solutions confirmed as the current Part C IRE
+            (CMS contract award; Maximus through Apr 30 2026, C2C from May 1),
+            and every figure in the table below checked against the regulation
+            text rather than the task doc.
+       COPY RULE, from the legal read in SYNC_0012: never say a facility can
+       file in its own name on a pre-admission denial. Its route is CMS-1696
+       representation. The physician route is real and is deliberately NOT
+       mentioned, because it belongs to the treating physician, not the
+       facility. -->
+  <h2>Stop letting insurance denials block your admissions</h2>
+  <p>A Medicare Advantage plan can refuse to cover a skilled nursing admission before the resident even arrives. <strong>When these denials are appealed, they are overwhelmingly overturned. Most are never appealed.</strong></p>
+
+  <h3>The data: what the federal numbers say</h3>
+  <p>An HHS OIG report published in June 2026 (OEI-09-24-00331) looked at the 109,400 skilled nursing admission requests that the 19 largest Medicare Advantage organizations, covering 86% of MA enrollment, processed in June 2024:</p>
+  <ul>
+    <li>12% of the requests were denied.</li>
+    <li>Only 18% of those denials were appealed.</li>
+    <li><strong>95% of the appeals that were filed were overturned.</strong></li>
+  </ul>
+  <p><strong>The 95% is the share of filed appeals that succeeded. It is not the chance that any given denial would be overturned</strong>, because most denials were never appealed. It is also one month at the largest organizations, not every plan.</p>
+
+  <h3>Pre-admission appeals run on a different clock</h3>
+  <p>Mid-stay appeals go to a QIO, with a noon-the-day-before deadline. A pre-admission appeal follows a two-step federal track.</p>
+  <div class="table-scroll">
+  <table class="clock-table">
+    <thead>
+      <tr><th>Step</th><th>Who reviews it</th><th>You file within</th><th>They decide within</th><th>If expedited</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. Plan reconsideration</td>
+        <td>A different reviewer at the plan</td>
+        <td>60 days of receiving the denial (65 counting mail time)</td>
+        <td>30 days</td>
+        <td>72 hours</td>
+      </tr>
+      <tr>
+        <td>2. Independent review</td>
+        <td>Forwarded automatically if the plan upholds the denial or misses its deadline, to the independent review entity (currently C2C Innovative Solutions)</td>
+        <td>&mdash;</td>
+        <td>30 days</td>
+        <td>72 hours</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Standard (non-expedited) timelines can be extended by up to 14 days.</p>
+
+  <h3>How CaseWhy handles it</h3>
+  <ul>
+    <li><strong>Upload the plan's denial notice.</strong> CaseWhy recognizes it and puts both deadlines on the case.</li>
+    <li>The case is built around the Medicare skilled-level-of-care test.</li>
+    <li>CaseWhy drafts the reconsideration letter with the governing regulations cited.</li>
+    <li>CaseWhy prepares CMS-1696, the appointment-of-representative form, so your facility can file on the resident's behalf.</li>
+  </ul>
+
+  <!-- The board filtered to admission denials, Oct 3 2026. Taken from the live
+       QA facility, scrolled so the "QA Skilled Nursing (TEST)" header is off
+       the top rather than cropped out of a wider shot.
+
+       WHY THIS VIEW AND NOT THE WHOLE BOARD: the full board is already shown
+       further up. Filtered, it makes the point this section is about -- every
+       DAYS LEFT reads in weeks, 7d to 63d, against the 5h and 30h of the NOMNC
+       rows above. The contrast IS the "different clock" heading.
+
+       The figures are seeded sample data. References are room and file
+       numbers because desk_clients cannot hold a name; the line under the
+       table is the product stating its own constraint, not marketing copy. -->
+  <figure class="diagram">
+    <img src="/images/appeals-desk-snf-admission-denials.webp" width="1006" height="812" loading="lazy" decoding="async"
+         alt="The CaseWhy Appeals Desk case board filtered by the tag &quot;admission denied&quot;. Columns: your reference, tags, coverage, level, days left, and next step. Eight open admission-denial cases. FILE-2350, tagged admission denied and IRE, Medicare Advantage, Level 2 Independent Review Entity, 7 days left, next step wait for the decision. ADM-541, tagged admission denied and expedited, Level 1 ask the plan to reconsider, 14 days left, next step gather what goes with it. ADM-534, 21 days left, next step decide who acts. ADM-527, tagged prior auth, 33 days left, next step send it. ADM-512, tagged prior auth, 44 days left, next step gather what goes with it. ADM-501, tagged rehab, 51 days left, next step get the letter. ADM-519, 58 days left, next step decide who acts. ADM-488, tagged new, 63 days left, next step know your deadline. A line below the table reads: no client names are stored here, your reference and tags are how you find a case.">
+    <figcaption>The same board, filtered to admission denials. Every clock here runs in weeks, not hours &mdash; a pre-service reconsideration has 65 days from the notice date, where a NOMNC is due by noon tomorrow.</figcaption>
+  </figure>
+
+  <p><strong>The appeal is the resident's. CMS-1696 is what lets your facility act as their appointed representative.</strong></p>
+
+  <p><a href="https://appeals.casewhy.com/medicare-advantage/decisions/oig-2026-snf-prior-auth-overturns?utm_source=hub&amp;utm_medium=referral">See the full numbers &rarr;</a></p>
+
+  <p class="sources">Sources: HHS OIG, OEI-09-24-00331 (June 2026); 42 CFR &sect;&sect;422.566&ndash;422.590 (organization determinations and reconsiderations), including &sect;422.582 (time to request).</p>
+
 
   <h2>Per-site licence</h2>
   <p>One licence covers the building — every nurse, social worker, and business-office staffer, one shared counter. A licensed site also gets the resource library: written guides, a video walkthrough, and audio explainers.</p>
@@ -274,18 +378,7 @@
     });
   });
 </script>
-
 <script>
-  // FORWARD THE ARRIVING CAMPAIGN'S UTM TAGS — forward-utm
-  //
-  // Every onward link on this site hardcodes utm_source=hub. That is right for
-  // a visitor who found the hub on their own, and wrong for one who arrived
-  // from a tagged campaign: appeals.casewhy.com would record "hub" and the
-  // campaign would be indistinguishable from organic traffic. This site is
-  // static and records nothing itself, so the tags have to survive the hop or
-  // they are lost entirely.
-  //
-  // Arrived with no utm_source -> nothing changes, "hub" stands.
   (function () {
     var incoming = new URLSearchParams(location.search);
     if (!incoming.get('utm_source')) return;

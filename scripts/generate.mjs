@@ -327,6 +327,50 @@ const FORWARD_UTM_SCRIPT = `<script>
   })();
 </script>`;
 
+// ---- the facility privacy section, one source for three pages ---------
+//
+// Five sentences, approved by Peter on Oct 4 2026 (SYNC_0112). Four are word
+// for word as Code drafted them in SYNC_0067 §6; sentence 2 is his own edit,
+// and the reason for it is the reason this block is shared rather than written
+// into each page: his words were "'Resident' and 'room' fit skilled nursing but
+// not home health or hospice", so "a resident's name" became "a client's name"
+// and "a room or file number" became "your own room, file or client number".
+// Three copies of that sentence is three chances for one of them to keep saying
+// "resident".
+//
+// EVERY SENTENCE IS VERIFIED AGAINST THE APPEALS REPO, not against the draft it
+// came from (SYNC_0112 §3.1 asked for exactly this):
+//   1. notices are read once then deleted — read-and-delete, Oct 1
+//   2. desk_clients has NO name column at all: id, orgId, label, reference,
+//      tags, deepLinkOverride, createdBySeatId. The Label field's own helper
+//      says "Free text, never a real name", and the case board's footer says
+//      "No client names are stored here — your reference and tags are how you
+//      find a case."
+//   3. loadAccessibleCase() grants the creator or a seat at the organization
+//      owning the case's deskClientId, and nobody else
+//   4. the wording matches the Terms addendum Peter approved Oct 1 and is NOT
+//      to be edited here (SYNC_0112 §3.5)
+//   5. closing an organization cascades
+//
+// NOT PUBLISHED ON appeals.casewhy.com. Its advocate How-To already carries an
+// equivalent section ("Records, exports, and privacy") in advocate language, and
+// the FAQ's business-associate answer points at it. Publishing these five there
+// too would make two statements of one policy that can drift — which is exactly
+// how that page came to claim "Access pauses" and a family "shared view" that
+// never existed. One statement per audience.
+const facilityPrivacySentences = [
+  ["We don’t keep the notice you upload.", "The file is read once to pull out what the appeal needs (dates, notice type, the denial reason) and then deleted. We keep the extracted details, not the document."],
+  ["We don’t ask for a client’s name.", "A case is found by your own room, file or client number and the tags you give it. There is no name field."],
+  ["Your staff see your organization’s cases, and nothing else.", "Every seat is scoped to one organization."],
+  ["We don’t hold protected health information,", "so no HIPAA business associate agreement is needed between us. If that ever changes, we will tell you first."],
+  ["Closing your organization deletes everything under it, immediately.", "Export first if you want a copy."],
+];
+
+const facilityPrivacyHtml = `  <h2>What we store, and what we don’t</h2>
+  <ul class="checklist">
+${facilityPrivacySentences.map(([lead, rest]) => `    <li><strong>${lead}</strong> ${rest}</li>`).join("\n")}
+  </ul>`;
+
 // ---- pricing, rendered from scripts/pricing.json ----------------------
 //
 // Sep 30, 2026. The hub was advertising a WITHDRAWN offer — "twenty free
@@ -455,6 +499,9 @@ function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, 
   let body = bodyOverride !== undefined ? bodyOverride : readFileSync(join(__dirname, "content", `${contentId}.html`), "utf8");
   for (const m of [...body.matchAll(/\{\{PRICING:([a-z_:]+)\}\}/g)]) {
     body = body.replace(m[0], pricingHtml(m[1]));
+  }
+  if (body.includes("{{FACILITY_PRIVACY}}")) {
+    body = body.replace("{{FACILITY_PRIVACY}}", facilityPrivacyHtml);
   }
   if (body.includes("{{PARTNER_KIT}}")) {
     body = body.replace("{{PARTNER_KIT}}", partnerKit.replaceAll("{{PAGE_ID}}", contentId));

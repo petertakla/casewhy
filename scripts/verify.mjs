@@ -344,6 +344,29 @@ check(`the free-trial count on the pages matches pricing.json (${pricingJson.fre
   (read("/appeals/advocates") ?? "").includes(`first ${pricingJson.freeTrialCases} cases are free`));
 
 // ---------------------------------------------------------------------------
+// THE FACILITY PRIVACY SECTION IS ON ALL THREE FACILITY PAGES.
+//
+// Peter approved five sentences on Oct 4 2026 (SYNC_0112). They are rendered
+// from ONE constant in generate.mjs via {{FACILITY_PRIVACY}}, because his own
+// edit to sentence 2 existed to make the wording work for home health and
+// hospice as well as skilled nursing — three hand-written copies is three
+// chances for one of them to go on saying "resident".
+//
+// Checked here rather than trusted because a page losing this section loses a
+// promise about health information, silently, on the pages the Oct 13 campaign
+// points at. The word check is the point: "resident" must not come back.
+for (const path of ["/appeals/facilities/skilled-nursing", "/appeals/facilities/home-health", "/appeals/facilities/hospice"]) {
+  const html = read(path);
+  if (!html) continue;
+  check(`${path} carries the facility privacy section`, html.includes("What we store, and what we don"));
+  check(`${path} states there is no name field`, html.includes("There is no name field"));
+  check(`${path} keeps the approved BAA wording`,
+    html.includes("no HIPAA business associate agreement is needed between us"));
+  check(`${path} uses "client", not the SNF-only "resident", in the privacy section`,
+    !/We don.t ask for a resident.s name/i.test(html));
+}
+
+// ---------------------------------------------------------------------------
 // THE FOUNDER STORY ON THE APPEALS LINE IS NOT A PERSONAL FAMILY CLAIM.
 //
 // Oct 2, 2026 audit, item 8. The Appeals pages claimed Peter built the product

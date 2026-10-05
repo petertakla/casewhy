@@ -136,6 +136,7 @@
   .tier .price{font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--brand-600);margin:0 0 10px;}
   @media (prefers-color-scheme: dark){ .tier .price{color:var(--brand-400);} }
   .tier p{margin:0;color:var(--muted);font-size:0.88rem;}
+  .cta-alt{margin-top:10px;font-size:0.88rem;color:var(--muted);}
   a.cta{display:inline-block;margin-top:14px;padding:13px 26px;border-radius:10px;background:var(--brand-600);color:#fff !important;font-weight:700;text-decoration:none;font-size:0.98rem;}
   a.cta:hover{background:#164a8c;}
   .preview-card{margin:14px 0 20px;border:1px solid var(--border);background:var(--surface);border-radius:12px;padding:16px 18px;max-width:360px;}
@@ -326,7 +327,20 @@
     <li><strong>Closing your organization deletes everything under it, immediately.</strong> Export first if you want a copy.</li>
   </ul>
 
-  <a class="cta" href="mailto:appeals-help@casewhy.com?subject=Skilled%20nursing%20per-site%20license">Ask about a site license →</a>
+  <!-- Oct 5, 2026 — Peter: "/for-advocates should be the landing page not
+       sending us an email from the campaign email flow", and signup "should be
+       self-serve for all and self-serve first".
+
+       This was a mailto. The October letter's whole path therefore ended in an
+       email to Peter and a wait, which for cold outreach is the conversion
+       step. It now lands on the real signup, pre-set to skilled nursing so the visitor
+       does not re-pick what the page they are standing on already knows.
+
+       The mailto is kept as a SECOND option rather than deleted: a facility
+       deciding for a group of buildings genuinely does need a person, and the
+       section above this one says so. -->
+  <a class="cta" href="https://appeals.casewhy.com/for-advocates?segment=facility&amp;facilityType=snf&amp;utm_source=hub&amp;utm_medium=referral">Set up your site licence &rarr;</a>
+  <p class="cta-alt">Deciding for more than one building? <a href="mailto:appeals-help@casewhy.com?subject=Skilled%20nursing%20per-site%20license">Email us instead</a> and we will price the group.</p>
 
 </main>
 

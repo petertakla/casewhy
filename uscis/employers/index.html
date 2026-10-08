@@ -285,6 +285,69 @@
     <p id="form-status" class="status" role="status"></p>
   </form>
 
+<script>
+  // THIS FORM HAD NO HANDLER AT ALL until Oct 8 2026, and had not had one for
+  // as long as it existed.
+  //
+  // It carries the same markup as the caseworkers form one directory over —
+  // same field names, same honeypot, same #form-status paragraph, same submit
+  // button — and only that one had a submit listener. With no `action`, no
+  // `method` and no listener, pressing Send did the browser default: a GET to
+  // this same page with every field in the query string. The page reloaded,
+  // the status line stayed empty, and the lead was gone. It looked like it
+  // had worked.
+  //
+  // Found while building the NOMNC cheat-sheet page, which was nearly copied
+  // from this file rather than from the caseworkers one (SYNC_0272 §4.2).
+  //
+  // `teamSize` is sent too — the caseworkers form has no such field, so this
+  // is not quite a copy of that handler. Checked against the endpoint rather
+  // than assumed: /api/employer-leads reads `teamSize` and defaults `kind` to
+  // "employer" for anything that is not "caseworker".
+  (function () {
+    var form = document.getElementById('employer-lead-form');
+    var statusEl = document.getElementById('form-status');
+    if (!form || !statusEl) return;
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var button = form.querySelector('button[type="submit"]');
+      button.disabled = true;
+      statusEl.textContent = 'Sending…';
+      statusEl.className = 'status';
+
+      var params = new URLSearchParams(window.location.search);
+      try {
+        var res = await fetch('https://app.casewhy.com/api/employer-leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            kind: 'employer',
+            website: form.website.value, // honeypot
+            company: form.company.value,
+            teamSize: form.teamSize.value,
+            contactName: form.contactName.value,
+            email: form.email.value,
+            needs: form.needs.value,
+            utmSource: params.get('utm_source') || '',
+            utmMedium: params.get('utm_medium') || '',
+            utmCampaign: params.get('utm_campaign') || ''
+          })
+        });
+        if (!res.ok) throw new Error('request failed');
+        form.reset();
+        statusEl.textContent = "Thanks — we read every message.";
+        statusEl.classList.add('success');
+      } catch (err) {
+        statusEl.textContent = 'Something went wrong. Please try again or email hello@casewhy.com.';
+        statusEl.classList.add('error');
+      } finally {
+        button.disabled = false;
+      }
+    });
+  })();
+</script>
+
 </main>
 
 <footer>

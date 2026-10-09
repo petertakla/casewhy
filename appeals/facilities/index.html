@@ -274,6 +274,31 @@
     <p>One printable page with every NOMNC and Medicare Advantage denial deadline, for the business office or the nursing station.</p>
     <p class="arrow" style="margin-top:14px;font-weight:700;color:var(--brand-600);font-size:0.88rem;"><a href="/appeals/facilities/nomnc-cheat-sheet" style="color:inherit;text-decoration:none;">Get the cheat sheet &rarr;</a></p>
   </div>
+  <!-- D47 (SYNC_0361, Links item 2): a box NEXT TO the cheat-sheet box, as
+       asked. The two belong together — one is the deadlines on paper for the
+       wall, the other works out one specific date from a notice in hand.
+
+       UTM-tagged like the fast-appeal link above it, with the same three keys
+       the appeals site's middleware reads, so a visit arriving from this page
+       is attributable rather than landing in the direct bucket. utm_content
+       distinguishes it from the fast-appeal link on the same page.
+
+       "Your dates are not saved" rather than "nothing is saved", because the
+       second would not be true: the tool increments a bare usage counter. That
+       counter takes NO ARGUMENTS by design — no date, no state, no identifier
+       can be passed to it — so the claim as written is exactly right and the
+       looser one would not have been. Checked in
+       lib/deadlines/find-your-deadline-usage.ts rather than assumed.
+
+       "Three questions" is also checked, not rounded: the tool asks which
+       notice, which kind of Medicare, and what date is printed — three
+       numbered steps. "The regulation it comes from" is the citation chips the
+       shared deadline card renders. -->
+  <div class="type-card" style="margin-top:18px;">
+    <h2>Free deadline finder</h2>
+    <p>Not sure of your date? Answer three questions about the notice in front of you and get the deadline, with the regulation it comes from. No account, and your dates are not saved.</p>
+    <p class="arrow" style="margin-top:14px;font-weight:700;color:var(--brand-600);font-size:0.88rem;"><a href="https://appeals.casewhy.com/find-your-deadline?utm_source=hub&amp;utm_medium=referral&amp;utm_campaign=facilities&amp;utm_content=deadline-finder" style="color:inherit;text-decoration:none;">Find your deadline &rarr;</a></p>
+  </div>
 
   <p class="planned-note">One-sheets with a QR code for the nursing station are still on the way. The cheat sheet above is live now.</p>
 

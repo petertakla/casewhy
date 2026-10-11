@@ -24,6 +24,26 @@
       "source": "/schools",
       "destination": "/uscis/schools",
       "permanent": true
+    },
+    {
+      "source": "/snf/:campaign",
+      "destination": "/appeals/facilities/skilled-nursing?utm_source=snf&utm_medium=email&utm_campaign=facility-outreach-:campaign",
+      "permanent": false
+    },
+    {
+      "source": "/demo/:campaign",
+      "destination": "https://appeals.casewhy.com/desk/demo?utm_source=snf&utm_medium=email&utm_campaign=facility-outreach-:campaign",
+      "permanent": false
+    },
+    {
+      "source": "/snf",
+      "destination": "/appeals/facilities/skilled-nursing?utm_source=snf&utm_medium=email",
+      "permanent": false
+    },
+    {
+      "source": "/demo",
+      "destination": "https://appeals.casewhy.com/desk/demo?utm_source=snf&utm_medium=email",
+      "permanent": false
     }
   ]
 }

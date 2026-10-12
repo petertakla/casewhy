@@ -681,7 +681,21 @@ console.log("wrote sitemap.xml");
 // tested in scripts/verify.mjs and the table actually serving 301s can't
 // drift apart.
 const vercelJson = {
-  redirects: redirects.map((r) => ({ source: r.from, destination: r.to, permanent: true })),
+  // `permanent` defaults to true, and a redirect may opt out with
+  // `"permanent": false`. The four campaign short links do: they are the
+  // addresses printed in the outreach letters, they have always served 307,
+  // and a campaign link has to stay changeable.
+  //
+  // THEY LIVE IN pages.json BECAUSE THIS FILE REWRITES vercel.json. They were
+  // hand-added to vercel.json for D149, so the first `node scripts/generate.mjs`
+  // after that deleted all four -- which would have pointed every link in
+  // tomorrow's 28 letters at a 404. Caught 12 Oct by diffing vercel.json
+  // before and after a regeneration rather than trusting it.
+  redirects: redirects.map((r) => ({
+    source: r.from,
+    destination: r.to,
+    permanent: r.permanent !== false,
+  })),
 };
 writeFileSync(join(ROOT, "vercel.json"), JSON.stringify(vercelJson, null, 2) + "\n");
 console.log("wrote vercel.json");

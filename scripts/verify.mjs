@@ -35,7 +35,16 @@ console.log("== Redirect table (vercel.json) ==");
 const vercelJson = JSON.parse(readFileSync(join(ROOT, "vercel.json"), "utf8"));
 for (const r of redirects) {
   const entry = vercelJson.redirects.find((v) => v.source === r.from);
-  check(`${r.from} -> ${r.to} (permanent)`, !!entry && entry.destination === r.to && entry.permanent === true);
+  // `permanent` comes from the registry: true unless the entry says
+  // `"permanent": false`. The four campaign short links do -- they are the
+  // addresses printed in the outreach letters and have always served 307.
+  // This used to assert `=== true` for every row, which is why adding them
+  // to pages.json turned this red on 12 Oct.
+  const wantPermanent = r.permanent !== false;
+  check(
+    `${r.from} -> ${r.to} (${wantPermanent ? "permanent" : "temporary"})`,
+    !!entry && entry.destination === r.to && entry.permanent === wantPermanent,
+  );
 }
 // Every redirect source must NOT also exist as a live page in the registry
 // (that would mean the 301 shadows a real page and nobody could reach it).
@@ -188,8 +197,37 @@ check("the footer reaches the Desk from every page", (read("/appeals") ?? "").in
 // copy return; it cannot see this repo, which is exactly why the promise
 // survived here. This is that guard's other half.
 const pricingJson = JSON.parse(readFileSync(join(__dirname, "pricing.json"), "utf8"));
-const APPEALS_PAGES = ["/appeals", "/appeals/advocates", "/appeals/facilities", "/appeals/attorneys", "/appeals/press"];
-const WITHDRAWN = [/founding[- ]advocate/i, /founding pilot/i, /founding facilities/i, /twenty free seats/i, /February 28, 2027/i, /Feb 28, 2027/i, /Pricing (is being|set once)/i];
+// /appeals/counselors and /appeals/ombudsman were MISSING from this list, and
+// they are the two pages Peter named on 12 Oct when he found them still
+// promising "free, forever" and "Unlimited cases". The sweep that was meant
+// to stop withdrawn copy returning could not see the pages it mattered most
+// on. Added.
+const APPEALS_PAGES = [
+  "/appeals",
+  "/appeals/advocates",
+  "/appeals/facilities",
+  "/appeals/attorneys",
+  "/appeals/press",
+  "/appeals/counselors",
+  "/appeals/ombudsman",
+];
+const WITHDRAWN = [
+  /founding[- ]advocate/i, /founding pilot/i, /founding facilities/i,
+  /twenty free seats/i, /February 28, 2027/i, /Feb 28, 2027/i,
+  /Pricing (is being|set once)/i,
+  // 12 Oct 2026 -- Peter: "fix these two to say the correct statement".
+  // "free, forever", "permanently" and "Unlimited cases" stopped being true
+  // when fair-use limits existed, and he removed the numbers from
+  // /for-advocates the same morning. The approved sentence is "Free for
+  // SHIP, ombudsman, legal aid and nonprofit organizations -- fair-use limits
+  // apply."
+  //
+  // DELIBERATELY NOT a bare /unlimited/: "one license per site, unlimited
+  // staff" on /appeals is the facility site licence and is TRUE, and
+  // /uscis/press's "unlimited questions" is a different product. code3's
+  // 0763 §2 caught that a blanket fix would break both.
+  /\bforever\b/i, /permanently/i, /Unlimited cases/i,
+];
 
 for (const path of APPEALS_PAGES) {
   const html = read(path);
@@ -198,8 +236,11 @@ for (const path of APPEALS_PAGES) {
   for (const re of WITHDRAWN) {
     check(`${path} does not advertise the withdrawn offer (${re.source})`, !re.test(html));
   }
-  // "unlimited cases" is TRUE for the permanently-free segments and FALSE
-  // for every paid one, so it is only forbidden where a price is quoted.
+  // NO LONGER TRUE ANYWHERE: "unlimited cases" was true for the
+  // permanently-free segments until 12 Oct, when Peter withdrew the claim --
+  // it is now in WITHDRAWN above and forbidden on every appeals page, not
+  // only beside a price. This narrower check is kept because it covers pages
+  // outside APPEALS_PAGES that quote a price.
   if (/\$\d/.test(html)) {
     check(`${path} makes no "unlimited cases" claim beside a price`, !/unlimited cases/i.test(html));
   }

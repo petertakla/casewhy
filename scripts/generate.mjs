@@ -313,6 +313,63 @@ const COPY_SCRIPT = `<script>
 // scripts/generate.mjs` would have silently deleted it from every page, and
 // the campaign's attribution with it. Anything that belongs on every page
 // belongs in this file.
+// ---- REPORTING A PER-RECIPIENT CLICK, Oct 13 2026 -------------------
+//
+// Peter, asked directly tonight whether to wire this before the Oct 14 letters:
+// **"Yes"**.
+//
+// WHAT THE PROBLEM WAS. Every SNF letter's main call to action lands on this
+// site carrying `?rc=<signed token>`, one per recipient. Two of the three coded
+// links in each letter point here. Measured on the staged Oct 14 letters: 50 of
+// 75 coded links land on this site and 25 go straight to the app.
+//
+// The app already reads `rc`, verifies the signature and records the click —
+// `src/middleware.ts` does it for any page request. **This site did not, and
+// could not: it is static and records nothing itself.** So the code arrived
+// intact and was dropped on the floor, and the main call to action was
+// unmeasurable while the demo link was measurable.
+//
+// WHY THIS REUSES THE APP'S RECORDER INSTEAD OF ADDING ONE. The project
+// manager's warning was the right one: a second recorder would be worse than
+// none, because two of them double-count and the error is in the flattering
+// direction. So this writes nothing and knows nothing about facilities — it
+// asks the APP to record, by making one request the app's existing middleware
+// already understands. There is exactly one recorder and it is the one that was
+// already there.
+//
+// WHY THE REQUEST GOES TO "/" AND NOT A PURPOSE-BUILT ENDPOINT. The app's
+// middleware matcher deliberately skips `/api/*` and anything with a file
+// extension, so a `/api/...` call or a `.gif` pixel would never reach the code
+// that records. A bare page path does. "/" costs one static page render we throw
+// away, needs no change to the app at all, and is therefore the version that
+// could ship the same evening it was asked for.
+//
+// WHAT IT DELIBERATELY DOES NOT DO — and this was a real decision, not an
+// omission. `rc` is NOT added to FORWARD_UTM_SCRIPT's key list above. Copying
+// the arriving code onto this page's own onward links would attribute a click
+// on the DEMO button to the right person under the wrong label: the token in
+// the URL is signed for the `snf` context, so a demo click would be recorded as
+// a main-link click. The letter's own demo link already carries its own
+// correctly-signed code, so demo clicks from the letter are already right.
+// Right person, wrong label is worse than one fewer data point.
+//
+// FAILURE IS SILENT ON PURPOSE. A measurement must never break the page a
+// stranger is reading. Everything is inside one try/catch, there is no await,
+// and nothing is rendered from the result.
+const REPORT_CLICK_SCRIPT = `<script>
+  (function () {
+    try {
+      var rc = new URLSearchParams(location.search).get('rc');
+      if (!rc) return;
+      fetch('https://appeals.casewhy.com/?rc=' + encodeURIComponent(rc), {
+        mode: 'no-cors',
+        credentials: 'omit',
+        keepalive: true
+      });
+    } catch (e) { /* a measurement never breaks the page */ }
+  })();
+</script>`;
+
 const FORWARD_UTM_SCRIPT = `<script>
   (function () {
     var incoming = new URLSearchParams(location.search);
@@ -543,6 +600,7 @@ ${body}
 ${footer()}
 ${needsCopyScript ? "\n" + COPY_SCRIPT : ""}
 ${FORWARD_UTM_SCRIPT}
+${REPORT_CLICK_SCRIPT}
 </body>
 </html>
 `;

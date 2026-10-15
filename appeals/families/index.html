@@ -82,6 +82,14 @@
   .free-line{margin-top:18px;font-size:0.92rem;font-weight:600;color:var(--foreground);}
   .disclaimer{margin-top:20px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);padding:16px 18px;font-size:0.88rem;color:var(--foreground);}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:48px;}
+  /* THE FAMILIES PAGE MARKS ITS CARDS UP AS A LIST, and every other page on the
+     hub uses a <div class="cards">. So the grid above was written for a div and
+     carries no list reset — which put a grey bullet beside all six cards the
+     moment a <ul class="cards"> appeared. Found by opening the published page,
+     not by any check: the HTML is correct, the acceptance script passes, and a
+     static fetch cannot see a marker. Scoped to ul so no existing .cards div is
+     touched. Same shape as ul.checklist below. 15 Oct 2026. */
+  ul.cards{list-style:none;padding-left:0;}
   .cards.lines{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
   .card{border:1px solid var(--border);background:var(--surface);border-radius:16px;padding:24px;text-decoration:none;color:inherit;transition:border-color .15s;}
   .card:hover{border-color:var(--border-strong);}

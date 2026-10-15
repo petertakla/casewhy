@@ -182,6 +182,50 @@ for (const path of ["/appeals", "/appeals/advocates", "/appeals/facilities", "/a
   const html = read(path);
   check(`${path} header points at the Desk landing page, not the USCIS tracker`, linkOf(html ?? "") === "https://appeals.casewhy.com/desk");
 }
+
+// ---- AND THE FAMILIES PAGE IS THE ONE EXCEPTION ----
+//
+// 15 Oct 2026, Peter: the families page showed the Desk link at the top and he
+// asked for the right one instead. The rule above is right for the pages it
+// names and its own comment says why — the Desk is "the professional front
+// door these pages are selling". It was written on 30 Sep, when every appeals
+// page sold to professionals; the families page arrived afterwards and
+// inherited a header meant for a different reader. The list above never
+// covered it, which is why nothing failed.
+//
+// Peter chose the plain family front door, so a family clicking the one
+// outbound link in the header lands where the letters send them rather than on
+// a professional sign-in.
+check(
+  "/appeals/families header points at the family site, NOT the Desk",
+  linkOf(read("/appeals/families") ?? "") === "https://appeals.casewhy.com"
+);
+// The reference Peter asked for in the same breath. `inLineNav` puts it in the
+// AUDIENCE CARDS on /appeals — "Find your page" — which is the hub's own index
+// of who each page is for. My first version of this check asserted a "line
+// nav" on /appeals/advocates and failed: inLineNav does not build a nav on
+// sub-pages, and the check was describing a surface that does not exist.
+// Fixed by reading the generator rather than by relaxing the assertion.
+check(
+  "/appeals references the families page in its audience cards",
+  (read("/appeals") ?? "").includes('href="/appeals/families"')
+);
+// With its own words, not a bare URL — a card whose title vanished would still
+// satisfy the check above while reading as an empty box.
+check(
+  "and the families card carries its title",
+  (read("/appeals") ?? "").includes("Families &amp; caregivers") ||
+    (read("/appeals") ?? "").includes("Families & caregivers")
+);
+// AND IT IS STILL NOT OFFERED TO SEARCH. Peter asked for a link, not for
+// indexing, and `draft: true` is what keeps it out of the sitemap and carries
+// noindex. If somebody drops that flag, this check fails and they have to say
+// so out loud — which is the point, because it is a separate decision of his.
+check(
+  "the families page is linked but still unindexed, and the sitemap omits it",
+  (read("/appeals/families") ?? "").includes('name="robots" content="noindex,nofollow"') &&
+    !(read("/sitemap.xml") ?? "").includes("/appeals/families")
+);
 for (const path of ["/uscis", "/uscis/attorneys", "/uscis/employers"]) {
   const html = read(path);
   check(`${path} header still points at casewhy.com`, linkOf(html ?? "") === "https://www.casewhy.com");

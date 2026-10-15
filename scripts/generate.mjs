@@ -240,8 +240,21 @@ const CSS = `
 // casewhy.com as the neutral default.
 const DEFAULT_SITE_LINK = { href: "https://www.casewhy.com", label: "casewhy.com" };
 
-function header(currentLineId, currentSharedId) {
-  const siteLink = lines.find((l) => l.id === currentLineId)?.siteLink ?? DEFAULT_SITE_LINK;
+function header(currentLineId, currentSharedId, siteLinkOverride) {
+  // PER-PAGE OVERRIDE, 15 Oct 2026, Peter: the families page showed the Desk
+  // link at the top and he asked for the right one instead.
+  //
+  // The rule above is per LINE and its own comment says why: the Desk is "the
+  // professional front door this hub's appeals pages are selling". That was
+  // written on 30 Sep, when every appeals page sold to professionals. The
+  // families page was added afterwards and inherited a header built for a
+  // different audience — it is the hub's only consumer page, which is exactly
+  // why it is the only one where that link is wrong. A family clicking the one
+  // outbound app link in the header landed on the professional sign-in.
+  //
+  // Per-page rather than per-line because the line is still overwhelmingly
+  // professional: twelve of its thirteen pages want the Desk.
+  const siteLink = siteLinkOverride ?? lines.find((l) => l.id === currentLineId)?.siteLink ?? DEFAULT_SITE_LINK;
   const lineLinks = lines
     .map(
       (l) =>
@@ -569,7 +582,7 @@ function socialMeta({ path, titleTag, description, ogImage }) {
 // the nav and the cards, but every page path went into sitemap.xml regardless,
 // so "unlinked" would still have meant "offered to Google". Drop the flag when
 // he approves the copy and it becomes an ordinary page.
-function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, currentLineId, currentSharedId, extraJsonLd, ogImage, draft }) {
+function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, currentLineId, currentSharedId, extraJsonLd, ogImage, draft, siteLink }) {
   let body = bodyOverride !== undefined ? bodyOverride : readFileSync(join(__dirname, "content", `${contentId}.html`), "utf8");
   for (const m of [...body.matchAll(/\{\{PRICING:([a-z_:]+)\}\}/g)]) {
     body = body.replace(m[0], pricingHtml(m[1]));
@@ -607,7 +620,7 @@ ${socialMeta({ path, titleTag, description, ogImage })}
 ${jsonLd}</head>
 <body>
 
-${header(currentLineId, currentSharedId)}
+${header(currentLineId, currentSharedId, siteLink)}
 
 <main class="wrap">
 ${body}
@@ -717,6 +730,7 @@ for (const p of pages) {
       currentSharedId: null,
       ogImage: p.ogImage,
       draft: p.draft,
+      siteLink: p.siteLink,
       extraJsonLd: p.content !== "press" && p.content !== "appeals-press", // Organization JSON-LD is inline in those content files themselves
     })
   );

@@ -125,12 +125,16 @@
       "path": "/appeals/families",
       "content": "appeals-families",
       "navLabel": "Families",
-      "inLineNav": false,
+      "inLineNav": true,
       "draft": true,
       "cardTitle": "Families & caregivers",
       "cardDesc": "What to do when a Medicare Advantage plan refuses or ends skilled nursing care for someone you care for.",
       "titleTag": "For Families & Caregivers — Medicare Advantage Appeals | CaseWhy Hub",
-      "description": "A plain-language guide for families when a Medicare Advantage plan refuses or cuts short skilled nursing care: the notice, the deadline, and how to appeal."
+      "description": "A plain-language guide for families when a Medicare Advantage plan refuses or cuts short skilled nursing care: the notice, the deadline, and how to appeal.",
+      "siteLink": {
+        "href": "https://appeals.casewhy.com",
+        "label": "appeals.casewhy.com"
+      }
     },
     {
       "id": "appeals-advocates",

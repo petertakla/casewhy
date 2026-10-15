@@ -217,14 +217,37 @@ check(
   (read("/appeals") ?? "").includes("Families &amp; caregivers") ||
     (read("/appeals") ?? "").includes("Families & caregivers")
 );
-// AND IT IS STILL NOT OFFERED TO SEARCH. Peter asked for a link, not for
-// indexing, and `draft: true` is what keeps it out of the sitemap and carries
-// noindex. If somebody drops that flag, this check fails and they have to say
-// so out loud — which is the point, because it is a separate decision of his.
+// AND IT IS NOW OFFERED TO SEARCH, ON PETER'S WORDS. 15 Oct, asked whether to
+// index it, he said: "index it". So `draft` is dropped and the page is an
+// ordinary one, which is exactly what the generator's own note said should
+// happen "when he approves the copy".
+//
+// THIS CHECK IS THE INVERSE OF THE ONE IT REPLACES, and that is the mechanism
+// working rather than a reversal. For the twenty minutes between his two
+// instructions it asserted the page stayed unindexed, so that dropping the
+// flag could not happen quietly — it had to go red and be answered. He
+// answered it.
+//
+// Both halves, because they fail independently: the robots tag is per-page and
+// the sitemap is a separate file, and an indexable page missing from the
+// sitemap is the failure nobody notices.
 check(
-  "the families page is linked but still unindexed, and the sitemap omits it",
-  (read("/appeals/families") ?? "").includes('name="robots" content="noindex,nofollow"') &&
-    !(read("/sitemap.xml") ?? "").includes("/appeals/families")
+  "the families page is indexable — no noindex tag",
+  !(read("/appeals/families") ?? "").includes('name="robots" content="noindex')
+);
+// READ DIRECTLY, NOT THROUGH `read()` — that helper appends "/index.html",
+// so `read("/sitemap.xml")` looks for `sitemap.xml/index.html` and returns
+// null for every sitemap question ever asked of it.
+//
+// THIS BIT ME IN THE USEFUL DIRECTION AND I AM RECORDING IT. The check this
+// replaced asserted the sitemap did NOT contain the page, as
+// `!(read("/sitemap.xml") ?? "").includes(...)`. With the read returning null
+// that is `!false` — green, always, whatever the sitemap said. It passed for
+// twenty minutes on a premise that was never tested. The inverse failed
+// immediately, which is the only reason I looked.
+check(
+  "and the sitemap offers it",
+  readFileSync(join(ROOT, "sitemap.xml"), "utf8").includes("/appeals/families")
 );
 for (const path of ["/uscis", "/uscis/attorneys", "/uscis/employers"]) {
   const html = read(path);

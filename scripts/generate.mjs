@@ -553,7 +553,15 @@ function socialMeta({ path, titleTag, description, ogImage }) {
   ].join("\n");
 }
 
-function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, currentLineId, currentSharedId, extraJsonLd, ogImage }) {
+// `draft: true` on a page in pages.json publishes it at its real URL so it can
+// be READ and reviewed, while keeping it out of the sitemap and asking search
+// engines not to index it. Added 14 Oct 2026 for the families page: Peter asked
+// for it up now — "put it up now for me to review" — and chat's spec says
+// nothing links to it until he has. `inLineNav: false` already keeps it out of
+// the nav and the cards, but every page path went into sitemap.xml regardless,
+// so "unlinked" would still have meant "offered to Google". Drop the flag when
+// he approves the copy and it becomes an ordinary page.
+function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, currentLineId, currentSharedId, extraJsonLd, ogImage, draft }) {
   let body = bodyOverride !== undefined ? bodyOverride : readFileSync(join(__dirname, "content", `${contentId}.html`), "utf8");
   for (const m of [...body.matchAll(/\{\{PRICING:([a-z_:]+)\}\}/g)]) {
     body = body.replace(m[0], pricingHtml(m[1]));
@@ -579,7 +587,7 @@ function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${titleTag}</title>
 <meta name="description" content="${description}">
-<link rel="canonical" href="https://casewhyhub.com${path}">
+${draft ? `<meta name="robots" content="noindex,nofollow">\n` : ""}<link rel="canonical" href="https://casewhyhub.com${path}">
 ${socialMeta({ path, titleTag, description, ogImage })}
 <link rel="icon" href="/brand/icon-192.png">
 <link rel="icon" href="/brand/icon-512.png" sizes="512x512">
@@ -700,6 +708,7 @@ for (const p of pages) {
       currentLineId: line.id,
       currentSharedId: null,
       ogImage: p.ogImage,
+      draft: p.draft,
       extraJsonLd: p.content !== "press" && p.content !== "appeals-press", // Organization JSON-LD is inline in those content files themselves
     })
   );
@@ -723,7 +732,10 @@ for (const p of companyPages) {
 const allUrls = [
   "/",
   ...lines.map((l) => l.path),
-  ...pages.map((p) => p.path),
+  // A `draft` page is published at its real URL but NOT advertised here —
+  // see the note on pageHtml(). Without this filter "nothing links to it"
+  // would still have handed the URL to every search engine.
+  ...pages.filter((p) => !p.draft).map((p) => p.path),
   ...companyPages.map((p) => p.path),
 ];
 const sitemapUrls = allUrls

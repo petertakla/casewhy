@@ -721,11 +721,35 @@ ${sharedCards}
 // providers. Anything ungrouped (/appeals/press) falls through to the end
 // rather than being dropped — a page silently missing from this list is the
 // failure mode, so the fallback is "show it", not "skip it".
+/**
+ * THE ORDER THE GROUPS APPEAR IN, and it is ordered by WHO ACTUALLY ARRIVES.
+ *
+ * Peter, 20 Oct 2026: *"maybe the Healthcare Providers bloc should come after
+ * Individuals & Families ... logically makes more sense"*. Agreed, and the
+ * numbers are one-sided — measured the same evening:
+ *
+ *   every letter ever sent        200, all skilled nursing
+ *   every click ever recorded     31 clicks, 22 people, all skilled nursing
+ *   landings by real campaign     facility 39 · families 4 · ombudsman 1
+ *
+ * (Two larger rows in that table are NOT readers and are excluded on purpose:
+ * one is our own logging of unverified click codes, the other a scanner's
+ * mangled tag. A machine's traffic has been mistaken for a reader's here
+ * before.)
+ *
+ * So the group most likely to be the REASON somebody is on this page was
+ * fourth of five. It is second now.
+ *
+ * FAMILIES STAY FIRST, and not merely because they were first. A family inside
+ * a 48-hour fast-appeal window is the most time-critical reader this site has,
+ * and nothing that serves the business may sit above the instruction that
+ * serves them.
+ */
 const AUDIENCE_GROUP_ORDER = [
   "Individuals & Families",
+  "Healthcare Providers",
   "Advocates & Professionals",
   "Nonprofits & Public Programs",
-  "Healthcare Providers",
 ];
 
 function linePage(line) {

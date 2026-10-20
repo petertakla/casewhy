@@ -182,7 +182,7 @@
       "content": "appeals-facilities",
       "navLabel": "Facilities",
       "inLineNav": true,
-      "groupNote": "Non-profit skilled nursing facilities are never billed — we identify them from the public Medicare ownership data.",
+      "groupNote": "Non-profit facilities are never billed — skilled nursing, home health and hospice alike — identified from the public Medicare ownership data.",
       "groupLead": true,
       "cardTitle": "Why this matters for your building",
       "cardDesc": "The case for a family's fast appeal from the provider's side, plus one-sheets with a QR code for the floor.",

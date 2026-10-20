@@ -104,6 +104,26 @@ const CSS = `
   .card:hover{border-color:var(--border-strong);}
   h3.audience-group{font-size:1.02rem;margin:30px 0 0;color:var(--muted);font-weight:700;letter-spacing:0.01em;}
   .cards.grouped{margin-top:14px;}
+  .group-note{margin:6px 0 0;font-size:0.86rem;color:var(--muted);}
+  /* A GROUP LEAD CARD SITS ALONE ON ITS OWN ROW, CENTRED.
+
+     A plain "grid-column: 2" was the obvious way to say the middle, and it does NOT
+     work: grid auto-placement only ever moves FORWARD, so the next card lands
+     in column 3 beside it and the three buildings end up split across two rows.
+     Owning the whole row and centring inside it is what actually puts one card
+     above three.
+
+     The width is one column's: the grid is three columns of 1fr with an 18px
+     gap, so a column is (100% - 36px)/3.
+
+     ONLY AT THREE COLUMNS. The grid is auto-fit/minmax(220px,1fr) inside a
+     820px wrap with 24px padding, so it is three columns from 744px of viewport
+     (3*220 + 2*18 = 696px of content) and two or one below that. At those
+     narrower widths "the middle" has no meaning, so the rule simply does not
+     apply and the card flows like any other. */
+  @media (min-width: 744px){
+    .cards.grouped .card.lead{grid-column:1 / -1;max-width:calc((100% - 36px) / 3);margin-inline:auto;}
+  }
   .card h2{margin:0 0 8px;font-size:1.1rem;}
   .card .tagline{margin:0 0 10px;font-size:0.85rem;font-weight:700;color:var(--brand-600);}
   @media (prefers-color-scheme: dark){ .card .tagline{color:var(--brand-400);} }
@@ -710,7 +730,31 @@ const AUDIENCE_GROUP_ORDER = [
 
 function linePage(line) {
   const audiencePages = pages.filter((p) => p.line === line.id && p.inLineNav);
-  const cardHtml = (p) => `    <a class="card" href="${p.path}">
+  // `groupLead` puts one card on its own centred row ABOVE the rest of its
+  // group — Peter, 20 Oct 2026, for the Healthcare Providers group: the
+  // provider-side card in "the middle card position" with skilled nursing, home
+  // health and hospice on the row beneath, left to right.
+  /** The note a group carries, from whichever of its pages declares one.
+   *
+   *  A SECOND ONE THROWS. Only one line is rendered, so a second declaration
+   *  would vanish silently — which is the same class of fault as a navGroup
+   *  nobody listed. Ampersands only for escaping: the text is ours, and this
+   *  file has no escapeHtml (I reached for one earlier and the generator
+   *  refused to run, which is how that was caught).
+   */
+  const noteFor = (group) => {
+    const withNote = group.filter((p) => p.groupNote);
+    if (withNote.length > 1) {
+      throw new Error(
+        `[generate] ${withNote.length} pages in one group declare a groupNote ` +
+          `(${withNote.map((p) => p.path).join(", ")}). Only one is rendered, so the others would ` +
+          "vanish silently — put it on the group lead and remove the rest."
+      );
+    }
+    return withNote[0] ? withNote[0].groupNote.replace(/&/g, "&amp;") : "";
+  };
+
+  const cardHtml = (p) => `    <a class="card${p.groupLead ? " lead" : ""}" href="${p.path}">
       <h2>${p.cardTitle}</h2>
       <p>${p.cardDesc}</p>
       <p class="arrow">Learn more →</p>
@@ -733,6 +777,18 @@ function linePage(line) {
       // match — I reached for an escapeHtml() this file does not have, and the
       // generator refused to run, which is how that was caught.
       `  <h3 class="audience-group">${groupName.replace(/&/g, "&amp;")}</h3>\n` +
+        // A GROUP NOTE BELONGS TO THE GROUP, NOT TO A CARD. Peter, 20 Oct 2026,
+        // asked for one line about the non-profit free tier here rather than a
+        // fifth card: a non-profit skilled nursing facility is not a separate
+        // AUDIENCE, it is the same audience on a different price, decided by
+        // ownership. A card would have had to sit either in this group (making
+        // it five, which breaks the layout he specified) or under "Nonprofits &
+        // Public Programs" beside counsellors and ombudsman, which misdescribes
+        // a nursing home.
+        //
+        // Carried on the group's LEAD page, so there is one obvious place to put
+        // it and no second mechanism to keep in step.
+        (noteFor(inGroup) ? `  <p class="group-note">${noteFor(inGroup)}</p>\n` : "") +
         `  <div class="cards grouped">\n${inGroup.map(cardHtml).join("\n")}\n  </div>`
     );
   }

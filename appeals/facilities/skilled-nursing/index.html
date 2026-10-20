@@ -94,6 +94,26 @@
   .card:hover{border-color:var(--border-strong);}
   h3.audience-group{font-size:1.02rem;margin:30px 0 0;color:var(--muted);font-weight:700;letter-spacing:0.01em;}
   .cards.grouped{margin-top:14px;}
+  .group-note{margin:6px 0 0;font-size:0.86rem;color:var(--muted);}
+  /* A GROUP LEAD CARD SITS ALONE ON ITS OWN ROW, CENTRED.
+
+     A plain "grid-column: 2" was the obvious way to say the middle, and it does NOT
+     work: grid auto-placement only ever moves FORWARD, so the next card lands
+     in column 3 beside it and the three buildings end up split across two rows.
+     Owning the whole row and centring inside it is what actually puts one card
+     above three.
+
+     The width is one column's: the grid is three columns of 1fr with an 18px
+     gap, so a column is (100% - 36px)/3.
+
+     ONLY AT THREE COLUMNS. The grid is auto-fit/minmax(220px,1fr) inside a
+     820px wrap with 24px padding, so it is three columns from 744px of viewport
+     (3*220 + 2*18 = 696px of content) and two or one below that. At those
+     narrower widths "the middle" has no meaning, so the rule simply does not
+     apply and the card flows like any other. */
+  @media (min-width: 744px){
+    .cards.grouped .card.lead{grid-column:1 / -1;max-width:calc((100% - 36px) / 3);margin-inline:auto;}
+  }
   .card h2{margin:0 0 8px;font-size:1.1rem;}
   .card .tagline{margin:0 0 10px;font-size:0.85rem;font-weight:700;color:var(--brand-600);}
   @media (prefers-color-scheme: dark){ .card .tagline{color:var(--brand-400);} }
@@ -324,6 +344,29 @@
     </div>
   </div>
   <p class="trial-note"><strong>Your first 3 cases are free, whichever plan you're on.</strong> New skilled nursing facilities start on Volume — no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>
+
+  <!-- THE LETTER AND THIS PAGE MUST NOT CONTRADICT EACH OTHER.
+
+       From Sat 24 Oct the free-tier campaign mails non-profit skilled
+       nursing facilities a letter saying in bold that CaseWhy Appeals is
+       free for them, never billed, with no plan to buy. The single link in
+       that letter redirects HERE — and until this paragraph existed, the
+       page it landed on quoted a per-site licence and said nothing about
+       non-profits at all. A reader would reasonably conclude the letter was
+       wrong.
+
+       SKILLED NURSING ONLY, and that is not hedging: the ownership lookup
+       that grants the free tier queries skilled nursing rows in both of its
+       paths, so a non-profit hospice or home health agency is NOT free.
+       This paragraph must not be copied onto those two pages.
+
+       The wording tracks the letter and the sign-up form so all three
+       agree: never billed, fair-use limits apply, nothing to claim because
+       ownership is read from the public Medicare data. -->
+  <p class="free-line">If yours is a non-profit, none of this applies to you: non-profit skilled nursing
+    facilities are never billed — not a trial, and not free for a while. Fair-use limits apply and there is no plan
+    for you to buy. We identify non-profit ownership from the public Medicare data, so there is nothing to claim and
+    you will never be asked for a card.</p>
 
   <h2>If you run more than one building</h2>
   <p>Skilled nursing is far more consolidated than the facility count suggests: 14,690 Medicare-certified facilities resolve to roughly 5,184 independent decision-makers once common ownership is accounted for. If you're deciding for a group rather than a building, the per-site table above is the wrong shape — write to us and we'll price the group properly.</p>

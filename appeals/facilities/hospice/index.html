@@ -94,6 +94,26 @@
   .card:hover{border-color:var(--border-strong);}
   h3.audience-group{font-size:1.02rem;margin:30px 0 0;color:var(--muted);font-weight:700;letter-spacing:0.01em;}
   .cards.grouped{margin-top:14px;}
+  .group-note{margin:6px 0 0;font-size:0.86rem;color:var(--muted);}
+  /* A GROUP LEAD CARD SITS ALONE ON ITS OWN ROW, CENTRED.
+
+     A plain "grid-column: 2" was the obvious way to say the middle, and it does NOT
+     work: grid auto-placement only ever moves FORWARD, so the next card lands
+     in column 3 beside it and the three buildings end up split across two rows.
+     Owning the whole row and centring inside it is what actually puts one card
+     above three.
+
+     The width is one column's: the grid is three columns of 1fr with an 18px
+     gap, so a column is (100% - 36px)/3.
+
+     ONLY AT THREE COLUMNS. The grid is auto-fit/minmax(220px,1fr) inside a
+     820px wrap with 24px padding, so it is three columns from 744px of viewport
+     (3*220 + 2*18 = 696px of content) and two or one below that. At those
+     narrower widths "the middle" has no meaning, so the rule simply does not
+     apply and the card flows like any other. */
+  @media (min-width: 744px){
+    .cards.grouped .card.lead{grid-column:1 / -1;max-width:calc((100% - 36px) / 3);margin-inline:auto;}
+  }
   .card h2{margin:0 0 8px;font-size:1.1rem;}
   .card .tagline{margin:0 0 10px;font-size:0.85rem;font-weight:700;color:var(--brand-600);}
   @media (prefers-color-scheme: dark){ .card .tagline{color:var(--brand-400);} }

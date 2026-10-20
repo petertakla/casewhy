@@ -102,6 +102,8 @@ const CSS = `
   .cards.lines{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
   .card{border:1px solid var(--border);background:var(--surface);border-radius:16px;padding:24px;text-decoration:none;color:inherit;transition:border-color .15s;}
   .card:hover{border-color:var(--border-strong);}
+  h3.audience-group{font-size:1.02rem;margin:30px 0 0;color:var(--muted);font-weight:700;letter-spacing:0.01em;}
+  .cards.grouped{margin-top:14px;}
   .card h2{margin:0 0 8px;font-size:1.1rem;}
   .card .tagline{margin:0 0 10px;font-size:0.85rem;font-weight:700;color:var(--brand-600);}
   @media (prefers-color-scheme: dark){ .card .tagline{color:var(--brand-400);} }
@@ -679,19 +681,94 @@ ${sharedCards}
   });
 }
 
+// Peter, 20 Oct 2026: "audience group nav".
+//
+// WHY GROUPED AND NOT JUST SHORTER. The eight destinations were a flat list, and
+// the value proposition genuinely differs between them: a family needs
+// reassurance and speed, a professional needs caseload workflow, a nonprofit
+// needs free access, a facility needs licensing and staff access. A flat list
+// makes a visitor read all eight to find which sentence is about them.
+//
+// THE GROUP CARRIES NO PRICE, deliberately, and that is not a style choice.
+// Ownership decides price, not audience: as of 20 Oct a NON-PROFIT skilled
+// nursing facility is permanently free, so it sits in "Healthcare Providers"
+// and pays nothing, while a for-profit one in the same group pays. A grouping
+// that advertised a price per group would have been wrong the day it shipped,
+// and wrong again the next time a segment changes tier — which has now happened
+// twice in two weeks.
+//
+// THE ORDER IS PETER'S, from his own table: individuals, advocates, nonprofits,
+// providers. Anything ungrouped (/appeals/press) falls through to the end
+// rather than being dropped — a page silently missing from this list is the
+// failure mode, so the fallback is "show it", not "skip it".
+const AUDIENCE_GROUP_ORDER = [
+  "Individuals & Families",
+  "Advocates & Professionals",
+  "Nonprofits & Public Programs",
+  "Healthcare Providers",
+];
+
 function linePage(line) {
   const audiencePages = pages.filter((p) => p.line === line.id && p.inLineNav);
-  const cards = audiencePages
-    .map(
-      (p) => `    <a class="card" href="${p.path}">
+  const cardHtml = (p) => `    <a class="card" href="${p.path}">
       <h2>${p.cardTitle}</h2>
       <p>${p.cardDesc}</p>
       <p class="arrow">Learn more →</p>
-    </a>`
-    )
-    .join("\n");
+    </a>`;
+
+  // Ungrouped pages keep the old flat behaviour, so a line with no groups at
+  // all (USCIS today) renders exactly as it did.
+  const grouped = audiencePages.filter((p) => p.navGroup);
+  const ungrouped = audiencePages.filter((p) => !p.navGroup);
+  const seen = new Set();
+  const blocks = [];
+  for (const groupName of AUDIENCE_GROUP_ORDER) {
+    const inGroup = grouped.filter((p) => p.navGroup === groupName);
+    if (inGroup.length === 0) continue;
+    inGroup.forEach((p) => seen.add(p.path));
+    blocks.push(
+      // Only `&` needs escaping in these four names, and they are literals in
+      // AUDIENCE_GROUP_ORDER rather than anything a visitor supplies. The
+      // comparison above uses the RAW name, so escaping here cannot break the
+      // match — I reached for an escapeHtml() this file does not have, and the
+      // generator refused to run, which is how that was caught.
+      `  <h3 class="audience-group">${groupName.replace(/&/g, "&amp;")}</h3>\n` +
+        `  <div class="cards grouped">\n${inGroup.map(cardHtml).join("\n")}\n  </div>`
+    );
+  }
+  // A group name nobody listed in AUDIENCE_GROUP_ORDER would otherwise vanish.
+  // Throwing is right: a destination missing from the only page that links to
+  // it is invisible, and invisible is how /appeals/forms shipped unreviewed.
+  const orphans = grouped.filter((p) => !seen.has(p.path));
+  if (orphans.length > 0) {
+    throw new Error(
+      `[generate] navGroup not in AUDIENCE_GROUP_ORDER: ${orphans
+        .map((p) => `${p.path} -> "${p.navGroup}"`)
+        .join(", ")}`
+    );
+  }
+  // AN UNGROUPED BLOCK NEEDS ITS OWN HEADING ONCE GROUPS EXIST. Without one it
+  // renders directly under the LAST group's cards and reads as a member of it —
+  // /appeals/press appeared under "Healthcare Providers", and a press page is
+  // not a healthcare provider. Caught by reading the rendered page rather than
+  // the template.
+  //
+  // Press stays in the list rather than being removed: it is a real destination
+  // and verify.mjs asserts the audience cards. It is just not an audience, so it
+  // gets a neutral heading instead of a fifth audience group, which would have
+  // changed the four Peter asked for.
+  if (ungrouped.length > 0) {
+    if (blocks.length > 0) blocks.push(`  <h3 class="audience-group">More from CaseWhy Appeals</h3>`);
+    blocks.push(`  <div class="cards${blocks.length ? " grouped" : ""}">\n${ungrouped.map(cardHtml).join("\n")}\n  </div>`);
+  }
+  const cards = blocks.join("\n");
   let body = readFileSync(join(__dirname, "content", `${line.content}.html`), "utf8");
-  body = body.replace("{{AUDIENCE_CARDS}}", `<div class="cards">\n${cards}\n  </div>`);
+  // CONSUME THE PLACEHOLDER'S OWN INDENTATION. The templates write
+  // "  {{AUDIENCE_CARDS}}" and every block below already carries two spaces, so
+  // replacing the bare token left the cards div indented by four — a whitespace
+  // change on every line page, which makes a real content diff indistinguishable
+  // from a reformat. Match the indentation too and the blocks own it alone.
+  body = body.replace("  {{AUDIENCE_CARDS}}", cards);
   return pageHtml({
     path: line.path,
     titleTag: line.titleTag,

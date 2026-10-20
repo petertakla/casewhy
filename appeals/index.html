@@ -92,6 +92,8 @@
   .cards.lines{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
   .card{border:1px solid var(--border);background:var(--surface);border-radius:16px;padding:24px;text-decoration:none;color:inherit;transition:border-color .15s;}
   .card:hover{border-color:var(--border-strong);}
+  h3.audience-group{font-size:1.02rem;margin:30px 0 0;color:var(--muted);font-weight:700;letter-spacing:0.01em;}
+  .cards.grouped{margin-top:14px;}
   .card h2{margin:0 0 8px;font-size:1.1rem;}
   .card .tagline{margin:0 0 10px;font-size:0.85rem;font-weight:700;color:var(--brand-600);}
   @media (prefers-color-scheme: dark){ .card .tagline{color:var(--brand-400);} }
@@ -299,20 +301,19 @@
   <p>"We built CaseWhy to make sense of confusing government and insurance letters, starting with USCIS case letters. When we looked at Medicare, we found the same problem — and a telling number: only 1 in 9 Medicare Advantage denials ever gets appealed, but more than 8 in 10 appeals win. That gap is the appeal paradox, and it's the reason CaseWhy Appeals exists — not because appealing is hard to win, but because almost nobody does it." — Peter, founder of CaseWhy</p>
 
   <h2>Find your page</h2>
-  <div class="cards">
+  <h3 class="audience-group">Individuals &amp; Families</h3>
+  <div class="cards grouped">
     <a class="card" href="/appeals/families">
       <h2>Families & caregivers</h2>
       <p>What to do when a Medicare Advantage plan refuses or ends skilled nursing care for someone you care for.</p>
       <p class="arrow">Learn more →</p>
     </a>
+  </div>
+  <h3 class="audience-group">Advocates &amp; Professionals</h3>
+  <div class="cards grouped">
     <a class="card" href="/appeals/advocates">
       <h2>Advocates & care managers</h2>
       <p>The professional seat, what it costs, and linking cases back to your own records.</p>
-      <p class="arrow">Learn more →</p>
-    </a>
-    <a class="card" href="/appeals/counselors">
-      <h2>SHIP & SHINE counselors</h2>
-      <p>A free counselor seat, plus free pages to hand out today. Fair-use limits apply.</p>
       <p class="arrow">Learn more →</p>
     </a>
     <a class="card" href="/appeals/attorneys">
@@ -320,9 +321,17 @@
       <p>The professional seat for firms, a free seat for legal aid, and the higher-level forms filled.</p>
       <p class="arrow">Learn more →</p>
     </a>
-    <a class="card" href="/appeals/facilities">
-      <h2>Home health, hospice & SNFs</h2>
-      <p>Why a family's fast appeal is in your interest, and one-sheets with a QR code for the floor.</p>
+    <a class="card" href="/appeals/care-managers">
+      <h2>Care managers</h2>
+      <p>Geriatric care managers juggling clients in several settings at once — one deadline list across the whole caseload.</p>
+      <p class="arrow">Learn more →</p>
+    </a>
+  </div>
+  <h3 class="audience-group">Nonprofits &amp; Public Programs</h3>
+  <div class="cards grouped">
+    <a class="card" href="/appeals/counselors">
+      <h2>SHIP & SHINE counselors</h2>
+      <p>A free counselor seat, plus free pages to hand out today. Fair-use limits apply.</p>
       <p class="arrow">Learn more →</p>
     </a>
     <a class="card" href="/appeals/ombudsman">
@@ -330,14 +339,35 @@
       <p>A free program seat, observation-status and discharge content, and a state-program template letter.</p>
       <p class="arrow">Learn more →</p>
     </a>
+  </div>
+  <h3 class="audience-group">Healthcare Providers</h3>
+  <div class="cards grouped">
+    <a class="card" href="/appeals/facilities">
+      <h2>Home health, hospice & SNFs</h2>
+      <p>Why a family's fast appeal is in your interest, and one-sheets with a QR code for the floor.</p>
+      <p class="arrow">Learn more →</p>
+    </a>
+    <a class="card" href="/appeals/facilities/skilled-nursing">
+      <h2>Skilled nursing</h2>
+      <p>Per-site license for a skilled nursing facility.</p>
+      <p class="arrow">Learn more →</p>
+    </a>
+    <a class="card" href="/appeals/facilities/home-health">
+      <h2>Home health</h2>
+      <p>Per-site license for a home health agency.</p>
+      <p class="arrow">Learn more →</p>
+    </a>
+    <a class="card" href="/appeals/facilities/hospice">
+      <h2>Hospice</h2>
+      <p>Pay-per-case for a hospice, and why there is no monthly plan.</p>
+      <p class="arrow">Learn more →</p>
+    </a>
+  </div>
+  <h3 class="audience-group">More from CaseWhy Appeals</h3>
+  <div class="cards grouped">
     <a class="card" href="/appeals/press">
       <h2>Press</h2>
       <p>The appeal paradox, sourced, plus product facts and the founder's own story.</p>
-      <p class="arrow">Learn more →</p>
-    </a>
-    <a class="card" href="/appeals/care-managers">
-      <h2>Care managers</h2>
-      <p>Geriatric care managers juggling clients in several settings at once — one deadline list across the whole caseload.</p>
       <p class="arrow">Learn more →</p>
     </a>
   </div>

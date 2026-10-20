@@ -133,7 +133,8 @@
       "siteLink": {
         "href": "https://appeals.casewhy.com",
         "label": "appeals.casewhy.com"
-      }
+      },
+      "navGroup": "Individuals & Families"
     },
     {
       "id": "appeals-advocates",
@@ -145,7 +146,8 @@
       "cardTitle": "Advocates & care managers",
       "cardDesc": "The professional seat, what it costs, and linking cases back to your own records.",
       "titleTag": "For Patient Advocates & Aging Life Care Managers | CaseWhy Hub",
-      "description": "A professional seat in CaseWhy Appeals for independent and board-certified patient advocates and aging life care managers — first 3 cases free, then pay per case or a monthly plan."
+      "description": "A professional seat in CaseWhy Appeals for independent and board-certified patient advocates and aging life care managers — first 3 cases free, then pay per case or a monthly plan.",
+      "navGroup": "Advocates & Professionals"
     },
     {
       "id": "appeals-counselors",
@@ -157,7 +159,8 @@
       "cardTitle": "SHIP & SHINE counselors",
       "cardDesc": "A free counselor seat, plus free pages to hand out today. Fair-use limits apply.",
       "titleTag": "For SHIP & SHINE Counselors | CaseWhy Hub",
-      "description": "A free counselor seat in CaseWhy Appeals for SHIP and SHINE counselors, plus free pages you can hand a client today."
+      "description": "A free counselor seat in CaseWhy Appeals for SHIP and SHINE counselors, plus free pages you can hand a client today.",
+      "navGroup": "Nonprofits & Public Programs"
     },
     {
       "id": "appeals-attorneys",
@@ -169,7 +172,8 @@
       "cardTitle": "Elder-law & legal aid attorneys",
       "cardDesc": "The professional seat for firms, a free seat for legal aid, and the higher-level forms filled.",
       "titleTag": "For Elder-Law & Legal Aid Attorneys | CaseWhy Hub",
-      "description": "CaseWhy Appeals for elder-law and legal-aid attorneys: OMHA-100 filled, the good-cause package, and a free seat for legal aid."
+      "description": "CaseWhy Appeals for elder-law and legal-aid attorneys: OMHA-100 filled, the good-cause package, and a free seat for legal aid.",
+      "navGroup": "Advocates & Professionals"
     },
     {
       "id": "appeals-facilities",
@@ -181,7 +185,8 @@
       "cardTitle": "Home health, hospice & SNFs",
       "cardDesc": "Why a family's fast appeal is in your interest, and one-sheets with a QR code for the floor.",
       "titleTag": "For Home Health Agencies, Hospices & SNFs | CaseWhy Hub",
-      "description": "One-sheets and a per-site license for home health agencies, hospices, and independent skilled nursing facilities."
+      "description": "One-sheets and a per-site license for home health agencies, hospices, and independent skilled nursing facilities.",
+      "navGroup": "Healthcare Providers"
     },
     {
       "id": "appeals-ombudsman",
@@ -193,7 +198,8 @@
       "cardTitle": "Long-term care ombudsman programs",
       "cardDesc": "A free program seat, observation-status and discharge content, and a state-program template letter.",
       "titleTag": "For Long-Term Care Ombudsman Programs | CaseWhy Hub",
-      "description": "A free program seat in CaseWhy Appeals for long-term care ombudsman programs."
+      "description": "A free program seat in CaseWhy Appeals for long-term care ombudsman programs.",
+      "navGroup": "Nonprofits & Public Programs"
     },
     {
       "id": "appeals-press",
@@ -229,7 +235,8 @@
       "cardTitle": "Care managers",
       "cardDesc": "Geriatric care managers juggling clients in several settings at once — one deadline list across the whole caseload.",
       "titleTag": "For Geriatric Care Managers — Medicare Appeal Deadlines Across Your Caseload | CaseWhy Hub",
-      "description": "Care managers carry clients in rehab, at home, and on Part D at the same time. CaseWhy Appeals explains each notice, writes the request, and tracks every deadline in one place."
+      "description": "Care managers carry clients in rehab, at home, and on Part D at the same time. CaseWhy Appeals explains each notice, writes the request, and tracks every deadline in one place.",
+      "navGroup": "Advocates & Professionals"
     },
     {
       "id": "appeals-facilities-snf",
@@ -237,7 +244,7 @@
       "path": "/appeals/facilities/skilled-nursing",
       "content": "appeals-facilities-snf",
       "navLabel": "Skilled nursing",
-      "inLineNav": false,
+      "inLineNav": true,
       "cardTitle": "Skilled nursing",
       "cardDesc": "Per-site license for a skilled nursing facility.",
       "titleTag": "For Skilled Nursing Facilities — Medicare Fast Appeals | CaseWhy Hub",
@@ -246,7 +253,8 @@
         "url": "https://casewhyhub.com/images/appeals-desk-snf-board.webp",
         "width": 989,
         "height": 740
-      }
+      },
+      "navGroup": "Healthcare Providers"
     },
     {
       "id": "appeals-facilities-snf-admission",
@@ -288,11 +296,12 @@
       "path": "/appeals/facilities/home-health",
       "content": "appeals-facilities-home-health",
       "navLabel": "Home health",
-      "inLineNav": false,
+      "inLineNav": true,
       "cardTitle": "Home health",
       "cardDesc": "Per-site license for a home health agency.",
       "titleTag": "For Home Health Agencies — Medicare Fast Appeals | CaseWhy Hub",
-      "description": "The same NOMNC and the same fast-review right, handed over in a patient's living room. CaseWhy Appeals explains the notice, writes the request, and tracks the deadline."
+      "description": "The same NOMNC and the same fast-review right, handed over in a patient's living room. CaseWhy Appeals explains the notice, writes the request, and tracks the deadline.",
+      "navGroup": "Healthcare Providers"
     },
     {
       "id": "appeals-facilities-hospice",
@@ -300,11 +309,12 @@
       "path": "/appeals/facilities/hospice",
       "content": "appeals-facilities-hospice",
       "navLabel": "Hospice",
-      "inLineNav": false,
+      "inLineNav": true,
       "cardTitle": "Hospice",
       "cardDesc": "Pay-per-case for a hospice, and why there is no monthly plan.",
       "titleTag": "For Hospices — Medicare Discharge Appeals | CaseWhy Hub",
-      "description": "A hospice discharge for no longer being terminally ill carries the same fast-review right as any ending service. Pay per case, no monthly fee."
+      "description": "A hospice discharge for no longer being terminally ill carries the same fast-review right as any ending service. Pay per case, no monthly fee.",
+      "navGroup": "Healthcare Providers"
     }
   ],
   "companyPages": [

@@ -539,5 +539,97 @@ const uscisPress = visible(read("/uscis/press") ?? "");
 check("/uscis/press still tells the TRUE naturalization family story",
   /own family'?s[\s\S]{0,40}?naturalization/i.test(uscisPress));
 
+// ---------------------------------------------------------------------------
+// SEARCH RESULTS — length and uniqueness, read from the BUILT HTML.
+//
+// Added 21 Oct 2026 with the first SEO pass. Measured that day across the 28
+// built pages: 10 titles over 60 characters (worst 90), 8 descriptions over
+// 160 (worst 192), and TWO PAIRS byte-identical — skilled-nursing and its
+// mid-stay child shared a description, /resources and /uscis/resources shared
+// a title. Over-length gets truncated mid-sentence in a result; identical
+// gives two real pages a searcher cannot tell apart.
+//
+// READ FROM THE BUILT FILES, NOT pages.json, for two reasons. The landing
+// pages /uscis and /appeals take their tags from `lines[]` rather than
+// `pages[]`, so a source-side audit missed them entirely — they were the last
+// two over the limit and they are the most valuable pages on the site. And the
+// generator decides what actually ships, so checking its input proves the
+// wrong thing.
+//
+// THE DESCRIPTION PARSER IS QUOTE-AWARE ON PURPOSE. A regex shaped
+// content=["']([^"']*) stops at the first APOSTROPHE, so the skilled-nursing
+// description — "a resident's family" — measured 24 characters instead of 182
+// and looked like a truncation bug in the page. It was a bug in the
+// measurement. Match the opening delimiter, then only its own closing one.
+const SEO_TITLE_MAX = 60;
+const SEO_DESC_MAX = 160;
+
+function builtPages(dir = ROOT, found = []) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name.startsWith(".") || ["node_modules", "scripts", "images"].includes(entry.name)) continue;
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) builtPages(full, found);
+    else if (entry.name === "index.html") found.push(full);
+  }
+  return found;
+}
+
+function titleOf(html) {
+  const m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  return m ? m[1].trim() : null;
+}
+
+function descriptionOf(html) {
+  const tag = html.match(/<meta[^>]+name=["']description["'][^>]*>/i);
+  if (!tag) return null;
+  const d = tag[0].match(/content="([^"]*)"/) || tag[0].match(/content='([^']*)'/);
+  return d ? d[1] : null;
+}
+
+console.log("\n== Search results: length and uniqueness ==");
+{
+  const built = builtPages();
+  // An empty sweep must not read as a clean one.
+  check(`the SEO scan found pages to read (${built.length})`, built.length > 20);
+
+  const longTitles = [];
+  const longDescs = [];
+  const missing = [];
+  const byTitle = new Map();
+  const byDesc = new Map();
+
+  for (const file of built) {
+    const html = readFileSync(file, "utf8");
+    const rel = file.slice(ROOT.length).replace(/\/index\.html$/, "") || "/";
+    const title = titleOf(html);
+    const desc = descriptionOf(html);
+    if (!title || !desc) missing.push(rel);
+    if (title) {
+      if (title.length > SEO_TITLE_MAX) longTitles.push(`${rel} (${title.length})`);
+      byTitle.set(title, [...(byTitle.get(title) ?? []), rel]);
+    }
+    if (desc) {
+      if (desc.length > SEO_DESC_MAX) longDescs.push(`${rel} (${desc.length})`);
+      byDesc.set(desc, [...(byDesc.get(desc) ?? []), rel]);
+    }
+  }
+
+  const dupTitles = [...byTitle.values()].filter((v) => v.length > 1);
+  const dupDescs = [...byDesc.values()].filter((v) => v.length > 1);
+
+  check(`every page has a title and a description${missing.length ? ` — missing on ${missing.join(", ")}` : ""}`,
+    missing.length === 0);
+  check(`no title over ${SEO_TITLE_MAX} chars${longTitles.length ? ` — ${longTitles.join(", ")}` : ""}`,
+    longTitles.length === 0);
+  check(`no description over ${SEO_DESC_MAX} chars${longDescs.length ? ` — ${longDescs.join(", ")}` : ""}`,
+    longDescs.length === 0);
+  // Uniqueness is the half a length check cannot see: two pages can both be
+  // comfortably short and still be indistinguishable in a result.
+  check(`no two pages share a title${dupTitles.length ? ` — ${dupTitles.map((v) => v.join(" = ")).join("; ")}` : ""}`,
+    dupTitles.length === 0);
+  check(`no two pages share a description${dupDescs.length ? ` — ${dupDescs.map((v) => v.join(" = ")).join("; ")}` : ""}`,
+    dupDescs.length === 0);
+}
+
 console.log(`\n${failures === 0 ? "All checks passed." : `${failures} check(s) FAILED.`}`);
 process.exit(failures === 0 ? 0 : 1);

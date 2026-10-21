@@ -10,8 +10,8 @@
         "label": "casewhy.com"
       },
       "content": "uscis",
-      "titleTag": "CaseWhy — Partner with the Free USCIS Case-Status Tracker | CaseWhy Hub",
-      "description": "Free listings and partnership programs for immigration attorneys, legal aid organizations, schools, congressional offices, press, and employers — from CaseWhy, the free USCIS case-status tracker.",
+      "titleTag": "Partner with CaseWhy — Free USCIS Case-Status Tracker",
+      "description": "Free listings and partnership programs for immigration attorneys, legal aid, schools, congressional offices and employers — from CaseWhy.",
       "rootCardTitle": "CaseWhy",
       "rootCardTagline": "The free USCIS case-status tracker",
       "rootCardDesc": "Attorneys, legal aid organizations, schools, congressional offices, employers, and press — partner with the USCIS side of CaseWhy.",
@@ -26,8 +26,8 @@
         "label": "appeals.casewhy.com/desk"
       },
       "content": "appeals",
-      "titleTag": "CaseWhy Appeals — Partner with the Medicare Appeals Engine | CaseWhy Hub",
-      "description": "Free and professional seats for patient advocates, SHIP counselors, elder-law attorneys, facilities, and long-term care ombudsman programs — from CaseWhy Appeals, the Medicare appeals engine that works alongside what you already use.",
+      "titleTag": "Partner with CaseWhy Appeals — Medicare Appeals Engine",
+      "description": "Free and professional seats for patient advocates, SHIP counselors, elder-law attorneys, facilities and ombudsman programs — CaseWhy Appeals.",
       "rootCardTitle": "CaseWhy Appeals",
       "rootCardTagline": "Every Medicare appeal, explained, written, and tracked",
       "rootCardDesc": "Advocates, SHIP counselors, elder-law attorneys, facilities, and ombudsman programs — partner with the Appeals side of CaseWhy.",
@@ -44,7 +44,7 @@
       "inLineNav": true,
       "cardTitle": "Attorneys",
       "cardDesc": "A free, non-exclusive founding-partner listing in CaseWhy's immigration attorney directory.",
-      "titleTag": "For Immigration Attorneys — Free Directory Listing | CaseWhy Hub",
+      "titleTag": "Immigration Attorneys — Free Directory Listing | CaseWhy",
       "description": "Join 272 board-certified immigration attorneys already listed free in CaseWhy's directory. No fee, no exclusivity, ever."
     },
     {
@@ -116,7 +116,7 @@
       "inLineNav": false,
       "cardTitle": "Resources",
       "cardDesc": "A one-pager, logos, boilerplate, and a website snippet — everything a partner needs.",
-      "titleTag": "Partner Resources — CaseWhy | CaseWhy Hub",
+      "titleTag": "Partner Resources — USCIS Case-Status Tracker | CaseWhy",
       "description": "Download CaseWhy's one-pager, logo pack, and boilerplate, or copy a snippet for your own resources page."
     },
     {
@@ -128,7 +128,7 @@
       "inLineNav": true,
       "cardTitle": "Families & caregivers",
       "cardDesc": "What to do when a Medicare Advantage plan refuses or ends skilled nursing care for someone you care for.",
-      "titleTag": "For Families & Caregivers — Medicare Advantage Appeals | CaseWhy Hub",
+      "titleTag": "Families & Caregivers — Medicare Advantage Appeals | CaseWhy",
       "description": "A plain-language guide for families when a Medicare Advantage plan refuses or cuts short skilled nursing care: the notice, the deadline, and how to appeal.",
       "siteLink": {
         "href": "https://appeals.casewhy.com",
@@ -145,8 +145,8 @@
       "inLineNav": true,
       "cardTitle": "Advocates & care managers",
       "cardDesc": "The professional seat, what it costs, and linking cases back to your own records.",
-      "titleTag": "For Patient Advocates & Aging Life Care Managers | CaseWhy Hub",
-      "description": "A professional seat in CaseWhy Appeals for independent and board-certified patient advocates and aging life care managers — first 3 cases free, then pay per case or a monthly plan.",
+      "titleTag": "Patient Advocates & Aging Life Care Managers | CaseWhy",
+      "description": "A professional seat in CaseWhy Appeals for independent and board-certified patient advocates and aging life care managers. First 3 cases free.",
       "navGroup": "Advocates & Professionals"
     },
     {
@@ -236,8 +236,8 @@
       "inLineNav": true,
       "cardTitle": "Care managers",
       "cardDesc": "Geriatric care managers juggling clients in several settings at once — one deadline list across the whole caseload.",
-      "titleTag": "For Geriatric Care Managers — Medicare Appeal Deadlines Across Your Caseload | CaseWhy Hub",
-      "description": "Care managers carry clients in rehab, at home, and on Part D at the same time. CaseWhy Appeals explains each notice, writes the request, and tracks every deadline in one place.",
+      "titleTag": "Geriatric Care Managers — Medicare Deadlines | CaseWhy",
+      "description": "Clients in rehab, at home and on Part D at once. CaseWhy Appeals explains each notice, writes the request, and tracks every deadline in one place.",
       "navGroup": "Advocates & Professionals"
     },
     {
@@ -249,8 +249,8 @@
       "inLineNav": true,
       "cardTitle": "Skilled nursing",
       "cardDesc": "Per-site license for a skilled nursing facility.",
-      "titleTag": "For Skilled Nursing Facilities — Medicare Fast Appeals | CaseWhy Hub",
-      "description": "A NOMNC gives a resident's family until noon the day before coverage ends to ask for a fast QIO review. CaseWhy Appeals explains the notice, writes the request, and tracks the clock.",
+      "titleTag": "Skilled Nursing Facilities — Medicare Fast Appeals | CaseWhy",
+      "description": "A NOMNC gives a resident's family until noon the day before coverage ends to request a fast QIO review. CaseWhy explains it and writes the request.",
       "ogImage": {
         "url": "https://casewhyhub.com/images/appeals-desk-snf-board.webp",
         "width": 989,
@@ -267,8 +267,8 @@
       "inLineNav": false,
       "cardTitle": "Admission denials",
       "cardDesc": "When a plan refuses the admission before the resident arrives.",
-      "titleTag": "SNF Admission Denials — Medicare Advantage Appeals | CaseWhy Hub",
-      "description": "A Medicare Advantage plan can refuse a skilled nursing admission before the resident arrives. 95% of filed appeals were overturned (HHS OIG, June 2026). The 65-day clock, the letter, CMS-1696.",
+      "titleTag": "SNF Admission Denials — Medicare Advantage Appeals | CaseWhy",
+      "description": "A Medicare Advantage plan can refuse a skilled nursing admission before the resident arrives. 95% of filed appeals were overturned (HHS OIG, June 2026).",
       "ogImage": {
         "url": "https://casewhyhub.com/images/appeals-desk-snf-admission-denials.webp",
         "width": 1006,
@@ -284,8 +284,8 @@
       "inLineNav": false,
       "cardTitle": "Mid-stay cut-offs",
       "cardDesc": "When a plan ends a resident's covered stay.",
-      "titleTag": "When Medicare Advantage Ends a Resident's Stay — SNF Fast Appeals | CaseWhy Hub",
-      "description": "A NOMNC gives a resident's family until noon the day before coverage ends to ask for a fast QIO review. CaseWhy Appeals explains the notice, writes the request, and tracks the clock.",
+      "titleTag": "Medicare Ends a Resident's Stay — SNF Fast Appeals | CaseWhy",
+      "description": "When a plan ends a resident's covered stay, the family has until noon the day before to request a fast QIO review. CaseWhy tracks the clock.",
       "ogImage": {
         "url": "https://casewhyhub.com/images/appeals-desk-snf-board.webp",
         "width": 989,
@@ -301,8 +301,8 @@
       "inLineNav": true,
       "cardTitle": "Home health",
       "cardDesc": "Per-site license for a home health agency.",
-      "titleTag": "For Home Health Agencies — Medicare Fast Appeals | CaseWhy Hub",
-      "description": "The same NOMNC and the same fast-review right, handed over in a patient's living room. CaseWhy Appeals explains the notice, writes the request, and tracks the deadline.",
+      "titleTag": "Home Health Agencies — Medicare Fast Appeals | CaseWhy",
+      "description": "The same NOMNC and the same fast-review right, handed over in a patient's living room. CaseWhy explains the notice and writes the request.",
       "navGroup": "Healthcare Providers"
     },
     {
@@ -333,7 +333,7 @@
       "path": "/resources",
       "content": "company-resources",
       "navLabel": "Resources",
-      "titleTag": "Partner Resources — CaseWhy | CaseWhy Hub",
+      "titleTag": "Partner Resources — Every CaseWhy Line | CaseWhy Hub",
       "description": "Partner resource kits for every CaseWhy line: the free USCIS case-status tracker and CaseWhy Appeals, the Medicare appeals engine."
     },
     {

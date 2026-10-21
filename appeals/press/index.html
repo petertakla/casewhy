@@ -90,6 +90,16 @@
      touched. Same shape as ul.checklist below. 15 Oct 2026. */
   ul.cards{list-style:none;padding-left:0;}
   .cards.lines{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
+  /* TAP-TO-OPEN STEPS, used by the families page. The disclosure triangle IS
+     the marker, so the list bullet beside it was a second one — a circle and a
+     triangle on every row, which reads as a mistake rather than a control.
+     21 Oct 2026. */
+  ul.steps{list-style:none;padding-left:0;margin:0;}
+  ul.steps li{margin:0 0 10px;}
+  ul.steps summary{cursor:pointer;}
+  /* The open state needs to look attached to its label rather than floating. */
+  ul.steps details[open] p{margin:6px 0 0;}
+  .path-hint{color:var(--muted);font-size:0.92rem;margin-top:8px;}
   .card{border:1px solid var(--border);background:var(--surface);border-radius:16px;padding:24px;text-decoration:none;color:inherit;transition:border-color .15s;}
   .card:hover{border-color:var(--border-strong);}
   h3.audience-group{font-size:1.02rem;margin:30px 0 0;color:var(--muted);font-weight:700;letter-spacing:0.01em;}

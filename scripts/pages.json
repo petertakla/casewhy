@@ -293,6 +293,21 @@
       }
     },
     {
+      "comment": "THE LEAD MAGNET, moved into this registry 22 Oct 2026. It shipped on 8 Oct as a hand-committed index.html that was in NO registry, and the cost of that was exactly what you would predict and nobody saw: it was absent from sitemap.xml (which is generated from this file), no page linked to it, and it had already drifted a shared script behind every generated page. A free offer reachable only by typing its URL is not an offer. inLineNav is false on purpose — it is not a fourth audience alongside SNF/home health/hospice — so its only paths in are the two crosslinks added to the facilities hub and the mid-stay page, plus the sitemap. verify.mjs now fails if a built page is missing from the sitemap, which is the check that would have caught this on day one.",
+      "id": "appeals-facilities-nomnc-cheat-sheet",
+      "line": "appeals",
+      "path": "/appeals/facilities/nomnc-cheat-sheet",
+      "content": "appeals-facilities-nomnc-cheat-sheet",
+      "navLabel": "NOMNC cheat sheet",
+      "inLineNav": false,
+      "titleTag": "Free NOMNC deadline cheat sheet | CaseWhy Hub",
+      "description": "A free one-page NOMNC and Medicare Advantage denial deadline cheat sheet for SNF, home health and hospice teams. Print it, pin it up. No cost, no commitment.",
+      "siteLink": {
+        "href": "https://appeals.casewhy.com",
+        "label": "appeals.casewhy.com"
+      }
+    },
+    {
       "id": "appeals-facilities-home-health",
       "line": "appeals",
       "path": "/appeals/facilities/home-health",

@@ -13,6 +13,8 @@
 <meta property="og:site_name" content="CaseWhy Hub">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://casewhyhub.com/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Free NOMNC deadline cheat sheet | CaseWhy Hub">
 <meta name="twitter:description" content="A free one-page NOMNC and Medicare Advantage denial deadline cheat sheet for SNF, home health and hospice teams. Print it, pin it up. No cost, no commitment.">
@@ -79,9 +81,49 @@
   .free-line{margin-top:18px;font-size:0.92rem;font-weight:600;color:var(--foreground);}
   .disclaimer{margin-top:20px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);padding:16px 18px;font-size:0.88rem;color:var(--foreground);}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:48px;}
+  /* THE FAMILIES PAGE MARKS ITS CARDS UP AS A LIST, and every other page on the
+     hub uses a <div class="cards">. So the grid above was written for a div and
+     carries no list reset — which put a grey bullet beside all six cards the
+     moment a <ul class="cards"> appeared. Found by opening the published page,
+     not by any check: the HTML is correct, the acceptance script passes, and a
+     static fetch cannot see a marker. Scoped to ul so no existing .cards div is
+     touched. Same shape as ul.checklist below. 15 Oct 2026. */
+  ul.cards{list-style:none;padding-left:0;}
   .cards.lines{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
+  /* TAP-TO-OPEN STEPS, used by the families page. The disclosure triangle IS
+     the marker, so the list bullet beside it was a second one — a circle and a
+     triangle on every row, which reads as a mistake rather than a control.
+     21 Oct 2026. */
+  ul.steps{list-style:none;padding-left:0;margin:0;}
+  ul.steps li{margin:0 0 10px;}
+  ul.steps summary{cursor:pointer;}
+  /* The open state needs to look attached to its label rather than floating. */
+  ul.steps details[open] p{margin:6px 0 0;}
+  .path-hint{color:var(--muted);font-size:0.92rem;margin-top:8px;}
   .card{border:1px solid var(--border);background:var(--surface);border-radius:16px;padding:24px;text-decoration:none;color:inherit;transition:border-color .15s;}
   .card:hover{border-color:var(--border-strong);}
+  h3.audience-group{font-size:1.02rem;margin:30px 0 0;color:var(--muted);font-weight:700;letter-spacing:0.01em;}
+  .cards.grouped{margin-top:14px;}
+  .group-note{margin:6px 0 0;font-size:0.86rem;color:var(--muted);}
+  /* A GROUP LEAD CARD SITS ALONE ON ITS OWN ROW, CENTRED.
+
+     A plain "grid-column: 2" was the obvious way to say the middle, and it does NOT
+     work: grid auto-placement only ever moves FORWARD, so the next card lands
+     in column 3 beside it and the three buildings end up split across two rows.
+     Owning the whole row and centring inside it is what actually puts one card
+     above three.
+
+     The width is one column's: the grid is three columns of 1fr with an 18px
+     gap, so a column is (100% - 36px)/3.
+
+     ONLY AT THREE COLUMNS. The grid is auto-fit/minmax(220px,1fr) inside a
+     820px wrap with 24px padding, so it is three columns from 744px of viewport
+     (3*220 + 2*18 = 696px of content) and two or one below that. At those
+     narrower widths "the middle" has no meaning, so the rule simply does not
+     apply and the card flows like any other. */
+  @media (min-width: 744px){
+    .cards.grouped .card.lead{grid-column:1 / -1;max-width:calc((100% - 36px) / 3);margin-inline:auto;}
+  }
   .card h2{margin:0 0 8px;font-size:1.1rem;}
   .card .tagline{margin:0 0 10px;font-size:0.85rem;font-weight:700;color:var(--brand-600);}
   @media (prefers-color-scheme: dark){ .card .tagline{color:var(--brand-400);} }
@@ -112,6 +154,32 @@
   .status.success{color:var(--logo-green);}
   .status.error{color:#e05252;}
   .form-note{font-size:0.8rem;color:var(--muted);margin:-4px 0 0;}
+  /* The cheat-sheet lead form (/appeals/facilities/nomnc-cheat-sheet).
+     These nine rules lived ONLY in that one page's own <style> block, which
+     is the same mistake this file's own diagram-styles comment records: a
+     hand-added rule on a generated page is dropped the next time anything
+     regenerates it. The page was not in pages.json at all, so nothing ever
+     did — it simply sat there drifting, already missing one of the shared
+     scripts. Moving the page into the registry is what forced these here.
+
+     NO BACKTICKS IN HERE. This whole stylesheet is one JS template literal,
+     so a backtick in a comment ends the string and the generator dies with
+     "Unexpected identifier" pointing at CSS. It happened writing this very
+     block, which is the third time this file's class of trap has bitten.
+
+     .consent input is LOAD-BEARING, not cosmetic: the shared
+     input,select,textarea rule above sets width:100%, which stretches a
+     checkbox to the full column, so without this the consent tick becomes a
+     full-width bar and the sentence beside it wraps underneath. */
+  .optional{font-weight:400;color:var(--muted);}
+  .consent{display:flex;gap:10px;align-items:flex-start;font-size:0.88rem;font-weight:400;line-height:1.45;}
+  .consent input{margin-top:3px;width:auto;flex:none;}
+  .done{display:none;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);padding:18px 20px;}
+  .done h2{margin-top:0;}
+  .download{display:inline-block;margin-top:6px;padding:12px 22px;border-radius:10px;background:var(--brand-500);color:#fff;text-decoration:none;font-weight:700;}
+  .download:hover{background:var(--brand-600);}
+  ul.sheet-bullets{padding-left:20px;}
+  ul.sheet-bullets li{margin-bottom:10px;}
   .kit{margin-top:32px;border:1px solid var(--border);background:var(--surface);border-radius:16px;padding:24px;}
   .kit h2{margin-top:0;}
   .kit-intro{color:var(--muted);font-size:0.9rem;margin-top:-6px;}
@@ -204,29 +272,10 @@
   footer .links a{margin-right:16px;}
   footer .app-line{font-weight:600;color:var(--foreground);}
   footer .coming{margin-top:10px;font-size:0.8rem;font-style:italic;}
-
-  /* The sign-up form. Values taken from the uscis lead forms so the two pages
-     look like the same site; the consent row is new, because no other form
-     here has a checkbox that has to be read before it is ticked. */
-  form{margin-top:4px;display:grid;gap:14px;max-width:480px;}
-  label{font-size:0.85rem;font-weight:600;display:block;margin-bottom:5px;}
-  input[type=text],input[type=email],select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border-strong);background:var(--surface);color:var(--foreground);font-family:inherit;font-size:0.95rem;}
-  .honeypot{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;}
-  .optional{font-weight:400;color:var(--muted);}
-  .consent{display:flex;gap:10px;align-items:flex-start;font-size:0.88rem;font-weight:400;line-height:1.45;}
-  .consent input{margin-top:3px;width:auto;flex:none;}
-  button.submit{padding:13px 26px;border-radius:10px;background:var(--brand-500);color:#fff;font-weight:700;border:none;font-size:0.98rem;cursor:pointer;justify-self:start;}
-  button.submit:hover{background:var(--brand-600);}
-  button.submit:disabled{opacity:0.6;cursor:not-allowed;}
-  .status{font-size:0.9rem;margin:0;}
-  .status.error{color:#b91c1c;}
-  .done{display:none;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);padding:18px 20px;}
-  .done h2{margin-top:0;}
-  .download{display:inline-block;margin-top:6px;padding:12px 22px;border-radius:10px;background:var(--brand-500);color:#fff;text-decoration:none;font-weight:700;}
-  .download:hover{background:var(--brand-600);}
-  ul.sheet-bullets{padding-left:20px;}
-  ul.sheet-bullets li{margin-bottom:10px;}
 </style>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebPage","name":"Free NOMNC deadline cheat sheet | CaseWhy Hub","url":"https://casewhyhub.com/appeals/facilities/nomnc-cheat-sheet","isPartOf":{"@type":"WebSite","name":"CaseWhy Hub","url":"https://casewhyhub.com"}}
+  </script>
 </head>
 <body>
 
@@ -247,7 +296,7 @@
       <a class="shared-link" href="/press">Press</a>
       <a class="shared-link" href="/resources">Resources</a>
       <a class="shared-link" href="/brand">Brand</a>
-      <a class="site-link" href="https://appeals.casewhy.com/desk?utm_source=hub&utm_medium=header">appeals.casewhy.com/desk ↗</a>
+      <a class="site-link" href="https://appeals.casewhy.com?utm_source=hub&utm_medium=header">appeals.casewhy.com ↗</a>
     </nav>
   </div>
 </header>
@@ -305,6 +354,14 @@
   </section>
 
   <div class="disclaimer">
+    <!-- THE AFFILIATION SENTENCE WAS MISSING FROM THIS PAGE FOR TWO WEEKS, and
+         it took moving the page into pages.json to find out. verify.mjs asserts
+         it on every /appeals/* page by looping the registry, so a page outside
+         the registry is outside the check — the page shipped 8 Oct with its own
+         legal-advice caveat and without the one sentence every sibling page
+         carries. It is the page that collects an email address and names CMS,
+         so it is the last page that should have been missing it. -->
+    <p>CaseWhy Appeals is not affiliated with or endorsed by Medicare, CMS, or any health plan, and is not a law firm.</p>
     <p><strong>General information, not legal advice.</strong> The cheat sheet summarises CMS's own NOMNC
       instructions and the Medicare Advantage appeal regulations; it is not a substitute for reading the notice in
       front of you or for advice about a particular resident.</p>
@@ -312,21 +369,7 @@
       letter citing the rule the plan must follow, and tracks every case on one board.
       <a href="https://appeals.casewhy.com/desk?utm_source=hub&utm_medium=cheat-sheet">Your first 3 cases are free.</a></p>
   </div>
-</main>
-<footer>
-  <div class="wrap">
-    <p class="app-line">CaseWhy — the USCIS tracker: <a href="https://www.casewhy.com?utm_source=hub&utm_medium=footer">casewhy.com</a> · CaseWhy Appeals: <a href="https://appeals.casewhy.com?utm_source=hub&utm_medium=footer">appeals.casewhy.com</a> · Appeals Desk: <a href="https://appeals.casewhy.com/desk?utm_source=hub&utm_medium=footer">appeals.casewhy.com/desk</a></p>
-    <p class="app-line">USCIS help: <a href="https://app.casewhy.com/get-help?utm_source=hub&utm_medium=footer">app.casewhy.com/get-help</a> · Appeals help: <a href="mailto:appeals-help@casewhy.com">appeals-help@casewhy.com</a></p>
-    <p>CaseWhy LLC, 7901 4th St N, Ste 300, St. Petersburg, FL 33702, US</p>
-    <div class="links">
-      <a href="/resources">Resources</a>
-      <a href="/brand">Brand</a>
-      <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>
-      <a href="mailto:terms@casewhy.com">terms@casewhy.com</a>
-    </div>
-    <p class="coming">Coming: creators, libraries, Español.</p>
-  </div>
-</footer>
+
 <script>
   // The sign-up. Posts to the appeals app, which is where the database, the
   // suppression list and the sender are — this site is static and cannot do
@@ -420,6 +463,36 @@
     });
   })();
 </script>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="app-line">CaseWhy — the USCIS tracker: <a href="https://www.casewhy.com?utm_source=hub&utm_medium=footer">casewhy.com</a> · CaseWhy Appeals: <a href="https://appeals.casewhy.com?utm_source=hub&utm_medium=footer">appeals.casewhy.com</a> · Appeals Desk: <a href="https://appeals.casewhy.com/desk?utm_source=hub&utm_medium=footer">appeals.casewhy.com/desk</a></p>
+    <p class="app-line">USCIS help: <a href="https://app.casewhy.com/get-help?utm_source=hub&utm_medium=footer">app.casewhy.com/get-help</a> · Appeals help: <a href="mailto:appeals-help@casewhy.com">appeals-help@casewhy.com</a></p>
+    <p>CaseWhy LLC, 7901 4th St N, Ste 300, St. Petersburg, FL 33702, US</p>
+    <div class="links">
+      <a href="/resources">Resources</a>
+      <a href="/brand">Brand</a>
+      <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>
+      <a href="mailto:terms@casewhy.com">terms@casewhy.com</a>
+    </div>
+    <p class="coming">Coming: creators, libraries, Español.</p>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.copy-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.copyTarget);
+      navigator.clipboard.writeText(target.value).then(() => {
+        const original = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = original; }, 1800);
+      });
+    });
+  });
+</script>
 <script>
   (function () {
     var incoming = new URLSearchParams(location.search);
@@ -432,6 +505,19 @@
         a.href = u.toString();
       } catch (e) { /* a malformed href stays exactly as authored */ }
     });
+  })();
+</script>
+<script>
+  (function () {
+    try {
+      var rc = new URLSearchParams(location.search).get('rc');
+      if (!rc) return;
+      fetch('https://appeals.casewhy.com/?rc=' + encodeURIComponent(rc), {
+        mode: 'no-cors',
+        credentials: 'omit',
+        keepalive: true
+      });
+    } catch (e) { /* a measurement never breaks the page */ }
   })();
 </script>
 </body>

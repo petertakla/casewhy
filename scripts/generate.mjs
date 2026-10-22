@@ -164,6 +164,32 @@ const CSS = `
   .status.success{color:var(--logo-green);}
   .status.error{color:#e05252;}
   .form-note{font-size:0.8rem;color:var(--muted);margin:-4px 0 0;}
+  /* The cheat-sheet lead form (/appeals/facilities/nomnc-cheat-sheet).
+     These nine rules lived ONLY in that one page's own <style> block, which
+     is the same mistake this file's own diagram-styles comment records: a
+     hand-added rule on a generated page is dropped the next time anything
+     regenerates it. The page was not in pages.json at all, so nothing ever
+     did — it simply sat there drifting, already missing one of the shared
+     scripts. Moving the page into the registry is what forced these here.
+
+     NO BACKTICKS IN HERE. This whole stylesheet is one JS template literal,
+     so a backtick in a comment ends the string and the generator dies with
+     "Unexpected identifier" pointing at CSS. It happened writing this very
+     block, which is the third time this file's class of trap has bitten.
+
+     .consent input is LOAD-BEARING, not cosmetic: the shared
+     input,select,textarea rule above sets width:100%, which stretches a
+     checkbox to the full column, so without this the consent tick becomes a
+     full-width bar and the sentence beside it wraps underneath. */
+  .optional{font-weight:400;color:var(--muted);}
+  .consent{display:flex;gap:10px;align-items:flex-start;font-size:0.88rem;font-weight:400;line-height:1.45;}
+  .consent input{margin-top:3px;width:auto;flex:none;}
+  .done{display:none;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);padding:18px 20px;}
+  .done h2{margin-top:0;}
+  .download{display:inline-block;margin-top:6px;padding:12px 22px;border-radius:10px;background:var(--brand-500);color:#fff;text-decoration:none;font-weight:700;}
+  .download:hover{background:var(--brand-600);}
+  ul.sheet-bullets{padding-left:20px;}
+  ul.sheet-bullets li{margin-bottom:10px;}
   .kit{margin-top:32px;border:1px solid var(--border);background:var(--surface);border-radius:16px;padding:24px;}
   .kit h2{margin-top:0;}
   .kit-intro{color:var(--muted);font-size:0.9rem;margin-top:-6px;}

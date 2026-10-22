@@ -631,5 +631,54 @@ console.log("\n== Search results: length and uniqueness ==");
     dupDescs.length === 0);
 }
 
+// ---- a page that ships is a page the sitemap offers ----
+//
+// THE CHECK ABOVE IT ASKS THIS QUESTION FOR ONE HARDCODED PATH, and that is
+// why it missed the page that needed it. The families check asserts
+// `sitemap.xml.includes("/appeals/families")` by name, so it can only ever
+// catch the one page somebody already thought about.
+//
+// Measured 22 Oct 2026: 28 pages on disk, 27 in sitemap.xml. The missing one
+// was /appeals/facilities/nomnc-cheat-sheet — a free lead magnet, live since
+// 8 Oct, committed as a hand-written index.html that was in NO registry. The
+// sitemap is generated from pages.json, so a page outside pages.json is
+// invisible to it by construction, and nothing noticed for two weeks. It had
+// also silently fallen a shared script behind every generated page.
+//
+// WALK THE DISK, NOT THE REGISTRY. A registry-vs-sitemap check is a tautology
+// here — both come from pages.json, so it would have been green throughout.
+// The disk is where the discrepancy lives.
+//
+// DRAFTS ARE THE ONE LEGITIMATE ABSENCE, and the exemption reads the flag from
+// pages.json rather than listing paths, so approving a draft (dropping the
+// flag) automatically brings it under this rule. A non-draft page whose URL is
+// published and unlisted has no honest reason to exist: either it is for
+// readers, in which case search should have it, or it is not, in which case it
+// should be a draft.
+console.log("\n== Every shipped page is in the sitemap ==");
+{
+  const sitemap = readFileSync(join(ROOT, "sitemap.xml"), "utf8");
+  const draftPaths = new Set([...lines, ...pages, ...companyPages].filter((p) => p.draft).map((p) => p.path));
+  const built = builtPages().map((f) => f.slice(ROOT.length).replace(/\/index\.html$/, "") || "/");
+  check(`the sweep found pages to check (${built.length})`, built.length > 20);
+
+  const unlisted = built.filter((rel) => !draftPaths.has(rel) && !sitemap.includes(`<loc>https://casewhyhub.com${rel}</loc>`));
+  check(
+    `every non-draft page is offered in sitemap.xml${unlisted.length ? ` — missing: ${unlisted.join(", ")}` : ""}`,
+    unlisted.length === 0
+  );
+  // And the inverse, which fails the other way round: the sitemap must not
+  // advertise a URL that does not exist. A 404 in a sitemap is a crawl budget
+  // spent on nothing, and it is how a renamed path goes unnoticed.
+  const builtSet = new Set(built);
+  const phantom = [...sitemap.matchAll(/<loc>https:\/\/casewhyhub\.com([^<]*)<\/loc>/g)]
+    .map((m) => m[1] || "/")
+    .filter((rel) => !builtSet.has(rel));
+  check(
+    `the sitemap offers no URL without a page${phantom.length ? ` — ${phantom.join(", ")}` : ""}`,
+    phantom.length === 0
+  );
+}
+
 console.log(`\n${failures === 0 ? "All checks passed." : `${failures} check(s) FAILED.`}`);
 process.exit(failures === 0 ? 0 : 1);

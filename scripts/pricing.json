@@ -8,6 +8,7 @@
         "label": "Volume",
         "monthlyUsd": 0,
         "includedCases": 0,
+        "unlimited": false,
         "tiers": [
           {
             "upTo": 8,
@@ -28,6 +29,7 @@
         "label": "Standard",
         "monthlyUsd": 99,
         "includedCases": 8,
+        "unlimited": false,
         "tiers": [
           {
             "upTo": 8,
@@ -44,6 +46,7 @@
         "label": "Growth",
         "monthlyUsd": 249,
         "includedCases": 25,
+        "unlimited": false,
         "tiers": [
           {
             "upTo": 25,
@@ -62,6 +65,7 @@
         "label": "Volume",
         "monthlyUsd": 0,
         "includedCases": 0,
+        "unlimited": false,
         "tiers": [
           {
             "upTo": 25,
@@ -81,31 +85,12 @@
         "id": "standard",
         "label": "Standard",
         "monthlyUsd": 499,
-        "includedCases": 25,
+        "includedCases": 0,
+        "unlimited": true,
         "tiers": [
           {
-            "upTo": 25,
-            "perCaseUsd": 0
-          },
-          {
             "upTo": null,
-            "perCaseUsd": 20
-          }
-        ]
-      },
-      {
-        "id": "growth",
-        "label": "Growth",
-        "monthlyUsd": 999,
-        "includedCases": 60,
-        "tiers": [
-          {
-            "upTo": 60,
             "perCaseUsd": 0
-          },
-          {
-            "upTo": null,
-            "perCaseUsd": 16
           }
         ]
       }
@@ -116,6 +101,7 @@
         "label": "Volume",
         "monthlyUsd": 0,
         "includedCases": 0,
+        "unlimited": false,
         "tiers": [
           {
             "upTo": 15,
@@ -136,6 +122,7 @@
         "label": "Standard",
         "monthlyUsd": 249,
         "includedCases": 15,
+        "unlimited": false,
         "tiers": [
           {
             "upTo": 15,
@@ -152,6 +139,7 @@
         "label": "Growth",
         "monthlyUsd": 599,
         "includedCases": 40,
+        "unlimited": false,
         "tiers": [
           {
             "upTo": 40,
@@ -170,6 +158,7 @@
         "label": "Volume",
         "monthlyUsd": 0,
         "includedCases": 0,
+        "unlimited": false,
         "tiers": [
           {
             "upTo": 8,

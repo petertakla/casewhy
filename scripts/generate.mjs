@@ -551,6 +551,13 @@ function planCard(plan, unit) {
   const detail =
     plan.monthlyUsd === 0
       ? `No monthly fee, no commitment. ${ladderProse(plan.tiers)}`
+      : plan.unlimited
+      // A FLAT SITE LICENSE. `includedCases` is 0 for one of these, which is
+      // the absence of a cap rather than a cap of nothing — rendering the
+      // number would say "0 cases included each month, then $0 a case."
+      // Appeals' own pricing.ts gained `unlimited` on 28 Oct 2026 when Peter
+      // removed the SNF cap, and it travels through pricing.json to here.
+      ? "Every case included, whatever the volume."
       : `${plan.includedCases} cases included each month, then $${plan.tiers[plan.tiers.length - 1].perCaseUsd} a case.`;
   return `    <div class="tier">
       <h3>${plan.label}</h3>

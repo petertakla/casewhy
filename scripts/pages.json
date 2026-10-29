@@ -146,7 +146,7 @@
       "cardTitle": "Advocates & care managers",
       "cardDesc": "The professional seat, what it costs, and linking cases back to your own records.",
       "titleTag": "Patient Advocates & Aging Life Care Managers | CaseWhy",
-      "description": "A professional seat in CaseWhy Appeals for independent and board-certified patient advocates and aging life care managers. First 3 cases free.",
+      "description": "A professional seat in CaseWhy Appeals for independent and board-certified patient advocates and aging life care managers. Your first 30 days are free.",
       "navGroup": "Advocates & Professionals"
     },
     {
@@ -188,6 +188,19 @@
       "cardDesc": "The case for a family's fast appeal from the provider's side, plus one-sheets with a QR code for the floor.",
       "titleTag": "For Home Health Agencies, Hospices & SNFs | CaseWhy Hub",
       "description": "One-sheets and a per-site license for home health agencies, hospices, and independent skilled nursing facilities.",
+      "navGroup": "Healthcare Providers"
+    },
+    {
+      "id": "appeals-enterprise",
+      "line": "appeals",
+      "path": "/appeals/enterprise",
+      "content": "appeals-enterprise",
+      "navLabel": "Organizations",
+      "inLineNav": true,
+      "cardTitle": "Multi-facility organizations",
+      "cardDesc": "One board across every building you operate, with a separate plan and free period for each line of business.",
+      "titleTag": "Medicare Appeals for Multi-Facility Organizations | CaseWhy",
+      "description": "One view of Medicare appeals across every building you operate. Priced per site, per care segment. No business associate agreement required.",
       "navGroup": "Healthcare Providers"
     },
     {

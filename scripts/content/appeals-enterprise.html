@@ -1,0 +1,94 @@
+  <p class="eyebrow">CaseWhy Hub · <a href="/appeals">CaseWhy Appeals</a> · For multi-facility organizations</p>
+  <h1>CaseWhy Appeals for healthcare organizations</h1>
+  <p class="sub">Medicare coverage denials are appealable on a two-day clock, and independent reviewers overturn roughly half of them. For an organization operating multiple buildings, the material question is not whether appeals succeed. It is how many are never filed, and whether anyone would know.</p>
+  <div class="disclaimer">CaseWhy Appeals is not affiliated with or endorsed by Medicare, CMS, or any health plan, and is not a law firm.</div>
+
+  <!-- ===================================================================
+       AUDIENCE: AN EXECUTIVE. Peter, 29 Oct 2026: "write the pages in a
+       professional language ... from an executive perspective".
+
+       Two rewrites informed this file. The first carried the house voice used
+       on the family and facility pages — effective for a business office
+       manager reading a cold letter, wrong for a vendor evaluation. The second
+       was professional but organised around FEATURES, which is still a
+       manager's document: it opened with what the software does.
+
+       An executive reads for exposure, control, risk and commercial terms, in
+       that order, and decides whether to delegate the evaluation. So the
+       capability list is compressed and moved below the commercial terms, and
+       the page opens on what is at stake rather than on what is built.
+
+       NO INVENTED ECONOMICS. There is no "average facility loses $X per denied
+       day" on this page because that figure is not in our possession. The
+       framing rests on CMS's own published overturn rate, attributed — which
+       is both defensible and stronger than an estimate we cannot source.
+
+       ===================================================================
+       WHAT THIS PAGE MAY CLAIM. Peter set the constraint himself: "Avoid
+       presenting enterprise capabilities as available until verified." Each
+       capability was checked against the code on the day of writing:
+
+         consolidated view of buildings  BUILT, ships 29 Oct 2026
+         organization -> segment ->
+           building -> case              BUILT
+         filter by segment and region    BUILT
+         accountable owner per case      BUILT, pre-dates this work
+         separate free period and plan
+           per care segment              BUILT — the price book is keyed to
+                                         facility type, not to the organization
+
+       DELIBERATELY ABSENT, being untrue today: outcome reporting (the columns
+       exist, nothing writes to them, none has been recorded); any success rate
+       of ours (no facility has used the product); single sign-on, API and
+       integrations (not built); a scheduling calendar (not built — the closing
+       section offers the demonstration that exists and a named contact).
+       =================================================================== -->
+
+  <h2>The exposure</h2>
+  <p>CMS reviewed 625,608 fast-track appeals of post-acute coverage terminations between May 2024 and September 2025. Independent reviewers (BFCC-QIOs) disagreed with the plan in approximately half of them. For denied admissions, the HHS Office of Inspector General reported in June 2026 that 95% of appealed denials were overturned.</p>
+  <p>Two conclusions follow for an organization operating at scale. First, an appeal not filed is, more often than not, a reversible decision left unchallenged. Second, the determining factor is administrative rather than clinical: the fast-track deadline is a call to the reviewer before noon on the day before coverage ends, and it is met or missed by whoever happens to be handling the notice that day.</p>
+  <p>At a single site that risk is visible to the administrator. Across twenty or forty sites it is visible to no one, because there has not been a report that shows it.</p>
+
+  <h2>What an organization gets that a single facility does not</h2>
+  <ul>
+    <li><strong>Portfolio-level visibility of the nearest deadline.</strong> Not when a given deadline falls, but which building is closest to missing one.</li>
+    <li><strong>Named accountability on every open appeal.</strong> Appeals lapse for want of an owner more often than for want of time.</li>
+    <li><strong>Regional and segment views of the same data.</strong> Operations leadership reviews by region; line-of-business leadership reviews by care segment. Both are required and they are different reports.</li>
+    <li><strong>A single point of access</strong> rather than separate credentials per site.</li>
+  </ul>
+
+  <h2>Risk and compliance posture</h2>
+  <p><strong>No business associate agreement is required.</strong> This follows from the architecture rather than from a contractual position. The notice is read, the dates and denial reason are extracted, and the file is then deleted. No protected health information is retained for an agreement to govern.</p>
+  <p>For most organizations this removes the procurement review rather than passing it. Resident names and Medicare numbers are never entered; each case carries the organization's own reference; access is granted per seat, with account owners able to view the full organization and members their own site. The <a href="https://appeals.casewhy.com/privacy">Privacy Policy</a> is the complete statement.</p>
+
+  <h2>Commercial terms</h2>
+  <p><strong>Priced per site, per care segment.</strong> Skilled nursing, home health and hospice carry separate pricing because they are separate operations. Published per-site rates appear on each segment's page.</p>
+  {{PRICING:facility:snf}}
+  <p>Skilled nursing is shown above. <a href="/appeals/facilities/home-health">Home health</a> and <a href="/appeals/facilities/hospice">hospice</a> are documented separately; hospice is per case, with no site license.</p>
+  <p><strong>A free period per care segment, not per organization.</strong> An organization operating in two or three segments receives a separate period for each. A single organization-wide period would oblige two evaluations to proceed on a third's timetable, and the personnel evaluating skilled nursing are generally not those evaluating home health.</p>
+  <p><strong>No enterprise rate card is published here, because none has been established.</strong> No multi-facility organization has yet subscribed, and a stated volume discount would not reflect an actual agreement. Pricing against a specific footprint is provided on request.</p>
+
+  <h2>Evaluating without commitment</h2>
+  <p>A pilot uses the standard free period. There is no separate programme, agreement or minimum.</p>
+  <ul>
+    <li><strong>Two or three buildings within one care segment.</strong></li>
+    <li><strong>The period begins at the first letter generated, not at account creation.</strong> An account opened now and first used in several months receives its full period, so there is no incentive to begin before a genuine notice arrives.</li>
+    <li><strong>Cases opened during the free period remain free permanently</strong>, including their letters and tracked deadlines. No appeal in progress is affected by a commercial decision.</li>
+    <li><strong>The decision at the end is made per care segment.</strong> The remaining segments will not have started their own periods.</li>
+  </ul>
+
+  <h2>What is implemented today</h2>
+  <p>Stated plainly, because an evaluation should not have to distinguish between a capability and an intention.</p>
+  <ul>
+    <li>A consolidated view of every building, showing open appeals, the next deadline at each site, and whether the case has an assigned owner.</li>
+    <li>Navigation from organization to care segment to building to case. The building-level view is the interface a single facility already uses; consolidation is added above it rather than as a second system.</li>
+    <li>Combined filtering by care segment and region, with regions defined by the organization rather than inferred from state.</li>
+    <li>An assigned owner on every case, set at creation and reassignable by an account owner.</li>
+    <li>Deadlines calculated from the notice by deterministic rule, incorporating a holiday and weekend schedule. No language model participates in producing a date.</li>
+  </ul>
+  <p>Appeal outcome reporting is not yet available. The data model supports it; no outcomes have been recorded, and it will not be presented as a capability until there is evidence behind it.</p>
+
+  <h2>Next step</h2>
+  <p>The appeal workflow and a working demonstration are available without registration:</p>
+  <p><a class="cta" href="/demo/2026-10-13-w1">See the appeal flow &amp; live demo (no signup)</a></p>
+  <p>For a walkthrough of the organizational view configured to your own structure, or pricing against your footprint, write to <a href="mailto:peter@casewhy.com?subject=CaseWhy%20Appeals%20—%20multi-facility%20enquiry">peter@casewhy.com</a>. Enquiries receive a direct reply; there is no scheduling system in place.</p>

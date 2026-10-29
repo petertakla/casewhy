@@ -1,6 +1,11 @@
 {
   "generatedFrom": "appeals src/lib/desk/pricing.ts",
-  "freeTrialCases": 3,
+  "freeTrialCases": 0,
+  "freePeriodSentence": "Your first 30 days are free, on your own cases.",
+  "freePeriodShort": "30 days free",
+  "freePeriodStartsWhenYouUseIt": "The 30 days start the first time you generate a letter, not when you open the account — so an account opened today and first used in six months still gets its full 30 days.",
+  "trialDays": 30,
+  "trialIsBuilt": true,
   "lanes": {
     "advocate": [
       {

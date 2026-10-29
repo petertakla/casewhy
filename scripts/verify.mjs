@@ -448,8 +448,62 @@ for (const path of ["/appeals/advocates", "/appeals/facilities/skilled-nursing",
     check(`${path}: $${n}/month is a price the billing module actually charges`, realMonthly.has(n));
   }
 }
-check(`the free-trial count on the pages matches pricing.json (${pricingJson.freeTrialCases})`,
-  (read("/appeals/advocates") ?? "").includes(`first ${pricingJson.freeTrialCases} cases are free`));
+// ---------------------------------------------------------------------------
+// THE OFFER IS NEVER TYPED BY HAND.
+//
+// This used to assert that the pages contained `first ${freeTrialCases} cases
+// are free` — a check that tracked the NUMBER while the sentence around it was
+// hand-written on every page separately. When the three free cases became
+// thirty free days on 28 Oct 2026 the number went to 0 and the check started
+// demanding the phrase "first 0 cases are free", which is the guard asking for
+// the bug. Peter found the real thing on the live skilled-nursing page:
+// *"this does not read right in that spot ... confusing!"*
+//
+// So it now checks the two things that actually matter.
+const offerPages = [
+  "/appeals/advocates",
+  "/appeals/facilities/skilled-nursing",
+  "/appeals/facilities/home-health",
+  "/appeals/facilities/hospice",
+  "/appeals/attorneys",
+  "/appeals/press",
+  "/appeals/facilities/nomnc-cheat-sheet",
+];
+
+// ONE: the rendered page carries appeals' own sentence, verbatim. Not a
+// paraphrase and not a number — the exact string `freePeriodSentence()`
+// produced, so a change over there is either reflected here or red here.
+let sawOffer = 0;
+for (const path of offerPages) {
+  const html = read(path);
+  if (!html) continue;
+  // `&` is the only character in these sentences the generator can transform,
+  // and it escapes it. Comparing the raw string would be a check that silently
+  // stopped matching the day somebody put "cases & claims" in the offer.
+  if (!html.includes(pricingJson.freePeriodSentence.replaceAll("&", "&amp;"))) continue;
+  sawOffer += 1;
+}
+check(`at least four pages state the free period in appeals' own words ("${pricingJson.freePeriodSentence}")`,
+  sawOffer >= 4);
+
+// TWO: and nobody writes their own. A content file spelling the offer out is
+// how all three of the stale pages came to exist, so the literal is banned at
+// source rather than corrected at the end. {{FREE_PERIOD}} is the way in.
+//
+// IT READS THE CONTENT FILES, NOT THE BUILT PAGES, because the built pages
+// legitimately contain the sentence — substituted. Checking the output could
+// only ever flag the correct result.
+const handWritten = [];
+for (const f of readdirSync(join(__dirname, "content"))) {
+  if (!f.endsWith(".html")) continue;
+  const src = readFileSync(join(__dirname, "content", f), "utf8");
+  if (/(?:first|your first)\s+(?:\d+|one|two|three|four|five)\s+cases?\s+(?:are\s+)?free/i.test(src)
+      || /\b\d+\s+days?\s+free\b/i.test(src)) {
+    handWritten.push(f);
+  }
+}
+check(`no content file writes the free offer out by hand (use {{FREE_PERIOD}})${handWritten.length ? " — " + handWritten.join(", ") : ""}`,
+  handWritten.length === 0);
 
 // ---------------------------------------------------------------------------
 // THE FACILITY PRIVACY SECTION IS ON ALL THREE FACILITY PAGES.
@@ -468,8 +522,19 @@ for (const path of ["/appeals/facilities/skilled-nursing", "/appeals/facilities/
   if (!html) continue;
   check(`${path} carries the facility privacy section`, html.includes("What we store, and what we don"));
   check(`${path} states there is no name field`, html.includes("There is no name field"));
+  // THE ACRONYM IS NOW PART OF THE APPROVED WORDING. Peter, 29 Oct 2026: "add
+  // (BAA) wherever the full name is reference because it's instant visual
+  // recognition." This check failed on all three pages the moment the copy
+  // changed, which is exactly its job — the sentence is a promise about health
+  // information and must not drift unnoticed. The pin moves in the commit that
+  // quotes him, not before.
+  //
+  // THE ACRONYM IS ASSERTED SEPARATELY from the sentence, so dropping "(BAA)"
+  // fails on its own rather than hiding inside a longer string comparison.
   check(`${path} keeps the approved BAA wording`,
-    html.includes("no HIPAA business associate agreement is needed between us"));
+    html.includes("no HIPAA business associate agreement (BAA) is needed between us"));
+  check(`${path} spells the acronym out beside the full name`,
+    html.includes("business associate agreement (BAA)"));
   check(`${path} uses "client", not the SNF-only "resident", in the privacy section`,
     !/We don.t ask for a resident.s name/i.test(html));
 }
@@ -561,6 +626,30 @@ check("/uscis/press still tells the TRUE naturalization family story",
 // description — "a resident's family" — measured 24 characters instead of 182
 // and looked like a truncation bug in the page. It was a bug in the
 // measurement. Match the opening delimiter, then only its own closing one.
+// ---------------------------------------------------------------------------
+// NO PAGE SHIPS WITH AN UNSUBSTITUTED TOKEN.
+//
+// Found by mutating the guard above: deleting one `replaceAll` line in the
+// generator put a literal `{{FREE_PERIOD}}` on three live pages — including
+// the NOMNC cheat sheet, where it is the link text of the call to action — and
+// every check still passed, because the pages that DO carry the sentence come
+// from the pricing table rather than the token.
+//
+// A missing substitution is the one template failure that is both invisible to
+// the build and glaring to a reader, so it is checked on the OUTPUT, where the
+// only correct number of tokens is zero.
+{
+  const leaked = [];
+  for (const file of builtPages()) {
+    const html = readFileSync(file, "utf8");
+    for (const m of new Set([...html.matchAll(/\{\{[A-Z][A-Z_:]*\}\}/g)].map((x) => x[0]))) {
+      leaked.push(`${file.slice(ROOT.length)} ${m}`);
+    }
+  }
+  check(`no built page carries an unsubstituted {{TOKEN}}${leaked.length ? " — " + leaked.join(", ") : ""}`,
+    leaked.length === 0);
+}
+
 const SEO_TITLE_MAX = 60;
 const SEO_DESC_MAX = 160;
 

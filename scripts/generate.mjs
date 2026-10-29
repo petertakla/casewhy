@@ -499,7 +499,7 @@ const facilityPrivacySentences = [
   ["We don’t keep the notice you upload.", "The file is read once to pull out what the appeal needs (dates, notice type, the denial reason) and then deleted. We keep the extracted details, not the document."],
   ["We don’t ask for a client’s name.", "A case is found by your own room, file or client number and the tags you give it. There is no name field."],
   ["Your staff see your organization’s cases, and nothing else.", "Every seat is scoped to one organization."],
-  ["We don’t hold protected health information,", "so no HIPAA business associate agreement is needed between us. If that ever changes, we will tell you first."],
+  ["We don’t hold protected health information,", "so no HIPAA business associate agreement (BAA) is needed between us. If that ever changes, we will tell you first."],
   ["Closing your organization deletes everything under it, immediately.", "Export first if you want a copy."],
 ];
 
@@ -583,9 +583,38 @@ function pricingHtml(lane) {
   // than special-cased to hospice, so any future single-plan lane is correct the
   // day it is added instead of inheriting the same contradiction.
   const hasMonthlyPlan = plans.some((p) => p.monthlyUsd > 0);
+
+  // THE FREE-PERIOD SENTENCE IS APPEALS' WORDS, NOT OURS.
+  //
+  // It arrives in pricing.json from `freePeriodSentence()` over there, and the
+  // hub prints it verbatim. This file used to write its own — "Your first
+  // ${n} cases are free, whichever plan you're on" — around a number it
+  // interpolated from the same file. So the NUMBER tracked the product and the
+  // PROSE did not, which is the worst of both: it stayed grammatical while
+  // becoming false.
+  //
+  // Measured 29 Oct 2026: the three free cases were replaced by thirty free
+  // days on the 28th, the exporter was still sending the raw constant, and
+  // /appeals/facilities/skilled-nursing/ was telling facilities "Your first 3
+  // cases are free" a day later. Peter read it on the live page: *"this does
+  // not read right in that spot ... confusing!"*
+  //
+  // AND IT CARRIES THE CLOCK SENTENCE WITH IT, because on this page the offer
+  // is the reason to act today: the thirty days start at the first letter, so
+  // an account opened now and first used in March still gets all thirty.
+  // Without it a time box reads as a deadline to open an account, which is the
+  // opposite of the intent.
+  const freePeriod = `<strong>${pricing.freePeriodSentence}</strong> ${pricing.freePeriodStartsWhenYouUseIt}`;
+
+  // AFTER THAT — and only this half is lane-specific. It describes which plan
+  // a new customer lands on, which is a fact about the TIERS above, so it is
+  // keyed off the data (does this lane have a plan with a monthly fee?) rather
+  // than special-cased to hospice. Found by the Oct 2 audit: the hospice page
+  // spent a section explaining there is no monthly plan and then promised one
+  // directly underneath.
   const trial = hasMonthlyPlan
-    ? `  <p class="trial-note"><strong>Your first ${pricing.freeTrialCases} cases are free, whichever plan you're on.</strong> New ${LANE_LABELS[lane].noun} start on ${plans[0].label} — no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>`
-    : `  <p class="trial-note"><strong>Your first ${pricing.freeTrialCases} cases are free.</strong> Every ${LANE_LABELS[lane].noun.replace(/s$/, "")} runs on the same ${plans[0].label} pricing above — there is no monthly plan to switch to (see why, above).</p>`;
+    ? `  <p class="trial-note">${freePeriod} After that, new ${LANE_LABELS[lane].noun} stay on ${plans[0].label} — there is no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>`
+    : `  <p class="trial-note">${freePeriod} After that, every ${LANE_LABELS[lane].noun.replace(/s$/, "")} runs on the same ${plans[0].label} pricing above — there is no monthly plan to switch to (see why, above).</p>`;
   return `  <div class="tiers">\n${cards}\n  </div>\n${trial}`;
 }
 
@@ -652,6 +681,21 @@ function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, 
   for (const m of [...body.matchAll(/\{\{PRICING:([a-z_:]+)\}\}/g)]) {
     body = body.replace(m[0], pricingHtml(m[1]));
   }
+  // {{FREE_PERIOD}} — the offer, in appeals' own words, for PROSE pages.
+  //
+  // The pricing tables got this right (see `pricingHtml`); hand-written content
+  // did not. On 29 Oct 2026 three pages — the attorney page, the press page and
+  // the NOMNC cheat sheet — still promised "Your first 3 cases are free" a day
+  // after the three free cases were replaced by thirty free days, because each
+  // had been typed out by hand and nothing connected them to the product.
+  //
+  // A LITERAL IN A CONTENT FILE CANNOT TRACK ANYTHING, so the token exists to
+  // make the correct thing the easy thing: write {{FREE_PERIOD}} and the offer
+  // is right for ever. `the-offer-is-never-typed-by-hand` in verify.mjs fails
+  // the build if a content file spells one out instead.
+  body = body.replaceAll("{{FREE_PERIOD}}", pricing.freePeriodSentence);
+  body = body.replaceAll("{{FREE_PERIOD_CLOCK}}", pricing.freePeriodStartsWhenYouUseIt);
+  body = body.replaceAll("{{FREE_PERIOD_SHORT}}", pricing.freePeriodShort);
   if (body.includes("{{FACILITY_PRIVACY}}")) {
     body = body.replace("{{FACILITY_PRIVACY}}", facilityPrivacyHtml);
   }

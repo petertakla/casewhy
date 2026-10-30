@@ -323,18 +323,24 @@ for (const sub of ["/appeals/facilities/skilled-nursing", "/appeals/facilities/h
   check(`${sub} links back to the chooser`, (read(sub) ?? "").includes('href="/appeals/facilities"'));
 }
 
-// Hospice is pay-per-case ON PURPOSE (no sourced MA denial rate to size a
-// monthly allowance against). Asserting it states that reason, not just that
-// it omits a monthly price, so the omission can never read as an oversight.
+// HOSPICE GAINED A SITE LICENSE ON 30 OCT 2026, so these checks inverted —
+// and the invariant behind them did not. What mattered was never "hospice has
+// no monthly plan"; it was that the PAGE and the PRICE BOOK cannot disagree,
+// because the old prose outlived the rule it described for exactly as long as
+// nothing checked it.
+//
+// So the page must now show the per-case price FIRST (Peter, 27 Oct: "change
+// to lead with per case then site") and must not claim the monthly plan does
+// not exist.
 const hospice = read("/appeals/facilities/hospice") ?? "";
-check("/appeals/facilities/hospice explains why there is no monthly plan", /deliberate choice, not a missing option/i.test(hospice));
-// NOT "no monthly price" — the first version of this assertion said that and
-// failed a correct page. The hospice lane has one plan and the generator
-// renders it "$0 / month", which is accurate for pay-per-case. The real claim
-// is that there is no PAID monthly tier.
+check("/appeals/facilities/hospice no longer claims there is no monthly plan",
+  !/deliberate choice, not a missing option/i.test(hospice) && !/pay-per-case only/i.test(hospice));
 const hospiceMonthly = [...hospice.matchAll(/\$(\d+)\s*\/\s*month/g)].map((m) => Number(m[1]));
-check(`/appeals/facilities/hospice offers no paid monthly plan (found ${JSON.stringify(hospiceMonthly)})`,
-  hospiceMonthly.every((n) => n === 0));
+check(`/appeals/facilities/hospice shows its site license (found ${JSON.stringify(hospiceMonthly)})`,
+  // A PAID tier must be present now. The $0 entry is the pay-as-you-go plan,
+  // which the generator renders as "$0 / month" and which stays — so the test
+  // is that SOMETHING above zero is offered, not that everything is.
+  hospiceMonthly.some((n) => n > 0));
 
 // ADVOCATE-FACING PAGES MUST NOT SEND A VISITOR INTO THE CONSUMER APP.
 //

@@ -125,34 +125,13 @@
       {
         "id": "standard",
         "label": "Standard",
-        "monthlyUsd": 249,
-        "includedCases": 15,
-        "unlimited": false,
+        "monthlyUsd": 299,
+        "includedCases": 0,
+        "unlimited": true,
         "tiers": [
           {
-            "upTo": 15,
-            "perCaseUsd": 0
-          },
-          {
             "upTo": null,
-            "perCaseUsd": 15
-          }
-        ]
-      },
-      {
-        "id": "growth",
-        "label": "Growth",
-        "monthlyUsd": 599,
-        "includedCases": 40,
-        "unlimited": false,
-        "tiers": [
-          {
-            "upTo": 40,
             "perCaseUsd": 0
-          },
-          {
-            "upTo": null,
-            "perCaseUsd": 12
           }
         ]
       }
@@ -176,6 +155,19 @@
           {
             "upTo": null,
             "perCaseUsd": 12
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "label": "Standard",
+        "monthlyUsd": 199,
+        "includedCases": 0,
+        "unlimited": true,
+        "tiers": [
+          {
+            "upTo": null,
+            "perCaseUsd": 0
           }
         ]
       }

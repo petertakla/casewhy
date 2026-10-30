@@ -5,7 +5,7 @@
 // *generated, committed* HTML/JSON so a real drift between pages.json and
 // the files on disk fails loudly. Exits non-zero on any failure.
 
-import { readFileSync, existsSync, readdirSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -32,6 +32,56 @@ function read(relPath) {
 }
 
 console.log("== Redirect table (vercel.json) ==");
+// ---------------------------------------------------------------------------
+// ARE WE CHECKING THE CURRENT PAGES, OR YESTERDAY'S?
+//
+// THIS CHECK EXISTS BECAUSE EVERYTHING BELOW IT PASSED ON A DEAD BUILD, TWICE
+// IN TWO DAYS. Both times a backtick inside a CSS comment closed the
+// generator's own template literal; generate.mjs died loudly with a
+// SyntaxError, and this file then verified 516 checks against the pages built
+// BEFORE the change and printed "All checks passed."
+//
+// A verification that cannot tell a fresh artifact from a stale one is worse
+// than no verification: it converts a loud failure into a green tick.
+//
+// So before anything else: no built page may be older than the newest input
+// that produces it. The inputs are the generator, its page registry, the
+// pricing it substitutes, and every content file.
+const buildInputs = [
+  join(__dirname, "generate.mjs"),
+  join(__dirname, "pages.json"),
+  join(__dirname, "pricing.json"),
+  ...readdirSync(join(__dirname, "content")).map((f) => join(__dirname, "content", f)),
+].filter((f) => existsSync(f));
+const newestInput = Math.max(...buildInputs.map((f) => statSync(f).mtimeMs));
+// A SAMPLE, NOT EVERY PAGE. One stale page means the whole run is stale —
+// they are written by a single pass — and reading three is enough to say so
+// while keeping this cheap.
+//
+// THE PATH IS BUILT FROM `path`, NOT FROM `id`. The first version of this
+// looked pages up by `id` and read a non-existent `out` field; `id` is a slug
+// like "uscis-attorneys" and the URL lives in `path`. Every lookup missed, the
+// sample list came out EMPTY, and the check passed on a build it had not read
+// — which is precisely the failure it was written to catch, committed inside
+// the catcher. Found by planting the real bug and watching it stay green.
+const builtSamples = ["/appeals/enterprise", "/appeals", "/"]
+  .map((url) => join(ROOT, url === "/" ? "index.html" : `${url.replace(/^\//, "")}/index.html`))
+  .filter((f) => existsSync(f));
+// AND IT MUST HAVE FOUND SOMETHING. An empty sample makes every assertion
+// below it vacuously true, which is how the first version reported "0 stale"
+// about nothing at all.
+check(
+  `the staleness check found pages to read (${builtSamples.length})`,
+  builtSamples.length === 3,
+  "could not resolve the sample pages on disk — this check would pass without reading anything"
+);
+const stale = builtSamples.filter((f) => statSync(f).mtimeMs < newestInput);
+check(
+  `the built pages are newer than the generator and its content (${stale.length} stale)`,
+  stale.length === 0,
+  stale.length ? `Run \`node scripts/generate.mjs\` and READ ITS EXIT CODE — these pages predate their source:\n    ${stale.map((f) => f.slice(ROOT.length + 1)).join("\n    ")}` : ""
+);
+
 const vercelJson = JSON.parse(readFileSync(join(ROOT, "vercel.json"), "utf8"));
 for (const r of redirects) {
   const entry = vercelJson.redirects.find((v) => v.source === r.from);

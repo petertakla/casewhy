@@ -283,10 +283,35 @@
   .screen .body{padding:16px 18px 18px;}
   .screen h4{margin:0;font-size:1.06rem;font-weight:700;color:var(--foreground);}
   .screen .who{margin:2px 0 0;font-size:0.82rem;color:var(--muted);}
-  .screen .figs{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin:14px 0 0;border:1px solid var(--border);border-radius:11px;background:var(--border);overflow:hidden;}
-  @media (min-width:620px){ .screen .figs{grid-template-columns:repeat(4,1fr);} }
-  .screen .fig{background:var(--surface);padding:11px 13px;}
-  .screen .fig b{display:block;font-size:0.63rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);}
+  /* SIX SPACED CARDS, not four hairline-divided cells — Peter, 30 Oct 2026:
+     "make a space between the top blocks / cards similar to Demo page", and
+     "additional blocks (roll-up maybe) to make it six". The product's own
+     facility board has used a six-column grid with a real gap since D79, so
+     this matches the Desk rather than inventing a second card treatment.
+     The old one-pixel gap over a border-coloured background reads as one block
+     with dividers, which is what he was pointing at. */
+  .screen .figs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:14px 0 0;}
+  @media (min-width:620px){ .screen .figs{grid-template-columns:repeat(3,1fr);} }
+  @media (min-width:900px){ .screen .figs{grid-template-columns:repeat(6,1fr);} }
+  .screen .fig{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:11px 13px;}
+  /* THE CARD IS TINTED, NOT JUST THE NUMBER — the same vocabulary the product
+     uses: a red-bordered card for what is already missed, amber for what needs
+     doing, green ONLY where zero is the good news. A tile that is coloured
+     whatever its value teaches a reader to stop looking at colour. */
+  .screen .fig.urgent{border-color:rgba(192,57,43,0.55);background:rgba(192,57,43,0.05);}
+  .screen .fig.warn{border-color:rgba(154,103,0,0.5);background:rgba(154,103,0,0.05);}
+  .screen .fig.good{border-color:rgba(27,175,122,0.45);background:rgba(27,175,122,0.05);}
+  .screen .fig u.good{color:#13865e;}
+  @media (prefers-color-scheme: dark){
+    .screen .fig.urgent{border-color:rgba(243,131,122,0.45);background:rgba(243,131,122,0.07);}
+    .screen .fig.warn{border-color:rgba(227,179,65,0.4);background:rgba(227,179,65,0.07);}
+    .screen .fig.good{border-color:rgba(73,211,163,0.4);background:rgba(73,211,163,0.07);}
+    .screen .fig u.good{color:#49d3a3;}
+  }
+  /* Slightly tighter tracking than the other labels: at six across, "Lines of
+     business" and "Due in 48 hours" both wrap, and the extra letter-spacing
+     was buying nothing but a third line. */
+  .screen .fig b{display:block;font-size:0.6rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);line-height:1.25;}
   .screen .fig u{display:block;text-decoration:none;font-size:1.45rem;font-weight:700;font-variant-numeric:tabular-nums;margin-top:1px;color:var(--foreground);}
   .screen .fig u.hot{color:#c0392b;} .screen .fig u.warn{color:#9a6700;} .screen .fig u.none{color:var(--muted);font-size:1.02rem;font-weight:600;}
   @media (prefers-color-scheme: dark){ .screen .fig u.hot{color:#f3837a;} .screen .fig u.warn{color:#e3b341;} }
@@ -307,6 +332,23 @@
   .screen .tag{padding:3px 9px;border-radius:999px;font-size:0.71rem;font-weight:700;background:var(--surface-2);color:var(--muted);border:1px solid var(--border);}
   .screen .tag.live{background:rgba(27,175,122,0.12);color:#13865e;border-color:transparent;}
   @media (prefers-color-scheme: dark){ .screen .tag.live{background:rgba(27,175,122,0.16);color:#49d3a3;} }
+  /* THE SUMMARY LINE PER LINE OF BUSINESS — the level between the company's
+     six tiles and every building. At seven buildings the detail is readable;
+     at forty it is not, and the executive this page is written for scrolls
+     past the thing they came for. Every figure here is the sum of the rows
+     beneath it, which is a property the real screen has too: totalsFor runs
+     over one group's buildings instead of all of them. */
+  /* A GRID, NOT A WRAPPING FLEX ROW. Seven items flexed left one of them
+     stranded on a second line beside a wide gap, which reads as a mistake
+     rather than as a layout. auto-fit distributes them evenly at any width and
+     breaks to a tidy second row on a phone. */
+  .screen .sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(4.6rem,1fr));gap:8px 14px;margin-top:10px;border:1px solid var(--border);border-radius:11px;background:var(--surface-2);padding:10px 14px;}
+  /* A FIXED LABEL HEIGHT so the values line up. "Soonest deadline" wraps to
+     two lines where the others take one, which dropped its number below the
+     rest and made a tidy row look accidental. */
+  .screen .sum b{display:block;min-height:2.1em;font-size:0.6rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);line-height:1.25;}
+  .screen .sum u{display:block;text-decoration:none;margin-top:1px;font-size:0.84rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--foreground);}
+  .screen .sum u.dim{color:var(--muted);font-weight:600;}
   .screen .bucket{display:flex;justify-content:space-between;align-items:center;padding:6px 11px;background:var(--surface-2);font-size:0.65rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
   .screen .bucket b{font-weight:600;text-transform:none;letter-spacing:0;}
   .screen .box{margin-top:10px;border:1px solid var(--border);border-radius:11px;overflow:hidden;}
@@ -432,10 +474,11 @@
        for 1,200 words and showed nobody what it looks like.
 
        EVERY COLUMN AND FIGURE HERE EXISTS IN THE REAL SCREEN
-       (src/app/desk/(seated)/admin/CompanyBoard.tsx): the four totals are
-       that file's own, in its order, and Building / Open / Next deadline /
-       No owner / Overturned are its five columns. The deadline pill has two
-       states because the Deadline helper has two.
+       (src/app/desk/(seated)/admin/CompanyBoard.tsx): the SIX tiles are that
+       file's own six, in its order; the per-segment summary line is its
+       GroupSummary; and Building / Open / Next deadline / No owner /
+       Overturned are its five columns. The deadline pill has two states
+       because the Deadline helper has two.
 
        THE NESTING IS THE ARGUMENT, and it is the real nesting rather than a
        flattering one. GroupSection renders a section per line of business
@@ -465,11 +508,23 @@
     <div class="body">
       <h4>Northstar Post-Acute</h4>
       <p class="who">7 buildings &middot; two lines of business &middot; account owner view</p>
+      <p class="who">Grouped by region &mdash; one click switches the whole board to group by care segment instead.</p>
 
+      <!-- SIX TILES, AND THEY ARE THE SCREEN'S OWN SIX. Peter, 30 Oct 2026:
+           "make my enterprise page match on number of tiles and style".
+           CompanyBoard renders exactly these, in this order, with the same
+           card treatment as the Desk's facility board.
+
+           OVERDUE AND DUE-IN-48 ARE DISJOINT HERE AS THERE. The underlying
+           count of "due soon" deliberately includes what is already past, so
+           the two tiles subtract rather than overlap — otherwise a reader
+           adding them would double-count the worst buildings. -->
       <div class="figs">
         <div class="fig"><b>Open appeals</b><u>25</u><i>across 7 buildings</i></div>
-        <div class="fig"><b>Due in 48 hours</b><u class="hot">4</u><i>buildings</i></div>
-        <div class="fig"><b>No owner yet</b><u class="warn">4</u><i>unassigned</i></div>
+        <div class="fig good"><b>Overdue</b><u class="good">0</u><i>nothing missed</i></div>
+        <div class="fig warn"><b>Due in 48 hours</b><u class="warn">4</u><i>buildings, not yet past</i></div>
+        <div class="fig warn"><b>No owner yet</b><u class="warn">4</u><i>unassigned cases</i></div>
+        <div class="fig"><b>Lines of business</b><u>2</u><i>7 buildings in total</i></div>
         <div class="fig"><b>Overturned</b><u class="none">&mdash;</u><i>none decided yet</i></div>
       </div>
 
@@ -482,6 +537,20 @@
            here would be the one that silently goes stale. The free-period
            STATE is the point of the tag, and it is not a price. -->
       <div class="seg"><h5>Skilled nursing</h5><span class="tag">Free period ended 2 Oct</span></div>
+      <!-- THE LINE BETWEEN THE COMPANY AND ITS BUILDINGS. Peter chose this of
+           three options: a summary per line of business, with the buildings
+           underneath and region as a toggle. Every figure is the sum of the
+           rows below it — 5+3+4+6+2 = 20 open across five buildings — which
+           is how the real screen computes it too. -->
+      <div class="sum">
+        <div><b>Buildings</b><u>5</u></div>
+        <div><b>Regions</b><u>2</u></div>
+        <div><b>Open</b><u>20</u></div>
+        <div><b>Soonest deadline</b><u>In 9h</u></div>
+        <div><b>Overdue</b><u class="dim">&mdash;</u></div>
+        <div><b>Due in 48h</b><u>3</u></div>
+        <div><b>No owner</b><u>3</u></div>
+      </div>
       <div class="box">
         <div class="bucket"><span>Ohio Valley</span><b>3 buildings</b></div>
         <div class="table-scroll">
@@ -509,6 +578,15 @@
       </div>
 
       <div class="seg"><h5>Home health</h5><span class="tag live">Free period &middot; 11 days left</span></div>
+      <div class="sum">
+        <div><b>Buildings</b><u>2</u></div>
+        <div><b>Regions</b><u>1</u></div>
+        <div><b>Open</b><u>5</u></div>
+        <div><b>Soonest deadline</b><u>In 41h</u></div>
+        <div><b>Overdue</b><u class="dim">&mdash;</u></div>
+        <div><b>Due in 48h</b><u>1</u></div>
+        <div><b>No owner</b><u>1</u></div>
+      </div>
       <div class="box">
         <div class="bucket"><span>Ohio Valley</span><b>2 buildings</b></div>
         <div class="table-scroll">

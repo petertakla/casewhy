@@ -59,10 +59,11 @@
        for 1,200 words and showed nobody what it looks like.
 
        EVERY COLUMN AND FIGURE HERE EXISTS IN THE REAL SCREEN
-       (src/app/desk/(seated)/admin/CompanyBoard.tsx): the four totals are
-       that file's own, in its order, and Building / Open / Next deadline /
-       No owner / Overturned are its five columns. The deadline pill has two
-       states because the Deadline helper has two.
+       (src/app/desk/(seated)/admin/CompanyBoard.tsx): the SIX tiles are that
+       file's own six, in its order; the per-segment summary line is its
+       GroupSummary; and Building / Open / Next deadline / No owner /
+       Overturned are its five columns. The deadline pill has two states
+       because the Deadline helper has two.
 
        THE NESTING IS THE ARGUMENT, and it is the real nesting rather than a
        flattering one. GroupSection renders a section per line of business
@@ -92,11 +93,23 @@
     <div class="body">
       <h4>Northstar Post-Acute</h4>
       <p class="who">7 buildings &middot; two lines of business &middot; account owner view</p>
+      <p class="who">Grouped by region &mdash; one click switches the whole board to group by care segment instead.</p>
 
+      <!-- SIX TILES, AND THEY ARE THE SCREEN'S OWN SIX. Peter, 30 Oct 2026:
+           "make my enterprise page match on number of tiles and style".
+           CompanyBoard renders exactly these, in this order, with the same
+           card treatment as the Desk's facility board.
+
+           OVERDUE AND DUE-IN-48 ARE DISJOINT HERE AS THERE. The underlying
+           count of "due soon" deliberately includes what is already past, so
+           the two tiles subtract rather than overlap — otherwise a reader
+           adding them would double-count the worst buildings. -->
       <div class="figs">
         <div class="fig"><b>Open appeals</b><u>25</u><i>across 7 buildings</i></div>
-        <div class="fig"><b>Due in 48 hours</b><u class="hot">4</u><i>buildings</i></div>
-        <div class="fig"><b>No owner yet</b><u class="warn">4</u><i>unassigned</i></div>
+        <div class="fig good"><b>Overdue</b><u class="good">0</u><i>nothing missed</i></div>
+        <div class="fig warn"><b>Due in 48 hours</b><u class="warn">4</u><i>buildings, not yet past</i></div>
+        <div class="fig warn"><b>No owner yet</b><u class="warn">4</u><i>unassigned cases</i></div>
+        <div class="fig"><b>Lines of business</b><u>2</u><i>7 buildings in total</i></div>
         <div class="fig"><b>Overturned</b><u class="none">&mdash;</u><i>none decided yet</i></div>
       </div>
 
@@ -109,6 +122,20 @@
            here would be the one that silently goes stale. The free-period
            STATE is the point of the tag, and it is not a price. -->
       <div class="seg"><h5>Skilled nursing</h5><span class="tag">Free period ended 2 Oct</span></div>
+      <!-- THE LINE BETWEEN THE COMPANY AND ITS BUILDINGS. Peter chose this of
+           three options: a summary per line of business, with the buildings
+           underneath and region as a toggle. Every figure is the sum of the
+           rows below it — 5+3+4+6+2 = 20 open across five buildings — which
+           is how the real screen computes it too. -->
+      <div class="sum">
+        <div><b>Buildings</b><u>5</u></div>
+        <div><b>Regions</b><u>2</u></div>
+        <div><b>Open</b><u>20</u></div>
+        <div><b>Soonest deadline</b><u>In 9h</u></div>
+        <div><b>Overdue</b><u class="dim">&mdash;</u></div>
+        <div><b>Due in 48h</b><u>3</u></div>
+        <div><b>No owner</b><u>3</u></div>
+      </div>
       <div class="box">
         <div class="bucket"><span>Ohio Valley</span><b>3 buildings</b></div>
         <div class="table-scroll">
@@ -136,6 +163,15 @@
       </div>
 
       <div class="seg"><h5>Home health</h5><span class="tag live">Free period &middot; 11 days left</span></div>
+      <div class="sum">
+        <div><b>Buildings</b><u>2</u></div>
+        <div><b>Regions</b><u>1</u></div>
+        <div><b>Open</b><u>5</u></div>
+        <div><b>Soonest deadline</b><u>In 41h</u></div>
+        <div><b>Overdue</b><u class="dim">&mdash;</u></div>
+        <div><b>Due in 48h</b><u>1</u></div>
+        <div><b>No owner</b><u>1</u></div>
+      </div>
       <div class="box">
         <div class="bucket"><span>Ohio Valley</span><b>2 buildings</b></div>
         <div class="table-scroll">

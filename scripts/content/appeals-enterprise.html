@@ -49,6 +49,113 @@
   <p>Two conclusions follow for an organization operating at scale. First, an appeal not filed is, more often than not, a reversible decision left unchallenged. Second, the determining factor is administrative rather than clinical: the fast-track deadline is a call to the reviewer before noon on the day before coverage ends, and it is met or missed by whoever happens to be handling the notice that day.</p>
   <p>At a single site that risk is visible to the administrator. Across twenty or forty sites it is visible to no one, because there has not been a report that shows it.</p>
 
+  <h2>The report that shows it</h2>
+  <p>One screen, every building, ordered by what is closest to being missed. The figures are summed from the rows beneath them, so the total and the table cannot disagree.</p>
+
+  <!-- ===================================================================
+       THE SCREEN, DRAWN RATHER THAN SCREENSHOT. Peter, 29 Oct 2026: "need to
+       show the visual of the page" and earlier "visuals are 80% of the
+       selling". This page previously described a consolidated view in prose
+       for 1,200 words and showed nobody what it looks like.
+
+       EVERY COLUMN AND FIGURE HERE EXISTS IN THE REAL SCREEN
+       (src/app/desk/(seated)/admin/CompanyBoard.tsx): the four totals are
+       that file's own, in its order, and Building / Open / Next deadline /
+       No owner / Overturned are its five columns. The deadline pill has two
+       states because the Deadline helper has two.
+
+       THE NESTING IS THE ARGUMENT, and it is the real nesting rather than a
+       flattering one. GroupSection renders a section per line of business
+       with its free-period tag beside the heading, then buckets buildings by
+       region — so company -> segment -> region -> building is what a
+       customer actually sees, and the per-segment free period (Peter's
+       decision of 29 Oct: three segments are "3 different business models")
+       is visible rather than asserted. An earlier draft of this mock showed
+       one flat table of buildings, which demonstrated none of that.
+
+       THE NUMBERS ADD UP, deliberately — (5+3+4)+(6+2)+(3+2) = 25 open
+       across 7 buildings; four buildings inside 48 hours (9h, 36h, 22h,
+       41h); four cases unassigned (1+2+1). A mock-up whose figures
+       contradict its own table is the exact defect the real page avoids by
+       summing from the rows, and a prospect who adds them up is the kind of
+       prospect this page is written for.
+
+       OVERTURNED IS EMPTY ON PURPOSE AND MUST STAY EMPTY. No outcome has
+       been recorded in the product, and this page says so two sections
+       below. Filling that column with a plausible success rate would be a
+       fabricated record on a sales page — the single most damaging thing
+       this file could contain. The column appears because it is on the real
+       screen; it reads "none decided yet" because that is true.
+       =================================================================== -->
+  <div class="screen">
+    <div class="chrome"><i></i><i></i><i></i><span>appeals.casewhy.com/desk/admin</span></div>
+    <div class="body">
+      <h4>Northstar Post-Acute</h4>
+      <p class="who">7 buildings &middot; two lines of business &middot; account owner view</p>
+
+      <div class="figs">
+        <div class="fig"><b>Open appeals</b><u>25</u><i>across 7 buildings</i></div>
+        <div class="fig"><b>Due in 48 hours</b><u class="hot">4</u><i>buildings</i></div>
+        <div class="fig"><b>No owner yet</b><u class="warn">4</u><i>unassigned</i></div>
+        <div class="fig"><b>Overturned</b><u class="none">&mdash;</u><i>none decided yet</i></div>
+      </div>
+
+      <div class="filters"><em>Segment</em><span class="chip on">All</span><span class="chip">Skilled nursing</span><span class="chip">Home health</span></div>
+      <div class="filters"><em>Region</em><span class="chip on">All</span><span class="chip">Ohio Valley</span><span class="chip">Gulf Coast</span></div>
+      <div class="filters"><em>Group by</em><span class="chip on">Region</span><span class="chip">Segment</span></div>
+
+      <!-- NO PRICE IN THIS TAG. Every other price on this page comes from
+           {{PRICING:...}}, which reads the live price book; a number typed
+           here would be the one that silently goes stale. The free-period
+           STATE is the point of the tag, and it is not a price. -->
+      <div class="seg"><h5>Skilled nursing</h5><span class="tag">Free period ended 2 Oct</span></div>
+      <div class="box">
+        <div class="bucket"><span>Ohio Valley</span><b>3 buildings</b></div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Building</th><th class="r">Open</th><th>Next deadline</th><th class="r">No owner</th><th>Overturned</th></tr></thead>
+            <tbody>
+              <tr><td class="name">Cedar Ridge Health &amp; Rehab</td><td class="r">5</td><td><span class="pill hot">In 9h</span></td><td class="r">1</td><td><span class="dash">&mdash;</span></td></tr>
+              <tr><td class="name">Maple Court Skilled Nursing</td><td class="r">3</td><td><span class="pill hot">In 36h</span></td><td class="r">0</td><td><span class="dash">&mdash;</span></td></tr>
+              <tr><td class="name">Westbrook Care Center</td><td class="r">4</td><td><span class="calm">6 days</span></td><td class="r">2</td><td><span class="dash">&mdash;</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="box">
+        <div class="bucket"><span>Gulf Coast</span><b>2 buildings</b></div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Building</th><th class="r">Open</th><th>Next deadline</th><th class="r">No owner</th><th>Overturned</th></tr></thead>
+            <tbody>
+              <tr><td class="name">Bayou Pines Rehabilitation</td><td class="r">6</td><td><span class="pill hot">In 22h</span></td><td class="r">0</td><td><span class="dash">&mdash;</span></td></tr>
+              <tr><td class="name">Palmetto Grove Health</td><td class="r">2</td><td><span class="calm">11 days</span></td><td class="r">0</td><td><span class="dash">&mdash;</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="seg"><h5>Home health</h5><span class="tag live">Free period &middot; 11 days left</span></div>
+      <div class="box">
+        <div class="bucket"><span>Ohio Valley</span><b>2 buildings</b></div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Building</th><th class="r">Open</th><th>Next deadline</th><th class="r">No owner</th><th>Overturned</th></tr></thead>
+            <tbody>
+              <tr><td class="name">Northstar Home Health &mdash; Dayton</td><td class="r">3</td><td><span class="pill hot">In 41h</span></td><td class="r">1</td><td><span class="dash">&mdash;</span></td></tr>
+              <tr><td class="name">Northstar Home Health &mdash; Toledo</td><td class="r">2</td><td><span class="calm">8 days</span></td><td class="r">0</td><td><span class="dash">&mdash;</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p class="caption">Illustration of the organizational view. Facility names and figures are samples, not a customer. The Overturned column is empty because no appeal outcome has been recorded in the product &mdash; see &ldquo;What is implemented today&rdquo; below.</p>
+    </div>
+  </div>
+
+  <p>Each line of business carries its own free period, shown against its own heading &mdash; in the illustration above, skilled nursing has converted while home health is still evaluating. That is the structure described under commercial terms below, rather than a separate claim about it.</p>
+  <p>A deadline inside 48 hours is marked, an overdue one is marked more loudly, and a building with no open appeals says so rather than showing a blank. Regions are named by the organization rather than inferred from the state; grouping switches to care segment for line-of-business review.</p>
+
   <h2>What an organization gets that a single facility does not</h2>
   <ul>
     <li><strong>Portfolio-level visibility of the nearest deadline.</strong> Not when a given deadline falls, but which building is closest to missing one.</li>

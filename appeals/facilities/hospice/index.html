@@ -258,6 +258,75 @@
   table.clock-table th,table.clock-table td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top;}
   table.clock-table thead th{background:var(--surface-2);font-size:0.78rem;letter-spacing:0.03em;text-transform:uppercase;color:var(--muted);}
   table.clock-table tbody td:first-child{font-weight:600;white-space:nowrap;}
+  /* ------------------------------------------------------------------
+     SCREEN MOCK (.screen). Added 29 Oct 2026 for the enterprise page.
+     Peter: "visuals are 80% of the selling" — that page was 1,200 words of
+     prose about a consolidated view and showed nobody what it looks like.
+
+     DRAWN IN HTML, NOT A SCREENSHOT, on purpose. A PNG of a dashboard is
+     fixed-width, illegible on a phone, invisible to search, carries no text
+     to copy, and goes stale silently the next time the real screen changes.
+     This mock is built from the same tokens as the rest of the site, so it
+     inherits light and dark, and it reads as part of the page rather than
+     as a pasted image.
+
+     IT MIRRORS A REAL SCREEN. Every column here exists in
+     desk/(seated)/admin/CompanyBoard.tsx — Building, Open, Next deadline,
+     No owner, Overturned — and the figures row is that file's own four
+     totals in the same order. If those diverge, this is the thing that
+     lied, and verify.mjs checks the column names against nothing: it is a
+     human's job to keep them in step, so the comment says so out loud. */
+  .screen{margin:18px 0 10px;border:1px solid var(--border-strong);border-radius:14px;background:var(--surface);overflow:hidden;}
+  .screen .chrome{display:flex;align-items:center;gap:7px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface-2);}
+  .screen .chrome i{width:9px;height:9px;border-radius:50%;background:var(--border-strong);display:inline-block;}
+  .screen .chrome span{margin-left:8px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--muted);}
+  .screen .body{padding:16px 18px 18px;}
+  .screen h4{margin:0;font-size:1.06rem;font-weight:700;color:var(--foreground);}
+  .screen .who{margin:2px 0 0;font-size:0.82rem;color:var(--muted);}
+  .screen .figs{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin:14px 0 0;border:1px solid var(--border);border-radius:11px;background:var(--border);overflow:hidden;}
+  @media (min-width:620px){ .screen .figs{grid-template-columns:repeat(4,1fr);} }
+  .screen .fig{background:var(--surface);padding:11px 13px;}
+  .screen .fig b{display:block;font-size:0.63rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);}
+  .screen .fig u{display:block;text-decoration:none;font-size:1.45rem;font-weight:700;font-variant-numeric:tabular-nums;margin-top:1px;color:var(--foreground);}
+  .screen .fig u.hot{color:#c0392b;} .screen .fig u.warn{color:#9a6700;} .screen .fig u.none{color:var(--muted);font-size:1.02rem;font-weight:600;}
+  @media (prefers-color-scheme: dark){ .screen .fig u.hot{color:#f3837a;} .screen .fig u.warn{color:#e3b341;} }
+  .screen .fig i{display:block;font-style:normal;font-size:0.7rem;color:var(--muted);margin-top:1px;}
+  .screen .filters{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:14px;}
+  .screen .filters em{font-style:normal;min-width:4.4rem;font-size:0.62rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);}
+  .screen .chip{padding:3px 10px;border-radius:999px;border:1px solid var(--border-strong);font-size:0.74rem;font-weight:600;color:var(--muted);background:var(--surface);}
+  .screen .chip.on{border-color:transparent;background:var(--brand-600);color:#fff;}
+  @media (prefers-color-scheme: dark){ .screen .chip.on{background:var(--brand-500);} }
+  /* THE SEGMENT BAND IS THE WHOLE ARGUMENT OF THIS PAGE, so it gets the
+     visual weight: a line of business, with ITS OWN free period beside it.
+     That is Peter's decision of 29 Oct ("the 30 day free should be at the
+     segment level not at the group level as they are 3 different business
+     models") made visible, and it mirrors GroupSection, which puts a
+     TrialTag next to each group heading. */
+  .screen .seg{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin:22px 0 0;padding-top:14px;border-top:1px solid var(--border);}
+  .screen .seg h5{margin:0;font-size:0.98rem;font-weight:700;color:var(--foreground);}
+  .screen .tag{padding:3px 9px;border-radius:999px;font-size:0.71rem;font-weight:700;background:var(--surface-2);color:var(--muted);border:1px solid var(--border);}
+  .screen .tag.live{background:rgba(27,175,122,0.12);color:#13865e;border-color:transparent;}
+  @media (prefers-color-scheme: dark){ .screen .tag.live{background:rgba(27,175,122,0.16);color:#49d3a3;} }
+  .screen .bucket{display:flex;justify-content:space-between;align-items:center;padding:6px 11px;background:var(--surface-2);font-size:0.65rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+  .screen .bucket b{font-weight:600;text-transform:none;letter-spacing:0;}
+  .screen .box{margin-top:10px;border:1px solid var(--border);border-radius:11px;overflow:hidden;}
+  .screen table{border-collapse:collapse;width:100%;min-width:560px;font-size:0.84rem;}
+  .screen thead th{text-align:left;padding:7px 11px;background:var(--surface);font-size:0.65rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);border-top:1px solid var(--border);}
+  .screen thead th.r,.screen tbody td.r{text-align:right;font-variant-numeric:tabular-nums;}
+  .screen tbody td{padding:9px 11px;border-bottom:1px solid var(--border);color:var(--foreground);}
+  .screen tbody tr:last-child td{border-bottom:none;}
+  .screen tbody td.name{font-weight:600;white-space:nowrap;}
+  .screen .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;font-variant-numeric:tabular-nums;}
+  /* TWO STATES ONLY, because the real screen has two. The Deadline helper in
+     CompanyBoard.tsx renders a red pill at 48 hours or less (and for an
+     overdue one) and plain muted text beyond it — there is no amber middle
+     tier. An invented third colour would be a promise of a distinction the
+     product does not draw. */
+  .screen .pill.hot{background:rgba(192,57,43,0.11);color:#c0392b;}
+  @media (prefers-color-scheme: dark){ .screen .pill.hot{background:rgba(243,131,122,0.14);color:#f3837a;} }
+  .screen .calm{color:var(--muted);}
+  .screen td .dash{color:var(--muted);}
+  .screen .caption{margin:12px 0 0;font-size:0.78rem;color:var(--muted);font-style:italic;}
   main.wrap ul{margin:12px 0 16px;padding-left:22px;color:var(--muted);}
   main.wrap ul li{margin-bottom:7px;}
   main.wrap ul li strong{color:var(--foreground);}

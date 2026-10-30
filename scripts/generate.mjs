@@ -838,28 +838,6 @@ function portfolioPricingHtml() {
   );
 }
 
-// THE WORKED EXAMPLE, COMPUTED — not typed.
-//
-// I wrote "$54,890 a month versus $35,640" into the page by hand first. Both
-// are DERIVED (110 x $499 and 110 x $324), so a change to the skilled nursing
-// site license would leave two confident wrong figures in prose on the page
-// whose whole job is to price a portfolio. That is the failure the pricing
-// token exists for, committed inside the section that adds the token.
-function portfolioExampleHtml(facilities = 110) {
-  const p = pricing.portfolio;
-  if (!p || !Array.isArray(p.bands)) return "";
-  const list = p.bands.find((b) => b.id === "none");
-  const best = p.bands[p.bands.length - 1];
-  if (!list || !best) return "";
-  const usd = (n) => "$" + n.toLocaleString("en-US");
-  const atList = list.perSiteUsd.snf * facilities;
-  const atBest = best.perSiteUsd.snf * facilities;
-  return (
-    `<p>For ${facilities} skilled nursing locations that is the difference between ` +
-    `${usd(atList)} a month and ${usd(atBest)} &mdash; ${usd((atList - atBest) * 12)} a year.</p>`
-  );
-}
-
 function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, currentLineId, currentSharedId, extraJsonLd, ogImage, draft, siteLink }) {
   let body = bodyOverride !== undefined ? bodyOverride : readFileSync(join(__dirname, "content", `${contentId}.html`), "utf8");
   for (const m of [...body.matchAll(/\{\{PRICING:([a-z_:]+)\}\}/g)]) {
@@ -890,9 +868,13 @@ function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, 
   if (body.includes("{{PORTFOLIO_PRICING}}")) {
     body = body.replace("{{PORTFOLIO_PRICING}}", portfolioPricingHtml());
   }
-  if (body.includes("{{PORTFOLIO_EXAMPLE}}")) {
-    body = body.replace("{{PORTFOLIO_EXAMPLE}}", portfolioExampleHtml());
-  }
+  // {{PORTFOLIO_EXAMPLE}} IS GONE. Peter removed the worked example on 30 Oct
+  // 2026 — "For 110 skilled nursing locations that is the difference between
+  // $54,890 a month and $35,640". His call; it is a sales judgement, not a
+  // correctness one. The renderer went with it rather than being left in place
+  // unused, because an unreferenced token is something a later session wires
+  // back up without knowing it was taken out on purpose. The band table above
+  // still carries every figure, so nothing is lost but the arithmetic.
   if (body.includes("{{FACILITY_PRIVACY}}")) {
     body = body.replace("{{FACILITY_PRIVACY}}", facilityPrivacyHtml);
   }

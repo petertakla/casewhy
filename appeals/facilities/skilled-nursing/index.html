@@ -418,31 +418,8 @@
   <p class="sub">A resident whose Medicare coverage is ending gets a Notice of Medicare Non-Coverage, and from that moment there is roughly a day to ask for a fast review. CaseWhy Appeals explains the notice to the family, writes the request, and tracks the clock — so the appeal happens inside the window instead of after it.</p>
   <div class="disclaimer">CaseWhy Appeals is not affiliated with or endorsed by Medicare, CMS, or any health plan, and is not a law firm.</div>
 
-  <!-- TWO-CARD CHOOSER. Structure and card copy approved by Peter Oct 3 2026
-       ("approved" to the mock-up); the record is SYNC_0025, which supersedes
-       the single-page admission section built earlier the same day from
-       SYNC_0019. Card ORDER is admission left, mid-stay right — Peter's "2.
-       flip". Link labels are descriptive of what the reader will see, his
-       "something more descriptive of what they will see", not "read the X
-       page". Numbers and key sentences bold, his "and bold the numbers or
-       sentence".
-
-       The SNF outreach email's one link still points HERE, unchanged for
-       Oct 13 (SYNC_0025 section 2.1). This page is the chooser it lands on. -->
-  <!-- DEMO STRIP. Wording approved by Peter Oct 3 ("2. approve", SYNC_0036
-       section 2) and published only now, because chat's gate 2 says the strip
-       ships only once the demo is live so no button points at nothing. It is
-       live: /desk/demo answers, provisions a sandbox with no login, and tears
-       itself down.
-
-       EVERY WORD HERE IS CHECKED AGAINST THE BUILD, which is chat's gate 1:
-         · "no signup"       — no login, no password, no email asked for
-         · "nothing to enter" — there is no upload and no form in the demo at all
-         · "sample SNF cases" — cloned fixtures, room and file references only
-
-       Absolute and UTM-tagged because this is a cross-domain hop; the
-       forward-utm script rewrites utm_source for a visitor who arrived from
-       the campaign, so a demo opened from the email is attributable to it. -->
+  
+  
   <div class="demo-strip">
     <p><strong>Try the live demo</strong> &mdash; sample SNF cases, no signup, nothing to enter.</p>
     <a class="demo-btn" href="https://appeals.casewhy.com/desk/demo?utm_source=hub&amp;utm_medium=referral">Open the demo &rarr;</a>
@@ -487,24 +464,7 @@
   </div>
   <p class="trial-note"><strong>Your first 30 days are free, on your own cases.</strong> The 30 days start the first time you generate a letter, not when you open the account — so an account opened today and first used in six months still gets its full 30 days. After that, new skilled nursing facilities stay on Volume — there is no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>
 
-  <!-- THE LETTER AND THIS PAGE MUST NOT CONTRADICT EACH OTHER.
-
-       From Sat 24 Oct the free-tier campaign mails non-profit skilled
-       nursing facilities a letter saying in bold that CaseWhy Appeals is
-       free for them, never billed, with no plan to buy. The single link in
-       that letter redirects HERE — and until this paragraph existed, the
-       page it landed on quoted a per-site licence and said nothing about
-       non-profits at all. A reader would reasonably conclude the letter was
-       wrong.
-
-       SKILLED NURSING ONLY, and that is not hedging: the ownership lookup
-       that grants the free tier queries skilled nursing rows in both of its
-       paths, so a non-profit hospice or home health agency is NOT free.
-       This paragraph must not be copied onto those two pages.
-
-       The wording tracks the letter and the sign-up form so all three
-       agree: never billed, fair-use limits apply, nothing to claim because
-       ownership is read from the public Medicare data. -->
+  
   <p class="free-line">If yours is a non-profit, none of this applies to you: non-profit skilled nursing facilities
     are never billed — not a trial, and not free for a while. Fair-use limits apply and there is no plan
     for you to buy. We identify non-profit ownership from the public Medicare data, so there is nothing to
@@ -522,18 +482,7 @@
     <li><strong>Closing your organization deletes everything under it, immediately.</strong> Export first if you want a copy.</li>
   </ul>
 
-  <!-- Oct 5, 2026 — Peter: "/for-advocates should be the landing page not
-       sending us an email from the campaign email flow", and signup "should be
-       self-serve for all and self-serve first".
-
-       This was a mailto. The October letter's whole path therefore ended in an
-       email to Peter and a wait, which for cold outreach is the conversion
-       step. It now lands on the real signup, pre-set to skilled nursing so the visitor
-       does not re-pick what the page they are standing on already knows.
-
-       The mailto is kept as a SECOND option rather than deleted: a facility
-       deciding for a group of buildings genuinely does need a person, and the
-       section above this one says so. -->
+  
   <a class="cta" href="https://appeals.casewhy.com/for-advocates?segment=facility&amp;facilityType=snf&amp;utm_source=hub&amp;utm_medium=referral">Set up your site license &rarr;</a>
   <p class="cta-alt">Deciding for more than one building? <a href="mailto:appeals-help@casewhy.com?subject=Skilled%20nursing%20per-site%20license">Email us instead</a> and we will price the group.</p>
 

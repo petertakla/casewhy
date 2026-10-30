@@ -479,7 +479,36 @@ check("no footer help link reads as product-neutral", !/>Get Help:/.test(homeHtm
 // comment (renders nothing) and is counted here, so the work stays tracked
 // while a visitor just sees a page with no image.
 const screenshotPages = ["/appeals/facilities/skilled-nursing", "/appeals/facilities/home-health", "/appeals/facilities/hospice", "/appeals/care-managers"];
-const pendingShots = screenshotPages.filter((p) => (read(p) ?? "").includes("SCREENSHOT PENDING"));
+// COUNTED FROM THE SOURCE, NOT THE BUILT PAGE, since 30 Oct 2026 — the
+// generator now strips comments on the way out, because 14% of the enterprise
+// page was internal commentary and two pages quoted Peter by name in
+// view-source. The brief is still an HTML comment and still renders nothing;
+// it is simply read where it is written.
+//
+// THIS NEARLY BECAME A SILENT ZERO. Stripping comments would have made this
+// read 0 pending with every screenshot still outstanding, and the check would
+// have gone on passing — the count sits in the label, not in the assertion.
+//
+// COUNTED ACROSS ALL SOURCE MATERIAL RATHER THAN MAPPED PER PAGE. My first fix
+// derived a content filename from each page path, which failed immediately:
+// `/appeals/facilities/skilled-nursing` has NO content file — that page is
+// generated from code — so a per-page mapping either fails on it or needs a
+// special case that the next page built from code will not get. The backlog is
+// a count of outstanding briefs, and nothing here needs to know which page each
+// belongs to.
+const briefSources = [
+  ...readdirSync(join(ROOT, "scripts/content"))
+    .filter((f) => f.endsWith(".html"))
+    .map((f) => join(ROOT, "scripts/content", f)),
+  join(ROOT, "scripts/generate.mjs"),
+];
+const pendingShots = briefSources.filter((f) => readFileSync(f, "utf8").includes("SCREENSHOT PENDING"));
+// VACUITY, measured in bytes rather than in list length — a full list of files
+// nobody opened is how the comment check below passed while reading nothing.
+check(
+  `the screenshot backlog was read from source (${briefSources.length} files, ${briefSources.reduce((n, f) => n + readFileSync(f, "utf8").length, 0)} bytes)`,
+  briefSources.length > 5
+);
 check(`no page shows a visible placeholder caption (${pendingShots.length} screenshot(s) pending, tracked in comments)`,
   screenshotPages.every((p) => !/PLACEHOLDER\s*[—-]\s*the/i.test(read(p) ?? "")));
 check("no page still renders the placeholder graphic",
@@ -822,6 +851,61 @@ console.log("\n== Every shipped page is in the sitemap ==");
   check(
     `the sitemap offers no URL without a page${phantom.length ? ` — ${phantom.join(", ")}` : ""}`,
     phantom.length === 0
+  );
+}
+
+// ---------------------------------------------------------------------------
+// NO INTERNAL COMMENTARY SHIPS TO A READER.
+//
+// Measured 30 Oct 2026, before `stripComments` existed: the enterprise page
+// carried 9 HTML comments — 8,408 of its 56,214 bytes, 14% of the page — and
+// two pages quoted Peter by name. One of them explained that the copy above it
+// had been wrong until that morning. All of it was readable in view-source on a
+// public marketing site.
+//
+// The comments themselves are worth keeping in the content files: that is where
+// a later session finds out why a sentence is worded the way it is. This checks
+// the OUTPUT, which is the only place it mattered.
+{
+  // `builtPages()` RETURNS ABSOLUTE FILE PATHS, not relative page paths. The
+  // first version of this block treated them as page paths and rebuilt each one
+  // as ROOT + path + "index.html" — which existed for none of them, so every
+  // file was filtered out and the check passed while reading nothing. It passed
+  // with nine comments sitting in the page it was supposed to be looking at.
+  //
+  // That is the second time in one day: the staleness check above had the same
+  // shape, looking pages up by a key they are not keyed on.
+  //
+  // SO THE VACUITY GUARD COUNTS BYTES READ, NOT PAGES LISTED. The broken version
+  // had a vacuity guard and it passed too, because the list was full — it was
+  // the reading that was empty, and a list length cannot tell you that.
+  const pageFiles = builtPages();
+  let bytesRead = 0;
+  const leaking = [];
+  for (const f of pageFiles) {
+    const html = readFileSync(f, "utf8");
+    bytesRead += html.length;
+    if (html.includes("<!--")) leaking.push(f.replace(ROOT, ""));
+  }
+  check(`the comment check actually read the pages (${pageFiles.length} files, ${bytesRead} bytes)`,
+    pageFiles.length > 5 && bytesRead > 100_000);
+  check(
+    `no built page ships an HTML comment${leaking.length ? ` — ${leaking.slice(0, 3).join(", ")}` : ""}`,
+    leaking.length === 0
+  );
+
+  // AND THE STRIP MUST NOT BE ABLE TO EAT A CODE SAMPLE. Nothing on this site
+  // displays markup today — 0 <pre>/<code> blocks contain a comment marker — so
+  // the strip is safe. If a page ever shows an HTML example, this fails here
+  // rather than silently deleting part of it.
+  const sources = readdirSync(join(ROOT, "scripts/content")).filter((f) => f.endsWith(".html"));
+  const risky = sources.filter((f) => {
+    const src = readFileSync(join(ROOT, "scripts/content", f), "utf8");
+    return [...src.matchAll(/<(pre|code)\b[\s\S]*?<\/\1>/g)].some((m) => m[0].includes("<!--"));
+  });
+  check(
+    `no page displays markup that the comment strip would eat${risky.length ? ` — ${risky.join(", ")}` : ""}`,
+    risky.length === 0
   );
 }
 

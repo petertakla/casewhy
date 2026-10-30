@@ -417,24 +417,7 @@
   <h1>Stop letting insurance denials block your admissions</h1>
   <div class="disclaimer">CaseWhy Appeals is not affiliated with or endorsed by Medicare, CMS, or any health plan, and is not a law firm.</div>
 
-  <!-- ADMISSION PAGE, SYNC_0025. The v2 copy Peter approved Oct 3 ("approved",
-       SYNC_0019), unchanged except that the numbers are now bold too, which
-       SYNC_0025 section 3 asks for and Peter's "and bold the numbers or
-       sentence" is the basis of.
-
-       Both publish gates in SYNC_0025 section 4.2 are met:
-         (a) the synthetic end-to-end test of a pre-service SNF denial passes
-             (test:snf-admission, 13 checks), including that BOTH clocks
-             compute for this notice -- the page's "both deadlines" claim;
-         (b) C2C Innovative Solutions confirmed as the current Part C IRE
-             (CMS contract award; Maximus through Apr 30 2026, C2C from
-             May 1), and every figure in the table checked against the
-             regulation text rather than the task doc.
-
-       NOT PRESENT, DELIBERATELY: the two further sections SYNC_0025 names,
-       "What a pre-admission denial notice looks like" and "What a winning
-       appeal has to show". Chat has not drafted them and Peter has not
-       approved them, and the task says do not invent them. -->
+  
 
   <p>A Medicare Advantage plan can refuse to cover a skilled nursing admission before the resident even arrives. <strong>When these denials are appealed, they are overwhelmingly overturned. Most are never appealed.</strong></p>
 
@@ -472,13 +455,7 @@
     </tbody>
   </table>
   </div>
-  <!-- "(non-expedited)" deleted Oct 3 2026 on Peter's instruction, verbatim:
-       "ship it ...Simplest fix is deleting those two words." The parenthetical
-       drew a contrast the regulation does not: 42 CFR 422.590(f)(1) extends
-       "the standard or expedited reconsideration deadline for services", and
-       CMS Guidance 40.10's table gives expedited as "72 hours | 17 days". Only
-       payment and Part B drug timeframes cannot be extended. Same correction
-       shipped in the deadline engine as appeals 5a50d7c. -->
+  
   <p>Standard timelines can be extended by up to <strong>14 days</strong>.</p>
 
   <h3>How CaseWhy handles it</h3>
@@ -489,18 +466,7 @@
     <li>CaseWhy prepares CMS-1696, the appointment-of-representative form, so your facility can file on the resident's behalf.</li>
   </ul>
 
-  <!-- The board filtered to admission denials, Oct 3 2026. Taken from the live
-       QA facility, scrolled so the "QA Skilled Nursing (TEST)" header is off
-       the top rather than cropped out of a wider shot.
-
-       WHY THIS VIEW AND NOT THE WHOLE BOARD: the full board is already shown
-       further up. Filtered, it makes the point this section is about -- every
-       DAYS LEFT reads in weeks, 7d to 63d, against the 5h and 30h of the NOMNC
-       rows above. The contrast IS the "different clock" heading.
-
-       The figures are seeded sample data. References are room and file
-       numbers because desk_clients cannot hold a name; the line under the
-       table is the product stating its own constraint, not marketing copy. -->
+  
   <p class="demo-inline"><a href="https://appeals.casewhy.com/desk/demo?flow=admission&amp;utm_source=hub&amp;utm_medium=referral">Try it with sample cases &rarr;</a></p>
   <figure class="diagram">
     <img src="/images/appeals-desk-snf-admission-denials.webp" width="1006" height="812" loading="lazy" decoding="async"
@@ -514,16 +480,7 @@
 
   <p class="sources">Sources: HHS OIG, OEI-09-24-00331 (June 2026); 42 CFR &sect;&sect;422.566&ndash;422.590 (organization determinations and reconsiderations), including &sect;422.582 (time to request).</p>
 
-  <!-- SCREENSHOTS STILL TO COME: SYNC_0025 asks for three from the end-to-end
-       run -- the denial notice uploaded with both deadlines on the case, the
-       drafted reconsideration letter, and the prepared CMS-1696. The board
-       above is real and shipped; these three are not captured yet.
-
-       NO VISIBLE PLACEHOLDER, on purpose. The Oct 2 site audit found a
-       rendered "PLACEHOLDER - real screenshot to come" on the live SNF page,
-       readable by any facility decision-maker. A page with fewer images reads
-       better to a prospect than a page apologising for them. This comment
-       renders nothing and verify.mjs counts it so the work stays tracked. -->
+  
 
   <p class="crosslink">The other way a plan denies a resident: <a href="/appeals/facilities/skilled-nursing/mid-stay">the mid-stay flow &mdash; notice, clocks, fast-appeal request &rarr;</a></p>
   <p class="crosslink"><a href="/appeals/facilities/skilled-nursing">&larr; Back to skilled nursing</a></p>

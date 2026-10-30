@@ -414,95 +414,24 @@
 
 <main class="wrap">
   <p class="eyebrow">CaseWhy Hub · <a href="/appeals">CaseWhy Appeals</a> · For multi-facility organizations</p>
-  <h1>CaseWhy Appeals for healthcare organizations</h1>
+  
+  <h1>CaseWhy Appeals<br>for healthcare organizations</h1>
   <p class="sub">Medicare coverage denials are appealable on a two-day clock, and independent reviewers overturn roughly half of them. For an organization operating multiple buildings, the material question is not whether appeals succeed. It is how many are never filed, and whether anyone would know.</p>
   <div class="disclaimer">CaseWhy Appeals is not affiliated with or endorsed by Medicare, CMS, or any health plan, and is not a law firm.</div>
 
-  <!-- ===================================================================
-       AUDIENCE: AN EXECUTIVE. Peter, 29 Oct 2026: "write the pages in a
-       professional language ... from an executive perspective".
-
-       Two rewrites informed this file. The first carried the house voice used
-       on the family and facility pages — effective for a business office
-       manager reading a cold letter, wrong for a vendor evaluation. The second
-       was professional but organised around FEATURES, which is still a
-       manager's document: it opened with what the software does.
-
-       An executive reads for exposure, control, risk and commercial terms, in
-       that order, and decides whether to delegate the evaluation. So the
-       capability list is compressed and moved below the commercial terms, and
-       the page opens on what is at stake rather than on what is built.
-
-       NO INVENTED ECONOMICS. There is no "average facility loses $X per denied
-       day" on this page because that figure is not in our possession. The
-       framing rests on CMS's own published overturn rate, attributed — which
-       is both defensible and stronger than an estimate we cannot source.
-
-       ===================================================================
-       WHAT THIS PAGE MAY CLAIM. Peter set the constraint himself: "Avoid
-       presenting enterprise capabilities as available until verified." Each
-       capability was checked against the code on the day of writing:
-
-         consolidated view of buildings  BUILT, ships 29 Oct 2026
-         organization -> segment ->
-           building -> case              BUILT
-         filter by segment and region    BUILT
-         accountable owner per case      BUILT, pre-dates this work
-         separate free period and plan
-           per care segment              BUILT — the price book is keyed to
-                                         facility type, not to the organization
-
-       DELIBERATELY ABSENT, being untrue today: outcome reporting (the columns
-       exist, nothing writes to them, none has been recorded); any success rate
-       of ours (no facility has used the product); single sign-on, API and
-       integrations (not built); a scheduling calendar (not built — the closing
-       section offers the demonstration that exists and a named contact).
-       =================================================================== -->
+  
 
   <h2>The exposure</h2>
   <p>CMS reviewed 625,608 fast-track appeals of post-acute coverage terminations between May 2024 and September 2025. Independent reviewers (BFCC-QIOs) disagreed with the plan in approximately half of them. For denied admissions, the HHS Office of Inspector General reported in June 2026 that 95% of appealed denials were overturned.</p>
   <p>Two conclusions follow for an organization operating at scale. First, an appeal not filed is, more often than not, a reversible decision left unchallenged. Second, the determining factor is administrative rather than clinical: the fast-track deadline is a call to the reviewer before noon on the day before coverage ends, and it is met or missed by whoever happens to be handling the notice that day.</p>
   <p>At a single site that risk is visible to the administrator. Across twenty or forty sites it is visible to no one, because there has not been a report that shows it.</p>
 
-  <h2>The report that shows it</h2>
-  <p>One screen, every building, ordered by what is closest to being missed. The figures are summed from the rows beneath them, so the total and the table cannot disagree.</p>
+  
+  <h2>One screen for the whole portfolio</h2>
+  <p>Every building you operate, ordered by what is closest to being missed. The question is not how many appeals are open — it is which site is about to lose one, and whose name is against it. Both are answered on the first screen rather than assembled afterwards from a report somebody has to ask for.</p>
+  <p>The same screen serves two readers who are usually sent two different reports: operations leadership reviews by region, line-of-business leadership reviews by care segment, and switching between them is one click rather than a different export.</p>
 
-  <!-- ===================================================================
-       THE SCREEN, DRAWN RATHER THAN SCREENSHOT. Peter, 29 Oct 2026: "need to
-       show the visual of the page" and earlier "visuals are 80% of the
-       selling". This page previously described a consolidated view in prose
-       for 1,200 words and showed nobody what it looks like.
-
-       EVERY COLUMN AND FIGURE HERE EXISTS IN THE REAL SCREEN
-       (src/app/desk/(seated)/admin/CompanyBoard.tsx): the SIX tiles are that
-       file's own six, in its order; the per-segment summary line is its
-       GroupSummary; and Building / Open / Next deadline / No owner /
-       Overturned are its five columns. The deadline pill has two states
-       because the Deadline helper has two.
-
-       THE NESTING IS THE ARGUMENT, and it is the real nesting rather than a
-       flattering one. GroupSection renders a section per line of business
-       with its free-period tag beside the heading, then buckets buildings by
-       region — so company -> segment -> region -> building is what a
-       customer actually sees, and the per-segment free period (Peter's
-       decision of 29 Oct: three segments are "3 different business models")
-       is visible rather than asserted. An earlier draft of this mock showed
-       one flat table of buildings, which demonstrated none of that.
-
-       THE NUMBERS ADD UP, deliberately — (5+3+4)+(6+2)+(3+2) = 25 open
-       across 7 buildings; four buildings inside 48 hours (9h, 36h, 22h,
-       41h); four cases unassigned (1+2+1). A mock-up whose figures
-       contradict its own table is the exact defect the real page avoids by
-       summing from the rows, and a prospect who adds them up is the kind of
-       prospect this page is written for.
-
-       OVERTURNED IS EMPTY ON PURPOSE AND MUST STAY EMPTY. No outcome has
-       been recorded in the product, and this page says so two sections
-       below. Filling that column with a plausible success rate would be a
-       fabricated record on a sales page — the single most damaging thing
-       this file could contain. The column appears because it is on the real
-       screen; it reads "none decided yet" because that is true.
-       =================================================================== -->
+  
   <div class="screen">
     <div class="chrome"><i></i><i></i><i></i><span>appeals.casewhy.com/desk/admin</span></div>
     <div class="body">
@@ -510,15 +439,7 @@
       <p class="who">7 buildings &middot; two lines of business &middot; account owner view</p>
       <p class="who">Grouped by region &mdash; one click switches the whole board to group by care segment instead.</p>
 
-      <!-- SIX TILES, AND THEY ARE THE SCREEN'S OWN SIX. Peter, 30 Oct 2026:
-           "make my enterprise page match on number of tiles and style".
-           CompanyBoard renders exactly these, in this order, with the same
-           card treatment as the Desk's facility board.
-
-           OVERDUE AND DUE-IN-48 ARE DISJOINT HERE AS THERE. The underlying
-           count of "due soon" deliberately includes what is already past, so
-           the two tiles subtract rather than overlap — otherwise a reader
-           adding them would double-count the worst buildings. -->
+      
       <div class="figs">
         <div class="fig"><b>Open appeals</b><u>25</u><i>across 7 buildings</i></div>
         <div class="fig good"><b>Overdue</b><u class="good">0</u><i>nothing missed</i></div>
@@ -532,16 +453,9 @@
       <div class="filters"><em>Region</em><span class="chip on">All</span><span class="chip">Ohio Valley</span><span class="chip">Gulf Coast</span></div>
       <div class="filters"><em>Group by</em><span class="chip on">Region</span><span class="chip">Segment</span></div>
 
-      <!-- NO PRICE IN THIS TAG. Every other price on this page comes from
-           {{PRICING:...}}, which reads the live price book; a number typed
-           here would be the one that silently goes stale. The free-period
-           STATE is the point of the tag, and it is not a price. -->
+      
       <div class="seg"><h5>Skilled nursing</h5><span class="tag">Free period ended 2 Oct</span></div>
-      <!-- THE LINE BETWEEN THE COMPANY AND ITS BUILDINGS. Peter chose this of
-           three options: a summary per line of business, with the buildings
-           underneath and region as a toggle. Every figure is the sum of the
-           rows below it — 5+3+4+6+2 = 20 open across five buildings — which
-           is how the real screen computes it too. -->
+      
       <div class="sum">
         <div><b>Buildings</b><u>5</u></div>
         <div><b>Regions</b><u>2</u></div>
@@ -634,13 +548,7 @@
     </div>
   </div>
   <p class="trial-note"><strong>Your first 30 days are free, on your own cases.</strong> The 30 days start the first time you generate a letter, not when you open the account — so an account opened today and first used in six months still gets its full 30 days. After that, new skilled nursing facilities stay on Volume — there is no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>
-  <!-- HOSPICE GAINED A SITE LICENCE ON 30 OCT 2026 and this sentence used to
-       say it had none. Peter: "pricing of site for SNF should be the same for
-       home helath and hospice ... one price for unlimited cases". All three
-       segments are now one flat price for unlimited cases — $499 for skilled
-       nursing, $249 for the other two — with pay-as-you-go still available on
-       each. The per-site figures come from the price book through the pricing
-       token above, never typed here. -->
+  
   <p>Skilled nursing is shown above. <a href="/appeals/facilities/home-health">Home health</a> and <a href="/appeals/facilities/hospice">hospice</a> are documented separately, and each is priced the same way: one flat monthly fee per site covering every case at any volume, with pay-as-you-go available instead.</p>
   <p><strong>A free period per care segment, not per organization.</strong> An organization operating in two or three segments receives a separate period for each. A single organization-wide period would oblige two evaluations to proceed on a third's timetable, and the personnel evaluating skilled nursing are generally not those evaluating home health.</p>
   <p><strong>No enterprise rate card is published here, because none has been established.</strong> No multi-facility organization has yet subscribed, and a stated volume discount would not reflect an actual agreement. Pricing against a specific footprint is provided on request.</p>
@@ -667,24 +575,7 @@
 
   <h2>Next step</h2>
 
-  <!-- THE PAGE HAD NO WAY TO OPEN AN ACCOUNT. Peter, 30 Oct 2026: "need apply
-       button", with the sign-up URL.
-
-       Every other facility page on this site has carried that call to action
-       for weeks — skilled nursing, home health and hospice each link straight
-       to the sign-up with their own facilityType. THIS page shipped with a
-       demonstration link and an email address and nothing else, so an
-       executive who had read 1,200 words and decided to proceed had no button
-       to press. Shipped is not the same as reachable.
-
-       NO facilityType ON THIS ONE, deliberately, unlike the three segment
-       pages. An organization reading this operates in more than one line of
-       business, so choosing a type on its behalf would be wrong; the form
-       asks which kind of facility and prices it from the answer.
-
-       THE DEMONSTRATION LINK STAYS AND STAYS SECOND. It is the thing that
-       requires nothing of the reader, and for a cautious evaluator it is
-       still the better first step. -->
+  
   <p>Two ways to proceed, neither requiring a commitment:</p>
   <p><a class="cta" href="https://appeals.casewhy.com/for-advocates?segment=facility&amp;utm_source=hub&amp;utm_medium=referral">Apply &mdash; open an account</a></p>
   <p>The free period starts at the first letter generated, not at sign-up, so an account opened now and first used in several months still gets its full period. Or see the appeal workflow and a working demonstration without registering at all:</p>

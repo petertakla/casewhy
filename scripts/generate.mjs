@@ -1059,10 +1059,32 @@ function linePage(line) {
 
 // --- write everything ---
 
+// THE REASONING STAYS IN THE SOURCE AND OUT OF THE BUILD.
+//
+// HTML comments ship to the browser. Measured 30 Oct 2026: the enterprise page
+// carried 9 comments totalling 8,408 of its 56,214 bytes — 14% of the page —
+// and two pages quoted Peter by name in them, all of it readable in view-source
+// on a public marketing site. One comment explained that the copy it sat above
+// had been wrong until that morning.
+//
+// Those comments are worth having. The content files are where a later session
+// finds out WHY a sentence is worded the way it is, and stripping them there
+// would throw that away to fix a leak that belongs at the output. So they are
+// removed on the way out instead.
+//
+// SAFE BECAUSE NOTHING ON THIS SITE DISPLAYS MARKUP: checked across every built
+// page, 0 <pre> or <code> blocks contain a comment marker, so there is no
+// sample of HTML whose own comment would be eaten. If one is ever added, this
+// is the line that will quietly change it — hence the assertion in verify.mjs
+// rather than a note here.
+function stripComments(html) {
+  return html.replace(/<!--(?!\[if )[\s\S]*?-->/g, "");
+}
+
 function writePage(relPath, html) {
   const dir = join(ROOT, relPath.replace(/^\//, ""));
   mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, "index.html"), html);
+  writeFileSync(join(dir, "index.html"), stripComments(html));
   console.log("wrote", relPath);
 }
 

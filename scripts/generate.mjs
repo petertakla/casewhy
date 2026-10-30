@@ -465,6 +465,15 @@ function footer() {
     <div class="links">
       <a href="/resources">Resources</a>
       <a href="/brand">Brand</a>
+      <!-- THE DOCUMENTS THEMSELVES, not only an address to write to. Until 30
+           Oct 2026 this footer offered privacy@ and terms@ and nothing to read:
+           a visitor who wanted to know the terms got a mailbox. Both documents
+           exist and are rendered from plain files on the app, so they are
+           linked rather than copied — a second copy on this site would drift,
+           and a permanence promise sat on the enterprise page for weeks for
+           exactly that reason, one repo away from the guard that forbids it. -->
+      <a href="https://appeals.casewhy.com/terms?utm_source=hub&utm_medium=footer">Terms of Service</a>
+      <a href="https://appeals.casewhy.com/privacy?utm_source=hub&utm_medium=footer">Privacy Policy</a>
       <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>
       <a href="mailto:terms@casewhy.com">terms@casewhy.com</a>
     </div>

@@ -1,4 +1,59 @@
+# casewhyhub.com
+#
+# Terms of Service: https://appeals.casewhy.com/terms
+# Automated extraction of this site's content is prohibited by those terms.
+# This file states the same thing in the form a crawler can read; the terms are
+# what the prohibition rests on.
+
 User-agent: *
 Allow: /
 
 Sitemap: https://casewhyhub.com/sitemap.xml
+
+# ---------------------------------------------------------------------------
+# CRAWLERS THAT TAKE CONTENT FOR MODEL TRAINING AND SEND NOBODY BACK.
+#
+# Peter's decision, 30 Oct 2026: block training, allow citation. The split is
+# the point — a crawler that cites us and sends a reader is doing something we
+# want, and somebody asking an assistant "how do I appeal a Medicare discharge"
+# is exactly the person these pages are written for. A blanket block would have
+# bought content protection by making us invisible to them.
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Diffbot
+Disallow: /
+
+User-agent: Omgilibot
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+# ---------------------------------------------------------------------------
+# SEARCH FETCHERS ARE DELIBERATELY NOT LISTED, so the `User-agent: *` rule
+# above allows them. Named here only so a later reader can see the omission was
+# a choice and not an oversight: OAI-SearchBot, Claude-SearchBot,
+# PerplexityBot, Applebot, Googlebot, Bingbot.
+#
+# Note that Google-Extended and Applebot-Extended above control TRAINING only —
+# neither affects Googlebot or Applebot, so blocking them costs no search
+# visibility. That asymmetry is why they can be blocked without a trade-off.

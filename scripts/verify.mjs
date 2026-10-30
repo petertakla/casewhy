@@ -909,5 +909,39 @@ console.log("\n== Every shipped page is in the sitemap ==");
   );
 }
 
+// ---------------------------------------------------------------------------
+// EMPHASIS TAGS BALANCE, AND NONE NESTS.
+//
+// Added 30 Oct 2026 after I broke it. Replacing a bold phrase on the
+// enterprise page, I wrote `<strong>` inside an existing `<strong>` and
+// consumed its closing tag — leaving the outer one unclosed, which bolds the
+// rest of the list item. This file passed before the mistake and after it,
+// because nothing here looked at the markup.
+//
+// It matters beyond tidiness: a pinned decision allows bold on SIX phrases
+// only, and an unclosed tag silently bolds whatever follows. The violation
+// would have been visible on the page and invisible to every check.
+{
+  const pages = builtPages();
+  let read = 0;
+  const broken = [];
+  for (const f of pages) {
+    const html = readFileSync(f, "utf8");
+    read += html.length;
+    for (const tag of ["strong", "em", "b", "i"]) {
+      const open = (html.match(new RegExp(`<${tag}>`, "g")) ?? []).length;
+      const close = (html.match(new RegExp(`</${tag}>`, "g")) ?? []).length;
+      if (open !== close) broken.push(`${f.replace(ROOT, "")}: ${open} <${tag}> vs ${close} </${tag}>`);
+      if (new RegExp(`<${tag}>[^<]*<${tag}>`).test(html)) broken.push(`${f.replace(ROOT, "")}: nested <${tag}>`);
+    }
+  }
+  // Vacuity in bytes, not in list length — the lesson from the comment check.
+  check(`the markup check read the pages (${pages.length} files, ${read} bytes)`, pages.length > 5 && read > 100_000);
+  check(
+    `emphasis tags balance and do not nest${broken.length ? ` — ${broken.slice(0, 3).join("; ")}` : ""}`,
+    broken.length === 0
+  );
+}
+
 console.log(`\n${failures === 0 ? "All checks passed." : `${failures} check(s) FAILED.`}`);
 process.exit(failures === 0 ? 0 : 1);

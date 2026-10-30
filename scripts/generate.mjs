@@ -268,6 +268,19 @@ const CSS = `
   table.clock-table th,table.clock-table td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top;}
   table.clock-table thead th{background:var(--surface-2);font-size:0.78rem;letter-spacing:0.03em;text-transform:uppercase;color:var(--muted);}
   table.clock-table tbody td:first-child{font-weight:600;white-space:nowrap;}
+  /* THE PRICE TABLE. A bare <table> inherits nothing on this site — the only
+     table styles are scoped to .clock-table and .screen — so the portfolio
+     bands rendered with no padding, no min-width and no scroll box, and the
+     columns collapsed into each other. Peter: "spread them out they scooched".
+     Same conventions as the clock table above, plus right-aligned tabular
+     figures so the dollar amounts line up down each column, which is the whole
+     reason somebody reads a price table. */
+  table.price-table{border-collapse:collapse;width:100%;min-width:600px;font-size:0.88rem;}
+  table.price-table th,table.price-table td{border:1px solid var(--border);padding:11px 14px;text-align:left;vertical-align:middle;}
+  table.price-table thead th{background:var(--surface-2);font-size:0.78rem;letter-spacing:0.03em;text-transform:uppercase;color:var(--muted);}
+  table.price-table tbody td:first-child{font-weight:600;white-space:nowrap;}
+  table.price-table th:not(:first-child),table.price-table td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  table.price-table tbody tr:last-child td{background:var(--surface-2);}
   /* ------------------------------------------------------------------
      SCREEN MOCK (.screen). Added 29 Oct 2026 for the enterprise page.
      Peter: "visuals are 80% of the selling" — that page was 1,200 words of
@@ -816,10 +829,10 @@ function portfolioPricingHtml() {
     `<tr><td>${b.label}</td><td>${b.discountPercent ? `${b.discountPercent}%` : "&mdash;"}</td>` +
     `<td>$${b.perSiteUsd.snf}</td><td>$${b.perSiteUsd.home_health}</td><td>$${b.perSiteUsd.hospice}</td></tr>`;
   return (
-    `<table>\n  <thead><tr><th>Paid facilities</th><th>Discount</th><th>Skilled nursing</th>` +
+    `<div class="table-scroll">\n<table class="price-table">\n  <thead><tr><th>Paid facilities</th><th>Discount</th><th>Skilled nursing</th>` +
     `<th>Home health</th><th>Hospice</th></tr></thead>\n  <tbody>\n    ` +
     p.bands.map(row).join("\n    ") +
-    `\n  </tbody>\n</table>\n` +
+    `\n  </tbody>\n</table>\n</div>\n` +
     `<p>Per site, per month, every case included at any volume. A ${p.termMonths}-month term applies, ` +
     `billed monthly or annually, with facilities added mid-term pro rata.</p>`
   );

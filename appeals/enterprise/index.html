@@ -258,6 +258,19 @@
   table.clock-table th,table.clock-table td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top;}
   table.clock-table thead th{background:var(--surface-2);font-size:0.78rem;letter-spacing:0.03em;text-transform:uppercase;color:var(--muted);}
   table.clock-table tbody td:first-child{font-weight:600;white-space:nowrap;}
+  /* THE PRICE TABLE. A bare <table> inherits nothing on this site — the only
+     table styles are scoped to .clock-table and .screen — so the portfolio
+     bands rendered with no padding, no min-width and no scroll box, and the
+     columns collapsed into each other. Peter: "spread them out they scooched".
+     Same conventions as the clock table above, plus right-aligned tabular
+     figures so the dollar amounts line up down each column, which is the whole
+     reason somebody reads a price table. */
+  table.price-table{border-collapse:collapse;width:100%;min-width:600px;font-size:0.88rem;}
+  table.price-table th,table.price-table td{border:1px solid var(--border);padding:11px 14px;text-align:left;vertical-align:middle;}
+  table.price-table thead th{background:var(--surface-2);font-size:0.78rem;letter-spacing:0.03em;text-transform:uppercase;color:var(--muted);}
+  table.price-table tbody td:first-child{font-weight:600;white-space:nowrap;}
+  table.price-table th:not(:first-child),table.price-table td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  table.price-table tbody tr:last-child td{background:var(--surface-2);}
   /* ------------------------------------------------------------------
      SCREEN MOCK (.screen). Added 29 Oct 2026 for the enterprise page.
      Peter: "visuals are 80% of the selling" — that page was 1,200 words of
@@ -557,15 +570,17 @@
 
   <p>Published rates are per site. An organization enrolling five or more <em>paid</em> facilities is priced on its whole portfolio instead, at one discount applied across every segment it enrolls.</p>
 
-  <table>
+  <div class="table-scroll">
+<table class="price-table">
   <thead><tr><th>Paid facilities</th><th>Discount</th><th>Skilled nursing</th><th>Home health</th><th>Hospice</th></tr></thead>
   <tbody>
-    <tr><td>1-4</td><td>&mdash;</td><td>$499</td><td>$299</td><td>$199</td></tr>
+    <tr><td>1–4</td><td>&mdash;</td><td>$499</td><td>$299</td><td>$199</td></tr>
     <tr><td>5–19 — Group</td><td>15%</td><td>$424</td><td>$254</td><td>$169</td></tr>
     <tr><td>20–99 — Enterprise</td><td>25%</td><td>$374</td><td>$224</td><td>$149</td></tr>
     <tr><td>100+ — Strategic Enterprise</td><td>35%</td><td>$324</td><td>$194</td><td>$129</td></tr>
   </tbody>
 </table>
+</div>
 <p>Per site, per month, every case included at any volume. A 12-month term applies, billed monthly or annually, with facilities added mid-term pro rata.</p>
 
   <p>The count that sets the band is the <strong>whole portfolio across all three segments</strong>, not each segment on its own &mdash; an operator with sixty skilled nursing, twenty-five home health and fifteen hospice locations is at a hundred, not at three smaller numbers.</p>

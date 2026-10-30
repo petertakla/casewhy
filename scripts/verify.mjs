@@ -340,7 +340,7 @@ const WITHDRAWN = [
   // apply."
   //
   // DELIBERATELY NOT a bare /unlimited/: "one license per site, unlimited
-  // staff" on /appeals is the facility site licence and is TRUE, and
+  // staff" on /appeals is the facility site license and is TRUE, and
   // /uscis/press's "unlimited questions" is a different product. code3's
   // 0763 §2 caught that a blanket fix would break both.
   /\bforever\b/i, /permanently/i, /Unlimited cases/i,
@@ -941,6 +941,49 @@ console.log("\n== Every shipped page is in the sitemap ==");
     `emphasis tags balance and do not nest${broken.length ? ` — ${broken.slice(0, 3).join("; ")}` : ""}`,
     broken.length === 0
   );
+}
+
+// ---------------------------------------------------------------------------
+// THE PORTFOLIO BANDS ON THE PAGE ARE THE ONES IN THE PRICE BOOK.
+//
+// Every figure in that table is DERIVED — $499 at 15% off is $424 — so a
+// hand-typed $424 survives a change to $499 and nobody sees it. The table is
+// rendered from pricing.json through {{PORTFOLIO_PRICING}}; this fails the
+// build if somebody replaces the token with literals, which is the only way
+// the two can come apart.
+{
+  const page = read("/appeals/enterprise");
+  check("the enterprise page exists to check", page !== null);
+  if (page) {
+    const p = pricingJson.portfolio;
+    check("pricing.json carries portfolio bands", Boolean(p && p.bands && p.bands.length >= 3));
+    if (p && p.bands) {
+      const missing = [];
+      for (const b of p.bands) {
+        for (const seg of ["snf", "home_health", "hospice"]) {
+          const figure = `$${b.perSiteUsd[seg]}`;
+          if (!page.includes(figure)) missing.push(`${b.id}/${seg} ${figure}`);
+        }
+      }
+      check(
+        `every portfolio band figure appears on the page${missing.length ? ` — missing ${missing.slice(0, 4).join(", ")}` : ""}`,
+        missing.length === 0
+      );
+      // AND THE DISCOUNTS, because a table with the right prices under the
+      // wrong percentages is still wrong, and reads as deliberate.
+      const pcts = p.bands.filter((b) => b.discountPercent > 0).map((b) => `${b.discountPercent}%`);
+      check(
+        `every discount percentage appears too (${pcts.join(", ")})`,
+        pcts.every((x) => page.includes(x))
+      );
+    }
+    // The non-profit rule has to be ON the page, not only in the data: it is
+    // the rule a reader will test us on.
+    check(
+      "the page states that non-profit locations do not count toward the band",
+      /non-profit/i.test(page) && /not<\/strong>? counted|not counted/i.test(page)
+    );
+  }
 }
 
 console.log(`\n${failures === 0 ? "All checks passed." : `${failures} check(s) FAILED.`}`);

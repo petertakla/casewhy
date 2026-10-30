@@ -796,6 +796,57 @@ function socialMeta({ path, titleTag, description, ogImage }) {
 // the nav and the cards, but every page path went into sitemap.xml regardless,
 // so "unlinked" would still have meant "offered to Google". Drop the flag when
 // he approves the copy and it becomes an ordinary page.
+// The portfolio bands, rendered from pricing.json's `portfolio` block, which
+// `appeals scripts/export-desk-pricing.ts` writes from `portfolio-pricing.ts`.
+// `test:hub-pricing-drift` fails if this file goes stale against it.
+//
+// NO PRICE IS TYPED IN THIS FUNCTION and none should be. The bands, the
+// percentages and the per-site figures all arrive from the export; the only
+// strings here are column headings.
+function portfolioPricingHtml() {
+  const p = pricing.portfolio;
+  if (!p || !Array.isArray(p.bands) || p.bands.length === 0) {
+    // A MISSING BLOCK PRINTS NOTHING RATHER THAN AN EMPTY TABLE. An empty
+    // pricing table on a sales page reads as "no pricing", which is worse than
+    // the section being absent — and verify.mjs fails the build on it, so this
+    // branch is a safety net rather than an expected state.
+    return "";
+  }
+  const row = (b) =>
+    `<tr><td>${b.label}</td><td>${b.discountPercent ? `${b.discountPercent}%` : "&mdash;"}</td>` +
+    `<td>$${b.perSiteUsd.snf}</td><td>$${b.perSiteUsd.home_health}</td><td>$${b.perSiteUsd.hospice}</td></tr>`;
+  return (
+    `<table>\n  <thead><tr><th>Paid facilities</th><th>Discount</th><th>Skilled nursing</th>` +
+    `<th>Home health</th><th>Hospice</th></tr></thead>\n  <tbody>\n    ` +
+    p.bands.map(row).join("\n    ") +
+    `\n  </tbody>\n</table>\n` +
+    `<p>Per site, per month, every case included at any volume. A ${p.termMonths}-month term applies, ` +
+    `billed monthly or annually, with facilities added mid-term pro rata.</p>`
+  );
+}
+
+// THE WORKED EXAMPLE, COMPUTED — not typed.
+//
+// I wrote "$54,890 a month versus $35,640" into the page by hand first. Both
+// are DERIVED (110 x $499 and 110 x $324), so a change to the skilled nursing
+// site license would leave two confident wrong figures in prose on the page
+// whose whole job is to price a portfolio. That is the failure the pricing
+// token exists for, committed inside the section that adds the token.
+function portfolioExampleHtml(facilities = 110) {
+  const p = pricing.portfolio;
+  if (!p || !Array.isArray(p.bands)) return "";
+  const list = p.bands.find((b) => b.id === "none");
+  const best = p.bands[p.bands.length - 1];
+  if (!list || !best) return "";
+  const usd = (n) => "$" + n.toLocaleString("en-US");
+  const atList = list.perSiteUsd.snf * facilities;
+  const atBest = best.perSiteUsd.snf * facilities;
+  return (
+    `<p>For ${facilities} skilled nursing locations that is the difference between ` +
+    `${usd(atList)} a month and ${usd(atBest)} &mdash; ${usd((atList - atBest) * 12)} a year.</p>`
+  );
+}
+
 function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, currentLineId, currentSharedId, extraJsonLd, ogImage, draft, siteLink }) {
   let body = bodyOverride !== undefined ? bodyOverride : readFileSync(join(__dirname, "content", `${contentId}.html`), "utf8");
   for (const m of [...body.matchAll(/\{\{PRICING:([a-z_:]+)\}\}/g)]) {
@@ -816,6 +867,19 @@ function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, 
   body = body.replaceAll("{{FREE_PERIOD}}", pricing.freePeriodSentence);
   body = body.replaceAll("{{FREE_PERIOD_CLOCK}}", pricing.freePeriodStartsWhenYouUseIt);
   body = body.replaceAll("{{FREE_PERIOD_SHORT}}", pricing.freePeriodShort);
+  // {{PORTFOLIO_PRICING}} — the Group/Enterprise/Strategic bands, from the
+  // price book rather than typed.
+  //
+  // THE DISCOUNTED FIGURES ARE DERIVED, which is why they must not be written
+  // here: $499 at 15% off is $424, and a hand-typed $424 survives a change to
+  // $499 without anybody noticing. The per-site table above already learned
+  // this lesson the hard way; this is the same indirection for the same reason.
+  if (body.includes("{{PORTFOLIO_PRICING}}")) {
+    body = body.replace("{{PORTFOLIO_PRICING}}", portfolioPricingHtml());
+  }
+  if (body.includes("{{PORTFOLIO_EXAMPLE}}")) {
+    body = body.replace("{{PORTFOLIO_EXAMPLE}}", portfolioExampleHtml());
+  }
   if (body.includes("{{FACILITY_PRIVACY}}")) {
     body = body.replace("{{FACILITY_PRIVACY}}", facilityPrivacyHtml);
   }

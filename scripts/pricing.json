@@ -172,5 +172,53 @@
         ]
       }
     ]
+  },
+  "portfolio": {
+    "minimumFacilities": 5,
+    "termMonths": 12,
+    "countedAcrossSegments": true,
+    "nonprofitCountsTowardBand": false,
+    "bands": [
+      {
+        "id": "none",
+        "label": "1-4",
+        "discountPercent": 0,
+        "perSiteUsd": {
+          "snf": 499,
+          "home_health": 299,
+          "hospice": 199
+        }
+      },
+      {
+        "id": "group",
+        "label": "5–19 — Group",
+        "discountPercent": 15,
+        "perSiteUsd": {
+          "snf": 424,
+          "home_health": 254,
+          "hospice": 169
+        }
+      },
+      {
+        "id": "enterprise",
+        "label": "20–99 — Enterprise",
+        "discountPercent": 25,
+        "perSiteUsd": {
+          "snf": 374,
+          "home_health": 224,
+          "hospice": 149
+        }
+      },
+      {
+        "id": "strategic",
+        "label": "100+ — Strategic Enterprise",
+        "discountPercent": 35,
+        "perSiteUsd": {
+          "snf": 324,
+          "home_health": 194,
+          "hospice": 129
+        }
+      }
+    ]
   }
 }

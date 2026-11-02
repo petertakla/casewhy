@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Medicare Appeals for Multi-Facility Organizations | CaseWhy</title>
-<meta name="description" content="One view of Medicare appeals across every building you operate. Priced per site, per care segment. No business associate agreement required.">
+<meta name="description" content="One view of Medicare appeals across every building you operate. Priced per site, per care segment, with portfolio discounts published.">
 <link rel="canonical" href="https://casewhyhub.com/appeals/enterprise">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Medicare Appeals for Multi-Facility Organizations | CaseWhy">
-<meta property="og:description" content="One view of Medicare appeals across every building you operate. Priced per site, per care segment. No business associate agreement required.">
+<meta property="og:description" content="One view of Medicare appeals across every building you operate. Priced per site, per care segment, with portfolio discounts published.">
 <meta property="og:url" content="https://casewhyhub.com/appeals/enterprise">
 <meta property="og:site_name" content="CaseWhy Hub">
 <meta property="og:locale" content="en_US">
@@ -17,7 +17,7 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Medicare Appeals for Multi-Facility Organizations | CaseWhy">
-<meta name="twitter:description" content="One view of Medicare appeals across every building you operate. Priced per site, per care segment. No business associate agreement required.">
+<meta name="twitter:description" content="One view of Medicare appeals across every building you operate. Priced per site, per care segment, with portfolio discounts published.">
 <meta name="twitter:image" content="https://casewhyhub.com/og-default.png">
 <link rel="icon" href="/brand/icon-192.png">
 <link rel="icon" href="/brand/icon-512.png" sizes="512x512">
@@ -79,7 +79,12 @@
   h2{font-size:1.3rem;margin:36px 0 12px;letter-spacing:-0.01em;}
   .sub{color:var(--muted);font-size:1.05rem;max-width:680px;}
   .free-line{margin-top:18px;font-size:0.92rem;font-weight:600;color:var(--foreground);}
-  .disclaimer{margin-top:20px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);padding:16px 18px;font-size:0.88rem;color:var(--foreground);}
+  /* A MARGIN ON ONE SIDE ONLY. Peter, 1 Nov 2026: the block *"needs a space
+     line after"* it. It had margin-top and no margin-bottom, so a heading
+     after it was spaced (the heading brings its own top margin) while a
+     PARAGRAPH after it touched the box — the paragraph's top margin is 0.
+     Whether the disclaimer looked right depended on what came next. */
+  .disclaimer{margin-top:20px;margin-bottom:30px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);padding:16px 18px;font-size:0.88rem;color:var(--foreground);}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:48px;}
   /* THE FAMILIES PAGE MARKS ITS CARDS UP AS A LIST, and every other page on the
      hub uses a <div class="cards">. So the grid above was written for a div and
@@ -272,6 +277,55 @@
   table.price-table th:not(:first-child),table.price-table td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
   table.price-table tbody tr:last-child td{background:var(--surface-2);}
   /* ------------------------------------------------------------------
+     CONTENT CARDS AND LIST SPACING. Added 1 Nov 2026. Peter, looking at the
+     six new enterprise pages: *"space out the tables and do proper spacing for
+     all pages"*.
+
+     WHY THEY HAD NO SPACING AT ALL: .figs and .fig are scoped to .screen,
+     the dashboard mock-up, and <table> is styled only via .clock-table,
+     .price-table and .screen. So a card or a table written in page content
+     without one of those classes inherits NOTHING — it renders as a bare div
+     and a bare table, which is exactly how the new pages looked.
+
+     The scoping was deliberate and stays: a mock-up of a product screen must
+     not restyle a real content table. What was missing was the unscoped
+     equivalent, which is this.
+     ------------------------------------------------------------------ */
+  .panels{display:grid;grid-template-columns:1fr;gap:18px;margin:22px 0 32px;}
+  @media (min-width:700px){ .panels{grid-template-columns:repeat(3,1fr);} }
+  @media (min-width:700px){ .panels.two{grid-template-columns:repeat(2,1fr);} }
+  /* FOUR CARDS IN A THREE-COLUMN GRID ORPHANS THE FOURTH on its own row,
+     which reads as a mistake rather than a group. Two-by-two instead. */
+  @media (min-width:700px){ .panels.four{grid-template-columns:repeat(2,1fr);} }
+  .panel{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:20px 22px;}
+  .panel h3{margin:0 0 8px;font-size:1rem;}
+  .panel p{margin:0;font-size:0.93rem;color:var(--muted);}
+  /* A LEFT RULE RATHER THAN A COLOURED FILL for the ones that name a problem:
+     the page is read by an executive, and three red boxes reads as alarm. */
+  .panel.warn{border-left:3px solid var(--border-strong);}
+
+  /* LISTS NEED ROOM BETWEEN ITEMS, not just a bullet. Five tight lines read as
+     one block of text and nobody scans them, which is the only reason to use a
+     list on a page like this. */
+  main ul:not(.cards):not(.nav-list),main ol{margin:14px 0 26px;padding-left:22px;}
+  main ul:not(.cards) li,main ol li{margin:0 0 10px;line-height:1.55;}
+  main ol li{padding-left:4px;}
+
+  /* AIR AROUND A TABLE. .table-scroll already carries the horizontal scroll;
+     this gives it vertical separation from the paragraph above and the caption
+     below, which is what "space out the tables" asks for. */
+  .table-scroll{margin:22px 0 10px;}
+  .table-scroll + .caption{margin:0 0 34px;}
+
+  /* AND BETWEEN SECTIONS. h2 was 36px above with no guarantee of space below
+     the preceding block; a page of short sections needs the gap to be visible
+     rather than implied. */
+  main h2{margin:44px 0 14px;}
+  main h2:first-of-type{margin-top:34px;}
+  main p{margin:0 0 16px;}
+  main .cta{margin-top:6px;}
+
+  /* ------------------------------------------------------------------
      SCREEN MOCK (.screen). Added 29 Oct 2026 for the enterprise page.
      Peter: "visuals are 80% of the selling" — that page was 1,200 words of
      prose about a consolidated view and showed nobody what it looks like.
@@ -405,7 +459,7 @@
 
 <header>
   <div class="wrap">
-    <a class="logo" href="/">
+    <a class="logo" href="https://casewhyhub.com/">
       <img src="/brand/mark.svg" alt="">
       <span class="lockup">
         <span class="name">Case<span>Why</span> Hub</span>
@@ -414,230 +468,69 @@
     </a>
     <nav class="main">
       <span class="line-switch">
-        <a href="/uscis">USCIS</a>
-        <a href="/appeals" aria-current="page">Appeals</a>
+        <a href="https://casewhyhub.com/uscis">USCIS</a>
+        <a href="https://casewhyhub.com/appeals" aria-current="page">Appeals</a>
       </span>
-      <a class="shared-link" href="/press">Press</a>
-      <a class="shared-link" href="/resources">Resources</a>
-      <a class="shared-link" href="/brand">Brand</a>
+      <a class="shared-link" href="https://casewhyhub.com/press">Press</a>
+      <a class="shared-link" href="https://casewhyhub.com/resources">Resources</a>
+      <a class="shared-link" href="https://casewhyhub.com/brand">Brand</a>
       <a class="site-link" href="https://appeals.casewhy.com/desk?utm_source=hub&utm_medium=header">appeals.casewhy.com/desk ↗</a>
     </nav>
   </div>
 </header>
 
 <main class="wrap">
-  <p class="eyebrow">CaseWhy Hub · <a href="/appeals">CaseWhy Appeals</a> · For multi-facility organizations</p>
-  
-  <h1>CaseWhy Appeals<br>for healthcare organizations</h1>
-  <p class="sub">Medicare coverage denials are appealable on a two-day clock, and independent reviewers overturn roughly half of them. For an organization operating multiple buildings, the material question is not whether appeals succeed. It is how many are never filed, and whether anyone would know.</p>
+  <p class="eyebrow">CaseWhy Hub · <a href="https://casewhyhub.com/appeals">CaseWhy Appeals</a> · For multi-facility organizations</p>
+  <h1>One platform.<br>Every facility. Every Medicare appeal.</h1>
+  <p class="sub">Complete visibility. Clear accountability. Fewer missed deadlines.</p>
   <div class="disclaimer">CaseWhy Appeals is not affiliated with or endorsed by Medicare, CMS, or any health plan, and is not a law firm.</div>
 
   
 
-  <h2>The exposure</h2>
-  <p>CMS reviewed 625,608 fast-track appeals of post-acute coverage terminations between May 2024 and September 2025. Independent reviewers (BFCC-QIOs) disagreed with the plan in approximately half of them. For denied admissions, the HHS Office of Inspector General reported in June 2026 that 95% of appealed denials were overturned.</p>
-  <p>Two conclusions follow for an organization operating at scale. First, an appeal not filed is, more often than not, a reversible decision left unchallenged. Second, the determining factor is administrative rather than clinical: the fast-track deadline is a call to the reviewer before noon on the day before coverage ends, and it is met or missed by whoever happens to be handling the notice that day.</p>
-  <p>At a single site that risk is visible to the administrator. Across twenty or forty sites it is visible to no one, because there has not been a report that shows it.</p>
-
+  <p>Managing Medicare appeals across multiple facilities should not mean spreadsheets, forwarded email, and a different process in every building.</p>
+  <p>CaseWhy Appeals gives leadership one view of Medicare appeal activity across skilled nursing operations &mdash; which cases need attention, who is responsible, and where a deadline is close &mdash; from the organization down to the individual facility.</p>
   
-  <h2>One record, from the notice to the boardroom</h2>
+  <p class="caption">&ldquo;Every Medicare appeal&rdquo; means the appeal types CaseWhy covers today &mdash; see <a href="https://casewhyhub.com/coverage">what is covered</a>.</p>
 
-  <p>A coverage denial arrives at a building as a piece of paper. Four things then have to happen before anyone at head office knows it existed &mdash; and in most organizations they happen in four different places, or in none.</p>
+  <h2>The enterprise problem</h2>
+  <p>Individual facilities may each have a working process. What an operator usually lacks is a consistent view across all of them.</p>
 
-  <ol>
-    <li><strong>The appeal.</strong> The notice is read, the deadlines that follow from that notice type are calculated, reminders are set, and the letter is drafted for whichever appeal level the case has reached. Skilled nursing, home health and hospice carry their own rules, their own forms and their own clocks, because they are not the same process.</li>
-    <li><strong>The building.</strong> Every open appeal at that site, ordered by what is closest to being missed, with the name against each one and the deadlines that have already gone marked more loudly than the ones that have not.</li>
-    <li><strong>The line of business.</strong> Those buildings grouped the way the operator groups them &mdash; by region they name themselves, or by care segment when the question is how one segment is doing.</li>
-    <li><strong>The organization.</strong> One screen across every segment: what is open, what is overdue, what nobody owns, what was won, and &mdash; where the outcome has been recorded &mdash; what it recovered and how many days of covered care it restored.</li>
-  </ol>
-
-  <p><strong>Nothing is re-keyed between those four.</strong> The percentage an executive reads is the same record a nurse opened when the notice arrived, counted. Not an export, not a monthly roll-up somebody assembles, not a reporting system fed from the operational one and quietly drifting from it. Each figure opens into the rows it came from, down to the individual appeal.</p>
-
-  <p>Above the operational view sits the same data asked different questions: which plan overturns least and takes longest, which kind of denial the appeals are actually about, and which buildings to look at first. Those are judgements rather than counts, and each is labelled as one.</p>
-
-  <p>The point is not that any single layer is novel. It is that an organization operating across three care segments otherwise has to assemble this from a clinical system, a spreadsheet and somebody&rsquo;s memory &mdash; and the assembly is where the appeal that was never filed disappears.</p>
-
-  <h2>One screen for the whole portfolio</h2>
-  <p>Every building you operate, ordered by what is closest to being missed. The question is not how many appeals are open — it is which site is about to lose one, and whose name is against it. Both are answered on the first screen rather than assembled afterwards from a report somebody has to ask for.</p>
-  <p>The same screen serves two readers who are usually sent two different reports: operations leadership reviews by region, line-of-business leadership reviews by care segment, and switching between them is one click rather than a different export.</p>
-
-  
-  <div class="screen">
-    <div class="chrome"><i></i><i></i><i></i><span>appeals.casewhy.com/desk/admin</span></div>
-    <div class="body">
-      <h4>Northstar Post-Acute</h4>
-      <p class="who">7 buildings &middot; two lines of business &middot; account owner view</p>
-      <p class="who">Grouped by region &mdash; one click switches the whole board to group by care segment instead.</p>
-
-      
-      <div class="figs">
-        <div class="fig"><b>Open appeals</b><u>25</u><i>across 7 buildings</i></div>
-        <div class="fig good"><b>Overdue</b><u class="good">0</u><i>nothing missed</i></div>
-        <div class="fig warn"><b>Due in 48 hours</b><u class="warn">4</u><i>buildings, not yet past</i></div>
-        <div class="fig warn"><b>No owner yet</b><u class="warn">4</u><i>unassigned cases</i></div>
-        <div class="fig"><b>Lines of business</b><u>2</u><i>7 buildings in total</i></div>
-        <div class="fig"><b>Overturned</b><u class="none">&mdash;</u><i>none decided yet</i></div>
-      </div>
-
-      <div class="filters"><em>Segment</em><span class="chip on">All</span><span class="chip">Skilled nursing</span><span class="chip">Home health</span></div>
-      <div class="filters"><em>Region</em><span class="chip on">All</span><span class="chip">Ohio Valley</span><span class="chip">Gulf Coast</span></div>
-      <div class="filters"><em>Group by</em><span class="chip on">Region</span><span class="chip">Segment</span></div>
-
-      
-      <div class="seg"><h5>Skilled nursing</h5><span class="tag">Free period ended 2 Oct</span></div>
-      
-      <div class="sum">
-        <div><b>Buildings</b><u>5</u></div>
-        <div><b>Regions</b><u>2</u></div>
-        <div><b>Open</b><u>20</u></div>
-        <div><b>Soonest deadline</b><u>In 9h</u></div>
-        <div><b>Overdue</b><u class="dim">&mdash;</u></div>
-        <div><b>Due in 48h</b><u>3</u></div>
-        <div><b>No owner</b><u>3</u></div>
-      </div>
-      <div class="box">
-        <div class="bucket"><span>Ohio Valley</span><b>3 buildings</b></div>
-        <div class="table-scroll">
-          <table>
-            <thead><tr><th>Building</th><th class="r">Open</th><th>Next deadline</th><th class="r">No owner</th><th>Overturned</th></tr></thead>
-            <tbody>
-              <tr><td class="name">Cedar Ridge Health &amp; Rehab</td><td class="r">5</td><td><span class="pill hot">In 9h</span></td><td class="r">1</td><td><span class="dash">&mdash;</span></td></tr>
-              <tr><td class="name">Maple Court Skilled Nursing</td><td class="r">3</td><td><span class="pill hot">In 36h</span></td><td class="r">0</td><td><span class="dash">&mdash;</span></td></tr>
-              <tr><td class="name">Westbrook Care Center</td><td class="r">4</td><td><span class="calm">6 days</span></td><td class="r">2</td><td><span class="dash">&mdash;</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="box">
-        <div class="bucket"><span>Gulf Coast</span><b>2 buildings</b></div>
-        <div class="table-scroll">
-          <table>
-            <thead><tr><th>Building</th><th class="r">Open</th><th>Next deadline</th><th class="r">No owner</th><th>Overturned</th></tr></thead>
-            <tbody>
-              <tr><td class="name">Bayou Pines Rehabilitation</td><td class="r">6</td><td><span class="pill hot">In 22h</span></td><td class="r">0</td><td><span class="dash">&mdash;</span></td></tr>
-              <tr><td class="name">Palmetto Grove Health</td><td class="r">2</td><td><span class="calm">11 days</span></td><td class="r">0</td><td><span class="dash">&mdash;</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="seg"><h5>Home health</h5><span class="tag live">Free period &middot; 11 days left</span></div>
-      <div class="sum">
-        <div><b>Buildings</b><u>2</u></div>
-        <div><b>Regions</b><u>1</u></div>
-        <div><b>Open</b><u>5</u></div>
-        <div><b>Soonest deadline</b><u>In 41h</u></div>
-        <div><b>Overdue</b><u class="dim">&mdash;</u></div>
-        <div><b>Due in 48h</b><u>1</u></div>
-        <div><b>No owner</b><u>1</u></div>
-      </div>
-      <div class="box">
-        <div class="bucket"><span>Ohio Valley</span><b>2 buildings</b></div>
-        <div class="table-scroll">
-          <table>
-            <thead><tr><th>Building</th><th class="r">Open</th><th>Next deadline</th><th class="r">No owner</th><th>Overturned</th></tr></thead>
-            <tbody>
-              <tr><td class="name">Northstar Home Health &mdash; Dayton</td><td class="r">3</td><td><span class="pill hot">In 41h</span></td><td class="r">1</td><td><span class="dash">&mdash;</span></td></tr>
-              <tr><td class="name">Northstar Home Health &mdash; Toledo</td><td class="r">2</td><td><span class="calm">8 days</span></td><td class="r">0</td><td><span class="dash">&mdash;</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <p class="caption">Illustration of the organizational view. Facility names and figures are samples, not a customer. The Overturned column is empty because no appeal outcome has been recorded in the product &mdash; see &ldquo;What is implemented today&rdquo; below.</p>
+  <div class="panels">
+    <div class="panel warn">
+      <h3>Missed deadlines</h3>
+      <p>A fast-track appeal of a coverage termination is a phone call before noon the day before. An opportunity can pass before leadership knows it existed.</p>
+    </div>
+    <div class="panel warn">
+      <h3>Fragmented accountability</h3>
+      <p>Business offices, social workers and administrators all take part. Without one record of who owns the next action, cases sit.</p>
+    </div>
+    <div class="panel warn">
+      <h3>No portfolio view</h3>
+      <p>Twenty buildings, twenty processes. Nothing says which of them needs help this week.</p>
     </div>
   </div>
 
-  <p>Each line of business carries its own free period, shown against its own heading &mdash; in the illustration above, skilled nursing has converted while home health is still evaluating. That is the structure described under commercial terms below, rather than a separate claim about it.</p>
-  <p>A deadline inside 48 hours is marked, an overdue one is marked more loudly, and a building with no open appeals says so rather than showing a blank. Regions are named by the organization rather than inferred from the state; grouping switches to care segment for line-of-business review.</p>
-
-  <p><a href="https://appeals.casewhy.com/enterprise-demo?utm_source=hub&amp;utm_medium=referral">Open the portfolio view with a sample operator&rsquo;s ten buildings</a> &mdash; no registration.</p>
-
-<h2>What an organization gets that a single facility does not</h2>
+  <h2>What CaseWhy does about it</h2>
   <ul>
-    <li><strong>Portfolio-level visibility of the nearest deadline.</strong> Not when a given deadline falls, but which building is closest to missing one.</li>
-    <li><strong>Named accountability on every open appeal.</strong> Appeals lapse for want of an owner more often than for want of time.</li>
-    <li><strong>Regional and segment views of the same data.</strong> Operations leadership reviews by region; line-of-business leadership reviews by care segment. Both are required and they are different reports.</li>
-    <li><strong>A single point of access</strong> rather than separate credentials per site.</li>
+    <li>Appeal activity across every participating facility and region, in one board.</li>
+    <li>Deadlines surfaced before they pass, calculated from the notice.</li>
+    <li>A named owner for every case, and a list of the ones with nobody on them.</li>
+    <li>One way of preparing an appeal, the same in every building.</li>
+    <li>Access that follows your structure &mdash; a regional director sees their region, and nothing else.</li>
   </ul>
 
-  <h2>Risk and compliance posture</h2>
-  <p><strong>No business associate agreement is required.</strong> This follows from the architecture rather than from a contractual position. The notice is read, the dates and denial reason are extracted, and the file is then deleted. No protected health information is retained for an agreement to govern.</p>
-  <p>For most organizations this removes the procurement review rather than passing it. Resident names and Medicare numbers are never entered; each case carries the organization's own reference; access is granted per seat, with account owners able to view the full organization and members their own site. The <a href="https://appeals.casewhy.com/privacy">Privacy Policy</a> is the complete statement.</p>
+  <p><a class="cta" href="https://casewhyhub.com/appeals/enterprise/dashboard">See the portfolio view &rarr;</a></p>
 
-  <h2>Commercial terms</h2>
-  <p><strong>Priced per site, per care segment</strong>, with portfolio pricing below for an organization enrolling five or more. Skilled nursing, home health and hospice carry separate pricing because they are separate operations. Published per-site rates appear on each segment's page.</p>
-    <div class="tiers">
-    <div class="tier">
-      <h3>Volume</h3>
-      <p class="price">$0 / month per site</p>
-      <p>No monthly fee, no commitment. $25 a case for the first 25 each month, $20 for 26-60, then $16.</p>
-    </div>
-    <div class="tier">
-      <h3>Standard</h3>
-      <p class="price">$499 / month per site</p>
-      <p>Every case included, whatever the volume.</p>
-    </div>
-  </div>
-  <p class="trial-note"><strong>Your first 30 days are free, on your own cases.</strong> The 30 days start the first time you generate a letter, not when you open the account — so an account opened today and first used in six months still gets its full 30 days. After that, new skilled nursing facilities stay on Volume — there is no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>
-  
-  <p>Skilled nursing is shown above. <a href="/appeals/facilities/home-health">Home health</a> and <a href="/appeals/facilities/hospice">hospice</a> are documented separately, and each is priced the same way: one flat monthly fee per site covering every case at any volume, with pay-as-you-go available instead.</p>
-
-  <h3>Portfolio pricing</h3>
-
-  <p>Published rates are per site. An organization enrolling five or more <em>paid</em> facilities is priced on its whole portfolio instead, at one discount applied across every segment it enrolls.</p>
-
-  <div class="table-scroll">
-<table class="price-table">
-  <thead><tr><th>Paid facilities</th><th>Discount</th><th>Skilled nursing</th><th>Home health</th><th>Hospice</th></tr></thead>
-  <tbody>
-    <tr><td>1–4</td><td>&mdash;</td><td>$499</td><td>$299</td><td>$199</td></tr>
-    <tr><td>5–19 — Group</td><td>15%</td><td>$424</td><td>$254</td><td>$169</td></tr>
-    <tr><td>20–99 — Enterprise</td><td>25%</td><td>$374</td><td>$224</td><td>$149</td></tr>
-    <tr><td>100+ — Strategic Enterprise</td><td>35%</td><td>$324</td><td>$194</td><td>$129</td></tr>
-  </tbody>
-</table>
-</div>
-<p>Per site, per month, every case included at any volume. A 12-month term applies, billed monthly or annually, with facilities added mid-term pro rata.</p>
-
-  <p>The count that sets the band is the <strong>whole portfolio across all three segments</strong>, not each segment on its own &mdash; an operator with sixty skilled nursing, twenty-five home health and fifteen hospice locations is at a hundred, not at three smaller numbers.</p>
-
-  <p>Non-profit facilities remain free and are <strong>not</strong> counted toward the band. A non-profit location costs nothing and does not move a paid portfolio into a larger discount: the band reflects what is actually billed.</p>
-
-  <p>Send your facility counts by segment to <a href="mailto:peter@casewhy.com?subject=CaseWhy%20Appeals%20%E2%80%94%20portfolio%20pricing">peter@casewhy.com</a> and you will get the arithmetic back rather than a discovery call.</p>
-  <p><strong>A free period per care segment, not per organization.</strong> An organization operating in two or three segments receives a separate period for each. A single organization-wide period would oblige two evaluations to proceed on a third's timetable, and the personnel evaluating skilled nursing are generally not those evaluating home health.</p>
-
-  <h2>Evaluating without commitment</h2>
-  <p>A pilot uses the standard free period. There is no separate programme, agreement or minimum.</p>
+  <h2>Read further</h2>
   <ul>
-    <li><strong>Two or three buildings within one care segment.</strong></li>
-    <li><strong>The period begins at the first letter generated, not at account creation.</strong> An account opened now and first used in several months receives its full period, so there is no incentive to begin before a genuine notice arrives.</li>
-    <li><strong>Cases opened during the free period are never billed</strong>, including their letters and tracked deadlines. No appeal in progress is affected by a commercial decision.</li>
-    <li><strong>The decision at the end is made per care segment.</strong> The remaining segments will not have started their own periods.</li>
+    <li><a href="https://casewhyhub.com/appeals/enterprise/dashboard">The portfolio dashboard</a> &mdash; what leadership actually sees.</li>
+    <li><a href="https://casewhyhub.com/appeals/enterprise/how-it-works">How it works</a> &mdash; from a Medicare notice to a prepared appeal.</li>
+    <li><a href="https://casewhyhub.com/appeals/enterprise/pricing">Pricing</a> &mdash; per facility, with portfolio discounts, published.</li>
+    <li><a href="https://casewhyhub.com/appeals/enterprise/security">Security and privacy</a> &mdash; what happens to an uploaded notice.</li>
+    <li><a href="https://casewhyhub.com/appeals/enterprise/pilot">The free 30-day pilot</a> &mdash; how to try it on your own cases.</li>
   </ul>
 
-  <h2>What is implemented today</h2>
-  <p>Stated plainly, because an evaluation should not have to distinguish between a capability and an intention.</p>
-  <ul>
-    <li>A consolidated view of every building, showing open appeals, the next deadline at each site, and whether the case has an assigned owner.</li>
-    <li>Navigation from organization to care segment to building to case. The building-level view is the interface a single facility already uses; consolidation is added above it rather than as a second system.</li>
-    <li>Combined filtering by care segment and region, with regions defined by the organization rather than inferred from state.</li>
-    <li>An assigned owner on every case, set at creation and reassignable by an account owner.</li>
-    <li>Deadlines calculated from the notice by deterministic rule, incorporating a holiday and weekend schedule. No language model participates in producing a date.</li>
-  </ul>
-  <p>Appeal outcome reporting is not yet available. The data model supports it; no outcomes have been recorded, and it will not be presented as a capability until there is evidence behind it.</p>
-
-  <h2>Next step</h2>
-
-  
-  <p>Two ways to proceed, neither requiring a commitment:</p>
-  <p><a class="cta" href="https://appeals.casewhy.com/for-advocates?segment=facility&amp;utm_source=hub&amp;utm_medium=referral">Apply &mdash; open an account</a></p>
-  <p>The free period starts at the first letter generated, not at sign-up, so an account opened now and first used in several months still gets its full period. Or see the appeal workflow and a working demonstration without registering at all:</p>
-  <p><a class="cta" href="/demo/2026-10-13-w1">See the appeal flow &amp; live demo (no signup)</a></p>
-  <p>That demonstration is one building &mdash; the appeal itself, start to finish. The organizational view is a separate screen, and it is the one this page describes:</p>
-  <p><a class="cta" href="https://appeals.casewhy.com/enterprise-demo?utm_source=hub&amp;utm_medium=referral">See the portfolio view &mdash; a sample operator, ten buildings</a></p>
-  <p>A sample company, with sample residents and dates that move so the screen always reads as of today. No registration, nothing to install, and nothing on it to change.</p>
-  <p>For a walkthrough of the organizational view configured to your own structure, or pricing against your footprint, write to <a href="mailto:peter@casewhy.com?subject=CaseWhy%20Appeals%20—%20multi-facility%20enquiry">peter@casewhy.com</a>. Enquiries receive a direct reply; there is no scheduling system in place.</p>
+  <p>For a walkthrough against your own structure, write to <a href="mailto:peter@casewhy.com?subject=CaseWhy%20Appeals%20—%20multi-facility%20enquiry">peter@casewhy.com</a>. Enquiries receive a direct reply; there is no scheduling system in place.</p>
 
 </main>
 
@@ -647,8 +540,8 @@
     <p class="app-line">USCIS help: <a href="https://app.casewhy.com/get-help?utm_source=hub&utm_medium=footer">app.casewhy.com/get-help</a> · Appeals help: <a href="mailto:appeals-help@casewhy.com">appeals-help@casewhy.com</a></p>
     <p>CaseWhy LLC, 7901 4th St N, Ste 300, St. Petersburg, FL 33702, US</p>
     <div class="links">
-      <a href="/resources">Resources</a>
-      <a href="/brand">Brand</a>
+      <a href="https://casewhyhub.com/resources">Resources</a>
+      <a href="https://casewhyhub.com/brand">Brand</a>
       
       <a href="https://appeals.casewhy.com/terms?utm_source=hub&utm_medium=footer">Terms of Service</a>
       <a href="https://appeals.casewhy.com/privacy?utm_source=hub&utm_medium=footer">Privacy Policy</a>

@@ -79,7 +79,12 @@
   h2{font-size:1.3rem;margin:36px 0 12px;letter-spacing:-0.01em;}
   .sub{color:var(--muted);font-size:1.05rem;max-width:680px;}
   .free-line{margin-top:18px;font-size:0.92rem;font-weight:600;color:var(--foreground);}
-  .disclaimer{margin-top:20px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);padding:16px 18px;font-size:0.88rem;color:var(--foreground);}
+  /* A MARGIN ON ONE SIDE ONLY. Peter, 1 Nov 2026: the block *"needs a space
+     line after"* it. It had margin-top and no margin-bottom, so a heading
+     after it was spaced (the heading brings its own top margin) while a
+     PARAGRAPH after it touched the box — the paragraph's top margin is 0.
+     Whether the disclaimer looked right depended on what came next. */
+  .disclaimer{margin-top:20px;margin-bottom:30px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);padding:16px 18px;font-size:0.88rem;color:var(--foreground);}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:48px;}
   /* THE FAMILIES PAGE MARKS ITS CARDS UP AS A LIST, and every other page on the
      hub uses a <div class="cards">. So the grid above was written for a div and
@@ -272,6 +277,55 @@
   table.price-table th:not(:first-child),table.price-table td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
   table.price-table tbody tr:last-child td{background:var(--surface-2);}
   /* ------------------------------------------------------------------
+     CONTENT CARDS AND LIST SPACING. Added 1 Nov 2026. Peter, looking at the
+     six new enterprise pages: *"space out the tables and do proper spacing for
+     all pages"*.
+
+     WHY THEY HAD NO SPACING AT ALL: .figs and .fig are scoped to .screen,
+     the dashboard mock-up, and <table> is styled only via .clock-table,
+     .price-table and .screen. So a card or a table written in page content
+     without one of those classes inherits NOTHING — it renders as a bare div
+     and a bare table, which is exactly how the new pages looked.
+
+     The scoping was deliberate and stays: a mock-up of a product screen must
+     not restyle a real content table. What was missing was the unscoped
+     equivalent, which is this.
+     ------------------------------------------------------------------ */
+  .panels{display:grid;grid-template-columns:1fr;gap:18px;margin:22px 0 32px;}
+  @media (min-width:700px){ .panels{grid-template-columns:repeat(3,1fr);} }
+  @media (min-width:700px){ .panels.two{grid-template-columns:repeat(2,1fr);} }
+  /* FOUR CARDS IN A THREE-COLUMN GRID ORPHANS THE FOURTH on its own row,
+     which reads as a mistake rather than a group. Two-by-two instead. */
+  @media (min-width:700px){ .panels.four{grid-template-columns:repeat(2,1fr);} }
+  .panel{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:20px 22px;}
+  .panel h3{margin:0 0 8px;font-size:1rem;}
+  .panel p{margin:0;font-size:0.93rem;color:var(--muted);}
+  /* A LEFT RULE RATHER THAN A COLOURED FILL for the ones that name a problem:
+     the page is read by an executive, and three red boxes reads as alarm. */
+  .panel.warn{border-left:3px solid var(--border-strong);}
+
+  /* LISTS NEED ROOM BETWEEN ITEMS, not just a bullet. Five tight lines read as
+     one block of text and nobody scans them, which is the only reason to use a
+     list on a page like this. */
+  main ul:not(.cards):not(.nav-list),main ol{margin:14px 0 26px;padding-left:22px;}
+  main ul:not(.cards) li,main ol li{margin:0 0 10px;line-height:1.55;}
+  main ol li{padding-left:4px;}
+
+  /* AIR AROUND A TABLE. .table-scroll already carries the horizontal scroll;
+     this gives it vertical separation from the paragraph above and the caption
+     below, which is what "space out the tables" asks for. */
+  .table-scroll{margin:22px 0 10px;}
+  .table-scroll + .caption{margin:0 0 34px;}
+
+  /* AND BETWEEN SECTIONS. h2 was 36px above with no guarantee of space below
+     the preceding block; a page of short sections needs the gap to be visible
+     rather than implied. */
+  main h2{margin:44px 0 14px;}
+  main h2:first-of-type{margin-top:34px;}
+  main p{margin:0 0 16px;}
+  main .cta{margin-top:6px;}
+
+  /* ------------------------------------------------------------------
      SCREEN MOCK (.screen). Added 29 Oct 2026 for the enterprise page.
      Peter: "visuals are 80% of the selling" — that page was 1,200 words of
      prose about a consolidated view and showed nobody what it looks like.
@@ -402,7 +456,7 @@
 
 <header>
   <div class="wrap">
-    <a class="logo" href="/">
+    <a class="logo" href="https://casewhyhub.com/">
       <img src="/brand/mark.svg" alt="">
       <span class="lockup">
         <span class="name">Case<span>Why</span> Hub</span>
@@ -411,12 +465,12 @@
     </a>
     <nav class="main">
       <span class="line-switch">
-        <a href="/uscis" aria-current="page">USCIS</a>
-        <a href="/appeals">Appeals</a>
+        <a href="https://casewhyhub.com/uscis" aria-current="page">USCIS</a>
+        <a href="https://casewhyhub.com/appeals">Appeals</a>
       </span>
-      <a class="shared-link" href="/press">Press</a>
-      <a class="shared-link" href="/resources">Resources</a>
-      <a class="shared-link" href="/brand">Brand</a>
+      <a class="shared-link" href="https://casewhyhub.com/press">Press</a>
+      <a class="shared-link" href="https://casewhyhub.com/resources">Resources</a>
+      <a class="shared-link" href="https://casewhyhub.com/brand">Brand</a>
       <a class="site-link" href="https://www.casewhy.com?utm_source=hub&utm_medium=header">casewhy.com ↗</a>
     </nav>
   </div>
@@ -456,7 +510,7 @@
   <p>Peter, founder, Florida. Fifteen years as a solution architect in enterprise IT; built CaseWhy after his own family's naturalization cases stalled at the last step.</p>
 
   <h2>Contact</h2>
-  <p><a href="mailto:press@casewhy.com">press@casewhy.com</a> · Logo pack: <a href="/resources#logos">see Resources</a> · Boilerplate: <a href="/resources#boilerplate">see Resources</a></p>
+  <p><a href="mailto:press@casewhy.com">press@casewhy.com</a> · Logo pack: <a href="https://casewhyhub.com/resources#logos">see Resources</a> · Boilerplate: <a href="https://casewhyhub.com/resources#boilerplate">see Resources</a></p>
 
   <script type="application/ld+json">
   {
@@ -488,8 +542,8 @@
     <p class="app-line">USCIS help: <a href="https://app.casewhy.com/get-help?utm_source=hub&utm_medium=footer">app.casewhy.com/get-help</a> · Appeals help: <a href="mailto:appeals-help@casewhy.com">appeals-help@casewhy.com</a></p>
     <p>CaseWhy LLC, 7901 4th St N, Ste 300, St. Petersburg, FL 33702, US</p>
     <div class="links">
-      <a href="/resources">Resources</a>
-      <a href="/brand">Brand</a>
+      <a href="https://casewhyhub.com/resources">Resources</a>
+      <a href="https://casewhyhub.com/brand">Brand</a>
       
       <a href="https://appeals.casewhy.com/terms?utm_source=hub&utm_medium=footer">Terms of Service</a>
       <a href="https://appeals.casewhy.com/privacy?utm_source=hub&utm_medium=footer">Privacy Policy</a>

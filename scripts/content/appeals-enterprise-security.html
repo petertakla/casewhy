@@ -1,0 +1,54 @@
+  <p class="eyebrow">CaseWhy Hub · <a href="https://casewhyhub.com/appeals">CaseWhy Appeals</a> · <a href="https://casewhyhub.com/appeals/enterprise">Organizations</a> · Security and privacy</p>
+  <h1>What happens<br>to an uploaded notice.</h1>
+  <p class="sub">Designed to hold as little about your residents as the work allows.</p>
+  <div class="disclaimer">CaseWhy Appeals is not affiliated with or endorsed by Medicare, CMS, or any health plan, and is not a law firm.</div>
+
+  <!-- ===================================================================
+       THE PAGE THIS REPLACES CLAIMED "No business associate agreement is
+       required." That was wrong, and it was wrong on its central point.
+       Business associate status turns on what a vendor DOES with protected
+       health information, not on how long it keeps it. CaseWhy receives a
+       Medicare notice and READS it; deleting the file afterwards does not undo
+       having received it. The narrow conduit exception covers carriers that
+       move data without inspecting it, which is the opposite of this product.
+
+       Peter raised the reasoning on 1 Nov 2026 and withdrew the claim. By then
+       it had gone out in 60 letters and was staged in 260 more, and it was in
+       this page's own meta description.
+
+       SO THIS PAGE DESCRIBES AND CLAIMS NOTHING. It says what the product does
+       with a notice, every sentence of which is verifiable in the code, and
+       leaves the agreement to a conversation. A page that offered a BAA before
+       the safeguards and the subprocessor agreements behind it exist would be a
+       bigger problem than the sentence it replaced.
+
+       EVERY FACT BELOW WAS CHECKED, not recalled:
+         48 hours / 14 days   notices/retention.ts
+         no resident name     the cases table has no such column
+         identifiers masked   pii/redact.ts runs before any row is written
+         encrypted at rest    479 of 479 notice rows hold ciphertext
+       =================================================================== -->
+
+  <h2>The document</h2>
+  <ol>
+    <li><strong>Uploaded.</strong> A facility photographs or uploads the Medicare notice.</li>
+    <li><strong>Read.</strong> CaseWhy takes the dates, the notice type and the denial reason.</li>
+    <li><strong>Deleted.</strong> The document itself is removed on a schedule &mdash; within 48 hours on the ordinary path, and 14 days for a case that stalled before review. A scheduled job does this, not somebody remembering.</li>
+  </ol>
+
+  <h2>What is kept, and what is not</h2>
+  <ul>
+    <li><strong>No resident name is required.</strong> There is no resident-name field on a case. The facility's own reference is free text, and the product refuses something that looks like a person's name &mdash; in the form and in a bulk import.</li>
+    <li><strong>Medicare numbers and Social Security numbers are masked</strong> before any record is written, by a redaction step that runs ahead of storage. There is deliberately no column holding the unredacted reading.</li>
+    <li><strong>Sensitive fields are encrypted at rest</strong>, with the key held apart from the database.</li>
+    <li><strong>Transport is encrypted</strong> throughout.</li>
+  </ul>
+
+  <h2>Who can see what</h2>
+  <p>Access follows your organizational structure rather than a single administrator password. A facility administrator sees their building. A regional director sees their region. An executive or an analyst sees the portfolio in figures, and no individual resident is shown at that level &mdash; that is a deliberate limit, not an omission. Every access decision, including every refusal and its reason, is recorded.</p>
+
+  <h2>Business associate agreements</h2>
+  <p>Handling a notice at all makes CaseWhy a business associate under HIPAA, whatever is deleted afterwards. We are putting the agreement and the safeguards behind it in place rather than claiming none is needed. If your organization needs one executed before it can use the product, say so and you will get a straight answer about where that stands rather than a form.</p>
+
+  <p><a class="cta" href="mailto:peter@casewhy.com?subject=CaseWhy%20Appeals%20—%20security%20and%20compliance">Ask for the data-handling detail &rarr;</a></p>
+  <p>Retention, subprocessors, access controls and incident response, described as the system is actually deployed.</p>

@@ -64,6 +64,13 @@ const newestInput = Math.max(...buildInputs.map((f) => statSync(f).mtimeMs));
 // sample list came out EMPTY, and the check passed on a build it had not read
 // — which is precisely the failure it was written to catch, committed inside
 // the catcher. Found by planting the real bug and watching it stay green.
+// EVERY INTERNAL LINK IS NOW A FULL LINK — Peter's rule, applied across the
+// hub on 1 Nov 2026. These assertions were all written against `href="/x"`,
+// so twenty-seven of them went red at once. They are rewritten to the absolute
+// form rather than loosened: `href="${ORIGIN}/x"` is still an exact match, and
+// a page that reverted to a relative link would fail here, which is the point.
+const ORIGIN = "https://casewhyhub.com";
+
 const builtSamples = ["/appeals/enterprise", "/appeals", "/"]
   .map((url) => join(ROOT, url === "/" ? "index.html" : `${url.replace(/^\//, "")}/index.html`))
   .filter((f) => existsSync(f));
@@ -110,7 +117,7 @@ for (const r of redirects) {
 console.log("\n== Root renders both line cards ==");
 const root = read("/");
 for (const l of lines) {
-  check(`root links to ${l.path} (${l.rootCardTitle})`, root.includes(`href="${l.path}"`));
+  check(`root links to ${l.path} (${l.rootCardTitle})`, root.includes(`href="${ORIGIN}${l.path}"`));
 }
 
 console.log("\n== Nav line-switch present on every page type ==");
@@ -119,8 +126,8 @@ for (const path of sampleIds) {
   const html = read(path);
   check(`${path} exists`, html !== null);
   if (html) {
-    check(`${path} nav has USCIS + Appeals switch`, html.includes('href="/uscis"') && html.includes('href="/appeals"'));
-    check(`${path} nav has shared items (Press/Resources/Brand)`, ["/press", "/resources", "/brand"].every((s) => html.includes(`href="${s}"`)));
+    check(`${path} nav has USCIS + Appeals switch`, html.includes(`href="${ORIGIN}/uscis"`) && html.includes(`href="${ORIGIN}/appeals"`));
+    check(`${path} nav has shared items (Press/Resources/Brand)`, ["/press", "/resources", "/brand"].every((s) => html.includes(`href="${ORIGIN}${s}"`)));
   }
 }
 
@@ -258,7 +265,7 @@ check(
 // Fixed by reading the generator rather than by relaxing the assertion.
 check(
   "/appeals references the families page in its audience cards",
-  (read("/appeals") ?? "").includes('href="/appeals/families"')
+  (read("/appeals") ?? "").includes(`href="${ORIGIN}/appeals/families"`)
 );
 // With its own words, not a bare URL — a card whose title vanished would still
 // satisfy the check above while reading as an empty box.
@@ -368,9 +375,9 @@ for (const path of APPEALS_PAGES) {
 // setting and the only symptom would be a page nobody can reach.
 const facilitiesChooser = read("/appeals/facilities");
 for (const sub of ["/appeals/facilities/skilled-nursing", "/appeals/facilities/home-health", "/appeals/facilities/hospice"]) {
-  check(`/appeals/facilities links to ${sub}`, facilitiesChooser !== null && facilitiesChooser.includes(`href="${sub}"`));
+  check(`/appeals/facilities links to ${sub}`, facilitiesChooser !== null && facilitiesChooser.includes(`href="${ORIGIN}${sub}"`));
   check(`${sub} exists`, read(sub) !== null);
-  check(`${sub} links back to the chooser`, (read(sub) ?? "").includes('href="/appeals/facilities"'));
+  check(`${sub} links back to the chooser`, (read(sub) ?? "").includes(`href="${ORIGIN}/appeals/facilities"`));
 }
 
 // HOSPICE GAINED A SITE LICENSE ON 30 OCT 2026, so these checks inverted —
@@ -589,6 +596,48 @@ for (const f of readdirSync(join(__dirname, "content"))) {
 }
 check(`no content file writes the free offer out by hand (use {{FREE_PERIOD}})${handWritten.length ? " — " + handWritten.join(", ") : ""}`,
   handWritten.length === 0);
+
+// ---------------------------------------------------------------------------
+// A TABLE OR A CARD WITH NO CLASS INHERITS NOTHING, AND SAYS NOTHING ABOUT IT.
+//
+// Added 1 Nov 2026, after Peter looked at the six new enterprise pages and
+// said *"space out the tables and do proper spacing for all pages"*.
+//
+// WHY IT HAPPENED. The stylesheet styles tables ONLY through `.clock-table`,
+// `.price-table` and `.screen`, and styles cards ONLY through `.screen .fig`
+// — all deliberately scoped, so that a mock-up of a product screen cannot
+// restyle a real content table. The consequence nobody had written down is
+// that a bare `<table>` or a bare `<div class="fig">` written in page content
+// matches none of them and renders completely unstyled. The generator is
+// happy, the verifier was happy, the HTML is valid, and the page is wrong.
+//
+// So it is caught here, by name: every table in content carries a styling
+// class, and no card block uses the `.screen`-scoped names outside a `.screen`.
+
+const unstyledTables = [];
+const scopedCards = [];
+const TABLE_CLASSES = ["price-table", "clock-table"];
+
+for (const f of readdirSync(join(__dirname, "content"))) {
+  if (!f.endsWith(".html")) continue;
+  const src = readFileSync(join(__dirname, "content", f), "utf8");
+
+  for (const tag of src.match(/<table\b[^>]*>/g) ?? []) {
+    if (!TABLE_CLASSES.some((c) => tag.includes(c))) unstyledTables.push(`${f}: ${tag}`);
+  }
+
+  // `.fig`/`.figs` only exist under `.screen`. A content file that is not a
+  // screen mock-up and uses them gets no grid and no card — which is exactly
+  // how three of these pages shipped to the local preview.
+  if (!src.includes('class="screen') && /<div class="figs?\b/.test(src)) {
+    scopedCards.push(f);
+  }
+}
+
+check(`every table in page content carries a styling class${unstyledTables.length ? " — " + unstyledTables.join("; ") : ""}`,
+  unstyledTables.length === 0);
+check(`no content file uses the .screen-scoped card classes outside a .screen${scopedCards.length ? " — " + scopedCards.join(", ") : ""}`,
+  scopedCards.length === 0);
 
 // ---------------------------------------------------------------------------
 // THE FACILITY PRIVACY SECTION IS ON ALL THREE FACILITY PAGES.
@@ -952,8 +1001,31 @@ console.log("\n== Every shipped page is in the sitemap ==");
 // build if somebody replaces the token with literals, which is the only way
 // the two can come apart.
 {
-  const page = read("/appeals/enterprise");
-  check("the enterprise page exists to check", page !== null);
+  // THE PRICING MOVED TO ITS OWN PAGE, 1 Nov 2026. Peter: *"this is too much
+  // for one page ... provide short multi-pages focusing on single topic per
+  // page"*, then *"build the 6 pages"*.
+  //
+  // These checks exist because a published price that drifts from the price the
+  // product charges is the worst kind of stale copy — and the $499 line went
+  // wrong once already. They were pinned to /appeals/enterprise because that is
+  // where the table was. It is now /appeals/enterprise/pricing, so they read
+  // that page.
+  //
+  // THE OVERVIEW IS CHECKED TOO, for the opposite property: it must NOT carry
+  // the figures. A price in two places is a price that drifts in one of them,
+  // which is exactly what splitting the page could have caused.
+  const page = read("/appeals/enterprise/pricing");
+  check("the enterprise pricing page exists to check", page !== null);
+
+  const overview = read("/appeals/enterprise");
+  check("the enterprise overview exists to check", overview !== null);
+  if (overview) {
+    check(
+      "the overview carries NO price — one page owns the figures",
+      !/\$499|\$424|\$374|\$324|\$299|\$199/.test(overview),
+      "a price on two pages is a price that goes stale on one of them",
+    );
+  }
   if (page) {
     const p = pricingJson.portfolio;
     check("pricing.json carries portfolio bands", Boolean(p && p.bands && p.bands.length >= 3));
@@ -984,6 +1056,129 @@ console.log("\n== Every shipped page is in the sitemap ==");
       /non-profit/i.test(page) && /not<\/strong>? counted|not counted/i.test(page)
     );
   }
+}
+
+// ===========================================================================
+// EVERY PAGE IS REACHABLE FROM THE ROOT. Peter, 1 Nov 2026: *"enfore a link for
+// every page url"*, and earlier *"rule any page must be reasuable from a link"*.
+//
+// REACHABILITY, NOT "LINKED SOMEWHERE" — and the difference is the whole check.
+//
+// My first version asked whether any page contained an href to each path. It
+// passed a mutation that deleted all five links from the enterprise overview,
+// because the five sub-pages link to EACH OTHER: a closed cluster, unreachable
+// from the rest of the site, every member "linked somewhere". Proved by
+// deleting the links and watching the check stay green, which is the only way
+// a check like this can be trusted.
+//
+// So this walks the link graph from `/` and reports what it cannot get to.
+// That is what the rule means: a reader can arrive.
+//
+// WHAT COUNTS AS AN EDGE: an href in the built HTML, and a redirect in the
+// generated vercel.json. The nav is an href like any other, so a page in the
+// line nav is reachable on that alone.
+{
+  const allPaths = [
+    ...lines.map((l) => `/${l.id}`),
+    ...pages.map((p) => p.path),
+    ...companyPages.map((p) => p.path),
+  ];
+
+  let routing = "";
+  try {
+    routing = readFileSync(join(ROOT, "vercel.json"), "utf8");
+  } catch {
+    routing = "";
+  }
+
+  /** Which of `allPaths` this page links to. */
+  const edgesFrom = (path) => {
+    const html = read(path);
+    if (!html) return [];
+    const hrefs = [...html.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
+    // ABSOLUTE OR RELATIVE, both count as an edge. Every internal link is
+    // absolute since Peter's rule landed, but accepting the relative form too
+    // means this walk keeps working rather than silently finding nothing — a
+    // reachability check that reaches nothing reports every page as an orphan,
+    // which is a false alarm nobody would trust twice.
+    const forms = (target) => [target, `${ORIGIN}${target}`];
+    return allPaths.filter((target) =>
+      forms(target).some((t) =>
+        hrefs.some((h) => h === t || h.startsWith(`${t}?`) || h.startsWith(`${t}#`)),
+      ),
+    );
+  };
+
+  // A redirect destination is reachable from outside, so it seeds the walk
+  // alongside the root.
+  const seeds = ["/", ...allPaths.filter((t) => new RegExp(`"${t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`).test(routing))];
+  const seen = new Set(seeds);
+  const queue = [...seeds];
+  while (queue.length > 0) {
+    for (const next of edgesFrom(queue.shift())) {
+      if (!seen.has(next)) {
+        seen.add(next);
+        queue.push(next);
+      }
+    }
+  }
+
+  const unreachable = allPaths.filter((p) => !seen.has(p));
+  check(
+    "every page is reachable by following links from the root",
+    unreachable.length === 0,
+    unreachable.length
+      ? `cannot be reached from "/" by any chain of links: ${unreachable.join(", ")}. ` +
+        `Link each from a page that is itself reachable — pages that only link to each other ` +
+        `are a cluster, not a route.`
+      : "",
+  );
+  check(
+    "the walk actually walked (it would be vacuous otherwise)",
+    seen.size > seeds.length + 3,
+    `the walk reached ${seen.size} of ${allPaths.length} paths from ${seeds.length} seed(s)`,
+  );
+}
+
+// ===========================================================================
+// EVERY INTERNAL LINK IS A FULL LINK. Peter, 1 Nov 2026: *"i said before a rule
+// links must be the full link"* — he had given the rule before and I had not
+// recorded it anywhere, which is why he had to give it twice. This check is so
+// that cannot happen a third time.
+//
+// WHY IT MATTERS ON THESE PAGES PARTICULARLY: they are the destination of cold
+// outreach. A reader forwards one to a colleague, pastes it into a procurement
+// email, or saves the page — and a relative href survives none of that once the
+// HTML leaves the browser. The canonical, the og:url and the sitemap were
+// already absolute; the links a human actually clicks were not.
+//
+// ASSETS ARE NOT LINKS. `<link rel="icon" href="/brand/icon-192.png">` stays
+// relative: it is resolved by the browser against the document and never
+// copied by a person. The rule is about places a reader can go.
+{
+  const offenders = [];
+  for (const path of [
+    ...lines.map((l) => `/${l.id}`),
+    ...pages.map((p) => p.path),
+    ...companyPages.map((p) => p.path),
+    "/",
+  ]) {
+    const html = read(path);
+    if (!html) continue;
+    // An <a href> starting with a single slash. Not "//", not an asset tag —
+    // this looks only at anchors.
+    const relative = [...html.matchAll(/<a\b[^>]*\bhref="(\/(?!\/)[^"]*)"/g)].map((m) => m[1]);
+    if (relative.length > 0) {
+      offenders.push(`${path} -> ${[...new Set(relative)].join(", ")}`);
+    }
+  }
+  check(
+    "every anchor is a full link, never a relative path",
+    offenders.length === 0,
+    offenders.length
+      ? `relative anchors found — prefix them with ORIGIN:\n    ${offenders.join("\n    ")}`
+      : "",
+  );
 }
 
 console.log(`\n${failures === 0 ? "All checks passed." : `${failures} check(s) FAILED.`}`);

@@ -297,6 +297,9 @@
   /* FOUR CARDS IN A THREE-COLUMN GRID ORPHANS THE FOURTH on its own row,
      which reads as a mistake rather than a group. Two-by-two instead. */
   @media (min-width:700px){ .panels.four{grid-template-columns:repeat(2,1fr);} }
+  /* ONE CARD IN A THREE-COLUMN GRID IS A THIRD-WIDTH COLUMN, which reads as
+     a layout accident rather than a single deliberate option. */
+  @media (min-width:700px){ .panels.one{grid-template-columns:1fr;} }
   /* THE PRICING CALCULATOR. Four number fields and a result that updates as
      they are typed into — no submit button, because there is nothing to send
      and a button would imply there was. */

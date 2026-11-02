@@ -622,8 +622,35 @@ for (const f of readdirSync(join(__dirname, "content"))) {
   if (!f.endsWith(".html")) continue;
   const src = readFileSync(join(__dirname, "content", f), "utf8");
 
-  for (const tag of src.match(/<table\b[^>]*>/g) ?? []) {
-    if (!TABLE_CLASSES.some((c) => tag.includes(c))) unstyledTables.push(`${f}: ${tag}`);
+  // A TABLE INSIDE A .screen IS STYLED BY THE MOCK-UP'S OWN RULES, so it is
+  // correctly classless. Everything outside one must carry a class.
+  //
+  // THE RANGES ARE COMPUTED BY DIV DEPTH, not by looking backwards for the
+  // nearest "class=\"screen\"" — a nearest-preceding match finds a SIBLING as
+  // readily as a parent, which is a mistake this project has made before.
+  const screenRanges = [];
+  {
+    const opens = /<div class="screen"/g;
+    let m;
+    while ((m = opens.exec(src)) !== null) {
+      let depth = 0;
+      let i = m.index;
+      const tag = /<div\b|<\/div>/g;
+      tag.lastIndex = i;
+      let t;
+      while ((t = tag.exec(src)) !== null) {
+        depth += t[0] === "</div>" ? -1 : 1;
+        if (depth === 0) break;
+      }
+      screenRanges.push([m.index, t ? tag.lastIndex : src.length]);
+    }
+  }
+  const insideScreen = (at) => screenRanges.some(([a, b]) => at >= a && at < b);
+
+  for (const m of src.matchAll(/<table\b[^>]*>/g)) {
+    if (TABLE_CLASSES.some((c) => m[0].includes(c))) continue;
+    if (insideScreen(m.index)) continue;
+    unstyledTables.push(`${f}: ${m[0]}`);
   }
 
   // `.fig`/`.figs` only exist under `.screen`. A content file that is not a

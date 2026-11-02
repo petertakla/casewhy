@@ -297,6 +297,24 @@
   /* FOUR CARDS IN A THREE-COLUMN GRID ORPHANS THE FOURTH on its own row,
      which reads as a mistake rather than a group. Two-by-two instead. */
   @media (min-width:700px){ .panels.four{grid-template-columns:repeat(2,1fr);} }
+  /* THE PRICING CALCULATOR. Four number fields and a result that updates as
+     they are typed into — no submit button, because there is nothing to send
+     and a button would imply there was. */
+  .calc{margin:24px 0 30px;border:1px solid var(--border-strong);border-radius:16px;background:var(--surface);padding:22px;}
+  .calc-fields{display:grid;grid-template-columns:1fr;gap:16px;}
+  @media (min-width:640px){ .calc-fields{grid-template-columns:repeat(2,1fr);} }
+  .calc-field{display:flex;flex-direction:column;gap:5px;}
+  .calc-field label{font-size:0.9rem;font-weight:600;}
+  .calc-field input{border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--foreground);padding:10px 12px;font:inherit;font-variant-numeric:tabular-nums;width:100%;}
+  .calc-field input:focus{outline:2px solid var(--accent, #2f6fed);outline-offset:1px;}
+  .calc-hint{font-size:0.78rem;color:var(--muted);}
+  .calc-out{margin-top:22px;}
+  .calc-out .table-scroll{margin:0 0 14px;}
+  .calc-note{font-size:0.88rem;color:var(--muted);margin:0 0 10px;}
+  .calc-empty{font-size:0.9rem;color:var(--muted);margin:0;}
+  /* A NON-PROFIT ROW CARRIES WORDS WHERE THE MONEY WOULD BE, so the
+     right-aligned numeric rule for those columns must not apply to it. */
+  .calc-free td:not(:first-child){text-align:right;font-style:italic;color:var(--muted);}
   .panel{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:20px 22px;}
   .panel h3{margin:0 0 8px;font-size:1rem;}
   .panel p{margin:0;font-size:0.93rem;color:var(--muted);}
@@ -487,21 +505,174 @@
 
   
 
+  <h2>Work out your own figure</h2>
+  <p>Enter your footprint. Nothing is sent anywhere, and no figure below is typed by hand &mdash; the calculator reads the same price list the product bills from.</p>
+  <div class="calc" id="pricing-calc">
+  <form id="calc-form" autocomplete="off">
+    <div class="calc-fields">
+      <div class="calc-field">
+        <label for="calc-snf">Skilled nursing</label>
+        <input type="number" id="calc-snf" min="0" step="1" value="0" inputmode="numeric">
+        <span class="calc-hint">Facilities you would pay for</span>
+      </div>
+      <div class="calc-field">
+        <label for="calc-hha">Home health</label>
+        <input type="number" id="calc-hha" min="0" step="1" value="0" inputmode="numeric">
+        <span class="calc-hint">Locations</span>
+      </div>
+      <div class="calc-field">
+        <label for="calc-hospice">Hospice</label>
+        <input type="number" id="calc-hospice" min="0" step="1" value="0" inputmode="numeric">
+        <span class="calc-hint">Locations</span>
+      </div>
+      <div class="calc-field">
+        <label for="calc-nonprofit">Non-profit skilled nursing</label>
+        <input type="number" id="calc-nonprofit" min="0" step="1" value="0" inputmode="numeric">
+        <span class="calc-hint">Never charged, never counted</span>
+      </div>
+    </div>
+  </form>
+  <div class="calc-out" id="calc-out" role="status" aria-live="polite"></div>
+</div>
+<script>
+(function () {
+  var BOOK = {"bands":[{"label":"1–4","discountPercent":0,"minFacilities":0,"maxFacilities":4,"perSiteUsd":{"snf":499,"home_health":299,"hospice":199}},{"label":"5–19 — Group","discountPercent":15,"minFacilities":5,"maxFacilities":19,"perSiteUsd":{"snf":424,"home_health":254,"hospice":169}},{"label":"20–99 — Enterprise","discountPercent":25,"minFacilities":20,"maxFacilities":99,"perSiteUsd":{"snf":374,"home_health":224,"hospice":149}},{"label":"100+ — Strategic Enterprise","discountPercent":35,"minFacilities":100,"maxFacilities":null,"perSiteUsd":{"snf":324,"home_health":194,"hospice":129}}],"termMonths":12,"minimumFacilities":5,"freePeriodShort":"30 days free"};
+  var form = document.getElementById("calc-form");
+  var out = document.getElementById("calc-out");
+  if (!form || !out) return;
+
+  var SETTINGS = [
+    { id: "calc-snf", key: "snf", label: "Skilled nursing" },
+    { id: "calc-hha", key: "home_health", label: "Home health" },
+    { id: "calc-hospice", key: "hospice", label: "Hospice" }
+  ];
+
+  function whole(id) {
+    var el = document.getElementById(id);
+    var n = el ? Math.floor(Number(el.value)) : 0;
+    return isFinite(n) && n > 0 ? n : 0;
+  }
+
+  function money(n) { return "$" + n.toLocaleString("en-US"); }
+
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+
+  // ---- QUOTE RULE (extracted and tested by verify.mjs) ----
+  // ONE PURE FUNCTION, no DOM, so the arithmetic can be run and checked
+  // outside a browser. The fence comments are how verify.mjs finds it;
+  // renaming them turns the test into a no-op, so it fails if they go.
+  function quote(BOOK, counts, nonprofit) {
+    var keys = ["snf", "home_health", "hospice"];
+    var paid = 0;
+    for (var k = 0; k < keys.length; k++) paid += Math.max(0, Math.floor(counts[keys[k]] || 0));
+    // NON-PROFIT LOCATIONS ARE NOT ADDED. Counting them would hand a
+    // portfolio a discount earned by facilities nobody pays for.
+    var band = BOOK.bands[BOOK.bands.length - 1];
+    for (var i = 0; i < BOOK.bands.length; i++) {
+      var b = BOOK.bands[i];
+      if (paid >= b.minFacilities && (b.maxFacilities === null || paid <= b.maxFacilities)) { band = b; break; }
+    }
+    var lines = [], total = 0, listTotal = 0, std = BOOK.bands[0].perSiteUsd;
+    for (var j = 0; j < keys.length; j++) {
+      var n = Math.max(0, Math.floor(counts[keys[j]] || 0));
+      if (n === 0) continue;
+      var per = band.perSiteUsd[keys[j]];
+      total += per * n; listTotal += std[keys[j]] * n;
+      lines.push({ key: keys[j], n: n, per: per, sub: per * n });
+    }
+    return { paid: paid, nonprofit: Math.max(0, Math.floor(nonprofit || 0)),
+             band: band, lines: lines, total: total, saving: listTotal - total };
+  }
+  // ---- END QUOTE RULE ----
+
+  function table(rows, totalRow) {
+    return "<div class='table-scroll'><table class='price-table'><thead><tr>" +
+      "<th>Care setting</th><th>Facilities</th><th>Per facility</th><th>Monthly</th>" +
+      "</tr></thead><tbody>" + rows + totalRow + "</tbody></table></div>";
+  }
+
+  function render() {
+    var nonprofit = whole("calc-nonprofit");
+    var counts = SETTINGS.map(function (s) { return { s: s, n: whole(s.id) }; });
+    var paid = counts.reduce(function (t, c) { return t + c.n; }, 0);
+
+    if (paid === 0 && nonprofit === 0) {
+      out.innerHTML = "<p class='calc-empty'>Enter how many facilities of each kind and the monthly figure appears here.</p>";
+      return;
+    }
+
+    var byKey = {};
+    counts.forEach(function (c) { byKey[c.s.key] = c.n; });
+    var q = quote(BOOK, byKey, nonprofit);
+    var band = q.band;
+    var total = q.total;
+    var LABELS = { snf: "Skilled nursing", home_health: "Home health", hospice: "Hospice" };
+    var rows = "";
+    q.lines.forEach(function (l) {
+      rows += "<tr><td>" + LABELS[l.key] + "</td><td>" + l.n + "</td><td>" + money(l.per) +
+              "</td><td>" + money(l.sub) + "</td></tr>";
+    });
+
+    // NON-PROFIT GETS A ROW WITH NO PRICE IN IT. Showing $0 would be a
+    // quote, and showing nothing would read as a forgotten number.
+    if (nonprofit > 0) {
+      rows += "<tr class='calc-free'><td>Non-profit skilled nursing</td><td>" + nonprofit +
+              "</td><td>Not charged</td><td>Not charged</td></tr>";
+    }
+
+    if (paid === 0) {
+      out.innerHTML = table(rows, "") +
+        "<p class='calc-note'>Nothing to price. A non-profit skilled nursing facility is not " +
+        "charged, and is never quoted a price.</p>";
+      return;
+    }
+
+    var saving = q.saving;
+    var note;
+    if (band.discountPercent > 0) {
+      note = "<strong>" + esc(band.label) + "</strong> — a " + band.discountPercent +
+        "% portfolio discount on every facility, earned by the " + paid + " you pay for. " +
+        "That is " + money(saving) + " a month below the standard rate, or " + money(saving * 12) +
+        " a year. A " + BOOK.termMonths + "-month agreement applies.";
+    } else {
+      var need = BOOK.minimumFacilities - paid;
+      note = "Standard rates. Portfolio discounts start at " + BOOK.minimumFacilities +
+        " paid facilities, which is " + need + " more" +
+        (nonprofit > 0 ? " — non-profit locations do not count toward that" : "") + ".";
+    }
+
+    var totalRow = "<tr><td><strong>Total</strong></td><td><strong>" + paid +
+      "</strong></td><td>&mdash;</td><td><strong>" + money(total) + "</strong></td></tr>";
+
+    var free = BOOK.freePeriodShort;
+    free = free.charAt(0).toUpperCase() + free.slice(1);
+
+    out.innerHTML = table(rows, totalRow) +
+      "<p class='calc-note'>" + note + "</p>" +
+      "<p class='calc-note'>Every appeal is included at any volume. " + esc(free) +
+      ", before any of this is charged.</p>";
+  }
+
+  form.addEventListener("input", render);
+  render();
+})();
+</script>
+
+
   <h2>Monthly, per facility</h2>
   <div class="table-scroll">
-    <table class="price-table">
-      <thead>
-        <tr><th>Facilities in the portfolio</th><th>Discount</th><th>Skilled nursing</th><th>Home health</th><th>Hospice</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>1&ndash;4</td><td>&mdash;</td><td>$499</td><td>$299</td><td>$199</td></tr>
-        <tr><td>5&ndash;19</td><td>15%</td><td>$424</td><td>$254</td><td>$169</td></tr>
-        <tr><td>20&ndash;99</td><td>25%</td><td>$374</td><td>$224</td><td>$149</td></tr>
-        <tr><td>100 or more</td><td>35%</td><td>$324</td><td>$194</td><td>$129</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p class="caption">The discount is earned by the whole portfolio and applied to every facility in it, whichever care settings they are. A twelve-month agreement applies to portfolio pricing.</p>
+<table class="price-table">
+  <thead><tr><th>Paid facilities</th><th>Discount</th><th>Skilled nursing</th><th>Home health</th><th>Hospice</th></tr></thead>
+  <tbody>
+    <tr><td>1–4</td><td>&mdash;</td><td>$499</td><td>$299</td><td>$199</td></tr>
+    <tr><td>5–19 — Group</td><td>15%</td><td>$424</td><td>$254</td><td>$169</td></tr>
+    <tr><td>20–99 — Enterprise</td><td>25%</td><td>$374</td><td>$224</td><td>$149</td></tr>
+    <tr><td>100+ — Strategic Enterprise</td><td>35%</td><td>$324</td><td>$194</td><td>$129</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Per site, per month, every case included at any volume. A 12-month term applies, billed monthly or annually, with facilities added mid-term pro rata.</p>
+  <p class="caption">The discount is earned by the whole portfolio and applied to every facility in it, whichever care settings they are.</p>
 
   <h2>What the monthly price includes</h2>
   <ul>
@@ -511,28 +682,27 @@
   </ul>
 
   <h2>Pay per case instead</h2>
-  <p>A facility that handles a handful of appeals a year can pay $25 a case for skilled nursing rather than a monthly fee, with no commitment. Portfolio discounts apply to the monthly plans; a mixed portfolio is quoted against its actual mix.</p>
-
-  <h2>A worked example</h2>
-  <p>An operator with 60 skilled nursing facilities, 25 home health locations and 15 hospice locations has 100 participating facilities, so the whole portfolio sits in the 35% band:</p>
-  <div class="table-scroll">
-    <table class="price-table">
-      <thead><tr><th>Care setting</th><th>Facilities</th><th>Per facility</th><th>Monthly</th></tr></thead>
-      <tbody>
-        <tr><td>Skilled nursing</td><td>60</td><td>$324</td><td>$19,440</td></tr>
-        <tr><td>Home health</td><td>25</td><td>$194</td><td>$4,850</td></tr>
-        <tr><td>Hospice</td><td>15</td><td>$129</td><td>$1,935</td></tr>
-        <tr><td><strong>Total</strong></td><td><strong>100</strong></td><td>&mdash;</td><td><strong>$26,225</strong></td></tr>
-      </tbody>
-    </table>
+  <p>A facility that handles a handful of appeals a year can pay per case rather than a monthly fee, with no commitment. The per-case rate steps down as volume rises, and a facility that reaches enough appeals is better off on the monthly plan &mdash; the rates are below.</p>
+    <div class="tiers">
+    <div class="tier">
+      <h3>Volume</h3>
+      <p class="price">$0 / month per site</p>
+      <p>No monthly fee, no commitment. $25 a case for the first 25 each month, $20 for 26-60, then $16.</p>
+    </div>
+    <div class="tier">
+      <h3>Standard</h3>
+      <p class="price">$499 / month per site</p>
+      <p>Every case included, whatever the volume.</p>
+    </div>
   </div>
-  <p class="caption">An illustration at the published rates. Final pricing and terms are confirmed in writing before anything starts.</p>
+  <p class="trial-note"><strong>Your first 30 days are free, on your own cases.</strong> The 30 days start the first time you generate a letter, not when you open the account — so an account opened today and first used in six months still gets its full 30 days. After that, new skilled nursing facilities stay on Volume — there is no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>
+  <p class="caption">Portfolio discounts apply to the monthly plans. A mixed portfolio is quoted against its actual mix, which is what the calculator above does.</p>
 
   <h2>Non-profit facilities</h2>
   <p>A non-profit skilled nursing facility is not charged, and is never quoted a price. That is a standing commitment rather than a discount, and such locations are <strong>not counted</strong> toward the portfolio band &mdash; counting them would hand a portfolio a discount earned by facilities nobody pays for.</p>
 
-  <p><a class="cta" href="mailto:peter@casewhy.com?subject=CaseWhy%20Appeals%20—%20portfolio%20pricing">Ask for pricing against your footprint &rarr;</a></p>
-  <p>Tell us how many facilities of each kind and you will get the figure back, not a meeting invitation. An interactive calculator is being built so you need not ask at all.</p>
+  <p><a class="cta" href="mailto:peter@casewhy.com?subject=CaseWhy%20Appeals%20—%20portfolio%20pricing">Ask about your footprint &rarr;</a></p>
+  <p>The calculator above answers the price question without asking anybody. Write only if your structure needs something it does not cover &mdash; and you will get an answer back, not a meeting invitation.</p>
 
   <p><a href="https://casewhyhub.com/appeals/enterprise/pilot">Or start with a free pilot &rarr;</a></p>
 

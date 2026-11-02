@@ -297,6 +297,24 @@
   /* FOUR CARDS IN A THREE-COLUMN GRID ORPHANS THE FOURTH on its own row,
      which reads as a mistake rather than a group. Two-by-two instead. */
   @media (min-width:700px){ .panels.four{grid-template-columns:repeat(2,1fr);} }
+  /* THE PRICING CALCULATOR. Four number fields and a result that updates as
+     they are typed into — no submit button, because there is nothing to send
+     and a button would imply there was. */
+  .calc{margin:24px 0 30px;border:1px solid var(--border-strong);border-radius:16px;background:var(--surface);padding:22px;}
+  .calc-fields{display:grid;grid-template-columns:1fr;gap:16px;}
+  @media (min-width:640px){ .calc-fields{grid-template-columns:repeat(2,1fr);} }
+  .calc-field{display:flex;flex-direction:column;gap:5px;}
+  .calc-field label{font-size:0.9rem;font-weight:600;}
+  .calc-field input{border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--foreground);padding:10px 12px;font:inherit;font-variant-numeric:tabular-nums;width:100%;}
+  .calc-field input:focus{outline:2px solid var(--accent, #2f6fed);outline-offset:1px;}
+  .calc-hint{font-size:0.78rem;color:var(--muted);}
+  .calc-out{margin-top:22px;}
+  .calc-out .table-scroll{margin:0 0 14px;}
+  .calc-note{font-size:0.88rem;color:var(--muted);margin:0 0 10px;}
+  .calc-empty{font-size:0.9rem;color:var(--muted);margin:0;}
+  /* A NON-PROFIT ROW CARRIES WORDS WHERE THE MONEY WOULD BE, so the
+     right-aligned numeric rule for those columns must not apply to it. */
+  .calc-free td:not(:first-child){text-align:right;font-style:italic;color:var(--muted);}
   .panel{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:20px 22px;}
   .panel h3{margin:0 0 8px;font-size:1rem;}
   .panel p{margin:0;font-size:0.93rem;color:var(--muted);}

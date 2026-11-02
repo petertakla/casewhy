@@ -182,6 +182,8 @@
       {
         "id": "none",
         "label": "1–4",
+        "minFacilities": 0,
+        "maxFacilities": 4,
         "discountPercent": 0,
         "perSiteUsd": {
           "snf": 499,
@@ -192,6 +194,8 @@
       {
         "id": "group",
         "label": "5–19 — Group",
+        "minFacilities": 5,
+        "maxFacilities": 19,
         "discountPercent": 15,
         "perSiteUsd": {
           "snf": 424,
@@ -202,6 +206,8 @@
       {
         "id": "enterprise",
         "label": "20–99 — Enterprise",
+        "minFacilities": 20,
+        "maxFacilities": 99,
         "discountPercent": 25,
         "perSiteUsd": {
           "snf": 374,
@@ -212,6 +218,8 @@
       {
         "id": "strategic",
         "label": "100+ — Strategic Enterprise",
+        "minFacilities": 100,
+        "maxFacilities": null,
         "discountPercent": 35,
         "perSiteUsd": {
           "snf": 324,

@@ -1017,6 +1017,137 @@ console.log("\n== Every shipped page is in the sitemap ==");
   const page = read("/appeals/enterprise/pricing");
   check("the enterprise pricing page exists to check", page !== null);
 
+  // -------------------------------------------------------------------------
+  // NO CONTENT FILE TYPES A PRICE THE PRICE BOOK OWNS.
+  //
+  // Added 1 Nov 2026, because the check below it — "the overview carries NO
+  // price" — was scoped to ONE page, and the enterprise pricing page I wrote
+  // the same day hand-typed all seventeen portfolio figures plus a worked
+  // example and passed every check in this file.
+  //
+  // THE FIGURES ARE DERIVED, WHICH IS WHY TYPING THEM IS THE BUG: $499 at 15%
+  // off is $424, so a hand-typed $424 survives a change to $499 and nobody
+  // sees it. generate.mjs has warned about this in prose twice. Prose does not
+  // fail a build.
+  //
+  // SCOPED TO THE PORTFOLIO PER-SITE FIGURES ($129-$499) ON PURPOSE. The
+  // per-case rates are small numbers — 12, 15, 16, 19, 20, 25 — and matching
+  // those against arbitrary page copy produces false positives faster than it
+  // produces findings, which is how a guard gets switched off.
+  //
+  // COMMENTS ARE STRIPPED FIRST. appeals-facilities-hospice.html quotes Peter
+  // saying "Hospice $199 unlimited cases" in a comment explaining why the
+  // prices are NOT typed there. Flagging that file would have been exactly
+  // backwards.
+  const portfolioFigures = new Set();
+  for (const b of (pricingJson.portfolio?.bands ?? [])) {
+    for (const seg of Object.keys(b.perSiteUsd ?? {})) portfolioFigures.add(b.perSiteUsd[seg]);
+  }
+  const typedPrices = [];
+  for (const f of readdirSync(join(__dirname, "content"))) {
+    if (!f.endsWith(".html")) continue;
+    const src = readFileSync(join(__dirname, "content", f), "utf8").replace(/<!--[\s\S]*?-->/g, "");
+    const hits = [...src.matchAll(/\$([0-9][0-9,]*)/g)]
+      .map((m) => Number(m[1].replace(/,/g, "")))
+      .filter((n) => portfolioFigures.has(n));
+    if (hits.length) typedPrices.push(f + " (" + [...new Set(hits)].map((n) => "$" + n).join(", ") + ")");
+  }
+  check(
+    `no content file types a portfolio price by hand${typedPrices.length ? " — " + typedPrices.join("; ") : ""}`,
+    typedPrices.length === 0,
+    "use {{PORTFOLIO_PRICING}} or {{PRICING_CALCULATOR}} — a derived figure typed by hand goes stale in silence",
+  );
+
+  // -------------------------------------------------------------------------
+  // THE CALCULATOR ACTUALLY COMPUTES THE RIGHT NUMBER.
+  //
+  // Added 1 Nov 2026 with the calculator itself. The arithmetic was checked by
+  // driving the rendered page in a browser against portfolioQuote() in the
+  // appeals repo — twelve scenarios, all matching — but that was a one-off in
+  // a console. A one-off is not a test: it cannot fail tomorrow.
+  //
+  // So the rule is extracted from the BUILT PAGE and run here. Not a second
+  // copy of the rule, and not the source file — the bytes that ship. If the
+  // function or its fences are renamed the extraction fails and so does this
+  // check, which is the behaviour a silently-skipping test cannot give you.
+  //
+  // THE CASES ARE THE BAND EDGES AND THE ONE RULE A READER WILL TEST US ON:
+  // every boundary read out of the price book, and non-profit locations
+  // neither priced nor counted toward the band.
+  {
+    const built = read("/appeals/enterprise/pricing");
+    // THE MATCH STARTS AT THE "//", not at the dashes. Starting mid-comment
+    // captured a first line that was not a comment, so the comment filter
+    // below left it in and the extracted body would not parse.
+    const fence = built && built.match(/\/\/ ---- QUOTE RULE[\s\S]*?---- END QUOTE RULE ----/);
+    check(
+      "the calculator quote rule can be found in the built page",
+      Boolean(fence),
+      "the fence comments are how this test finds the rule — renaming them would disable it",
+    );
+
+    if (fence) {
+      const body = fence[0]
+        .split("\n")
+        .filter((l) => !l.trim().startsWith("//"))
+        .join("\n");
+      let quoteFn = null;
+      try {
+        quoteFn = new Function(body + "; return quote;")();
+      } catch (err) {
+        check("the extracted quote rule parses", false, String(err && err.message));
+      }
+      if (typeof quoteFn === "function") {
+        const bands = pricingJson.portfolio.bands;
+        const book = { bands };
+        const fails = [];
+        const one = (counts, np, wantTotal, wantPaid, wantDiscount, why) => {
+          const q = quoteFn(book, counts, np);
+          if (q.total !== wantTotal || q.paid !== wantPaid || q.band.discountPercent !== wantDiscount) {
+            fails.push(
+              why + ": got total " + q.total + " / paid " + q.paid + " / discount " +
+              q.band.discountPercent + ", wanted " + wantTotal + " / " + wantPaid + " / " + wantDiscount,
+            );
+          }
+        };
+
+        // EVERY BAND EDGE, derived from the book so a new band is covered too.
+        for (const b of bands) {
+          const lo = b.minFacilities > 0 ? b.minFacilities : 1;
+          one({ snf: lo }, 0, b.perSiteUsd.snf * lo, lo, b.discountPercent,
+            "band " + b.id + " at its lower edge of " + lo);
+          if (b.maxFacilities !== null) {
+            one({ snf: b.maxFacilities }, 0, b.perSiteUsd.snf * b.maxFacilities, b.maxFacilities,
+              b.discountPercent, "band " + b.id + " at its upper edge of " + b.maxFacilities);
+          }
+        }
+
+        // THE BAND COUNTS ACROSS CARE SETTINGS, not within one of them.
+        const tier1 = bands.find((b) => b.discountPercent > 0);
+        if (tier1) {
+          const n = tier1.minFacilities;
+          one({ snf: n - 1, hospice: 1 }, 0,
+            tier1.perSiteUsd.snf * (n - 1) + tier1.perSiteUsd.hospice, n, tier1.discountPercent,
+            "a mixed portfolio reaching " + n + " earns the band");
+
+          // NON-PROFIT: NOT PRICED, AND NOT COUNTED. The second half is the one
+          // that would be invisible in the output — it shows up only as a
+          // discount nobody earned.
+          const paidN = tier1.minFacilities - 1;
+          one({ snf: paidN }, 50, bands[0].perSiteUsd.snf * paidN, paidN, 0,
+            paidN + " paid plus 50 non-profit must stay at standard rates");
+        }
+        one({ snf: 0 }, 12, 0, 0, 0, "non-profit only is not priced at all");
+
+        check(
+          "the calculator agrees with the price book at every band edge and on the non-profit rule" +
+            (fails.length ? " — " + fails.slice(0, 3).join("; ") : ""),
+          fails.length === 0,
+        );
+      }
+    }
+  }
+
   const overview = read("/appeals/enterprise");
   check("the enterprise overview exists to check", overview !== null);
   if (overview) {

@@ -307,6 +307,24 @@ const CSS = `
   /* FOUR CARDS IN A THREE-COLUMN GRID ORPHANS THE FOURTH on its own row,
      which reads as a mistake rather than a group. Two-by-two instead. */
   @media (min-width:700px){ .panels.four{grid-template-columns:repeat(2,1fr);} }
+  /* THE PRICING CALCULATOR. Four number fields and a result that updates as
+     they are typed into — no submit button, because there is nothing to send
+     and a button would imply there was. */
+  .calc{margin:24px 0 30px;border:1px solid var(--border-strong);border-radius:16px;background:var(--surface);padding:22px;}
+  .calc-fields{display:grid;grid-template-columns:1fr;gap:16px;}
+  @media (min-width:640px){ .calc-fields{grid-template-columns:repeat(2,1fr);} }
+  .calc-field{display:flex;flex-direction:column;gap:5px;}
+  .calc-field label{font-size:0.9rem;font-weight:600;}
+  .calc-field input{border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--foreground);padding:10px 12px;font:inherit;font-variant-numeric:tabular-nums;width:100%;}
+  .calc-field input:focus{outline:2px solid var(--accent, #2f6fed);outline-offset:1px;}
+  .calc-hint{font-size:0.78rem;color:var(--muted);}
+  .calc-out{margin-top:22px;}
+  .calc-out .table-scroll{margin:0 0 14px;}
+  .calc-note{font-size:0.88rem;color:var(--muted);margin:0 0 10px;}
+  .calc-empty{font-size:0.9rem;color:var(--muted);margin:0;}
+  /* A NON-PROFIT ROW CARRIES WORDS WHERE THE MONEY WOULD BE, so the
+     right-aligned numeric rule for those columns must not apply to it. */
+  .calc-free td:not(:first-child){text-align:right;font-style:italic;color:var(--muted);}
   .panel{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:20px 22px;}
   .panel h3{margin:0 0 8px;font-size:1rem;}
   .panel p{margin:0;font-size:0.93rem;color:var(--muted);}
@@ -884,6 +902,213 @@ function socialMeta({ path, titleTag, description, ogImage }) {
 // NO PRICE IS TYPED IN THIS FUNCTION and none should be. The bands, the
 // percentages and the per-site figures all arrive from the export; the only
 // strings here are column headings.
+// ---------------------------------------------------------------------------
+// THE PRICING CALCULATOR.
+//
+// Peter, 1 Nov 2026, pointing at the sentence on the pricing page that reads
+// "An interactive calculator is being built so you need not ask at all":
+// *"need to build this"*.
+//
+// That sentence was a promise on a page cold outreach points at, which makes
+// it KNOWN work under his standing rule — build it now rather than in a rush
+// when somebody finally asks.
+//
+// ---------------------------------------------------------------------------
+// EVERY FIGURE COMES FROM THE PRICE BOOK. NONE IS TYPED HERE.
+//
+// The section this replaces hand-typed seventeen of them, including a worked
+// example whose arithmetic (324 x 60 = 19,440) would have survived any price
+// change in silence. That is the defect this file's own comments warn about
+// twice — "a hand-typed $424 survives a change to $499 and nobody sees it" —
+// and the new pricing page committed it in full while passing every check,
+// because the check that would have caught it only read the overview page.
+//
+// So the calculator is handed scripts/pricing.json and computes. A price
+// change flows: pricing.ts -> export-desk-pricing.ts -> pricing.json -> here.
+//
+// ---------------------------------------------------------------------------
+// IT MIRRORS portfolioQuote() IN THE APPEALS REPO, AND THAT IS THE RISK.
+//
+// Two implementations of one rule disagree eventually. Three things hold them
+// together: the bands now carry numeric minFacilities/maxFacilities so neither
+// side parses a display label, the arithmetic is one multiply per care
+// setting, and hub-pricing-drift.test.ts over there goes red if this file's
+// copy of the price book falls behind. The rule is small enough to state in a
+// sentence: count the PAID facilities across all settings, pick the band that
+// contains that count, apply that band's per-site price to each setting.
+//
+// NON-PROFIT SKILLED NURSING IS NOT PRICED, AND NOT COUNTED. Both halves
+// matter, and the second is the one that is easy to get wrong: counting those
+// locations toward the band would hand a portfolio a discount earned by
+// facilities nobody pays for. portfolioQuote excludes them before choosing a
+// tier, and so does this. The price book states it as data
+// (nonprofitCountsTowardBand: false), not only as prose.
+
+function pricingCalculatorHtml() {
+  const p = pricing.portfolio;
+  if (!p || !Array.isArray(p.bands) || p.bands.length === 0) return "";
+
+  // The price book travels to the browser as data. "</" is escaped so that a
+  // label containing a tag could never close the script element early.
+  const data = JSON.stringify({
+    bands: p.bands.map((b) => ({
+      label: b.label,
+      discountPercent: b.discountPercent,
+      minFacilities: b.minFacilities,
+      maxFacilities: b.maxFacilities,
+      perSiteUsd: b.perSiteUsd,
+    })),
+    termMonths: p.termMonths,
+    minimumFacilities: p.minimumFacilities,
+    freePeriodShort: pricing.freePeriodShort,
+  }).replace(/</g, "\\u003c");
+
+  const field = (id, label, hint) =>
+    '      <div class="calc-field">\n' +
+    '        <label for="' + id + '">' + label + '</label>\n' +
+    '        <input type="number" id="' + id + '" min="0" step="1" value="0" inputmode="numeric">\n' +
+    '        <span class="calc-hint">' + hint + '</span>\n' +
+    '      </div>';
+
+  return [
+    '<div class="calc" id="pricing-calc">',
+    '  <form id="calc-form" autocomplete="off">',
+    '    <div class="calc-fields">',
+    field("calc-snf", "Skilled nursing", "Facilities you would pay for"),
+    field("calc-hha", "Home health", "Locations"),
+    field("calc-hospice", "Hospice", "Locations"),
+    field("calc-nonprofit", "Non-profit skilled nursing", "Never charged, never counted"),
+    '    </div>',
+    '  </form>',
+    '  <div class="calc-out" id="calc-out" role="status" aria-live="polite"></div>',
+    '</div>',
+    '<script>',
+    '(function () {',
+    '  var BOOK = ' + data + ';',
+    '  var form = document.getElementById("calc-form");',
+    '  var out = document.getElementById("calc-out");',
+    '  if (!form || !out) return;',
+    '',
+    '  var SETTINGS = [',
+    '    { id: "calc-snf", key: "snf", label: "Skilled nursing" },',
+    '    { id: "calc-hha", key: "home_health", label: "Home health" },',
+    '    { id: "calc-hospice", key: "hospice", label: "Hospice" }',
+    '  ];',
+    '',
+    '  function whole(id) {',
+    '    var el = document.getElementById(id);',
+    '    var n = el ? Math.floor(Number(el.value)) : 0;',
+    '    return isFinite(n) && n > 0 ? n : 0;',
+    '  }',
+    '',
+    '  function money(n) { return "$" + n.toLocaleString("en-US"); }',
+    '',
+    '  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }',
+    '',
+    '  // ---- QUOTE RULE (extracted and tested by verify.mjs) ----',
+    '  // ONE PURE FUNCTION, no DOM, so the arithmetic can be run and checked',
+    '  // outside a browser. The fence comments are how verify.mjs finds it;',
+    '  // renaming them turns the test into a no-op, so it fails if they go.',
+    '  function quote(BOOK, counts, nonprofit) {',
+    '    var keys = ["snf", "home_health", "hospice"];',
+    '    var paid = 0;',
+    '    for (var k = 0; k < keys.length; k++) paid += Math.max(0, Math.floor(counts[keys[k]] || 0));',
+    '    // NON-PROFIT LOCATIONS ARE NOT ADDED. Counting them would hand a',
+    '    // portfolio a discount earned by facilities nobody pays for.',
+    '    var band = BOOK.bands[BOOK.bands.length - 1];',
+    '    for (var i = 0; i < BOOK.bands.length; i++) {',
+    '      var b = BOOK.bands[i];',
+    '      if (paid >= b.minFacilities && (b.maxFacilities === null || paid <= b.maxFacilities)) { band = b; break; }',
+    '    }',
+    '    var lines = [], total = 0, listTotal = 0, std = BOOK.bands[0].perSiteUsd;',
+    '    for (var j = 0; j < keys.length; j++) {',
+    '      var n = Math.max(0, Math.floor(counts[keys[j]] || 0));',
+    '      if (n === 0) continue;',
+    '      var per = band.perSiteUsd[keys[j]];',
+    '      total += per * n; listTotal += std[keys[j]] * n;',
+    '      lines.push({ key: keys[j], n: n, per: per, sub: per * n });',
+    '    }',
+    '    return { paid: paid, nonprofit: Math.max(0, Math.floor(nonprofit || 0)),',
+    '             band: band, lines: lines, total: total, saving: listTotal - total };',
+    '  }',
+    '  // ---- END QUOTE RULE ----',
+    '',
+    '  function table(rows, totalRow) {',
+    '    return "<div class=\'table-scroll\'><table class=\'price-table\'><thead><tr>" +',
+    '      "<th>Care setting</th><th>Facilities</th><th>Per facility</th><th>Monthly</th>" +',
+    '      "</tr></thead><tbody>" + rows + totalRow + "</tbody></table></div>";',
+    '  }',
+    '',
+    '  function render() {',
+    '    var nonprofit = whole("calc-nonprofit");',
+    '    var counts = SETTINGS.map(function (s) { return { s: s, n: whole(s.id) }; });',
+    '    var paid = counts.reduce(function (t, c) { return t + c.n; }, 0);',
+    '',
+    '    if (paid === 0 && nonprofit === 0) {',
+    '      out.innerHTML = "<p class=\'calc-empty\'>Enter how many facilities of each kind and the monthly figure appears here.</p>";',
+    '      return;',
+    '    }',
+    '',
+    '    var byKey = {};',
+    '    counts.forEach(function (c) { byKey[c.s.key] = c.n; });',
+    '    var q = quote(BOOK, byKey, nonprofit);',
+    '    var band = q.band;',
+    '    var total = q.total;',
+    '    var LABELS = { snf: "Skilled nursing", home_health: "Home health", hospice: "Hospice" };',
+    '    var rows = "";',
+    '    q.lines.forEach(function (l) {',
+    '      rows += "<tr><td>" + LABELS[l.key] + "</td><td>" + l.n + "</td><td>" + money(l.per) +',
+    '              "</td><td>" + money(l.sub) + "</td></tr>";',
+    '    });',
+    '',
+    '    // NON-PROFIT GETS A ROW WITH NO PRICE IN IT. Showing $0 would be a',
+    '    // quote, and showing nothing would read as a forgotten number.',
+    '    if (nonprofit > 0) {',
+    '      rows += "<tr class=\'calc-free\'><td>Non-profit skilled nursing</td><td>" + nonprofit +',
+    '              "</td><td>Not charged</td><td>Not charged</td></tr>";',
+    '    }',
+    '',
+    '    if (paid === 0) {',
+    '      out.innerHTML = table(rows, "") +',
+    '        "<p class=\'calc-note\'>Nothing to price. A non-profit skilled nursing facility is not " +',
+    '        "charged, and is never quoted a price.</p>";',
+    '      return;',
+    '    }',
+    '',
+    '    var saving = q.saving;',
+    '    var note;',
+    '    if (band.discountPercent > 0) {',
+    '      note = "<strong>" + esc(band.label) + "</strong> — a " + band.discountPercent +',
+    '        "% portfolio discount on every facility, earned by the " + paid + " you pay for. " +',
+    '        "That is " + money(saving) + " a month below the standard rate, or " + money(saving * 12) +',
+    '        " a year. A " + BOOK.termMonths + "-month agreement applies.";',
+    '    } else {',
+    '      var need = BOOK.minimumFacilities - paid;',
+    '      note = "Standard rates. Portfolio discounts start at " + BOOK.minimumFacilities +',
+    '        " paid facilities, which is " + need + " more" +',
+    '        (nonprofit > 0 ? " — non-profit locations do not count toward that" : "") + ".";',
+    '    }',
+    '',
+    '    var totalRow = "<tr><td><strong>Total</strong></td><td><strong>" + paid +',
+    '      "</strong></td><td>&mdash;</td><td><strong>" + money(total) + "</strong></td></tr>";',
+    '',
+    '    var free = BOOK.freePeriodShort;',
+    '    free = free.charAt(0).toUpperCase() + free.slice(1);',
+    '',
+    '    out.innerHTML = table(rows, totalRow) +',
+    '      "<p class=\'calc-note\'>" + note + "</p>" +',
+    '      "<p class=\'calc-note\'>Every appeal is included at any volume. " + esc(free) +',
+    '      ", before any of this is charged.</p>";',
+    '  }',
+    '',
+    '  form.addEventListener("input", render);',
+    '  render();',
+    '})();',
+    '</' + 'script>',
+    '',
+  ].join("\n");
+}
+
 function portfolioPricingHtml() {
   const p = pricing.portfolio;
   if (!p || !Array.isArray(p.bands) || p.bands.length === 0) {
@@ -935,6 +1160,9 @@ function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, 
   // this lesson the hard way; this is the same indirection for the same reason.
   if (body.includes("{{PORTFOLIO_PRICING}}")) {
     body = body.replace("{{PORTFOLIO_PRICING}}", portfolioPricingHtml());
+  }
+  if (body.includes("{{PRICING_CALCULATOR}}")) {
+    body = body.replace("{{PRICING_CALCULATOR}}", pricingCalculatorHtml());
   }
   // {{PORTFOLIO_EXAMPLE}} IS GONE. Peter removed the worked example on 30 Oct
   // 2026 — "For 110 skilled nursing locations that is the difference between

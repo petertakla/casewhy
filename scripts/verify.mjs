@@ -1465,5 +1465,61 @@ console.log("\n== Every shipped page is in the sitemap ==");
   );
 }
 
+
+// ===========================================================================
+// THE MULTI-FACILITY BAND ON /appeals — Peter, 4 Nov 2026: this proposition
+// *"should have a more prominent presence ... and not lumped in among other 4
+// cards"*.
+//
+// IT REPLACED THE DIRECTORY CARD, and that is why this check exists. The card
+// for /appeals/enterprise was the ONLY link to the overview from this page —
+// every other inbound link comes from the overview's own children. If the band
+// loses its primary button, the overview becomes reachable only THROUGH its
+// sub-pages. The root-reachability walk would still pass, which is exactly why
+// it needs its own check.
+//
+// AND THE FOUR LINKS ARE THE POINT OF THE BAND. Before it, six of the seven
+// enterprise pages were not on /appeals at all. A band that drifts back to one
+// link rebuilds the problem it was added to fix.
+{
+  const appeals = read("/appeals");
+  check("/appeals has the multi-facility band", appeals !== null && /class="ent-band"/.test(appeals));
+  if (appeals) {
+    for (const [target, why] of [
+      ["/appeals/enterprise", "the overview — its only direct link from this page"],
+      ["/appeals/enterprise/pricing", "pricing, which says published-not-quoted"],
+      ["/appeals/enterprise/pilot", "the 30-day pilot"],
+      ["/appeals/enterprise/open-an-account", "open an account"],
+    ]) {
+      check(
+        `the band links ${target} (${why})`,
+        appeals.includes(`href="https://casewhyhub.com${target}"`)
+      );
+    }
+    // NO FIGURE HERE EITHER. The pricing page owns the numbers; the overview is
+    // already checked for this and the band is the same hazard one level up.
+    check(
+      "the band carries no price figure — the pricing page owns them",
+      !/\$499|\$424|\$374|\$324|\$299|\$199/.test(
+        (appeals.match(/<section class="ent-band"[\s\S]*?<\/section>/) || [""])[0]
+      ),
+      "a price in two places is a price that goes stale in one of them",
+    );
+    // THE DIRECTORY MUST NOT SAY IT TWICE. The card was removed when the band
+    // landed; a reinstated card is the duplication Peter pointed at.
+    check(
+      "the directory does not repeat the band as a card",
+      !/<a class="card[^"]*" href="https:\/\/casewhyhub\.com\/appeals\/enterprise"/.test(appeals),
+      "the band and a card both point at the overview — pick one",
+    );
+    // AND THE DIRECTORY IS ADDRESSED TO THE SINGLE-BUILDING READER, which is
+    // what makes it safe for the band to sit above it.
+    check(
+      "the directory heading tells a single-facility reader it is theirs",
+      /One building/.test(appeals)
+    );
+  }
+}
+
 console.log(`\n${failures === 0 ? "All checks passed." : `${failures} check(s) FAILED.`}`);
 process.exit(failures === 0 ? 0 : 1);

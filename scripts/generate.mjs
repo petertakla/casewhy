@@ -97,6 +97,25 @@ const CSS = `
      PARAGRAPH after it touched the box — the paragraph's top margin is 0.
      Whether the disclaimer looked right depended on what came next. */
   .disclaimer{margin-top:20px;margin-bottom:30px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);padding:16px 18px;font-size:0.88rem;color:var(--foreground);}
+  /* THE MULTI-FACILITY BAND. Peter, 4 Nov 2026: the enterprise proposition
+     "should have a more prominent presence ... and not lumped in among other 4
+     cards". It was one card the same size as Hospice, and six of the seven
+     enterprise pages were not on this page at all.
+     Tokens only, no new colours, and the mono eyebrow and left accent rules are
+     the same vocabulary the facility pages already use. */
+  .ent-band{border:1px solid var(--border-strong);border-radius:16px;background:var(--surface-2);padding:26px 28px;margin:44px 0 8px;}
+  .ent-band h2{margin:6px 0 6px;font-size:1.42rem;line-height:1.24;letter-spacing:-0.015em;}
+  .ent-band .sub{margin:0;color:var(--muted);font-size:0.95rem;max-width:38rem;}
+  .ent-band .reasons{display:grid;gap:14px;margin:22px 0 22px;grid-template-columns:1fr;}
+  @media (min-width:760px){ .ent-band .reasons{grid-template-columns:repeat(3,1fr);} }
+  .ent-band .reasons div{border-left:2px solid var(--brand-600);padding-left:12px;font-size:0.89rem;}
+  .ent-band .reasons b{display:block;font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--brand-600);margin-bottom:2px;}
+  .ent-band .act{display:flex;flex-wrap:wrap;align-items:center;gap:16px;}
+  .ent-band .act .cta{margin-top:0;}
+  .ent-band .more{color:var(--muted);font-size:0.9rem;}
+  .ent-band .more a{color:var(--brand-600);font-weight:600;text-decoration:none;}
+  .ent-band .more a:hover{text-decoration:underline;}
+  @media (prefers-color-scheme: dark){ .ent-band .reasons div{border-left-color:var(--brand-400);} }
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:48px;}
   /* THE FAMILIES PAGE MARKS ITS CARDS UP AS A LIST, and every other page on the
      hub uses a <div class="cards">. So the grid above was written for a div and
@@ -1366,10 +1385,21 @@ ${sharedCards}
  * serves them.
  */
 const AUDIENCE_GROUP_ORDER = [
-  "Individuals & Families",
+  // FAMILIES LAST — Peter, 4 Nov 2026: *"move the familes to the last block but
+  // before 'Press'"*. The ungrouped pages (Press, Resources) render after every
+  // group, so putting families at the end of this list puts it exactly there
+  // without touching the renderer.
+  //
+  // WHY IT IS NOT A DEMOTION. /appeals is read by somebody deciding which page
+  // is theirs, and the three professional groups are who this hub exists to
+  // reach — a family arriving here is usually sent by one of them, and the
+  // whole product has a consumer front door of its own. The band above the
+  // directory now addresses operators, so the order reads: operators, the
+  // professionals who refer, the programmes that advise, then families.
   "Healthcare Providers",
   "Advocates & Professionals",
   "Nonprofits & Public Programs",
+  "Individuals & Families",
 ];
 
 function linePage(line) {
@@ -1410,10 +1440,27 @@ function linePage(line) {
   const ungrouped = audiencePages.filter((p) => !p.navGroup);
   const seen = new Set();
   const blocks = [];
+  // A CONTENT BLOCK CAN PRECEDE A GROUP. Peter, 4 Nov 2026: *"move the Seats
+  // (pricing) bloc just before 'Families & caregivers'"* — a position INSIDE
+  // the directory, between the professional groups and Individuals & Families.
+  //
+  // The directory renders as one blob, so a block cannot be moved there by
+  // editing the content file; it needs a seam. This is that seam, keyed by
+  // group name, and it is a map rather than a special case so the next one does
+  // not need another mechanism.
+  const BLOCK_BEFORE_GROUP = {
+    "Individuals & Families": line.id === "appeals" ? "appeals-seats" : null,
+  };
   for (const groupName of AUDIENCE_GROUP_ORDER) {
     const inGroup = grouped.filter((p) => p.navGroup === groupName);
     if (inGroup.length === 0) continue;
     inGroup.forEach((p) => seen.add(p.path));
+    const precede = BLOCK_BEFORE_GROUP[groupName];
+    if (precede) {
+      // Read at emit time, like every other content file, so the one copy on
+      // disk is the one that ships.
+      blocks.push(readFileSync(join(__dirname, "content", `${precede}.html`), "utf8"));
+    }
     blocks.push(
       // Only `&` needs escaping in these four names, and they are literals in
       // AUDIENCE_GROUP_ORDER rather than anything a visitor supplies. The

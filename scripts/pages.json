@@ -196,12 +196,13 @@
       "path": "/appeals/enterprise",
       "content": "appeals-enterprise",
       "navLabel": "Organizations",
-      "inLineNav": true,
+      "inLineNav": false,
       "cardTitle": "Multi-facility organizations",
       "cardDesc": "One board across every building you operate, with access that follows your own regions and groups.",
       "titleTag": "Medicare Appeals for Multi-Facility Organizations | CaseWhy",
       "description": "One view of Medicare appeals across every building you operate. Priced per site, per care segment, with portfolio discounts published.",
-      "navGroup": "Healthcare Providers"
+      "navGroup": "Healthcare Providers",
+      "cardNote": "Off the directory since 4 Nov 2026: the multi-facility BAND above the directory says this, and said it twice otherwise. The band's primary button is this page, so it keeps a direct inbound link from /appeals."
     },
     {
       "id": "appeals-enterprise-dashboard",

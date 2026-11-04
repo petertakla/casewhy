@@ -85,6 +85,25 @@
      PARAGRAPH after it touched the box — the paragraph's top margin is 0.
      Whether the disclaimer looked right depended on what came next. */
   .disclaimer{margin-top:20px;margin-bottom:30px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);padding:16px 18px;font-size:0.88rem;color:var(--foreground);}
+  /* THE MULTI-FACILITY BAND. Peter, 4 Nov 2026: the enterprise proposition
+     "should have a more prominent presence ... and not lumped in among other 4
+     cards". It was one card the same size as Hospice, and six of the seven
+     enterprise pages were not on this page at all.
+     Tokens only, no new colours, and the mono eyebrow and left accent rules are
+     the same vocabulary the facility pages already use. */
+  .ent-band{border:1px solid var(--border-strong);border-radius:16px;background:var(--surface-2);padding:26px 28px;margin:44px 0 8px;}
+  .ent-band h2{margin:6px 0 6px;font-size:1.42rem;line-height:1.24;letter-spacing:-0.015em;}
+  .ent-band .sub{margin:0;color:var(--muted);font-size:0.95rem;max-width:38rem;}
+  .ent-band .reasons{display:grid;gap:14px;margin:22px 0 22px;grid-template-columns:1fr;}
+  @media (min-width:760px){ .ent-band .reasons{grid-template-columns:repeat(3,1fr);} }
+  .ent-band .reasons div{border-left:2px solid var(--brand-600);padding-left:12px;font-size:0.89rem;}
+  .ent-band .reasons b{display:block;font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--brand-600);margin-bottom:2px;}
+  .ent-band .act{display:flex;flex-wrap:wrap;align-items:center;gap:16px;}
+  .ent-band .act .cta{margin-top:0;}
+  .ent-band .more{color:var(--muted);font-size:0.9rem;}
+  .ent-band .more a{color:var(--brand-600);font-weight:600;text-decoration:none;}
+  .ent-band .more a:hover{text-decoration:underline;}
+  @media (prefers-color-scheme: dark){ .ent-band .reasons div{border-left-color:var(--brand-400);} }
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:48px;}
   /* THE FAMILIES PAGE MARKS ITS CARDS UP AS A LIST, and every other page on the
      hub uses a <div class="cards">. So the grid above was written for a div and
@@ -530,49 +549,35 @@
     <li>No client names stored. A client is a label and a reference number you choose &mdash; never a name, never a Medicare number.</li>
   </ul>
 
-  <h2>Seats</h2>
-  <div class="tiers">
-    <div class="tier">
-      <h3>Free</h3>
-      <p class="price">$0 / seat</p>
-      <p>For SHIP and SHINE counselors, long-term care ombudsman programs, legal aid, and nonprofit staff — with attribution. Fair-use limits apply. <a href="https://appeals.casewhy.com/for-advocates?utm_source=hub&utm_medium=referral&utm_campaign=appeals&utm_content=appeals#fair-use">About fair use</a>. <a href="https://appeals.casewhy.com/for-advocates?utm_source=hub&utm_medium=referral&utm_campaign=appeals&utm_content=seats">Ask for a free seat</a>.</p>
-    </div>
-    <div class="tier">
-      <h3>Professional seat</h3>
-      <p class="price">30 days free, then $19/case to start</p>
-      <p>For independent advocates, care managers, and attorneys in private practice. Pay per case with no monthly fee, or take a monthly plan once your volume makes it cheaper &mdash; <a href="https://casewhyhub.com/appeals/advocates">see the seat pricing</a>.</p>
-    </div>
-    <div class="tier">
-      <h3>Per-site license</h3>
-      <p class="price">30 days free, then $19&ndash;25/case to start, by facility type</p>
-      <p>For home health agencies, hospices, and independent skilled nursing facilities &mdash; one license per site, unlimited staff, priced by facility type. <a href="https://casewhyhub.com/appeals/facilities">See facility pricing</a>.</p>
-    </div>
-  </div>
 
-  <h2>Why this exists</h2>
+
+
   
-  <p>"We built CaseWhy to make sense of confusing government and insurance letters, starting with USCIS case letters. When we looked at Medicare, we found the same problem — and a telling number: only 1 in 9 Medicare Advantage denials ever gets appealed, but more than 8 in 10 appeals win. That gap is the appeal paradox, and it's the reason CaseWhy Appeals exists — not because appealing is hard to win, but because almost nobody does it." — Peter, founder of CaseWhy</p>
+  <section class="ent-band">
+    <p class="eyebrow">Multi-facility organizations</p>
+    <h2>Forty buildings, one board</h2>
+    <p class="sub">One view across every facility you operate, with access that follows your own
+      regions and groups &mdash; not ours.</p>
+    <div class="reasons">
+      <div><b>Published</b>Pricing per facility, discounted by portfolio size. Published, not quoted.</div>
+      <div><b>Free to try</b>Thirty days on your own cases. The clock starts at your first letter.</div>
+      <div><b>Your structure</b>Regions, groups and roles mirror how you are actually organised.</div>
+    </div>
+    <div class="act">
+      <a class="cta" href="https://casewhyhub.com/appeals/enterprise">See the enterprise view &rarr;</a>
+      <span class="more">or go straight to <a href="https://casewhyhub.com/appeals/enterprise/pricing">pricing</a>
+        &middot; <a href="https://casewhyhub.com/appeals/enterprise/pilot">the 30-day pilot</a>
+        &middot; <a href="https://casewhyhub.com/appeals/enterprise/open-an-account">open an account</a></span>
+    </div>
+  </section>
 
-  <h2>Find your page</h2>
-  <h3 class="audience-group">Individuals &amp; Families</h3>
-  <div class="cards grouped">
-    <a class="card" href="https://casewhyhub.com/appeals/families">
-      <h2>Families & caregivers</h2>
-      <p>What to do when a Medicare Advantage plan refuses or ends skilled nursing care for someone you care for.</p>
-      <p class="arrow">Learn more →</p>
-    </a>
-  </div>
+  <h2>One building &mdash; Find your page</h2>
   <h3 class="audience-group">Healthcare Providers</h3>
   <p class="group-note">Non-profit facilities are never billed — skilled nursing, home health and hospice alike — identified from the public Medicare ownership data.</p>
   <div class="cards grouped">
     <a class="card lead" href="https://casewhyhub.com/appeals/facilities">
       <h2>Why this matters for your building</h2>
       <p>The case for a family's fast appeal from the provider's side, plus one-sheets with a QR code for the floor.</p>
-      <p class="arrow">Learn more →</p>
-    </a>
-    <a class="card" href="https://casewhyhub.com/appeals/enterprise">
-      <h2>Multi-facility organizations</h2>
-      <p>One board across every building you operate, with access that follows your own regions and groups.</p>
       <p class="arrow">Learn more →</p>
     </a>
     <a class="card" href="https://casewhyhub.com/appeals/facilities/skilled-nursing">
@@ -622,6 +627,34 @@
       <p class="arrow">Learn more →</p>
     </a>
   </div>
+
+  <h2>Seats</h2>
+  <div class="tiers">
+    <div class="tier">
+      <h3>Free</h3>
+      <p class="price">$0 / seat</p>
+      <p>For SHIP and SHINE counselors, long-term care ombudsman programs, legal aid, and nonprofit staff — with attribution. Fair-use limits apply. <a href="https://appeals.casewhy.com/for-advocates?utm_source=hub&utm_medium=referral&utm_campaign=appeals&utm_content=appeals#fair-use">About fair use</a>. <a href="https://appeals.casewhy.com/for-advocates?utm_source=hub&utm_medium=referral&utm_campaign=appeals&utm_content=seats">Ask for a free seat</a>.</p>
+    </div>
+    <div class="tier">
+      <h3>Professional seat</h3>
+      <p class="price">30 days free, then $19/case to start</p>
+      <p>For independent advocates, care managers, and attorneys in private practice. Pay per case with no monthly fee, or take a monthly plan once your volume makes it cheaper &mdash; <a href="https://casewhyhub.com/appeals/advocates">see the seat pricing</a>.</p>
+    </div>
+    <div class="tier">
+      <h3>Per-site license</h3>
+      <p class="price">30 days free, then $19&ndash;25/case to start, by facility type</p>
+      <p>For home health agencies, hospices, and independent skilled nursing facilities &mdash; one license per site, unlimited staff, priced by facility type. <a href="https://casewhyhub.com/appeals/facilities">See facility pricing</a>.</p>
+    </div>
+  </div>
+
+  <h3 class="audience-group">Individuals &amp; Families</h3>
+  <div class="cards grouped">
+    <a class="card" href="https://casewhyhub.com/appeals/families">
+      <h2>Families & caregivers</h2>
+      <p>What to do when a Medicare Advantage plan refuses or ends skilled nursing care for someone you care for.</p>
+      <p class="arrow">Learn more →</p>
+    </a>
+  </div>
   <h3 class="audience-group">More from CaseWhy Appeals</h3>
   <div class="cards grouped">
     <a class="card" href="https://casewhyhub.com/appeals/press">
@@ -630,6 +663,10 @@
       <p class="arrow">Learn more →</p>
     </a>
   </div>
+
+  
+  <h2>Why this exists</h2>
+  <p class="path-hint">CaseWhy was built to make sense of confusing government and insurance letters, starting with USCIS case letters. Medicare turned out to be the same problem: only 1 in 9 Medicare Advantage denials is ever appealed, and more than 8 in 10 appeals win &mdash; the appeal paradox this exists to close.</p>
 
 </main>
 

@@ -27,30 +27,63 @@
     <li>No client names stored. A client is a label and a reference number you choose &mdash; never a name, never a Medicare number.</li>
   </ul>
 
-  <h2>Seats</h2>
-  <div class="tiers">
-    <div class="tier">
-      <h3>Free</h3>
-      <p class="price">$0 / seat</p>
-      <p>For SHIP and SHINE counselors, long-term care ombudsman programs, legal aid, and nonprofit staff — with attribution. Fair-use limits apply. <a href="https://appeals.casewhy.com/for-advocates?utm_source=hub&utm_medium=referral&utm_campaign=appeals&utm_content=appeals#fair-use">About fair use</a>. <a href="https://appeals.casewhy.com/for-advocates?utm_source=hub&utm_medium=referral&utm_campaign=appeals&utm_content=seats">Ask for a free seat</a>.</p>
-    </div>
-    <div class="tier">
-      <h3>Professional seat</h3>
-      <p class="price">{{FREE_PERIOD_SHORT}}, then $19/case to start</p>
-      <p>For independent advocates, care managers, and attorneys in private practice. Pay per case with no monthly fee, or take a monthly plan once your volume makes it cheaper &mdash; <a href="https://casewhyhub.com/appeals/advocates">see the seat pricing</a>.</p>
-    </div>
-    <div class="tier">
-      <h3>Per-site license</h3>
-      <p class="price">{{FREE_PERIOD_SHORT}}, then $19&ndash;25/case to start, by facility type</p>
-      <p>For home health agencies, hospices, and independent skilled nursing facilities &mdash; one license per site, unlimited staff, priced by facility type. <a href="https://casewhyhub.com/appeals/facilities">See facility pricing</a>.</p>
-    </div>
-  </div>
 
-  <h2>Why this exists</h2>
-  <!-- Founder story: professional background plus the cited statistic. Not a
-       personal family claim — see verify.mjs for why, and the guard that keeps
-       it that way. -->
-  <p>"We built CaseWhy to make sense of confusing government and insurance letters, starting with USCIS case letters. When we looked at Medicare, we found the same problem — and a telling number: only 1 in 9 Medicare Advantage denials ever gets appealed, but more than 8 in 10 appeals win. That gap is the appeal paradox, and it's the reason CaseWhy Appeals exists — not because appealing is hard to win, but because almost nobody does it." — Peter, founder of CaseWhy</p>
 
-  <h2>Find your page</h2>
+
+  <!-- THE MULTI-FACILITY BAND. Peter, 4 Nov 2026: this proposition "should have
+       a more prominent presence ... and not lumped in among other 4 cards".
+
+       THE PRIMARY BUTTON GOES TO THE OVERVIEW, and that is load-bearing rather
+       than arbitrary. The directory card for /appeals/enterprise is removed
+       now that this band exists — it said the same thing twice — and that card
+       was the ONLY link to the overview from this page. Every other inbound
+       link comes from the overview's own children. Without this button the
+       overview would be reachable only THROUGH its sub-pages, which is
+       backwards for an overview.
+
+       NO PRICE FIGURE, deliberately. The pricing page owns the numbers and
+       verify.mjs enforces it; "published, not quoted" is that page's own claim
+       and stays true when the figures move. -->
+  <section class="ent-band">
+    <p class="eyebrow">Multi-facility organizations</p>
+    <h2>Forty buildings, one board</h2>
+    <p class="sub">One view across every facility you operate, with access that follows your own
+      regions and groups &mdash; not ours.</p>
+    <div class="reasons">
+      <div><b>Published</b>Pricing per facility, discounted by portfolio size. Published, not quoted.</div>
+      <div><b>Free to try</b>Thirty days on your own cases. The clock starts at your first letter.</div>
+      <div><b>Your structure</b>Regions, groups and roles mirror how you are actually organised.</div>
+    </div>
+    <div class="act">
+      <a class="cta" href="https://casewhyhub.com/appeals/enterprise">See the enterprise view &rarr;</a>
+      <span class="more">or go straight to <a href="https://casewhyhub.com/appeals/enterprise/pricing">pricing</a>
+        &middot; <a href="https://casewhyhub.com/appeals/enterprise/pilot">the 30-day pilot</a>
+        &middot; <a href="https://casewhyhub.com/appeals/enterprise/open-an-account">open an account</a></span>
+    </div>
+  </section>
+
+  <h2>One building &mdash; Find your page</h2>
   {{AUDIENCE_CARDS}}
+
+  <!-- "WHY THIS EXISTS", AT THE END AND HEADED AGAIN. Peter, 4 Nov 2026, in
+       three steps: *"Remove 'Why this exists' bloc"*, then *"move the bloc to
+       the end after Press"*, then *"bring back the heading"*.
+
+       SO IT IS A SECTION AGAIN, just the last one and one line long instead of
+       a long founder quote. What moved is its POSITION and its LENGTH; what did
+       not move is the claim.
+
+       THAT MATTERS, because two guards in verify.mjs require this text and they
+       exist for a reason that is not stylistic: the paragraph REPLACED A FALSE
+       CLAIM — an earlier version said these were Peter's own family's Medicare
+       letters, which was not true. The guard note says "deleting the paragraph
+       would pass a ban-only check while leaving the page with no why this
+       exists at all". The USCIS origin and the appeal-paradox statistic are the
+       honest replacement, so they travel with the block wherever it goes.
+
+       LAST ON THE PAGE IS THE RIGHT PLACE FOR IT NOW. A reader who has worked
+       through the band, the directory and Press has already decided whether any
+       of this is for them; the founder's reason is what they read if they want
+       to know who is behind it, not what they need to choose a page. -->
+  <h2>Why this exists</h2>
+  <p class="path-hint">CaseWhy was built to make sense of confusing government and insurance letters, starting with USCIS case letters. Medicare turned out to be the same problem: only 1 in 9 Medicare Advantage denials is ever appealed, and more than 8 in 10 appeals win &mdash; the appeal paradox this exists to close.</p>

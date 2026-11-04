@@ -20,6 +20,8 @@
 // Run: node scripts/generate.mjs from the repo root.
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+// For the sitemap's lastmod, which is read from git rather than the clock.
+import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -1181,12 +1183,65 @@ function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, 
     body = body.replace("{{PARTNER_KIT}}", partnerKit.replaceAll("{{PAGE_ID}}", contentId));
   }
   const needsCopyScript = body.includes("copy-btn") || partnerKit.includes("copy-btn");
+  // BREADCRUMBS, FOR PAGES BELOW THE TOP LEVEL — added 4 Nov 2026.
+  //
+  // Peter: *"do a SEO catchup for the new links / pages added since the initial
+  // SEO"*. The audit found the metadata complete — every page had a title, a
+  // description, a self-referential canonical, the four og tags, a twitter card
+  // and WebPage structured data, with no duplicates. What NO page had was a
+  // breadcrumb trail, and 29 of the 35 sit two or three levels deep.
+  //
+  // WHAT IT BUYS, specifically: a result for
+  // /appeals/facilities/skilled-nursing/admission currently shows the raw URL.
+  // With this it can show "CaseWhy Hub > Appeals > Facilities > Skilled
+  // nursing > Admission". That is the whole gain — not ranking, legibility of
+  // the result — and these are the deepest pages on the site.
+  //
+  // BUILT FROM THE PATH, so it cannot drift from where the page actually
+  // lives. The names come from the page registry when the ancestor is a real
+  // page, and fall back to the slug titled-cased — an ancestor segment with no
+  // page of its own still needs a readable name, and inventing one here is
+  // better than emitting a URL fragment as a label.
+  //
+  // TOP-LEVEL PAGES GET NO BREADCRUMB. A trail with one step is noise, and
+  // Google ignores it.
+  const crumbTrail = (() => {
+    const segs = path.split("/").filter(Boolean);
+    if (segs.length < 2) return null;
+    const names = new Map(
+      [...lines, ...pages, ...companyPages].map((x) => [x.path, x.navLabel || x.title || null])
+    );
+    const items = [{ name: "CaseWhy Hub", url: "https://casewhyhub.com/" }];
+    let acc = "";
+    for (const seg of segs) {
+      acc += `/${seg}`;
+      const label =
+        names.get(acc) ||
+        seg.replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase());
+      items.push({ name: label, url: `https://casewhyhub.com${acc}` });
+    }
+    return items;
+  })();
+  const breadcrumbLd = crumbTrail
+    ? `  <script type="application/ld+json">
+  ${JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: crumbTrail.map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: c.name,
+      item: c.url,
+    })),
+  })}
+  </script>\n`
+    : "";
   const jsonLd =
-    extraJsonLd === false
+    (extraJsonLd === false
       ? ""
       : `  <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"WebPage","name":${JSON.stringify(titleTag)},"url":"https://casewhyhub.com${path}","isPartOf":{"@type":"WebSite","name":"CaseWhy Hub","url":"https://casewhyhub.com"}}
-  </script>\n`;
+  </script>\n`) + breadcrumbLd;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1504,8 +1559,46 @@ const allUrls = [
   ...pages.filter((p) => !p.draft).map((p) => p.path),
   ...companyPages.map((p) => p.path),
 ];
+// LASTMOD, AND IT COMES FROM GIT — not from the clock.
+//
+// The sitemap carried a bare <loc> for every URL and nothing else, so a crawler
+// had no freshness signal at all for a site that gains pages most weeks.
+//
+// STAMPING `new Date()` ON EVERY URL WOULD BE A LIE, and the expensive kind: it
+// tells a crawler all thirty-five pages changed today, every time the generator
+// runs, which is exactly how a site teaches Google to stop believing its
+// sitemap. The honest answer is the last commit that touched the page's own
+// content file, which is what this reads.
+//
+// FALLS BACK TO THE REGISTRY'S OWN LAST COMMIT when a URL has no content file
+// of its own (a line index, a company page). Falls back to omitting lastmod
+// entirely if git cannot answer — a missing signal is better than a wrong one.
+const contentFileFor = new Map(
+  [...lines, ...pages, ...companyPages]
+    .filter((x) => x.content)
+    .map((x) => [x.path, join(__dirname, "content", `${x.content}.html`)])
+);
+const gitDate = (file) => {
+  try {
+    const out = execSync(`git log -1 --format=%cI -- ${JSON.stringify(file)}`, {
+      cwd: ROOT,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    return out ? out.slice(0, 10) : null;
+  } catch {
+    return null;
+  }
+};
+const registryDate = gitDate(join(__dirname, "pages.json"));
 const sitemapUrls = allUrls
-  .map((u) => `  <url><loc>https://casewhyhub.com${u}</loc></url>`)
+  .map((u) => {
+    const file = contentFileFor.get(u);
+    const when = (file && gitDate(file)) || registryDate;
+    return when
+      ? `  <url><loc>https://casewhyhub.com${u}</loc><lastmod>${when}</lastmod></url>`
+      : `  <url><loc>https://casewhyhub.com${u}</loc></url>`;
+  })
   .join("\n");
 writeFileSync(
   join(ROOT, "sitemap.xml"),

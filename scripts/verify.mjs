@@ -1339,5 +1339,131 @@ console.log("\n== Every shipped page is in the sitemap ==");
   );
 }
 
+
+// ===========================================================================
+// EVERY INTERNAL LINK MUST RESOLVE — not merely exist.
+//
+// Peter, 4 Nov 2026: *"do an audit on casewhyhub to ensure every link is
+// pointing to either internnally or to appeals.casewhy.com"*.
+//
+// THE AUDIT FOUND ONE DEAD LINK AND THIS FILE HAD PASSED IT EVERY TIME.
+// /appeals/enterprise proved its central claim — "every Medicare appeal" — with
+// a link to `https://casewhyhub.com/coverage`. There is no such page here and
+// never was; that path answers 404. The claim check above was satisfied by
+// `html.includes("/coverage")`, which asks whether a link is PRESENT and not
+// whether it goes anywhere.
+//
+// That page is where cold outreach sends an operator, so the one page that most
+// needed its evidence to hold was the one proving it with a dead end.
+//
+// A REDIRECT COUNTS, which is Peter's own rule and not a concession: /schools
+// has no file and answers 308 to /uscis/schools, so it is a working link. The
+// check consults the redirect table for exactly that reason — without it, this
+// would have reported four healthy links as broken.
+//
+// ASSETS ARE STILL NOT LINKS. Anchors only, same scope as the relative-path
+// check above.
+{
+  const pagePaths = new Set([
+    "/",
+    ...lines.map((l) => `/${l.id}`),
+    ...pages.map((p) => p.path),
+    ...companyPages.map((p) => p.path),
+  ]);
+  const redirectFroms = new Set(
+    (redirects || []).map((r) => String(r.from).replace(/\/:.*$/, ""))
+  );
+  const offenders = [];
+  for (const path of [...pagePaths]) {
+    const html = read(path);
+    if (!html) continue;
+    for (const m of html.matchAll(/<a\b[^>]*\bhref="https:\/\/casewhyhub\.com([^"]*)"/g)) {
+      const target = (m[1].split("#")[0].split("?")[0] || "/").replace(/\/$/, "") || "/";
+      if (pagePaths.has(target)) continue;
+      // A redirect, including the parameterised ones (/snf/:campaign), which
+      // are matched on their stem.
+      if (redirectFroms.has(target)) continue;
+      if ([...redirectFroms].some((f) => f && target.startsWith(f + "/"))) continue;
+      // A real file on disk — covers anything hand-authored outside pages.json.
+      if (
+        existsSync(join(ROOT, target.replace(/^\//, ""))) ||
+        existsSync(join(ROOT, target.replace(/^\//, ""), "index.html"))
+      ) {
+        continue;
+      }
+      offenders.push(`${path} -> https://casewhyhub.com${target}`);
+    }
+  }
+  check(
+    "every internal link resolves to a page, a redirect or a file",
+    offenders.length === 0,
+    offenders.length
+      ? `internal links that go nowhere:\n    ${[...new Set(offenders)].join("\n    ")}`
+      : "",
+  );
+}
+
+
+// ===========================================================================
+// THE SEO CATCH-UP OF 4 NOV 2026 — the two things the audit found missing.
+//
+// Peter: *"do a SEO catchup for the new links / pages added since the initial
+// SEO"*. The audit found the per-page metadata COMPLETE across all 35 pages —
+// title, description, self-referential canonical, four og tags, twitter card,
+// WebPage structured data, no duplicate titles or descriptions. Two gaps:
+// no sitemap carried a lastmod, and no page carried a breadcrumb trail while
+// 29 of 35 sit two or three levels deep.
+{
+  const sitemap = readFileSync(join(ROOT, "sitemap.xml"), "utf8");
+  const locs = [...sitemap.matchAll(/<loc>([^<]*)<\/loc>/g)].map((m) => m[1]);
+  const mods = [...sitemap.matchAll(/<lastmod>([^<]*)<\/lastmod>/g)].map((m) => m[1]);
+  check(`every sitemap URL carries a lastmod (${mods.length} of ${locs.length})`, locs.length > 0 && mods.length === locs.length);
+
+  // NOT ALL THE SAME DATE — the check that makes the one above mean something.
+  //
+  // `new Date()` on every URL would satisfy "has a lastmod" and tell a crawler
+  // all thirty-five pages changed today, every time the generator runs. That is
+  // how a site teaches Google to ignore its sitemap. The dates come from the
+  // last commit touching each page's content file, so they differ: measured on
+  // the day this shipped, 31 pages at 2026-11-01, three at 2026-09-15 and one
+  // at 2026-10-21 — the USCIS attorney pages genuinely had not changed since
+  // September, and the sitemap now says so.
+  check(
+    `lastmod dates are not all identical (${new Set(mods).size} distinct)`,
+    new Set(mods).size > 1,
+    new Set(mods).size <= 1 ? "every page claims the same change date — that is a clock stamp, not a fact" : ""
+  );
+}
+
+{
+  const offenders = [];
+  const noTrail = [];
+  for (const path of [...lines.map((l) => l.path), ...pages.map((p) => p.path), ...companyPages.map((p) => p.path)]) {
+    if (path.split("/").filter(Boolean).length < 2) continue;
+    const html = read(path);
+    if (!html) continue;
+    const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+    const crumb = blocks.map((b) => { try { return JSON.parse(b); } catch { return null; } })
+      .find((d) => d && d["@type"] === "BreadcrumbList");
+    if (!crumb) { noTrail.push(path); continue; }
+    // THE LAST STEP MUST BE THE PAGE ITSELF. A trail that ends at an ancestor
+    // is worse than none: Google renders it, and it renders the wrong page.
+    const last = crumb.itemListElement[crumb.itemListElement.length - 1];
+    if (!last || last.item.replace(/\/$/, "") !== `https://casewhyhub.com${path}`.replace(/\/$/, "")) {
+      offenders.push(`${path} -> trail ends at ${last && last.item}`);
+    }
+  }
+  check(
+    `every page below the top level has a breadcrumb trail (${noTrail.length} missing)`,
+    noTrail.length === 0,
+    noTrail.length ? `no BreadcrumbList on:\n    ${noTrail.join("\n    ")}` : ""
+  );
+  check(
+    "every breadcrumb trail ends at its own page",
+    offenders.length === 0,
+    offenders.length ? `trails ending somewhere else:\n    ${offenders.join("\n    ")}` : ""
+  );
+}
+
 console.log(`\n${failures === 0 ? "All checks passed." : `${failures} check(s) FAILED.`}`);
 process.exit(failures === 0 ? 0 : 1);

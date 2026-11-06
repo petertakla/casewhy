@@ -1209,7 +1209,7 @@ console.log("\n== Every shipped page is in the sitemap ==");
             // is the only input shape that can express an arbitrary mix.
             const counts = { snf: cp.cases.snf, home_health: cp.cases.home_health, hospice: cp.cases.hospice };
             const q = quoteFn(book2, counts, 0, 1);
-            // The licence cap can legitimately undercut the pooled figure at
+            // The license cap can legitimately undercut the pooled figure at
             // these shapes, so the POOLED number is what is compared — the cap
             // has its own check below.
             if (q.pooled !== cp.monthlyUsd) {
@@ -1227,20 +1227,20 @@ console.log("\n== Every shipped page is in the sitemap ==");
           );
 
           // THE CAP IS A PROMISE ON THE PAGE, so it is asserted rather than
-          // assumed: a busy portfolio must never be quoted above the licence.
+          // assumed: a busy portfolio must never be quoted above the license.
           const heavy = quoteFn(book2, { snf: 40 }, 0, 80);
           check(
-            "a very busy portfolio is quoted the licence, never above it",
-            heavy.total <= heavy.licence && heavy.cappedOut === true,
-            `got ${heavy.total} against a licence of ${heavy.licence}`,
+            "a very busy portfolio is quoted the license, never above it",
+            heavy.total <= heavy.license && heavy.cappedOut === true,
+            `got ${heavy.total} against a license of ${heavy.license}`,
           );
           // AND THE CAP MUST NOT BIND AT ORDINARY VOLUME, or the whole change
           // achieves nothing. 10 cases a building is the measured median.
           const typical = quoteFn(book2, { snf: 40 }, 0, 10);
           check(
             "at the median 10 cases a building the pooled price wins by a wide margin",
-            typical.cappedOut === false && typical.total < typical.licence * 0.6,
-            `got ${typical.total} against a licence of ${typical.licence}`,
+            typical.cappedOut === false && typical.total < typical.license * 0.6,
+            `got ${typical.total} against a license of ${typical.license}`,
           );
         }
       }
@@ -1584,6 +1584,43 @@ console.log("\n== Every shipped page is in the sitemap ==");
     );
   }
 
+  // -------------------------------------------------------------------------
+  // US SPELLING ONLY, AND THIS REPOSITORY HAD NO SUCH CHECK.
+  //
+  // Found 6 Nov 2026 by the APPEALS repo's gate, not by anything here. That
+  // gate has carried a US-spelling guard since the product was found using both
+  // spellings inside one sentence; this repository never had one, so when I
+  // wrote the new per-case pricing copy in British English it shipped. THIRTY
+  // FIVE occurrences, thirteen of them reader-facing on the live enterprise
+  // pricing page — "an unlimited licence", in a product that sells site
+  // licenses to US nursing homes.
+  //
+  // THE ASYMMETRY IS THE LESSON. The hub is where cold outreach lands, so its
+  // copy is read by more strangers than the app's is, and it had strictly fewer
+  // copy guards. A rule enforced in one repository of two is a rule that holds
+  // until somebody writes in the other one.
+  //
+  // CHECKED IN THE SOURCE, not the built pages, so the message names the file
+  // somebody has to edit. Built pages are a consequence.
+  {
+    const offenders = [];
+    for (const dir of ["content", "."]) {
+      const base = dir === "." ? __dirname : join(__dirname, dir);
+      for (const f of readdirSync(base)) {
+        if (!/\.(html|mjs|json)$/.test(f)) continue;
+        if (f === "verify.mjs") continue; // this file names the word to find it
+        const src = readFileSync(join(base, f), "utf8");
+        const hits = src.match(/\blicences?\b/gi);
+        if (hits) offenders.push(`${dir === "." ? "" : dir + "/"}${f} (${hits.length})`);
+      }
+    }
+    check(
+      `US spelling only — no "licence" in the hub's source${offenders.length ? ` — ${offenders.join(", ")}` : ""}`,
+      offenders.length === 0,
+      "this product sells site licenses to US facilities; the British spelling shipped once already",
+    );
+  }
+
   const overview = read("/appeals/enterprise");
   check("the enterprise overview exists to check", overview !== null);
   if (overview) {
@@ -1597,7 +1634,7 @@ console.log("\n== Every shipped page is in the sitemap ==");
     const p = pricingJson.portfolio;
     check("pricing.json carries portfolio bands", Boolean(p && p.bands && p.bands.length >= 3));
     if (p && p.bands) {
-      // THE LICENCE IS A ONE-LINE CEILING NOW, NOT A PUBLISHED TABLE, so this
+      // THE LICENSE IS A ONE-LINE CEILING NOW, NOT A PUBLISHED TABLE, so this
       // check changed shape on 6 Nov 2026. Peter: *"I thought the $499 is
       // gone"*, then — given that removing it would raise the price for the
       // heaviest users — he chose to keep the cap and shrink it to a sentence.
@@ -1648,7 +1685,7 @@ console.log("\n== Every shipped page is in the sitemap ==");
       check(
         `the withdrawn per-site ceilings stay off the page${reappeared.length ? ` — $${reappeared.join(", $")} are back` : ""}`,
         reappeared.length === 0,
-        "the licence table is back: either restore the every-figure check above it, or take the table out again",
+        "the license table is back: either restore the every-figure check above it, or take the table out again",
       );
 
       // READER-VISIBLE TEXT ONLY, and this was a false positive before it was a

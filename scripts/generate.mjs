@@ -1093,14 +1093,14 @@ function pricingCalculatorHtml() {
     '  // outside a browser. The fence comments are how verify.mjs finds it;',
     '  // renaming them turns the test into a no-op, so it fails if they go.',
     '  //',
-    '  // IT PRICES PER POOLED CASE SINCE 5 NOV 2026, and the licence it replaced is',
+    '  // IT PRICES PER POOLED CASE SINCE 5 NOV 2026, and the license it replaced is',
     '  // now the ceiling. Peter: "fix the chains pricing to per-case not per-site".',
     '  //',
     '  // THIS IS A SECOND IMPLEMENTATION OF portfolioQuote() AND THAT IS STILL THE',
     '  // RISK — it just stopped being a risk anybody has to remember. The pooled',
     '  // arithmetic needs graduated bands and largest-remainder apportionment',
     '  // across the care settings, which is far more than the four lines of',
-    '  // multiplication the licence needed. So the appeals repo exports',
+    '  // multiplication the license needed. So the appeals repo exports',
     '  // `pooledCases.checkpoints` — nine case mixes chosen to bite, with the',
     '  // authoritative answer for each — and verify.mjs fails this build if the',
     '  // function below disagrees with any of them. Change a rate over there,',
@@ -1117,12 +1117,12 @@ function pricingCalculatorHtml() {
     '      if (paid >= b.minFacilities && (b.maxFacilities === null || paid <= b.maxFacilities)) { band = b; break; }',
     '    }',
     '',
-    '    // THE LICENCE, WHICH IS NOW THE CEILING RATHER THAN THE PRICE.',
-    '    var licence = 0, listTotal = 0, std = BOOK.bands[0].perSiteUsd;',
+    '    // THE LICENSE, WHICH IS NOW THE CEILING RATHER THAN THE PRICE.',
+    '    var license = 0, listTotal = 0, std = BOOK.bands[0].perSiteUsd;',
     '    for (var j = 0; j < keys.length; j++) {',
     '      var n0 = Math.max(0, Math.floor(counts[keys[j]] || 0));',
     '      if (n0 === 0) continue;',
-    '      licence += band.perSiteUsd[keys[j]] * n0;',
+    '      license += band.perSiteUsd[keys[j]] * n0;',
     '      listTotal += std[keys[j]] * n0;',
     '    }',
     '',
@@ -1180,9 +1180,9 @@ function pricingCalculatorHtml() {
     '    }',
     '',
     '    // THE CAP IS CHARGED WHEN IT IS CHEAPER. Without this a busy portfolio',
-    '    // would be quoted above the licence it was promised as a ceiling.',
+    '    // would be quoted above the license it was promised as a ceiling.',
     '    var knowCases = per > 0;',
-    '    var total = !knowCases ? licence : Math.min(pooled, licence);',
+    '    var total = !knowCases ? license : Math.min(pooled, license);',
     '    var lines = [];',
     '    for (var L = 0; L < keys.length; L++) {',
     '      var nL = Math.max(0, Math.floor(counts[keys[L]] || 0));',
@@ -1191,9 +1191,9 @@ function pricingCalculatorHtml() {
     '                   sub: band.perSiteUsd[keys[L]] * nL });',
     '    }',
     '    return { paid: paid, nonprofit: Math.max(0, Math.floor(nonprofit || 0)),',
-    '             band: band, lines: lines, total: total, licence: licence,',
+    '             band: band, lines: lines, total: total, license: license,',
     '             pooled: pooled, pooledCases: pooledCases, deepestBand: deepest,',
-    '             knowCases: knowCases, cappedOut: knowCases && pooled > licence,',
+    '             knowCases: knowCases, cappedOut: knowCases && pooled > license,',
     '             perCase: pooledCases > 0 ? total / pooledCases : 0,',
     '             saving: listTotal - total };',
     '  }',
@@ -1269,15 +1269,15 @@ function pricingCalculatorHtml() {
     '    var lead;',
     '    if (!q.knowCases) {',
     '      lead = "Enter cases a month to see what you would pay. Until then this is the ceiling: " +',
-    '        money(q.licence) + " a month.";',
+    '        money(q.license) + " a month.";',
     '    } else if (q.cappedOut) {',
     '      lead = "At " + q.pooledCases + " cases a month, paying per case would come to " +',
-    '        money(q.pooled) + ", so you pay the site licence instead: " + money(total) +',
+    '        money(q.pooled) + ", so you pay the site license instead: " + money(total) +',
     '        " a month, which is " + money(Math.round((total / q.pooledCases) * 100) / 100) + " a case.";',
     '    } else {',
     '      lead = money(total) + " a month for " + q.pooledCases + " cases, which is " +',
     '        money(Math.round(q.perCase * 100) / 100) + " a case \\u2014 and never more than " +',
-    '        money(q.licence) + ".";',
+    '        money(q.license) + ".";',
     '    }',
     '    out.innerHTML = table(rows, totalRow) +',
     '      "<p class=\'calc-note\'><strong>" + lead + "</strong></p>" +',
@@ -1302,7 +1302,7 @@ function portfolioPricingHtml() {
     // branch is a safety net rather than an expected state.
     return "";
   }
-  // THE PER-CASE LADDER LEADS AND THE LICENCE FOLLOWS AS A CEILING — Peter,
+  // THE PER-CASE LADDER LEADS AND THE LICENSE FOLLOWS AS A CEILING — Peter,
   // 5 Nov 2026: *"fix the chains pricing to per-case not per-site"*.
   //
   // THE ORDER IS THE WHOLE POINT, not a layout preference. This page used to
@@ -1345,7 +1345,7 @@ function portfolioPricingHtml() {
   // their worst month costs. Keeping it costs us almost nothing because it
   // binds above about 28 cases a building, which under 2% reach.
   //
-  // WHY NOT THE TABLE. Four rows of licence prices with a discount ladder read
+  // WHY NOT THE TABLE. Four rows of license prices with a discount ladder read
   // as the old per-site model surviving next to the new one, which is exactly
   // what Peter saw. A guarantee needs one sentence; a price list needs a table,
   // and this is no longer a price list.
@@ -1360,13 +1360,13 @@ function portfolioPricingHtml() {
   // GENERATED FROM THE BANDS, so it cannot drift from the data the calculator
   // uses — the whole reason this page reads pricing.json.
   const capHeading = (() => {
-    if (!p.licenceIsACap || !p.bands?.length) return "";
+    if (!p.licenseIsACap || !p.bands?.length) return "";
     const list = p.bands[0].perSiteUsd;
     const deepest = p.bands[p.bands.length - 1].perSiteUsd;
     return (
       `<h3>The most you could ever pay</h3>\n` +
-      `<p>If a building is busy enough that per-case would come to more than an unlimited licence for ` +
-      `it, you pay the licence instead &mdash; $${list.snf} a month for a skilled nursing facility, ` +
+      `<p>If a building is busy enough that per-case would come to more than an unlimited license for ` +
+      `it, you pay the license instead &mdash; $${list.snf} a month for a skilled nursing facility, ` +
       `$${list.home_health} for home health, $${list.hospice} for hospice, falling to $${deepest.snf} ` +
       `a site across a large portfolio. Under 2% of facilities run the volume to reach it, so for ` +
       `almost everybody this is a guarantee rather than a bill.</p>\n`

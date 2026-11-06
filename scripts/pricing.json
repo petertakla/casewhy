@@ -242,7 +242,7 @@
     "countedAcrossSegments": true,
     "nonprofitCountsTowardBand": false,
     "pricedPerCase": true,
-    "licenceIsACap": true,
+    "licenseIsACap": true,
     "pooledCases": {
       "checkpoints": [
         {

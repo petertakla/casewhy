@@ -529,9 +529,11 @@
     <p class="wordmark">CaseWhy Appeals</p>
     <p class="tagline">Medicare appeals for families.</p>
     <h1>Appeal a Medicare decision. Start free.</h1>
+    
     <p class="sub">See what CaseWhy does for your family, then choose the card that matches your notice. Starting a case is free, and you see your appeal letter before you pay.</p>
   </header>
 
+  
   
   <section class="path">
     <h2>A clearer path through a Medicare appeal</h2>
@@ -620,7 +622,6 @@
     <ul>
       <li><strong>1-800-MEDICARE</strong> (1-800-633-4227)</li>
       <li><strong>shiphelp.org</strong> — State Health Insurance Assistance Program</li>
-      
       <li><strong>1-800-677-1116</strong> — Eldercare Locator</li>
     </ul>
   </section>
@@ -628,7 +629,6 @@
   <footer class="families-foot">
     <p>This page is information, not legal advice.</p>
     
-
     <p>CaseWhy Appeals is not affiliated with or endorsed by Medicare, CMS, or any health plan, and is not a law firm.</p>
   </footer>
 </main>
@@ -668,12 +668,15 @@
 <script>
   (function () {
     var incoming = new URLSearchParams(location.search);
-    if (!incoming.get('utm_source')) return;
+    var rc = incoming.get('rc');
+    if (rc) rc = rc.replace(/~/g, '.');
+    if (!incoming.get('utm_source') && !rc) return;
     var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
     document.querySelectorAll('a[href*="appeals.casewhy.com"]').forEach(function (a) {
       try {
         var u = new URL(a.href);
         keys.forEach(function (k) { var v = incoming.get(k); if (v) u.searchParams.set(k, v); });
+        if (rc && !u.searchParams.get('rc')) u.searchParams.set('rc', rc);
         a.href = u.toString();
       } catch (e) { /* a malformed href stays exactly as authored */ }
     });

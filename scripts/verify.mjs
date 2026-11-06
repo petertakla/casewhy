@@ -1722,6 +1722,100 @@ console.log("\n== Every shipped page is in the sitemap ==");
     );
   }
 
+  // -------------------------------------------------------------------------
+  // THE CLICK CODE SURVIVES A HOP THROUGH THIS SITE.
+  //
+  // Peter, 6 Nov 2026: "do the hub demo button code pass-through", after asking
+  // why the demo-survey columns were empty.
+  //
+  // MEASURED CAUSE: 31 of 68 demo-button landings had no facility attached, and
+  // 9 of those arrived tagged `snf / email` — a letter click that reached this
+  // site and then lost its identity. The reader lands on a facility page with
+  // `?rc=<code>` in the address bar, clicks "Open the demo", and that href is
+  // authored as a plain appeals.casewhy.com URL with no code in it.
+  //
+  // This runs the real forwarding script against the real page's real links,
+  // because the failure was never in the script's logic — it was in what the
+  // script chose to forward.
+  {
+    const page = read("/appeals/facilities/skilled-nursing");
+    check("the skilled-nursing page exists to check", page !== null);
+    if (page) {
+      const script = [...page.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+        .map((m) => m[1])
+        .find((b) => b.includes("querySelectorAll") && b.includes("utm_source"));
+      check(
+        "the page carries the link-forwarding script",
+        Boolean(script),
+        "without it a letter reader's identity stops at this page",
+      );
+      const hrefs = [...page.matchAll(/href="(https:\/\/appeals\.casewhy\.com[^"]*)"/g)].map((m) =>
+        m[1].replace(/&amp;/g, "&"),
+      );
+      check(
+        `the page links to the appeals app (${hrefs.length} link(s))`,
+        hrefs.length > 0,
+        "nothing to forward a code to — the check below would prove nothing",
+      );
+
+      if (script && hrefs.length) {
+        const run = (search) => {
+          const anchors = hrefs.map((h) => ({ href: h }));
+          // eslint-disable-next-line no-new-func
+          new Function("document", "location", script)({ querySelectorAll: () => anchors }, { search });
+          return anchors;
+        };
+        // THE TILDE FORM IS THE ONE THAT ARRIVES. The short link
+        // `/snf/:campaign/c/:code` forwards the code verbatim and a Vercel
+        // redirect cannot transform it, so the address bar holds `~` where the
+        // appeals app expects `.`. If this is not converted the link resolves
+        // and attributes nobody, which is worse than a broken link.
+        const tilde = run("?utm_source=snf&utm_medium=email&rc=PAYLOAD~SIGNATURE");
+        const converted = tilde.filter((a) => /[?&]rc=PAYLOAD\.SIGNATURE(&|$)/.test(a.href)).length;
+        check(
+          `every appeals link carries the code onward, tilde converted (${converted}/${tilde.length})`,
+          converted === tilde.length,
+          "a code left in path form in a query parameter cannot be verified — the click is anonymous",
+        );
+
+        // CODE WITH NO UTM. The script used to return early unless utm_source
+        // was present, so this case forwarded nothing even after `rc` was added
+        // to the list. It is the arrival shape of anybody who follows a coded
+        // link that lost its tags.
+        const bare = run("?rc=PAYLOAD~SIGNATURE");
+        check(
+          "a code arriving WITHOUT any utm tags is still forwarded",
+          bare.every((a) => /[?&]rc=PAYLOAD\.SIGNATURE(&|$)/.test(a.href)),
+          "the early return on a missing utm_source is what made this fail once already",
+        );
+
+        // AND NOTHING IS INVENTED. A visitor with no code must leave the links
+        // exactly as authored, or every organic visit would be attributed to
+        // whoever last arrived.
+        const none = run("?utm_source=snf&utm_medium=email");
+        check(
+          "a visitor with no code gets no code added",
+          none.every((a) => !/[?&]rc=/.test(a.href)),
+          "inventing an attribution is worse than missing one",
+        );
+
+        // A LINK WITH ITS OWN CODE IS LEFT ALONE, so a visitor cannot
+        // re-attribute a click that was already addressed to somebody.
+        const own = [{ href: "https://appeals.casewhy.com/desk/demo?rc=THEIR.OWN" }];
+        // eslint-disable-next-line no-new-func
+        new Function("document", "location", script)(
+          { querySelectorAll: () => own },
+          { search: "?rc=VISITOR~CODE" },
+        );
+        check(
+          "a link that already carries a code keeps it",
+          own[0].href.includes("rc=THEIR.OWN"),
+          "overwriting it would credit the visit to the wrong facility",
+        );
+      }
+    }
+  }
+
   const overview = read("/appeals/enterprise");
   check("the enterprise overview exists to check", overview !== null);
   if (overview) {

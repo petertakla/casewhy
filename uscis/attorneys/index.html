@@ -588,12 +588,15 @@
 <script>
   (function () {
     var incoming = new URLSearchParams(location.search);
-    if (!incoming.get('utm_source')) return;
+    var rc = incoming.get('rc');
+    if (rc) rc = rc.replace(/~/g, '.');
+    if (!incoming.get('utm_source') && !rc) return;
     var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
     document.querySelectorAll('a[href*="appeals.casewhy.com"]').forEach(function (a) {
       try {
         var u = new URL(a.href);
         keys.forEach(function (k) { var v = incoming.get(k); if (v) u.searchParams.set(k, v); });
+        if (rc && !u.searchParams.get('rc')) u.searchParams.set('rc', rc);
         a.href = u.toString();
       } catch (e) { /* a malformed href stays exactly as authored */ }
     });

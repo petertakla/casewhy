@@ -678,15 +678,53 @@ const REPORT_CLICK_SCRIPT = `<script>
   })();
 </script>`;
 
+// FORWARD THE UTM TAGS *AND THE CLICK CODE*. Peter, 6 Nov 2026: "do the hub
+// demo button code pass-through".
+//
+// THE GAP THIS CLOSES, measured. 31 of 68 demo-button landings had no facility
+// attached, and 9 of those arrived tagged `snf / email` — a letter click that
+// reached the hub and then lost its identity. The cause is on this page: the
+// reader arrives at `/appeals/facilities/skilled-nursing?...&rc=<code>`,
+// because the short link forwards the code, and then clicks "Open the demo",
+// whose href is authored as a plain `appeals.casewhy.com/desk/demo?utm_...`
+// with no code in it. The identity was in the address bar and went no further.
+//
+// TWO THINGS WERE WRONG HERE, not one:
+//   * `rc` was never in the forwarded list at all, and
+//   * the whole function RETURNED EARLY unless `utm_source` was present, so a
+//     visitor carrying only a code got nothing forwarded even once `rc` was
+//     added.
+//
+// THE QUERY FORM IS USED DELIBERATELY, not the path form the letters now use.
+// The path form exists because a mail gateway rewrites query strings — and a
+// gateway only ever touches the LETTER. By the time somebody clicks a link on
+// this page they are in a browser, where `?rc=` is safe. It is also universal:
+// measured against production, `/enterprise/c/<code>` is a 404 because that
+// route is a redirect, so appending a path segment to every outgoing link would
+// have broken one of them.
+//
+// AND THE TILDE IS CONVERTED BACK. The path form substitutes `~` for the `.`
+// that separates payload from signature, and the hub's own
+// `/snf/:campaign/c/:code` redirect passes the value through verbatim — a
+// Vercel redirect cannot transform it. So a reader arriving that way has a
+// tilde-form `rc` in the address bar, which the appeals app's `?rc=` reader
+// cannot verify. Converting here is the only place it can happen.
+//
+// A LINK THAT ALREADY CARRIES A CODE IS LEFT ALONE. Some hrefs are authored
+// with their own, and overwriting one would re-attribute a click to whoever
+// happened to be visiting.
 const FORWARD_UTM_SCRIPT = `<script>
   (function () {
     var incoming = new URLSearchParams(location.search);
-    if (!incoming.get('utm_source')) return;
+    var rc = incoming.get('rc');
+    if (rc) rc = rc.replace(/~/g, '.');
+    if (!incoming.get('utm_source') && !rc) return;
     var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
     document.querySelectorAll('a[href*="appeals.casewhy.com"]').forEach(function (a) {
       try {
         var u = new URL(a.href);
         keys.forEach(function (k) { var v = incoming.get(k); if (v) u.searchParams.set(k, v); });
+        if (rc && !u.searchParams.get('rc')) u.searchParams.set('rc', rc);
         a.href = u.toString();
       } catch (e) { /* a malformed href stays exactly as authored */ }
     });
@@ -1412,24 +1450,20 @@ function portfolioPricingHtml() {
 
 function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, currentLineId, currentSharedId, extraJsonLd, ogImage, draft, siteLink }) {
   let body = bodyOverride !== undefined ? bodyOverride : readFileSync(join(__dirname, "content", `${contentId}.html`), "utf8");
-  // {{FAMILY_PRICE:<slug>}} — ONE FIGURE, NOT A WHOLE CARD.
+  // THE {{FAMILY_PRICE}} TOKEN IS GONE, 6 Nov 2026, and so is the mechanism.
   //
-  // Only the price is substituted. Each card's heading, its plain-language line
-  // and its link stay in the content file, because those are copy rather than
-  // data — and the links in particular carry `utm_source=owned&utm_medium=social`
-  // while the export's own `taggedHref` carries `hub/referral`. Those are two
-  // different attributions for two different places a reader can arrive from,
-  // and generating the whole card would have silently overwritten one with the
-  // other and quietly re-pointed six counters.
-  for (const m of [...body.matchAll(/\{\{FAMILY_PRICE:([a-z-]+)\}\}/g)]) {
-    const row = familyPriceBySlug.get(m[1]);
-    if (!row) {
-      throw new Error(
-        `[generate] unknown coverage slug "${m[1]}" in {{FAMILY_PRICE}} — check scripts/families-pricing.json`
-      );
-    }
-    body = body.replace(m[0], `$${row.priceUsd}`);
-  }
+  // I added it when the six family prices on that page were hand-typed and went
+  // stale after Peter moved the ladder down. It worked. It was also the wrong
+  // fix: the APPEALS repo already generates that page from the packs — "Prices:
+  // read from each pack's priceUsd, never hand-typed" — and its generator now
+  // writes this repository's copy directly, so the literals arrive correct and
+  // cannot drift.
+  //
+  // DELETED RATHER THAN LEFT SWITCHED OFF. A handler no content file uses is
+  // dead code with a confident comment attached, which is a shape that bit me
+  // twice today already. The guard that matters survives in verify.mjs: every
+  // price on that page must be one the export knows, whether it got there as a
+  // literal or any other way.
 
   for (const m of [...body.matchAll(/\{\{PRICING:([a-z_:]+)\}\}/g)]) {
     body = body.replace(m[0], pricingHtml(m[1]));

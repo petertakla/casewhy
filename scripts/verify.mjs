@@ -1533,23 +1533,76 @@ console.log("\n== Every shipped page is in the sitemap ==");
     const p = pricingJson.portfolio;
     check("pricing.json carries portfolio bands", Boolean(p && p.bands && p.bands.length >= 3));
     if (p && p.bands) {
-      const missing = [];
-      for (const b of p.bands) {
-        for (const seg of ["snf", "home_health", "hospice"]) {
-          const figure = `$${b.perSiteUsd[seg]}`;
-          if (!page.includes(figure)) missing.push(`${b.id}/${seg} ${figure}`);
-        }
-      }
+      // THE LICENCE IS A ONE-LINE CEILING NOW, NOT A PUBLISHED TABLE, so this
+      // check changed shape on 6 Nov 2026. Peter: *"I thought the $499 is
+      // gone"*, then — given that removing it would raise the price for the
+      // heaviest users — he chose to keep the cap and shrink it to a sentence.
+      //
+      // IT WAS NOT SIMPLY LOOSENED. Three things are asserted:
+      //   * the figures the sentence DOES publish are there, and come from the
+      //     data rather than from prose
+      //   * the ones deliberately withdrawn are ABSENT, so re-adding the table
+      //     trips this check and says to restore the stronger form. A weakened
+      //     guard that cannot notice its own repair stays weak for ever.
+      //   * the discount percentages are gone with it, which is a real
+      //     reduction in published terms and is recorded as a choice
+      const list = p.bands[0].perSiteUsd;
+      const deepest = p.bands[p.bands.length - 1].perSiteUsd;
+      // SCOPED TO THE SENTENCE, NOT THE PAGE — and that distinction is the
+      // whole check. The first version asked whether the page contained $499,
+      // which it does anyway in the single-location plan cards further down, so
+      // deleting the figure from the ceiling sentence left this GREEN. Found by
+      // mutation immediately after writing it.
+      //
+      // The paragraph is located by its own heading, so if the heading is
+      // renamed this fails rather than quietly measuring the whole document.
+      const capBlock = (() => {
+        const h = page.indexOf("The most you could ever pay");
+        if (h < 0) return null;
+        const end = page.indexOf("</p>", h);
+        return end < 0 ? null : page.slice(h, end);
+      })();
       check(
-        `every portfolio band figure appears on the page${missing.length ? ` — missing ${missing.slice(0, 4).join(", ")}` : ""}`,
-        missing.length === 0
+        "the ceiling paragraph can be found to check",
+        capBlock !== null,
+        "its heading changed: re-point this check or it measures nothing",
       );
-      // AND THE DISCOUNTS, because a table with the right prices under the
-      // wrong percentages is still wrong, and reads as deliberate.
-      const pcts = p.bands.filter((b) => b.discountPercent > 0).map((b) => `${b.discountPercent}%`);
+      const published = [list.snf, list.home_health, list.hospice, deepest.snf];
+      const missing = capBlock
+        ? published.filter((n) => !capBlock.includes(`$${n}`)).map((n) => `$${n}`)
+        : published.map((n) => `$${n}`);
       check(
-        `every discount percentage appears too (${pcts.join(", ")})`,
-        pcts.every((x) => page.includes(x))
+        `the ceiling sentence itself carries the figures it claims${missing.length ? ` — missing ${missing.join(", ")}` : ""}`,
+        missing.length === 0,
+        "a reader cannot know the bound if the bound is not in the sentence that promises it",
+      );
+
+      const withdrawn = p.bands
+        .flatMap((b) => ["snf", "home_health", "hospice"].map((seg) => b.perSiteUsd[seg]))
+        .filter((n) => !published.includes(n));
+      const reappeared = [...new Set(withdrawn.filter((n) => page.includes(`$${n}`)))];
+      check(
+        `the withdrawn per-site ceilings stay off the page${reappeared.length ? ` — $${reappeared.join(", $")} are back` : ""}`,
+        reappeared.length === 0,
+        "the licence table is back: either restore the every-figure check above it, or take the table out again",
+      );
+
+      // READER-VISIBLE TEXT ONLY, and this was a false positive before it was a
+      // check. Searching the raw HTML found "15%" inside a CSS gradient
+      // position (`radial-gradient(... at 15% -10% ...)`) and reported the
+      // withdrawn Group discount as still published. A percentage is a common
+      // CSS unit, so style and script blocks have to go before asking whether a
+      // percentage is a CLAIM.
+      const visible = page
+        .replace(/<style[\s\S]*?<\/style>/g, " ")
+        .replace(/<script[\s\S]*?<\/script>/g, " ")
+        .replace(/<[^>]+>/g, " ");
+      const pcts = p.bands.filter((b) => b.discountPercent > 0).map((b) => `${b.discountPercent}%`);
+      const pctsOnPage = pcts.filter((x) => visible.includes(x));
+      check(
+        `the discount percentages are no longer published${pctsOnPage.length ? ` — ${pctsOnPage.join(", ")} present` : ""}`,
+        pctsOnPage.length === 0,
+        "they were withdrawn with the table on 6 Nov; if they are published again they must be generated and checked",
       );
     }
     // The non-profit rule has to be ON the page, not only in the data: it is

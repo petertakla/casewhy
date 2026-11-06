@@ -1334,56 +1334,46 @@ function portfolioPricingHtml() {
       `or annually, with locations added mid-term pro rata.</p>\n`
     : "";
 
-  // THE CEILING IS A GUARANTEE, NOT A SECOND PRICE LIST. Peter, 6 Nov 2026,
-  // quoting the whole block back: *"stale"*.
+  // ONE SENTENCE, NOT A TABLE. Peter, 6 Nov 2026: *"I thought the $499 is
+  // gone"* — then, given the measured cost of actually removing it, he chose
+  // to keep the cap and shrink it to a line.
   //
-  // Every figure in it was current. What was dated was the SHAPE: a "Discount"
-  // column off a list price, with Group / Enterprise / Strategic as row
-  // headlines, is the old per-site model's furniture. Printed next to the
-  // per-case ladder it reads as two live pricing systems and invites a reader
-  // to work out which one they are on — when the answer is always "per case,
-  // and this is only the most it can ever be".
+  // WHY NOT REMOVE IT. The ceiling is not decoration: without it a 60-case
+  // building pays $1,040 instead of $499 and a busy 40-site chain $17,500
+  // instead of $14,960. Deleting it would have been a price RISE on the
+  // heaviest users — the ones most worth having, and the ones who ask what
+  // their worst month costs. Keeping it costs us almost nothing because it
+  // binds above about 28 cases a building, which under 2% reach.
   //
-  // So the discount column goes, the tier names move to a parenthetical, and
-  // the table is titled as what it is. NO NUMBER CHANGED. The percentages are
-  // still what produced these ceilings and are still in pricing.json; they just
-  // stopped being the headline on a page where nobody buys a licence.
-  const capHeading = p.licenceIsACap
-    ? `<h3>The most you could ever pay</h3>\n<p>If a building is busy enough that per-case would come ` +
-      `to more than an unlimited licence for it, you pay the licence instead. Under 2% of facilities ` +
-      `run the volume to reach that, so for almost everybody these are a guarantee rather than a bill.</p>\n`
-    : "";
+  // WHY NOT THE TABLE. Four rows of licence prices with a discount ladder read
+  // as the old per-site model surviving next to the new one, which is exactly
+  // what Peter saw. A guarantee needs one sentence; a price list needs a table,
+  // and this is no longer a price list.
+  //
+  // WHAT IS NO LONGER PUBLISHED, stated because it is a real reduction: nine of
+  // the twelve per-site ceilings and all three discount percentages. The
+  // sentence carries the list ceiling for each care setting and the deepest
+  // portfolio ceiling, which is what a reader needs to know the bound. Exact
+  // portfolio ceilings belong in a contract, and the calculator still computes
+  // the right figure for any footprint.
+  //
+  // GENERATED FROM THE BANDS, so it cannot drift from the data the calculator
+  // uses — the whole reason this page reads pricing.json.
+  const capHeading = (() => {
+    if (!p.licenceIsACap || !p.bands?.length) return "";
+    const list = p.bands[0].perSiteUsd;
+    const deepest = p.bands[p.bands.length - 1].perSiteUsd;
+    return (
+      `<h3>The most you could ever pay</h3>\n` +
+      `<p>If a building is busy enough that per-case would come to more than an unlimited licence for ` +
+      `it, you pay the licence instead &mdash; $${list.snf} a month for a skilled nursing facility, ` +
+      `$${list.home_health} for home health, $${list.hospice} for hospice, falling to $${deepest.snf} ` +
+      `a site across a large portfolio. Under 2% of facilities run the volume to reach it, so for ` +
+      `almost everybody this is a guarantee rather than a bill.</p>\n`
+    );
+  })();
 
-  return (
-    pooled +
-    capHeading +
-    `<div class="table-scroll">\n<table class="price-table">\n  <thead><tr><th>Paid locations</th><th>Skilled nursing</th>` +
-    `<th>Home health</th><th>Hospice</th></tr></thead>\n  <tbody>\n    ` +
-    p.bands.map(siteRow).join("\n    ") +
-    `\n  </tbody>\n</table>\n</div>\n` +
-    (p.licenceIsACap
-      // THE PERCENTAGES STAY PUBLISHED, IN PROSE RATHER THAN IN A COLUMN.
-      //
-      // Removing the Discount column turned a check red: *"every discount
-      // percentage appears too (15%, 25%, 35%)"*. That guard was right and I
-      // had forgotten it. A customer on a licence genuinely is getting 25% off
-      // and must be able to check the arithmetic; dropping the figures would
-      // have been a quiet withdrawal of published terms, which is a different
-      // thing from Peter's point that they should not be the headline.
-      //
-      // GENERATED FROM THE BANDS, not typed, so the sentence cannot drift from
-      // the table above it — which is the whole reason this page reads
-      // pricing.json instead of restating prices.
-      ? `<p>Per site, per month, every case included at any volume. The ceiling falls as your portfolio ` +
-        `grows &mdash; ` +
-        p.bands
-          .filter((b) => b.discountPercent > 0)
-          .map((b) => `${b.discountPercent}% off from ${b.minFacilities} locations`)
-          .join(", ") +
-        ` &mdash; on the same count of paid locations that sets your per-case rate.</p>`
-      : `<p>Per site, per month, every case included at any volume. A ${p.termMonths}-month term applies, ` +
-        `billed monthly or annually, with facilities added mid-term pro rata.</p>`)
-  );
+  return pooled + capHeading;
 }
 
 function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, currentLineId, currentSharedId, extraJsonLd, ogImage, draft, siteLink }) {

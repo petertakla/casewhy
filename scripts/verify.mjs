@@ -1386,18 +1386,57 @@ console.log("\n== Every shipped page is in the sitemap ==");
   //     linked here fails rather than being quietly absent
   {
     const familiesSrc = readFileSync(join(__dirname, "content", "appeals-families.html"), "utf8");
-    const literals = [...familiesSrc.matchAll(/class="card-price">\s*\$(\d+)/g)].map((m) => m[1]);
+    // EITHER A TOKEN OR A LITERAL THAT MATCHES THE EXPORT — and the reason is a
+    // conflict I created and then found, 6 Nov 2026.
+    //
+    // This first demanded NO price literal at all, because the six prices on
+    // this page had been hand-typed and went stale when Peter moved the family
+    // ladder down. Tokens fixed that here.
+    //
+    // BUT THE APPEALS REPO ALREADY GENERATES THIS FILE, at this exact path, with
+    // LITERAL prices read from the packs — "Prices: read from each pack's
+    // priceUsd, never hand-typed" — and its own test fails when the generated
+    // copy drifts. The intended flow is that somebody copies that file here.
+    // Under my no-literals rule, doing so would have removed the tokens and
+    // tripped this check, so the two mechanisms were fighting.
+    //
+    // THE TWO COPIES HAVE ALSO GENUINELY DIVERGED: this one carries hub-only
+    // content the generator does not know about, including a note on why the
+    // ombudsman clause is deliberately absent. Copying the generated file over
+    // would lose that, so reconciling them is a decision rather than a
+    // clean-up, and it is not made here.
+    //
+    // So the rule becomes the one that holds either way: a price on this page
+    // must be one the export knows. A token resolves to one by construction; a
+    // literal is checked against the export below. What is still forbidden is a
+    // number that is nobody's price.
+    const literals = [...familiesSrc.matchAll(/class="card-price">\s*\$(\d+)/g)].map((m) => Number(m[1]));
+    const exportedPrices = new Set(familiesPricing.coverageTypes.map((c) => c.priceUsd));
+    const unknownLiterals = [...new Set(literals.filter((n) => !exportedPrices.has(n)))];
     check(
-      "the families page types no price of its own" + (literals.length ? ` — found $${literals.join(", $")}` : ""),
-      literals.length === 0,
-      "a hand-typed family price cannot be caught by the appeals repo's price guard, which is how this drifted",
+      "every price typed on the families page is one the export knows" +
+        (unknownLiterals.length ? ` — found $${unknownLiterals.join(", $")}` : ""),
+      unknownLiterals.length === 0,
+      "a hand-typed price the export does not contain is the drift that went stale once already",
     );
 
-    const tokens = [...familiesSrc.matchAll(/\{\{FAMILY_PRICE:([a-z-]+)\}\}/g)].map((m) => m[1]);
+    // COUNTED BY THE CARD'S LINK, NOT BY THE PRICE TOKEN. It counted tokens
+    // until 6 Nov 2026, which made the check fail the moment a price was a
+    // LITERAL instead — and a literal is exactly what the appeals repo's
+    // generator emits for this page. The count would then have been wrong for
+    // the supported case while saying nothing about the cards.
+    //
+    // Every card links to its own coverage path, in both forms, so that is what
+    // identifies a card.
     const exported = familiesPricing.coverageTypes;
+    const carded = exported.filter((c) =>
+      new RegExp(`appeals\\.casewhy\\.com/${c.slug}\\b`).test(familiesSrc),
+    );
+    const uncarded = exported.filter((c) => !carded.includes(c)).map((c) => c.slug);
     check(
-      `every coverage type in the export has a card (${tokens.length} of ${exported.length})`,
-      tokens.length === exported.length,
+      `every coverage type in the export has a card (${carded.length} of ${exported.length})` +
+        (uncarded.length ? ` — missing ${uncarded.join(", ")}` : ""),
+      carded.length === exported.length,
       "a coverage type priced in the appeals repo but not listed here is an appeal families cannot find",
     );
 

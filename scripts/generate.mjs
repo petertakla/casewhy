@@ -1030,6 +1030,21 @@ function pricingCalculatorHtml() {
     termMonths: p.termMonths,
     minimumFacilities: p.minimumFacilities,
     freePeriodShort: pricing.freePeriodShort,
+    // THE POOLED LADDER, WITHOUT WHICH THE CALCULATOR QUOTED $0. Peter found
+    // it on the live page: 5 skilled nursing, 3 home health, 2 hospice at 5
+    // cases each — "You pay 10 locations, 50 cases, $0".
+    //
+    // The quote function reads `BOOK.pooledCases.bands` and falls back to an
+    // empty list, so with the ladder absent every case priced at nothing,
+    // `Math.min(pooled, license)` took the zero, and the page told a reader
+    // their portfolio was free. The right answer for that footprint is $700.
+    //
+    // THE LADDER WAS IN pricing.json THE WHOLE TIME — exported, verified, and
+    // used by the table two sections down. It was never put in the object the
+    // calculator is handed, which is why the arithmetic and the published
+    // table disagreed with each other on the same page.
+    pooledCases: p.pooledCases,
+    licenseIsACap: p.licenseIsACap,
   }).replace(/</g, "\\u003c");
 
   const field2 = (id, label, hint, value) =>

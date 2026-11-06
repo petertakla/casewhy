@@ -1350,12 +1350,43 @@ console.log("\n== Every shipped page is in the sitemap ==");
       // AND THE FIGURE MUST BE THE RIGHT ONE. "It rendered something" would
       // pass on an error message, so this pins the actual arithmetic for a
       // known footprint against pricing.json rather than against a literal.
+      // THE FIGURE MUST BE THE RIGHT ONE, AND MY FIRST VERSION OF THIS CHECK
+      // PASSED ON A WRONG ONE. 6 Nov 2026.
+      //
+      // It asserted `/\$[\d,]+/.test(html)` and `html.includes("600")` — that
+      // SOME dollar amount appeared, and that the number 600 appeared. On the
+      // live page the calculator was quoting "$0", because the pooled ladder was
+      // never put in the object it is handed. "$0" matches a dollar amount, and
+      // 600 was the pooled CASE COUNT, so both halves passed while the page told
+      // a reader their portfolio was free. Peter found it; this check did not.
+      //
+      // IT IS NOW PINNED TO THE AUTHORITATIVE ANSWER. `pooledCases.checkpoints`
+      // is computed by the real implementation in the appeals repo, so the
+      // expected total cannot be derived from the thing under test. A zero, a
+      // stale ladder, or a missing one all fail with the figure named.
       const html = String(out.innerHTML);
-      check(
-        "it produced a monthly figure for 40 SNF + 12 HH + 8 hospice at 10 cases each",
-        /\$[\d,]+/.test(html) && html.includes("600"),
-        `expected the 600-case pool to appear; got ${html.slice(0, 220) || "(nothing at all)"}`,
+      const cp = (pricingJson.portfolio.pooledCases.checkpoints ?? []).find(
+        (c) => c.cases.snf === 400 && c.cases.home_health === 120 && c.cases.hospice === 80,
       );
+      check(
+        "there is an authoritative checkpoint for the shape this stub prices",
+        Boolean(cp),
+        "without it the figure below would be compared against nothing",
+      );
+      if (cp) {
+        const want = `$${cp.monthlyUsd.toLocaleString("en-US")}`;
+        check(
+          `it produced the right monthly figure for 40 SNF + 12 HH + 8 hospice at 10 cases each (${want})`,
+          html.includes(want),
+          `expected ${want} — the figure the appeals repo computes for this pool — got ` +
+            `${html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").slice(0, 200) || "(nothing at all)"}`,
+        );
+        check(
+          "and it is not quoting zero",
+          !/\$0\b/.test(html),
+          "a $0 portfolio price is what the missing pooled ladder produced, and it read as free",
+        );
+      }
       const pooledBands = pricingJson.portfolio.pooledCases.bands;
       check(
         "and it names the per-case rate rather than only a total",

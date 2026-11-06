@@ -1,0 +1,66 @@
+{
+  "generatedFrom": "appeals src/appeal-packs/registry.ts (each pack's plus.priceUsd)",
+  "note": "GENERATED — do not edit by hand. Re-run `npm run export:families-pricing` in the appeals repository. A hand-edited price here cannot be caught by that repo's price guard.",
+  "coverageTypes": [
+    {
+      "id": "medicare_advantage",
+      "slug": "medicare-advantage",
+      "displayName": "Medicare Advantage",
+      "priceUsd": 39,
+      "priceLine": "$39 per case",
+      "href": "https://appeals.casewhy.com/medicare-advantage",
+      "campaign": "appeals-families-medicare-advantage",
+      "taggedHref": "https://appeals.casewhy.com/medicare-advantage?utm_source=hub&utm_medium=referral&utm_campaign=appeals-families-medicare-advantage"
+    },
+    {
+      "id": "medicare_part_d",
+      "slug": "medicare-part-d",
+      "displayName": "Medicare Part D",
+      "priceUsd": 29,
+      "priceLine": "$29 per case",
+      "href": "https://appeals.casewhy.com/medicare-part-d",
+      "campaign": "appeals-families-medicare-part-d",
+      "taggedHref": "https://appeals.casewhy.com/medicare-part-d?utm_source=hub&utm_medium=referral&utm_campaign=appeals-families-medicare-part-d"
+    },
+    {
+      "id": "original_medicare",
+      "slug": "original-medicare",
+      "displayName": "Original Medicare",
+      "priceUsd": 39,
+      "priceLine": "$39 per case",
+      "href": "https://appeals.casewhy.com/original-medicare",
+      "campaign": "appeals-families-original-medicare",
+      "taggedHref": "https://appeals.casewhy.com/original-medicare?utm_source=hub&utm_medium=referral&utm_campaign=appeals-families-original-medicare"
+    },
+    {
+      "id": "medicare_premiums",
+      "slug": "medicare-premiums",
+      "displayName": "Medicare premiums and Extra Help",
+      "priceUsd": 29,
+      "priceLine": "$29 per case",
+      "href": "https://appeals.casewhy.com/medicare-premiums",
+      "campaign": "appeals-families-medicare-premiums",
+      "taggedHref": "https://appeals.casewhy.com/medicare-premiums?utm_source=hub&utm_medium=referral&utm_campaign=appeals-families-medicare-premiums"
+    },
+    {
+      "id": "medicare_enrollment",
+      "slug": "medicare-enrollment",
+      "displayName": "Medicare enrollment and entitlement",
+      "priceUsd": 29,
+      "priceLine": "$29 per case",
+      "href": "https://appeals.casewhy.com/medicare-enrollment",
+      "campaign": "appeals-families-medicare-enrollment",
+      "taggedHref": "https://appeals.casewhy.com/medicare-enrollment?utm_source=hub&utm_medium=referral&utm_campaign=appeals-families-medicare-enrollment"
+    },
+    {
+      "id": "pace",
+      "slug": "pace",
+      "displayName": "PACE (Program of All-Inclusive Care for the Elderly)",
+      "priceUsd": 29,
+      "priceLine": "$29 per case",
+      "href": "https://appeals.casewhy.com/pace",
+      "campaign": "appeals-families-pace",
+      "taggedHref": "https://appeals.casewhy.com/pace?utm_source=hub&utm_medium=referral&utm_campaign=appeals-families-pace"
+    }
+  ]
+}

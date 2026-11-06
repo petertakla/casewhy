@@ -754,6 +754,22 @@ ${facilityPrivacySentences.map(([lead, rest]) => `    <li><strong>${lead}</stron
 // isn't in the JSON.
 const pricing = JSON.parse(readFileSync(join(__dirname, "pricing.json"), "utf8"));
 
+// THE FAMILY PRICES, GENERATED IN THE APPEALS REPO LIKE EVERY OTHER PRICE HERE.
+//
+// Peter, 6 Nov 2026: *"famil pricing not updated on the hub"*. The families
+// page carried SIX HAND-TYPED PRICES, so when the appeals packs moved on 5 Nov
+// ($49 -> $39, $39 -> $29) this page kept publishing the old ones.
+//
+// The export existed the whole time. `export-families-pricing.ts` has been
+// writing a file since 14 October with a header reading "GENERATED — do not
+// edit by hand", and its own comment records why it stopped there: the decision
+// about which repository it landed in was somebody else's and the hub was
+// inside a freeze that day. Nobody ever made the decision, so a generator
+// produced an artefact no page read while the page typed its own numbers. A
+// producer with no consumer reads as finished.
+const familiesPricing = JSON.parse(readFileSync(join(__dirname, "families-pricing.json"), "utf8"));
+const familyPriceBySlug = new Map(familiesPricing.coverageTypes.map((c) => [c.slug, c]));
+
 const LANE_LABELS = {
   advocate: { unit: "per seat", noun: "advocate, care-manager and attorney seats" },
   "facility:snf": { unit: "per site", noun: "skilled nursing facilities" },
@@ -1372,6 +1388,25 @@ function portfolioPricingHtml() {
 
 function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, currentLineId, currentSharedId, extraJsonLd, ogImage, draft, siteLink }) {
   let body = bodyOverride !== undefined ? bodyOverride : readFileSync(join(__dirname, "content", `${contentId}.html`), "utf8");
+  // {{FAMILY_PRICE:<slug>}} — ONE FIGURE, NOT A WHOLE CARD.
+  //
+  // Only the price is substituted. Each card's heading, its plain-language line
+  // and its link stay in the content file, because those are copy rather than
+  // data — and the links in particular carry `utm_source=owned&utm_medium=social`
+  // while the export's own `taggedHref` carries `hub/referral`. Those are two
+  // different attributions for two different places a reader can arrive from,
+  // and generating the whole card would have silently overwritten one with the
+  // other and quietly re-pointed six counters.
+  for (const m of [...body.matchAll(/\{\{FAMILY_PRICE:([a-z-]+)\}\}/g)]) {
+    const row = familyPriceBySlug.get(m[1]);
+    if (!row) {
+      throw new Error(
+        `[generate] unknown coverage slug "${m[1]}" in {{FAMILY_PRICE}} — check scripts/families-pricing.json`
+      );
+    }
+    body = body.replace(m[0], `$${row.priceUsd}`);
+  }
+
   for (const m of [...body.matchAll(/\{\{PRICING:([a-z_:]+)\}\}/g)]) {
     body = body.replace(m[0], pricingHtml(m[1]));
   }

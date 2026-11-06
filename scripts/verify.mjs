@@ -321,6 +321,7 @@ check("the footer reaches the Desk from every page", (read("/appeals") ?? "").in
 // copy return; it cannot see this repo, which is exactly why the promise
 // survived here. This is that guard's other half.
 const pricingJson = JSON.parse(readFileSync(join(__dirname, "pricing.json"), "utf8"));
+const familiesPricing = JSON.parse(readFileSync(join(__dirname, "families-pricing.json"), "utf8"));
 // /appeals/counselors and /appeals/ombudsman were MISSING from this list, and
 // they are the two pages Peter named on 12 Oct when he found them still
 // promising "free, forever" and "Unlimited cases". The sweep that was meant
@@ -1360,6 +1361,65 @@ console.log("\n== Every shipped page is in the sitemap ==");
         "and it names the per-case rate rather than only a total",
         html.includes(`$${pooledBands[0].perCaseUsd.snf}`) || /a case/.test(html),
         "the blended per-case rate is the number a reader checks against what they pay today",
+      );
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // THE SIX FAMILY PRICES COME FROM THE EXPORT, NOT FROM THE PAGE.
+  //
+  // Peter, 6 Nov 2026: *"famil pricing not updated on the hub"*. The families
+  // page had six HAND-TYPED prices, so when the appeals packs moved on 5 Nov
+  // ($49 -> $39, $39 -> $29) this page went on publishing the old ones to
+  // families deciding whether to pay.
+  //
+  // The export had existed since 14 October, writing a file headed "GENERATED —
+  // do not edit by hand" that no page ever read: the decision about which
+  // repository it landed in was left open and never made. A producer with no
+  // consumer reads as finished, which is why nothing complained for three weeks.
+  //
+  // WHAT THIS ASSERTS, in both directions:
+  //   * the content file contains no price literal at all — the next person to
+  //     "just update the number" is stopped, which is the failure that happened
+  //   * every price in the export appears on the rendered page
+  //   * the count matches, so a coverage type added in the appeals repo and not
+  //     linked here fails rather than being quietly absent
+  {
+    const familiesSrc = readFileSync(join(__dirname, "content", "appeals-families.html"), "utf8");
+    const literals = [...familiesSrc.matchAll(/class="card-price">\s*\$(\d+)/g)].map((m) => m[1]);
+    check(
+      "the families page types no price of its own" + (literals.length ? ` — found $${literals.join(", $")}` : ""),
+      literals.length === 0,
+      "a hand-typed family price cannot be caught by the appeals repo's price guard, which is how this drifted",
+    );
+
+    const tokens = [...familiesSrc.matchAll(/\{\{FAMILY_PRICE:([a-z-]+)\}\}/g)].map((m) => m[1]);
+    const exported = familiesPricing.coverageTypes;
+    check(
+      `every coverage type in the export has a card (${tokens.length} of ${exported.length})`,
+      tokens.length === exported.length,
+      "a coverage type priced in the appeals repo but not listed here is an appeal families cannot find",
+    );
+
+    const familiesPage = read("/appeals/families");
+    check("the families page exists to check", familiesPage !== null);
+    if (familiesPage) {
+      const missing = exported
+        .filter((c) => !familiesPage.includes(`$${c.priceUsd}`))
+        .map((c) => `${c.slug} $${c.priceUsd}`);
+      check(
+        "every exported family price is on the page" + (missing.length ? ` — missing ${missing.join(", ")}` : ""),
+        missing.length === 0,
+      );
+      // AND NO PRICE THAT IS NOT OURS. A leftover figure from a previous
+      // ladder is the shape of staleness a reader notices and we do not: the
+      // page still renders, and the number is simply wrong.
+      const ours = new Set(exported.map((c) => c.priceUsd));
+      const cardPrices = [...familiesPage.matchAll(/class="card-price">\s*\$(\d+)/g)].map((m) => Number(m[1]));
+      const stray = [...new Set(cardPrices.filter((n) => !ours.has(n)))];
+      check(
+        "no card shows a price that is not in the export" + (stray.length ? ` — $${stray.join(", $")}` : ""),
+        stray.length === 0,
       );
     }
   }

@@ -775,7 +775,7 @@
         " a month, which is " + money(Math.round((total / q.pooledCases) * 100) / 100) + " a case.";
     } else {
       lead = money(total) + " a month for " + q.pooledCases + " cases, which is " +
-        money(Math.round(q.perCase * 100) / 100) + " a case " — and never more than " +
+        money(Math.round(q.perCase * 100) / 100) + " a case \u2014 and never more than " +
         money(q.licence) + ".";
     }
     out.innerHTML = table(rows, totalRow) +
@@ -804,21 +804,21 @@
 </table>
 </div>
 <p>Per case, pooled across every location you enrol. Each band prices only the cases inside it, so your bill never jumps — and bringing home health or hospice in alongside skilled nursing deepens the rate on all of them. Portfolio pricing starts at 2 paid locations. A 12-month term applies, billed monthly or annually, with locations added mid-term pro rata.</p>
-<h3>And never more than the site licence</h3>
-<p>If a location is busy enough that paying per case would cost more than an unlimited licence, you pay the licence instead. These are the ceilings, not the price.</p>
+<h3>The most you could ever pay</h3>
+<p>If a building is busy enough that per-case would come to more than an unlimited licence for it, you pay the licence instead. Under 2% of facilities run the volume to reach that, so for almost everybody these are a guarantee rather than a bill.</p>
 <div class="table-scroll">
 <table class="price-table">
-  <thead><tr><th>Paid facilities</th><th>Discount</th><th>Skilled nursing</th><th>Home health</th><th>Hospice</th></tr></thead>
+  <thead><tr><th>Paid locations</th><th>Skilled nursing</th><th>Home health</th><th>Hospice</th></tr></thead>
   <tbody>
-    <tr><td>1</td><td>&mdash;</td><td>$499</td><td>$299</td><td>$199</td></tr>
-    <tr><td>2–19 — Group</td><td>15%</td><td>$424</td><td>$254</td><td>$169</td></tr>
-    <tr><td>20–99 — Enterprise</td><td>25%</td><td>$374</td><td>$224</td><td>$149</td></tr>
-    <tr><td>100+ — Strategic Enterprise</td><td>35%</td><td>$324</td><td>$194</td><td>$129</td></tr>
+    <tr><td>1</td><td>$499</td><td>$299</td><td>$199</td></tr>
+    <tr><td>2–19 — Group</td><td>$424</td><td>$254</td><td>$169</td></tr>
+    <tr><td>20–99 — Enterprise</td><td>$374</td><td>$224</td><td>$149</td></tr>
+    <tr><td>100+ — Strategic Enterprise</td><td>$324</td><td>$194</td><td>$129</td></tr>
   </tbody>
 </table>
 </div>
-<p>Per site, per month, every case included at any volume.</p>
-  <p class="caption">The rate is earned by the whole portfolio, whichever care settings its locations are &mdash; and the licence ceiling applies to every facility in it on the same terms.</p>
+<p>Per site, per month, every case included at any volume. The ceiling falls as your portfolio grows &mdash; 15% off from 2 locations, 25% off from 20 locations, 35% off from 100 locations &mdash; on the same count of paid locations that sets your per-case rate.</p>
+  <p class="caption">One rate for the whole portfolio, whichever care settings its locations are.</p>
 
   <h2>What every case includes</h2>
   <ul>
@@ -844,7 +844,7 @@
     <div class="tier">
       <h3>Standard</h3>
       <p class="price">$499 / month per site</p>
-      <p>Every case included, whatever the volume.</p>
+      <p>Every case included, whatever the volume — a ceiling for a very busy building, not the usual choice.</p>
     </div>
   </div>
   <p class="trial-note"><strong>Your first 30 days are free, on your own cases.</strong> The 30 days start the first time you generate a letter, not when you open the account — so an account opened today and first used in six months still gets its full 30 days. After that, new skilled nursing facilities stay on Volume — there is no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>

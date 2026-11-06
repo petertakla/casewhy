@@ -1246,6 +1246,124 @@ console.log("\n== Every shipped page is in the sitemap ==");
     }
   }
 
+  // -------------------------------------------------------------------------
+  // THE CALCULATOR MUST ACTUALLY RUN AND PRODUCE A FIGURE.
+  //
+  // THIS EXISTS BECAUSE IT SHIPPED DEAD. On 5 Nov 2026 the per-case rewrite put
+  // an em dash OUTSIDE a JavaScript string instead of escaping it inside, so
+  // the whole inline script failed to parse and the calculator did nothing on
+  // the live page. Peter found it: *"on th hub ... the calc is doing nothing"*.
+  //
+  // EVERY EXISTING CHECK PASSED — twenty-four of them — because the quote-rule
+  // test EXTRACTS the pure function between the fence comments and runs that
+  // alone. The function was fine. The surrounding script, the render path and
+  // the DOM wiring were never executed by anything, so "the arithmetic is
+  // right" was being read as "the page works".
+  //
+  // So this evaluates the WHOLE script against a minimal DOM stub and asserts a
+  // figure comes out. It is the cheapest possible stand-in for opening the page,
+  // and it would have caught a bare syntax error, a missing element id, a
+  // renamed input, and a throw inside render().
+  //
+  // THE STUB IS DELIBERATELY DUMB. It implements only what the script touches,
+  // so if the script starts needing more of the DOM this check fails and says
+  // so rather than silently covering less than it claims.
+  {
+    const built = read("/appeals/enterprise/pricing");
+    const scripts = built
+      ? [...built.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)]
+          .filter((m) => !/src=|json/i.test(m[1]))
+          .map((m) => m[2])
+      : [];
+    const calcScript = scripts.find((b) => b.includes("calc-form"));
+    check(
+      "the pricing page carries a calculator script to run",
+      Boolean(calcScript),
+      "no inline script mentions calc-form — the calculator markup or its script is gone",
+    );
+
+    if (calcScript) {
+      // THE STUB'S IDS COME FROM THE PAGE, NOT FROM THIS FILE — and the first
+      // version got that wrong. It handed the script a hardcoded list of ids,
+      // so renaming an input in the markup left the stub still answering to the
+      // old name and the check passed. Found by mutation the same hour: a
+      // renamed `calc-cases` input was invisible, which on the live page means
+      // the field reads zero for ever and the figure silently stops responding.
+      //
+      // Now the ids are parsed out of the rendered form. If the script asks for
+      // something the page does not contain, `missing` catches it; if the page
+      // grows an input the script ignores, the figure below still has to come
+      // out right.
+      const formIds = [...(built.match(/<input[^>]*\bid="(calc-[a-z-]+)"/g) ?? [])]
+        .map((tag) => (tag.match(/id="(calc-[a-z-]+)"/) ?? [])[1])
+        .filter(Boolean);
+      check(
+        `the calculator form has its inputs in the markup (found ${formIds.length})`,
+        formIds.length >= 4,
+        "with no inputs parsed, the stub below would prove nothing about the real page",
+      );
+      // A plausible footprint: a mid-size mixed portfolio at the measured
+      // median volume. Per-setting counts are matched by name so this does not
+      // depend on the order the fields happen to be rendered in.
+      const valueFor = (id) =>
+        /snf/.test(id) ? "40" : /hha|home/.test(id) ? "12" : /hospice/.test(id) ? "8"
+        : /nonprofit/.test(id) ? "0" : /cases/.test(id) ? "10" : "0";
+      const elements = {};
+      for (const id of formIds) elements[id] = { value: valueFor(id) };
+      const out = { innerHTML: "" };
+      let listeners = 0;
+      const missing = [];
+      const documentStub = {
+        getElementById(id) {
+          if (id === "calc-out") return out;
+          if (id === "calc-form") return { addEventListener: () => { listeners++; } };
+          if (elements[id]) return elements[id];
+          missing.push(id);
+          return null;
+        },
+      };
+
+      let threw = null;
+      try {
+        // eslint-disable-next-line no-new-func
+        new Function("document", calcScript)(documentStub);
+      } catch (err) {
+        threw = err && err.message ? err.message : String(err);
+      }
+      check(
+        "the calculator script runs without throwing" + (threw ? ` — ${threw}` : ""),
+        threw === null,
+        "a syntax error or a throw here means the live calculator does nothing at all",
+      );
+      check(
+        "it wired itself to the form",
+        listeners > 0,
+        "nothing listened for input, so typing a footprint would change nothing",
+      );
+      check(
+        "it asked for no element the page does not have" + (missing.length ? ` — ${[...new Set(missing)].join(", ")}` : ""),
+        missing.length === 0,
+        "a renamed or removed input id leaves the calculator reading zero for ever",
+      );
+
+      // AND THE FIGURE MUST BE THE RIGHT ONE. "It rendered something" would
+      // pass on an error message, so this pins the actual arithmetic for a
+      // known footprint against pricing.json rather than against a literal.
+      const html = String(out.innerHTML);
+      check(
+        "it produced a monthly figure for 40 SNF + 12 HH + 8 hospice at 10 cases each",
+        /\$[\d,]+/.test(html) && html.includes("600"),
+        `expected the 600-case pool to appear; got ${html.slice(0, 220) || "(nothing at all)"}`,
+      );
+      const pooledBands = pricingJson.portfolio.pooledCases.bands;
+      check(
+        "and it names the per-case rate rather than only a total",
+        html.includes(`$${pooledBands[0].perCaseUsd.snf}`) || /a case/.test(html),
+        "the blended per-case rate is the number a reader checks against what they pay today",
+      );
+    }
+  }
+
   const overview = read("/appeals/enterprise");
   check("the enterprise overview exists to check", overview !== null);
   if (overview) {

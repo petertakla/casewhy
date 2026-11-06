@@ -786,7 +786,21 @@ function planCard(plan, unit) {
       // number would say "0 cases included each month, then $0 a case."
       // Appeals' own pricing.ts gained `unlimited` on 28 Oct 2026 when Peter
       // removed the SNF cap, and it travels through pricing.json to here.
-      ? "Every case included, whatever the volume."
+      // WHAT AN UNLIMITED PLAN IS NOW, AND IT IS NOT A HEADLINE. Peter, 6 Nov
+      // 2026, pointing at the SNF card: *"also this is dated: Standard / $499 /
+      // month per site / Every case included, whatever the volume."*
+      //
+      // The sentence was true and had stopped being the useful thing to say.
+      // Since the per-case change this plan is a CEILING, not an offer: a
+      // single building only reaches it above about 28 cases a month, which
+      // under 2% of real buildings could ever do, and a portfolio pays per
+      // pooled case and is merely capped here. Presented as a plan on equal
+      // footing with the others it invited the arithmetic that was losing us
+      // the reader — $499 against ten cases is $50 a case.
+      //
+      // So it says what it is FOR. The figure is unchanged; what changed is
+      // that the card no longer implies anybody should pick it first.
+      ? "Every case included, whatever the volume — a ceiling for a very busy building, not the usual choice."
       // THE FIRST PAID BAND, NOT THE LAST — and this understated the price
       // until 5 Nov 2026.
       //
@@ -1246,7 +1260,7 @@ function pricingCalculatorHtml() {
     '        " a month, which is " + money(Math.round((total / q.pooledCases) * 100) / 100) + " a case.";',
     '    } else {',
     '      lead = money(total) + " a month for " + q.pooledCases + " cases, which is " +',
-    '        money(Math.round(q.perCase * 100) / 100) + " a case " — and never more than " +',
+    '        money(Math.round(q.perCase * 100) / 100) + " a case \\u2014 and never more than " +',
     '        money(q.licence) + ".";',
     '    }',
     '    out.innerHTML = table(rows, totalRow) +',
@@ -1285,8 +1299,11 @@ function portfolioPricingHtml() {
   const caseRow = (b) =>
     `<tr><td>${b.label}</td><td>$${b.perCaseUsd.snf}</td>` +
     `<td>$${b.perCaseUsd.home_health}</td><td>$${b.perCaseUsd.hospice}</td></tr>`;
+  // THE DISCOUNT COLUMN IS GONE — see `capHeading` for why. The band NAME rides
+  // along in the size cell because a customer in a contract will see it on their
+  // paperwork, but it is no longer a row heading competing with the real price.
   const siteRow = (b) =>
-    `<tr><td>${b.label}</td><td>${b.discountPercent ? `${b.discountPercent}%` : "&mdash;"}</td>` +
+    `<tr><td>${b.label}</td>` +
     `<td>$${b.perSiteUsd.snf}</td><td>$${b.perSiteUsd.home_health}</td><td>$${b.perSiteUsd.hospice}</td></tr>`;
 
   const pooled = p.pricedPerCase && p.pooledCases && Array.isArray(p.pooledCases.bands)
@@ -1301,21 +1318,53 @@ function portfolioPricingHtml() {
       `or annually, with locations added mid-term pro rata.</p>\n`
     : "";
 
+  // THE CEILING IS A GUARANTEE, NOT A SECOND PRICE LIST. Peter, 6 Nov 2026,
+  // quoting the whole block back: *"stale"*.
+  //
+  // Every figure in it was current. What was dated was the SHAPE: a "Discount"
+  // column off a list price, with Group / Enterprise / Strategic as row
+  // headlines, is the old per-site model's furniture. Printed next to the
+  // per-case ladder it reads as two live pricing systems and invites a reader
+  // to work out which one they are on — when the answer is always "per case,
+  // and this is only the most it can ever be".
+  //
+  // So the discount column goes, the tier names move to a parenthetical, and
+  // the table is titled as what it is. NO NUMBER CHANGED. The percentages are
+  // still what produced these ceilings and are still in pricing.json; they just
+  // stopped being the headline on a page where nobody buys a licence.
   const capHeading = p.licenceIsACap
-    ? `<h3>And never more than the site licence</h3>\n<p>If a location is busy enough that paying ` +
-      `per case would cost more than an unlimited licence, you pay the licence instead. These are ` +
-      `the ceilings, not the price.</p>\n`
+    ? `<h3>The most you could ever pay</h3>\n<p>If a building is busy enough that per-case would come ` +
+      `to more than an unlimited licence for it, you pay the licence instead. Under 2% of facilities ` +
+      `run the volume to reach that, so for almost everybody these are a guarantee rather than a bill.</p>\n`
     : "";
 
   return (
     pooled +
     capHeading +
-    `<div class="table-scroll">\n<table class="price-table">\n  <thead><tr><th>Paid facilities</th><th>Discount</th><th>Skilled nursing</th>` +
+    `<div class="table-scroll">\n<table class="price-table">\n  <thead><tr><th>Paid locations</th><th>Skilled nursing</th>` +
     `<th>Home health</th><th>Hospice</th></tr></thead>\n  <tbody>\n    ` +
     p.bands.map(siteRow).join("\n    ") +
     `\n  </tbody>\n</table>\n</div>\n` +
     (p.licenceIsACap
-      ? `<p>Per site, per month, every case included at any volume.</p>`
+      // THE PERCENTAGES STAY PUBLISHED, IN PROSE RATHER THAN IN A COLUMN.
+      //
+      // Removing the Discount column turned a check red: *"every discount
+      // percentage appears too (15%, 25%, 35%)"*. That guard was right and I
+      // had forgotten it. A customer on a licence genuinely is getting 25% off
+      // and must be able to check the arithmetic; dropping the figures would
+      // have been a quiet withdrawal of published terms, which is a different
+      // thing from Peter's point that they should not be the headline.
+      //
+      // GENERATED FROM THE BANDS, not typed, so the sentence cannot drift from
+      // the table above it — which is the whole reason this page reads
+      // pricing.json instead of restating prices.
+      ? `<p>Per site, per month, every case included at any volume. The ceiling falls as your portfolio ` +
+        `grows &mdash; ` +
+        p.bands
+          .filter((b) => b.discountPercent > 0)
+          .map((b) => `${b.discountPercent}% off from ${b.minFacilities} locations`)
+          .join(", ") +
+        ` &mdash; on the same count of paid locations that sets your per-case rate.</p>`
       : `<p>Per site, per month, every case included at any volume. A ${p.termMonths}-month term applies, ` +
         `billed monthly or annually, with facilities added mid-term pro rata.</p>`)
   );

@@ -17,8 +17,15 @@
       <p>For independent advocates, care managers, and attorneys in private practice. Pay per case with no monthly fee, or take a monthly plan once your volume makes it cheaper &mdash; <a href="https://casewhyhub.com/appeals/advocates">see the seat pricing</a>.</p>
     </div>
     <div class="tier">
-      <h3>Per-site license</h3>
-      <p class="price">{{FREE_PERIOD_SHORT}}, then $19&ndash;25/case to start, by facility type</p>
-      <p>For home health agencies, hospices, and independent skilled nursing facilities &mdash; one license per site, unlimited staff, priced by facility type. <a href="https://casewhyhub.com/appeals/facilities">See facility pricing</a>.</p>
+      <!-- NOT "Per-site license" SINCE 6 NOV 2026, and the range was the part
+           most likely to go stale unnoticed: "$19-25/case to start" is a
+           hand-typed summary of three lanes' entry rates, which is exactly the
+           shape this project exports pricing.json to avoid. It still happens to
+           be right — hospice and home health open at $19, skilled nursing at
+           $25 — and it is kept as prose only because this card is a signpost
+           rather than a price list, with the real figures one click away. -->
+      <h3>Per facility</h3>
+      <p class="price">{{FREE_PERIOD_SHORT}}, then from $19&ndash;25 a case by facility type</p>
+      <p>For home health agencies, hospices, and independent skilled nursing facilities &mdash; one account per site, unlimited staff, and the rate steps down as the caseload grows. Running several buildings? Cases pool across them. <a href="https://casewhyhub.com/appeals/facilities">See facility pricing</a>.</p>
     </div>
   </div>

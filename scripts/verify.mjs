@@ -1520,6 +1520,70 @@ console.log("\n== Every shipped page is in the sitemap ==");
     );
   }
 
+  // -------------------------------------------------------------------------
+  // EVERY LETTER LINK RESOLVES IN BOTH CLICK-CODE FORMS.
+  //
+  // THIS WAS A LIVE 404 WAITING FOR A RE-RENDER, caught 6 Nov 2026 nine hours
+  // before a send. Peter: *"re-render tomorrow's letters so they carry the
+  // sentence"*. The frozen letters carry `?rc=<code>`; a fresh render carries
+  // `/c/<code>`, because the code moved into the path when a mail gateway was
+  // found stripping query parameters.
+  //
+  // The appeals app handles both — its middleware reads either. THE HUB DID
+  // NOT. Measured against production:
+  //
+  //     /snf/2026-11-06-w1                       307
+  //     /snf/2026-11-06-w1?rc=CODE               307
+  //     /snf/2026-11-06-w1/c/CODE                404   <- both calls to action
+  //     /demo/2026-11-06-w1/c/CODE               404
+  //
+  // So re-rendering would have put dead links in the two main calls to action
+  // of forty letters, and the re-render tool could not have known: it renders
+  // correct bytes pointing at a host that is a different repository.
+  //
+  // ORDER MATTERS AND IS ASSERTED. The path form must come BEFORE the shorter
+  // pattern, or `/snf/:campaign` matches first and swallows `/c/<code>` as part
+  // of a campaign name.
+  {
+    const redirects = JSON.parse(readFileSync(join(ROOT, "vercel.json"), "utf8")).redirects ?? [];
+    const campaignForms = redirects.filter((r) => /^\/(snf|demo)\/:campaign$/.test(r.source));
+    check(
+      `the letter-link redirects are present (${campaignForms.length})`,
+      campaignForms.length >= 2,
+      "without them the letters' short links do not resolve at all",
+    );
+    const missing = [];
+    const misordered = [];
+    for (const base of campaignForms) {
+      const want = `${base.source}/c/:code`;
+      const pathAt = redirects.findIndex((r) => r.source === want);
+      const baseAt = redirects.findIndex((r) => r.source === base.source);
+      if (pathAt === -1) missing.push(want);
+      else if (pathAt > baseAt) misordered.push(`${want} must come before ${base.source}`);
+    }
+    check(
+      `every letter link also resolves with the code in the path${missing.length ? ` — missing ${missing.join(", ")}` : ""}`,
+      missing.length === 0,
+      "a re-rendered letter carries /c/<code>; without this rule its call to action 404s",
+    );
+    check(
+      `the path form is matched before the bare campaign form${misordered.length ? ` — ${misordered.join("; ")}` : ""}`,
+      misordered.length === 0,
+      "otherwise :campaign swallows the code and the reader lands on a page for a campaign that does not exist",
+    );
+    // AND THE CODE MUST SURVIVE THE HOP, or the link works and the click is
+    // anonymous — which is worse than a 404 because nothing reports it.
+    const codeless = redirects
+      .filter((r) => r.source.endsWith("/c/:code"))
+      .filter((r) => !r.destination.includes(":code"))
+      .map((r) => r.source);
+    check(
+      `each path-form redirect carries the code to its destination${codeless.length ? ` — ${codeless.join(", ")} drops it` : ""}`,
+      codeless.length === 0,
+      "a redirect that drops the code resolves fine and attributes nobody",
+    );
+  }
+
   const overview = read("/appeals/enterprise");
   check("the enterprise overview exists to check", overview !== null);
   if (overview) {

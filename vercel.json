@@ -26,6 +26,16 @@
       "permanent": true
     },
     {
+      "source": "/snf/:campaign/c/:code",
+      "destination": "/appeals/facilities/skilled-nursing?utm_source=snf&utm_medium=email&utm_campaign=facility-outreach-:campaign&rc=:code",
+      "permanent": false
+    },
+    {
+      "source": "/demo/:campaign/c/:code",
+      "destination": "https://appeals.casewhy.com/desk/demo/c/:code?utm_source=snf&utm_medium=email&utm_campaign=facility-outreach-:campaign",
+      "permanent": false
+    },
+    {
       "source": "/snf/:campaign",
       "destination": "/appeals/facilities/skilled-nursing?utm_source=snf&utm_medium=email&utm_campaign=facility-outreach-:campaign",
       "permanent": false

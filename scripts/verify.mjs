@@ -1424,6 +1424,102 @@ console.log("\n== Every shipped page is in the sitemap ==");
     }
   }
 
+  // -------------------------------------------------------------------------
+  // EVERY DOLLAR FIGURE ON EVERY APPEALS PAGE IS ONE WE ACTUALLY CHARGE.
+  //
+  // Peter, 6 Nov 2026: *"check and double all the prices on th HUB"*. The audit
+  // that answered him found nothing stale — and the reason to keep it is that
+  // it only found nothing because somebody ran it. The four things it HAD
+  // caught in the preceding hour were each found by a person reading a page:
+  // a dead calculator, a dated plan card, a stale ceiling table, and six
+  // hand-typed family prices. Reading pages does not scale and does not repeat.
+  //
+  // HOW IT WORKS. Both exports describe everything the product charges, so any
+  // other figure rendered to a reader is either a non-price (a statistic, a
+  // figure from a cited rule) or a mistake. The allow-list of non-prices is
+  // short and each entry says what it is, so a new unexplained figure fails
+  // rather than joining a vague exception.
+  //
+  // WHAT IT DELIBERATELY DOES NOT CHECK. That each figure sits in a TRUE
+  // SENTENCE — "$25 a case for the first 5 each month" uses a real price and
+  // would still be wrong if the band were 25. Only a reader catches that, which
+  // is why the staleness Peter found was in prose and not in the numbers. This
+  // check covers the half that can be mechanised; it does not pretend to cover
+  // the other.
+  {
+    const CHARGED = new Map();
+    const noteFigure = (n, what) => {
+      if (!(n > 0)) return;
+      if (!CHARGED.has(n)) CHARGED.set(n, new Set());
+      CHARGED.get(n).add(what);
+    };
+    for (const [lane, plans] of Object.entries(pricingJson.lanes)) {
+      for (const plan of plans) {
+        noteFigure(plan.monthlyUsd, `${lane}/${plan.id} monthly`);
+        for (const t of plan.tiers ?? []) noteFigure(t.perCaseUsd, `${lane}/${plan.id} per case`);
+      }
+    }
+    for (const b of pricingJson.portfolio.bands ?? []) {
+      for (const [seg, v] of Object.entries(b.perSiteUsd ?? {})) noteFigure(v, `portfolio ${b.id} ${seg}`);
+    }
+    for (const b of pricingJson.portfolio.pooledCases?.bands ?? []) {
+      for (const [seg, v] of Object.entries(b.perCaseUsd ?? {})) noteFigure(v, `pooled ${b.label} ${seg}`);
+    }
+    for (const c of familiesPricing.coverageTypes) noteFigure(c.priceUsd, `family ${c.slug}`);
+
+    // NOT OUR PRICES, AND EACH ONE SAYS WHY. Adding to this list is a claim
+    // that a figure is not a price; leaving it vague is how a stale price hides
+    // in an exception.
+    const NOT_A_PRICE = new Map([
+      ["1,960", "the CMS/MA figure quoted in the appeal packs"],
+      ["200", "a dollar amount inside a cited rule"],
+      ["300", "a dollar amount inside a cited rule"],
+      ["38.99", "the 2026 Part D national base beneficiary premium"],
+      ["0", "free — no monthly fee"],
+    ]);
+
+    const stray = [];
+    let figures = 0;
+    let pagesScanned = 0;
+    for (const route of ["/appeals", ...pages.filter((pg) => pg.line === "appeals").map((pg) => pg.path)]) {
+      const html = read(route);
+      if (!html) continue;
+      pagesScanned++;
+      // THE INLINE SCRIPTS ARE STRIPPED because they carry the price BOOK, not
+      // a claim to a reader — the calculator's own figures are checked by
+      // running it. Comments are stripped for the same reason: they are notes.
+      const text = html
+        .replace(/<script[\s\S]*?<\/script>/g, " ")
+        .replace(/<!--[\s\S]*?-->/g, " ")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/&[a-z]+;/g, " ")
+        .replace(/\s+/g, " ");
+      for (const m of text.matchAll(/\$([\d,]+(?:\.\d+)?)/g)) {
+        figures++;
+        const raw = m[1];
+        const n = Number(raw.replace(/,/g, ""));
+        if (CHARGED.has(n) || NOT_A_PRICE.has(raw) || NOT_A_PRICE.has(String(n))) continue;
+        stray.push(`${route}: $${raw} — "…${text.slice(Math.max(0, m.index - 45), m.index + 35).trim()}…"`);
+      }
+    }
+
+    check(
+      `every dollar figure on the appeals pages is a price we charge (${figures} figures on ${pagesScanned} pages)` +
+        (stray.length ? ` — ${stray.slice(0, 3).join(" | ")}` : ""),
+      stray.length === 0,
+      "an unrecognised figure is either a stale price or a statistic nobody labelled; both need a human",
+    );
+
+    // AND THE CHECK IS NOT VACUOUS: it must have found real figures to look at.
+    // A route list that stopped matching, or a strip that ate the body, would
+    // otherwise pass by examining nothing.
+    check(
+      `it examined a plausible number of figures (${figures})`,
+      figures >= 40 && pagesScanned >= 5,
+      "too few figures seen — the page list or the markup strip is wrong, and this check is measuring nothing",
+    );
+  }
+
   const overview = read("/appeals/enterprise");
   check("the enterprise overview exists to check", overview !== null);
   if (overview) {

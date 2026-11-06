@@ -200,7 +200,7 @@
       "cardTitle": "Multi-facility organizations",
       "cardDesc": "One board across every building you operate, with access that follows your own regions and groups.",
       "titleTag": "Medicare Appeals for Multi-Facility Organizations | CaseWhy",
-      "description": "One view of Medicare appeals across every building you operate. Priced per site, per care segment, with portfolio discounts published.",
+      "description": "One view of Medicare appeals across every building you operate. Priced per case, pooled across your whole portfolio, and capped per site.",
       "navGroup": "Healthcare Providers",
       "cardNote": "Off the directory since 4 Nov 2026: the multi-facility BAND above the directory says this, and said it twice otherwise. The band's primary button is this page, so it keeps a direct inbound link from /appeals."
     },
@@ -240,7 +240,7 @@
       "inLineNav": false,
       "cardTitle": "Enterprise pricing",
       "cardDesc": "Per facility, discounted by portfolio size. Published, not quoted.",
-      "description": "Published CaseWhy Appeals pricing for multi-facility operators: per facility per month, with portfolio discounts from five facilities up.",
+      "description": "Published CaseWhy Appeals pricing for multi-facility operators: per case, pooled across every location you enrol, from two locations up.",
       "titleTag": "Enterprise Pricing \u2014 Medicare Appeals per Facility | CaseWhy"
     },
     {

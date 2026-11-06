@@ -42,7 +42,7 @@
           },
           {
             "upTo": null,
-            "perCaseUsd": 15
+            "perCaseUsd": 12
           }
         ]
       },
@@ -59,7 +59,7 @@
           },
           {
             "upTo": null,
-            "perCaseUsd": 12
+            "perCaseUsd": 9
           }
         ]
       }
@@ -73,11 +73,32 @@
         "unlimited": false,
         "tiers": [
           {
-            "upTo": 25,
+            "upTo": 5,
             "perCaseUsd": 25
           },
           {
-            "upTo": 60,
+            "upTo": 15,
+            "perCaseUsd": 20
+          },
+          {
+            "upTo": null,
+            "perCaseUsd": 16
+          }
+        ]
+      },
+      {
+        "id": "growth",
+        "label": "Growth",
+        "monthlyUsd": 100,
+        "includedCases": 5,
+        "unlimited": false,
+        "tiers": [
+          {
+            "upTo": 5,
+            "perCaseUsd": 0
+          },
+          {
+            "upTo": 15,
             "perCaseUsd": 20
           },
           {
@@ -109,11 +130,32 @@
         "unlimited": false,
         "tiers": [
           {
-            "upTo": 15,
+            "upTo": 5,
             "perCaseUsd": 19
           },
           {
-            "upTo": 40,
+            "upTo": 12,
+            "perCaseUsd": 15
+          },
+          {
+            "upTo": null,
+            "perCaseUsd": 12
+          }
+        ]
+      },
+      {
+        "id": "growth",
+        "label": "Growth",
+        "monthlyUsd": 75,
+        "includedCases": 5,
+        "unlimited": false,
+        "tiers": [
+          {
+            "upTo": 5,
+            "perCaseUsd": 0
+          },
+          {
+            "upTo": 12,
             "perCaseUsd": 15
           },
           {
@@ -145,11 +187,32 @@
         "unlimited": false,
         "tiers": [
           {
-            "upTo": 8,
+            "upTo": 5,
             "perCaseUsd": 19
           },
           {
-            "upTo": 25,
+            "upTo": 10,
+            "perCaseUsd": 15
+          },
+          {
+            "upTo": null,
+            "perCaseUsd": 12
+          }
+        ]
+      },
+      {
+        "id": "growth",
+        "label": "Growth",
+        "monthlyUsd": 75,
+        "includedCases": 5,
+        "unlimited": false,
+        "tiers": [
+          {
+            "upTo": 5,
+            "perCaseUsd": 0
+          },
+          {
+            "upTo": 10,
             "perCaseUsd": 15
           },
           {
@@ -174,16 +237,146 @@
     ]
   },
   "portfolio": {
-    "minimumFacilities": 5,
+    "minimumFacilities": 2,
     "termMonths": 12,
     "countedAcrossSegments": true,
     "nonprofitCountsTowardBand": false,
+    "pricedPerCase": true,
+    "licenceIsACap": true,
+    "pooledCases": {
+      "checkpoints": [
+        {
+          "cases": {
+            "snf": 20,
+            "home_health": 0,
+            "hospice": 0
+          },
+          "monthlyUsd": 320
+        },
+        {
+          "cases": {
+            "snf": 50,
+            "home_health": 0,
+            "hospice": 0
+          },
+          "monthlyUsd": 800
+        },
+        {
+          "cases": {
+            "snf": 51,
+            "home_health": 0,
+            "hospice": 0
+          },
+          "monthlyUsd": 814
+        },
+        {
+          "cases": {
+            "snf": 200,
+            "home_health": 0,
+            "hospice": 0
+          },
+          "monthlyUsd": 2900
+        },
+        {
+          "cases": {
+            "snf": 201,
+            "home_health": 0,
+            "hospice": 0
+          },
+          "monthlyUsd": 2912
+        },
+        {
+          "cases": {
+            "snf": 37,
+            "home_health": 11,
+            "hospice": 5
+          },
+          "monthlyUsd": 778
+        },
+        {
+          "cases": {
+            "snf": 400,
+            "home_health": 120,
+            "hospice": 80
+          },
+          "monthlyUsd": 7033
+        },
+        {
+          "cases": {
+            "snf": 0,
+            "home_health": 120,
+            "hospice": 80
+          },
+          "monthlyUsd": 2100
+        },
+        {
+          "cases": {
+            "snf": 1600,
+            "home_health": 500,
+            "hospice": 300
+          },
+          "monthlyUsd": 22333
+        }
+      ],
+      "bands": [
+        {
+          "from": 1,
+          "upTo": 50,
+          "label": "1–50",
+          "perCaseUsd": {
+            "snf": 16,
+            "home_health": 12,
+            "hospice": 12
+          }
+        },
+        {
+          "from": 51,
+          "upTo": 200,
+          "label": "51–200",
+          "perCaseUsd": {
+            "snf": 14,
+            "home_health": 10,
+            "hospice": 10
+          }
+        },
+        {
+          "from": 201,
+          "upTo": 600,
+          "label": "201–600",
+          "perCaseUsd": {
+            "snf": 12,
+            "home_health": 9,
+            "hospice": 9
+          }
+        },
+        {
+          "from": 601,
+          "upTo": 1500,
+          "label": "601–1500",
+          "perCaseUsd": {
+            "snf": 10,
+            "home_health": 8,
+            "hospice": 8
+          }
+        },
+        {
+          "from": 1501,
+          "upTo": null,
+          "label": "1501+",
+          "perCaseUsd": {
+            "snf": 8,
+            "home_health": 7,
+            "hospice": 7
+          }
+        }
+      ]
+    },
     "bands": [
       {
         "id": "none",
-        "label": "1–4",
+        "label": "1",
         "minFacilities": 0,
-        "maxFacilities": 4,
+        "maxFacilities": 1,
         "discountPercent": 0,
         "perSiteUsd": {
           "snf": 499,
@@ -193,8 +386,8 @@
       },
       {
         "id": "group",
-        "label": "5–19 — Group",
-        "minFacilities": 5,
+        "label": "2–19 — Group",
+        "minFacilities": 2,
         "maxFacilities": 19,
         "discountPercent": 15,
         "perSiteUsd": {

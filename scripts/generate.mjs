@@ -787,7 +787,22 @@ function planCard(plan, unit) {
       // Appeals' own pricing.ts gained `unlimited` on 28 Oct 2026 when Peter
       // removed the SNF cap, and it travels through pricing.json to here.
       ? "Every case included, whatever the volume."
-      : `${plan.includedCases} cases included each month, then $${plan.tiers[plan.tiers.length - 1].perCaseUsd} a case.`;
+      // THE FIRST PAID BAND, NOT THE LAST — and this understated the price
+      // until 5 Nov 2026.
+      //
+      // `tiers[tiers.length - 1]` was right while a Growth plan had exactly one
+      // overage band. SNF's new $99 rung mirrors the Volume ladder so that
+      // pay-as-you-go can never overtake it, which gives it THREE bands above
+      // the included five ($25 to 25 cases, $20 to 60, $16 beyond). The last
+      // one is the deepest-volume rate, so the page rendered "then $16 a case"
+      // for a customer whose sixth case costs $25.
+      //
+      // The first paid band is the rate the next case actually costs, which is
+      // the only one a reader can act on. The full ladder is on the pricing
+      // page; this is the one-line summary.
+      : `${plan.includedCases} cases included each month, then $${
+          (plan.tiers.find((t) => t.perCaseUsd > 0) ?? plan.tiers[plan.tiers.length - 1]).perCaseUsd
+        } a case.`;
   return `    <div class="tier">
       <h3>${plan.label}</h3>
       <p class="price">${price}</p>
@@ -987,6 +1002,13 @@ function pricingCalculatorHtml() {
     freePeriodShort: pricing.freePeriodShort,
   }).replace(/</g, "\\u003c");
 
+  const field2 = (id, label, hint, value) =>
+    '      <div class="calc-field">\n' +
+    '        <label for="' + id + '">' + label + '</label>\n' +
+    '        <input type="number" id="' + id + '" min="0" step="1" value="' + value + '" inputmode="numeric">\n' +
+    '        <span class="calc-hint">' + hint + '</span>\n' +
+    '      </div>';
+
   const field = (id, label, hint) =>
     '      <div class="calc-field">\n' +
     '        <label for="' + id + '">' + label + '</label>\n' +
@@ -1002,6 +1024,13 @@ function pricingCalculatorHtml() {
     field("calc-hha", "Home health", "Locations"),
     field("calc-hospice", "Hospice", "Locations"),
     field("calc-nonprofit", "Non-profit skilled nursing", "Never charged, never counted"),
+    // CASES A MONTH, PER LOCATION — added 5 Nov 2026, because a per-case price
+    // cannot be quoted from a location count. PREFILLED WITH 10 AND SAID SO:
+    // that is the median across 14,680 real facilities' certified bed counts,
+    // and a reader who leaves it alone gets a figure grounded in the market
+    // rather than in zero. A default of 0 would have shown every portfolio a
+    // $0 bill, which reads as broken.
+    field2("calc-cases", "Cases a month, per location", "About 10 for a typical building", 10),
     '    </div>',
     '  </form>',
     '  <div class="calc-out" id="calc-out" role="status" aria-live="polite"></div>',
@@ -1033,7 +1062,20 @@ function pricingCalculatorHtml() {
     '  // ONE PURE FUNCTION, no DOM, so the arithmetic can be run and checked',
     '  // outside a browser. The fence comments are how verify.mjs finds it;',
     '  // renaming them turns the test into a no-op, so it fails if they go.',
-    '  function quote(BOOK, counts, nonprofit) {',
+    '  //',
+    '  // IT PRICES PER POOLED CASE SINCE 5 NOV 2026, and the licence it replaced is',
+    '  // now the ceiling. Peter: "fix the chains pricing to per-case not per-site".',
+    '  //',
+    '  // THIS IS A SECOND IMPLEMENTATION OF portfolioQuote() AND THAT IS STILL THE',
+    '  // RISK — it just stopped being a risk anybody has to remember. The pooled',
+    '  // arithmetic needs graduated bands and largest-remainder apportionment',
+    '  // across the care settings, which is far more than the four lines of',
+    '  // multiplication the licence needed. So the appeals repo exports',
+    '  // `pooledCases.checkpoints` — nine case mixes chosen to bite, with the',
+    '  // authoritative answer for each — and verify.mjs fails this build if the',
+    '  // function below disagrees with any of them. Change a rate over there,',
+    '  // re-export, and the hub cannot build until this matches.',
+    '  function quote(BOOK, counts, nonprofit, casesPerLocation) {',
     '    var keys = ["snf", "home_health", "hospice"];',
     '    var paid = 0;',
     '    for (var k = 0; k < keys.length; k++) paid += Math.max(0, Math.floor(counts[keys[k]] || 0));',
@@ -1044,27 +1086,98 @@ function pricingCalculatorHtml() {
     '      var b = BOOK.bands[i];',
     '      if (paid >= b.minFacilities && (b.maxFacilities === null || paid <= b.maxFacilities)) { band = b; break; }',
     '    }',
-    '    var lines = [], total = 0, listTotal = 0, std = BOOK.bands[0].perSiteUsd;',
+    '',
+    '    // THE LICENCE, WHICH IS NOW THE CEILING RATHER THAN THE PRICE.',
+    '    var licence = 0, listTotal = 0, std = BOOK.bands[0].perSiteUsd;',
     '    for (var j = 0; j < keys.length; j++) {',
-    '      var n = Math.max(0, Math.floor(counts[keys[j]] || 0));',
-    '      if (n === 0) continue;',
-    '      var per = band.perSiteUsd[keys[j]];',
-    '      total += per * n; listTotal += std[keys[j]] * n;',
-    '      lines.push({ key: keys[j], n: n, per: per, sub: per * n });',
+    '      var n0 = Math.max(0, Math.floor(counts[keys[j]] || 0));',
+    '      if (n0 === 0) continue;',
+    '      licence += band.perSiteUsd[keys[j]] * n0;',
+    '      listTotal += std[keys[j]] * n0;',
+    '    }',
+    '',
+    '    // ---- THE POOLED PRICE ------------------------------------------------',
+    '    var per = Math.max(0, Math.floor(casesPerLocation || 0));',
+    '    var cases = {};',
+    '    var pooledCases = 0;',
+    '    for (var c = 0; c < keys.length; c++) {',
+    '      cases[keys[c]] = Math.max(0, Math.floor(counts[keys[c]] || 0)) * per;',
+    '      pooledCases += cases[keys[c]];',
+    '    }',
+    '',
+    '    // LARGEST REMAINDER, so the band\'s capacity is handed out in whole cases',
+    '    // and the shares add up. Rounding each share would lose or invent cases,',
+    '    // and a lost case is a wrong price.',
+    '    function apportion(total, weights) {',
+    '      var out = {}, sum = 0, ks = Object.keys(weights).sort(), x;',
+    '      for (x = 0; x < ks.length; x++) sum += weights[ks[x]];',
+    '      if (total <= 0 || sum <= 0) {',
+    '        for (x = 0; x < ks.length; x++) out[ks[x]] = 0;',
+    '        return out;',
+    '      }',
+    '      var rows = [], given = 0;',
+    '      for (x = 0; x < ks.length; x++) {',
+    '        var exact = (total * weights[ks[x]]) / sum, fl = Math.floor(exact);',
+    '        out[ks[x]] = fl; given += fl;',
+    '        rows.push({ key: ks[x], rem: exact - fl });',
+    '      }',
+    '      // TIES BREAK ON THE KEY, not on position, so the answer cannot depend on',
+    '      // the order the caller happened to hold the settings in.',
+    '      rows.sort(function (a, b) { return b.rem - a.rem || (a.key < b.key ? -1 : a.key > b.key ? 1 : 0); });',
+    '      for (var y = 0; given < total; y++, given++) out[rows[y % rows.length].key] += 1;',
+    '      return out;',
+    '    }',
+    '',
+    '    var bands = (BOOK.pooledCases && BOOK.pooledCases.bands) || [];',
+    '    var placed = { snf: 0, home_health: 0, hospice: 0 };',
+    '    var pooled = 0, remaining = pooledCases, lower = 0, deepest = 0;',
+    '    for (var bi = 0; bi < bands.length && remaining > 0; bi++) {',
+    '      var upTo = bands[bi].upTo;',
+    '      var capacity = upTo === null ? remaining : Math.min(remaining, upTo - lower);',
+    '      if (capacity > 0) {',
+    '        deepest = bi;',
+    '        var w = {};',
+    '        for (var z = 0; z < keys.length; z++) w[keys[z]] = Math.max(0, cases[keys[z]] - placed[keys[z]]);',
+    '        var share = apportion(capacity, w);',
+    '        for (var z2 = 0; z2 < keys.length; z2++) {',
+    '          var give = share[keys[z2]] || 0;',
+    '          placed[keys[z2]] += give;',
+    '          pooled += give * bands[bi].perCaseUsd[keys[z2]];',
+    '        }',
+    '        remaining -= capacity;',
+    '      }',
+    '      if (upTo !== null) lower = upTo;',
+    '    }',
+    '',
+    '    // THE CAP IS CHARGED WHEN IT IS CHEAPER. Without this a busy portfolio',
+    '    // would be quoted above the licence it was promised as a ceiling.',
+    '    var knowCases = per > 0;',
+    '    var total = !knowCases ? licence : Math.min(pooled, licence);',
+    '    var lines = [];',
+    '    for (var L = 0; L < keys.length; L++) {',
+    '      var nL = Math.max(0, Math.floor(counts[keys[L]] || 0));',
+    '      if (nL === 0) continue;',
+    '      lines.push({ key: keys[L], n: nL, cases: cases[keys[L]], per: band.perSiteUsd[keys[L]],',
+    '                   sub: band.perSiteUsd[keys[L]] * nL });',
     '    }',
     '    return { paid: paid, nonprofit: Math.max(0, Math.floor(nonprofit || 0)),',
-    '             band: band, lines: lines, total: total, saving: listTotal - total };',
+    '             band: band, lines: lines, total: total, licence: licence,',
+    '             pooled: pooled, pooledCases: pooledCases, deepestBand: deepest,',
+    '             knowCases: knowCases, cappedOut: knowCases && pooled > licence,',
+    '             perCase: pooledCases > 0 ? total / pooledCases : 0,',
+    '             saving: listTotal - total };',
     '  }',
     '  // ---- END QUOTE RULE ----',
     '',
     '  function table(rows, totalRow) {',
     '    return "<div class=\'table-scroll\'><table class=\'price-table\'><thead><tr>" +',
-    '      "<th>Care setting</th><th>Facilities</th><th>Per facility</th><th>Monthly</th>" +',
+    '      "<th>Care setting</th><th>Locations</th><th>Cases a month</th><th>Ceiling</th>" +',
     '      "</tr></thead><tbody>" + rows + totalRow + "</tbody></table></div>";',
     '  }',
     '',
     '  function render() {',
     '    var nonprofit = whole("calc-nonprofit");',
+    '    var casesPer = whole("calc-cases");',
     '    var counts = SETTINGS.map(function (s) { return { s: s, n: whole(s.id) }; });',
     '    var paid = counts.reduce(function (t, c) { return t + c.n; }, 0);',
     '',
@@ -1075,13 +1188,13 @@ function pricingCalculatorHtml() {
     '',
     '    var byKey = {};',
     '    counts.forEach(function (c) { byKey[c.s.key] = c.n; });',
-    '    var q = quote(BOOK, byKey, nonprofit);',
+    '    var q = quote(BOOK, byKey, nonprofit, casesPer);',
     '    var band = q.band;',
     '    var total = q.total;',
     '    var LABELS = { snf: "Skilled nursing", home_health: "Home health", hospice: "Hospice" };',
     '    var rows = "";',
     '    q.lines.forEach(function (l) {',
-    '      rows += "<tr><td>" + LABELS[l.key] + "</td><td>" + l.n + "</td><td>" + money(l.per) +',
+    '      rows += "<tr><td>" + LABELS[l.key] + "</td><td>" + l.n + "</td><td>" + l.cases +',
     '              "</td><td>" + money(l.sub) + "</td></tr>";',
     '    });',
     '',
@@ -1102,27 +1215,44 @@ function pricingCalculatorHtml() {
     '    var saving = q.saving;',
     '    var note;',
     '    if (band.discountPercent > 0) {',
-    '      note = "<strong>" + esc(band.label) + "</strong> — a " + band.discountPercent +',
-    '        "% portfolio discount on every facility, earned by the " + paid + " you pay for. " +',
-    '        "That is " + money(saving) + " a month below the standard rate, or " + money(saving * 12) +',
-    '        " a year. A " + BOOK.termMonths + "-month agreement applies.";',
+    '      note = "<strong>" + esc(band.label) + "</strong> — your cases pool across all " +',
+    '        paid + " locations, and the " + band.discountPercent + "% band sets the ceiling. " +',
+    '        "A " + BOOK.termMonths + "-month agreement applies.";',
     '    } else {',
     '      var need = BOOK.minimumFacilities - paid;',
-    '      note = "Standard rates. Portfolio discounts start at " + BOOK.minimumFacilities +',
-    '        " paid facilities, which is " + need + " more" +',
+    '      note = "Standard rates. Portfolio pricing starts at " + BOOK.minimumFacilities +',
+    '        " paid locations, which is " + need + " more" +',
     '        (nonprofit > 0 ? " — non-profit locations do not count toward that" : "") + ".";',
     '    }',
     '',
-    '    var totalRow = "<tr><td><strong>Total</strong></td><td><strong>" + paid +',
-    '      "</strong></td><td>&mdash;</td><td><strong>" + money(total) + "</strong></td></tr>";',
+    '    var totalRow = "<tr><td><strong>You pay</strong></td><td><strong>" + paid +',
+    '      "</strong></td><td><strong>" + q.pooledCases + "</strong></td><td><strong>" +',
+    '      money(total) + "</strong></td></tr>";',
     '',
     '    var free = BOOK.freePeriodShort;',
     '    free = free.charAt(0).toUpperCase() + free.slice(1);',
     '',
+    '    // THE HEADLINE IS THE BLENDED PER-CASE RATE, because that is the',
+    '    // number a reader checks against what they pay today. The monthly',
+    '    // total alone is what this page used to lead with, and it invited the',
+    '    // arithmetic instead of doing it.',
+    '    var lead;',
+    '    if (!q.knowCases) {',
+    '      lead = "Enter cases a month to see what you would pay. Until then this is the ceiling: " +',
+    '        money(q.licence) + " a month.";',
+    '    } else if (q.cappedOut) {',
+    '      lead = "At " + q.pooledCases + " cases a month, paying per case would come to " +',
+    '        money(q.pooled) + ", so you pay the site licence instead: " + money(total) +',
+    '        " a month, which is " + money(Math.round((total / q.pooledCases) * 100) / 100) + " a case.";',
+    '    } else {',
+    '      lead = money(total) + " a month for " + q.pooledCases + " cases, which is " +',
+    '        money(Math.round(q.perCase * 100) / 100) + " a case " — and never more than " +',
+    '        money(q.licence) + ".";',
+    '    }',
     '    out.innerHTML = table(rows, totalRow) +',
+    '      "<p class=\'calc-note\'><strong>" + lead + "</strong></p>" +',
     '      "<p class=\'calc-note\'>" + note + "</p>" +',
-    '      "<p class=\'calc-note\'>Every appeal is included at any volume. " + esc(free) +',
-    '      ", before any of this is charged.</p>";',
+    '      "<p class=\'calc-note\'>" + esc(free) + ", before any of this is charged.</p>";',
     '  }',
     '',
     '  form.addEventListener("input", render);',
@@ -1142,16 +1272,52 @@ function portfolioPricingHtml() {
     // branch is a safety net rather than an expected state.
     return "";
   }
-  const row = (b) =>
+  // THE PER-CASE LADDER LEADS AND THE LICENCE FOLLOWS AS A CEILING — Peter,
+  // 5 Nov 2026: *"fix the chains pricing to per-case not per-site"*.
+  //
+  // THE ORDER IS THE WHOLE POINT, not a layout preference. This page used to
+  // open with "$374 per site, every case included at any volume", and a reader
+  // with a calculator worked out that at the volume their buildings actually
+  // run it came to about $37 a case against our own $25 walk-up price. 58
+  // facilities reached this page and opened zero accounts. The ceiling is a
+  // real guarantee and worth printing; printing it FIRST is what was costing
+  // us the reader.
+  const caseRow = (b) =>
+    `<tr><td>${b.label}</td><td>$${b.perCaseUsd.snf}</td>` +
+    `<td>$${b.perCaseUsd.home_health}</td><td>$${b.perCaseUsd.hospice}</td></tr>`;
+  const siteRow = (b) =>
     `<tr><td>${b.label}</td><td>${b.discountPercent ? `${b.discountPercent}%` : "&mdash;"}</td>` +
     `<td>$${b.perSiteUsd.snf}</td><td>$${b.perSiteUsd.home_health}</td><td>$${b.perSiteUsd.hospice}</td></tr>`;
+
+  const pooled = p.pricedPerCase && p.pooledCases && Array.isArray(p.pooledCases.bands)
+    ? `<div class="table-scroll">\n<table class="price-table">\n  <thead><tr><th>Cases a month, across your portfolio</th>` +
+      `<th>Skilled nursing</th><th>Home health</th><th>Hospice</th></tr></thead>\n  <tbody>\n    ` +
+      p.pooledCases.bands.map(caseRow).join("\n    ") +
+      `\n  </tbody>\n</table>\n</div>\n` +
+      `<p>Per case, pooled across every location you enrol. Each band prices only the cases inside ` +
+      `it, so your bill never jumps \u2014 and bringing home health or hospice in alongside skilled ` +
+      `nursing deepens the rate on all of them. Portfolio pricing starts at ` +
+      `${p.minimumFacilities} paid locations. A ${p.termMonths}-month term applies, billed monthly ` +
+      `or annually, with locations added mid-term pro rata.</p>\n`
+    : "";
+
+  const capHeading = p.licenceIsACap
+    ? `<h3>And never more than the site licence</h3>\n<p>If a location is busy enough that paying ` +
+      `per case would cost more than an unlimited licence, you pay the licence instead. These are ` +
+      `the ceilings, not the price.</p>\n`
+    : "";
+
   return (
+    pooled +
+    capHeading +
     `<div class="table-scroll">\n<table class="price-table">\n  <thead><tr><th>Paid facilities</th><th>Discount</th><th>Skilled nursing</th>` +
     `<th>Home health</th><th>Hospice</th></tr></thead>\n  <tbody>\n    ` +
-    p.bands.map(row).join("\n    ") +
+    p.bands.map(siteRow).join("\n    ") +
     `\n  </tbody>\n</table>\n</div>\n` +
-    `<p>Per site, per month, every case included at any volume. A ${p.termMonths}-month term applies, ` +
-    `billed monthly or annually, with facilities added mid-term pro rata.</p>`
+    (p.licenceIsACap
+      ? `<p>Per site, per month, every case included at any volume.</p>`
+      : `<p>Per site, per month, every case included at any volume. A ${p.termMonths}-month term applies, ` +
+        `billed monthly or annually, with facilities added mid-term pro rata.</p>`)
   );
 }
 

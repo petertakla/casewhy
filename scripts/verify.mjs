@@ -1171,6 +1171,77 @@ console.log("\n== Every shipped page is in the sitemap ==");
             (fails.length ? " — " + fails.slice(0, 3).join("; ") : ""),
           fails.length === 0,
         );
+
+        // ---- THE POOLED LADDER, PINNED TO THE AUTHORITATIVE ANSWERS -------
+        //
+        // Peter, 5 Nov 2026: "fix the chains pricing to per-case not
+        // per-site". The calculator above is a hand-written SECOND
+        // implementation of portfolioQuote() in the appeals repo, and the
+        // pooled price needs graduated bands plus largest-remainder
+        // apportionment across the care settings — enough arithmetic to drift
+        // without anybody noticing. A marketing calculator that quotes a
+        // figure we will not honour is worse than no calculator.
+        //
+        // So the appeals repo exports `pooledCases.checkpoints`: case mixes
+        // with the answer computed by the real implementation. This build
+        // fails if the copy disagrees with any of them. The checkpoints are
+        // chosen to bite — single band, both band seams, a mix whose
+        // proportional shares do not divide evenly, the deepest band, and a
+        // setting with no cases beside two that have some.
+        //
+        // IT IS NOT A SELF-TEST: both sides are compared, and the expected
+        // values come from the other repo, so no amount of editing this file
+        // can make a wrong calculator pass.
+        const pooled = pricingJson.portfolio.pooledCases;
+        check(
+          "pricing.json carries the pooled ladder and its checkpoints",
+          Boolean(pooled && pooled.bands && pooled.bands.length && pooled.checkpoints && pooled.checkpoints.length),
+          "without them the calculator's pooled arithmetic is unverified",
+        );
+        if (pooled && pooled.checkpoints && pooled.bands) {
+          const book2 = { bands, pooledCases: pooled, minimumFacilities: pricingJson.portfolio.minimumFacilities };
+          const drift = [];
+          for (const cp of pooled.checkpoints) {
+            // ONE CASE PER LOCATION, so the location counts ARE the case
+            // counts and the checkpoint's mix is reproduced exactly. The
+            // calculator multiplies locations by cases-per-location, so this
+            // is the only input shape that can express an arbitrary mix.
+            const counts = { snf: cp.cases.snf, home_health: cp.cases.home_health, hospice: cp.cases.hospice };
+            const q = quoteFn(book2, counts, 0, 1);
+            // The licence cap can legitimately undercut the pooled figure at
+            // these shapes, so the POOLED number is what is compared — the cap
+            // has its own check below.
+            if (q.pooled !== cp.monthlyUsd) {
+              drift.push(
+                `snf ${cp.cases.snf}/hh ${cp.cases.home_health}/hospice ${cp.cases.hospice}: ` +
+                  `calculator $${q.pooled}, authoritative $${cp.monthlyUsd}`,
+              );
+            }
+          }
+          check(
+            "the calculator reproduces every pooled checkpoint from the appeals repo" +
+              (drift.length ? " — " + drift.slice(0, 3).join("; ") : ""),
+            drift.length === 0,
+            "the hub's copy of the pooled arithmetic has drifted from the real one",
+          );
+
+          // THE CAP IS A PROMISE ON THE PAGE, so it is asserted rather than
+          // assumed: a busy portfolio must never be quoted above the licence.
+          const heavy = quoteFn(book2, { snf: 40 }, 0, 80);
+          check(
+            "a very busy portfolio is quoted the licence, never above it",
+            heavy.total <= heavy.licence && heavy.cappedOut === true,
+            `got ${heavy.total} against a licence of ${heavy.licence}`,
+          );
+          // AND THE CAP MUST NOT BIND AT ORDINARY VOLUME, or the whole change
+          // achieves nothing. 10 cases a building is the measured median.
+          const typical = quoteFn(book2, { snf: 40 }, 0, 10);
+          check(
+            "at the median 10 cases a building the pooled price wins by a wide margin",
+            typical.cappedOut === false && typical.total < typical.licence * 0.6,
+            `got ${typical.total} against a licence of ${typical.licence}`,
+          );
+        }
       }
     }
   }

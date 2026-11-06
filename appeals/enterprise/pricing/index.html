@@ -524,8 +524,8 @@
 
 <main class="wrap">
   <p class="eyebrow">CaseWhy Hub · <a href="https://casewhyhub.com/appeals">CaseWhy Appeals</a> · <a href="https://casewhyhub.com/appeals/enterprise">Organizations</a> · Pricing</p>
-  <h1>Published pricing.<br>Unlimited appeals.</h1>
-  <p class="sub">Per participating facility, discounted by the size of your portfolio.</p>
+  <h1>Published pricing.<br>Per case, pooled.</h1>
+  <p class="sub">Your cases pool across every location you enrol, and the rate falls as the pool grows. Never more than an unlimited licence per site.</p>
   <div class="disclaimer">CaseWhy Appeals is not affiliated with or endorsed by Medicare, CMS, or any health plan, and is not a law firm.</div>
 
   
@@ -555,13 +555,18 @@
         <input type="number" id="calc-nonprofit" min="0" step="1" value="0" inputmode="numeric">
         <span class="calc-hint">Never charged, never counted</span>
       </div>
+      <div class="calc-field">
+        <label for="calc-cases">Cases a month, per location</label>
+        <input type="number" id="calc-cases" min="0" step="1" value="10" inputmode="numeric">
+        <span class="calc-hint">About 10 for a typical building</span>
+      </div>
     </div>
   </form>
   <div class="calc-out" id="calc-out" role="status" aria-live="polite"></div>
 </div>
 <script>
 (function () {
-  var BOOK = {"bands":[{"label":"1–4","discountPercent":0,"minFacilities":0,"maxFacilities":4,"perSiteUsd":{"snf":499,"home_health":299,"hospice":199}},{"label":"5–19 — Group","discountPercent":15,"minFacilities":5,"maxFacilities":19,"perSiteUsd":{"snf":424,"home_health":254,"hospice":169}},{"label":"20–99 — Enterprise","discountPercent":25,"minFacilities":20,"maxFacilities":99,"perSiteUsd":{"snf":374,"home_health":224,"hospice":149}},{"label":"100+ — Strategic Enterprise","discountPercent":35,"minFacilities":100,"maxFacilities":null,"perSiteUsd":{"snf":324,"home_health":194,"hospice":129}}],"termMonths":12,"minimumFacilities":5,"freePeriodShort":"30 days free"};
+  var BOOK = {"bands":[{"label":"1","discountPercent":0,"minFacilities":0,"maxFacilities":1,"perSiteUsd":{"snf":499,"home_health":299,"hospice":199}},{"label":"2–19 — Group","discountPercent":15,"minFacilities":2,"maxFacilities":19,"perSiteUsd":{"snf":424,"home_health":254,"hospice":169}},{"label":"20–99 — Enterprise","discountPercent":25,"minFacilities":20,"maxFacilities":99,"perSiteUsd":{"snf":374,"home_health":224,"hospice":149}},{"label":"100+ — Strategic Enterprise","discountPercent":35,"minFacilities":100,"maxFacilities":null,"perSiteUsd":{"snf":324,"home_health":194,"hospice":129}}],"termMonths":12,"minimumFacilities":2,"freePeriodShort":"30 days free"};
   var form = document.getElementById("calc-form");
   var out = document.getElementById("calc-out");
   if (!form || !out) return;
@@ -586,7 +591,20 @@
   // ONE PURE FUNCTION, no DOM, so the arithmetic can be run and checked
   // outside a browser. The fence comments are how verify.mjs finds it;
   // renaming them turns the test into a no-op, so it fails if they go.
-  function quote(BOOK, counts, nonprofit) {
+  //
+  // IT PRICES PER POOLED CASE SINCE 5 NOV 2026, and the licence it replaced is
+  // now the ceiling. Peter: "fix the chains pricing to per-case not per-site".
+  //
+  // THIS IS A SECOND IMPLEMENTATION OF portfolioQuote() AND THAT IS STILL THE
+  // RISK — it just stopped being a risk anybody has to remember. The pooled
+  // arithmetic needs graduated bands and largest-remainder apportionment
+  // across the care settings, which is far more than the four lines of
+  // multiplication the licence needed. So the appeals repo exports
+  // `pooledCases.checkpoints` — nine case mixes chosen to bite, with the
+  // authoritative answer for each — and verify.mjs fails this build if the
+  // function below disagrees with any of them. Change a rate over there,
+  // re-export, and the hub cannot build until this matches.
+  function quote(BOOK, counts, nonprofit, casesPerLocation) {
     var keys = ["snf", "home_health", "hospice"];
     var paid = 0;
     for (var k = 0; k < keys.length; k++) paid += Math.max(0, Math.floor(counts[keys[k]] || 0));
@@ -597,27 +615,98 @@
       var b = BOOK.bands[i];
       if (paid >= b.minFacilities && (b.maxFacilities === null || paid <= b.maxFacilities)) { band = b; break; }
     }
-    var lines = [], total = 0, listTotal = 0, std = BOOK.bands[0].perSiteUsd;
+
+    // THE LICENCE, WHICH IS NOW THE CEILING RATHER THAN THE PRICE.
+    var licence = 0, listTotal = 0, std = BOOK.bands[0].perSiteUsd;
     for (var j = 0; j < keys.length; j++) {
-      var n = Math.max(0, Math.floor(counts[keys[j]] || 0));
-      if (n === 0) continue;
-      var per = band.perSiteUsd[keys[j]];
-      total += per * n; listTotal += std[keys[j]] * n;
-      lines.push({ key: keys[j], n: n, per: per, sub: per * n });
+      var n0 = Math.max(0, Math.floor(counts[keys[j]] || 0));
+      if (n0 === 0) continue;
+      licence += band.perSiteUsd[keys[j]] * n0;
+      listTotal += std[keys[j]] * n0;
+    }
+
+    // ---- THE POOLED PRICE ------------------------------------------------
+    var per = Math.max(0, Math.floor(casesPerLocation || 0));
+    var cases = {};
+    var pooledCases = 0;
+    for (var c = 0; c < keys.length; c++) {
+      cases[keys[c]] = Math.max(0, Math.floor(counts[keys[c]] || 0)) * per;
+      pooledCases += cases[keys[c]];
+    }
+
+    // LARGEST REMAINDER, so the band's capacity is handed out in whole cases
+    // and the shares add up. Rounding each share would lose or invent cases,
+    // and a lost case is a wrong price.
+    function apportion(total, weights) {
+      var out = {}, sum = 0, ks = Object.keys(weights).sort(), x;
+      for (x = 0; x < ks.length; x++) sum += weights[ks[x]];
+      if (total <= 0 || sum <= 0) {
+        for (x = 0; x < ks.length; x++) out[ks[x]] = 0;
+        return out;
+      }
+      var rows = [], given = 0;
+      for (x = 0; x < ks.length; x++) {
+        var exact = (total * weights[ks[x]]) / sum, fl = Math.floor(exact);
+        out[ks[x]] = fl; given += fl;
+        rows.push({ key: ks[x], rem: exact - fl });
+      }
+      // TIES BREAK ON THE KEY, not on position, so the answer cannot depend on
+      // the order the caller happened to hold the settings in.
+      rows.sort(function (a, b) { return b.rem - a.rem || (a.key < b.key ? -1 : a.key > b.key ? 1 : 0); });
+      for (var y = 0; given < total; y++, given++) out[rows[y % rows.length].key] += 1;
+      return out;
+    }
+
+    var bands = (BOOK.pooledCases && BOOK.pooledCases.bands) || [];
+    var placed = { snf: 0, home_health: 0, hospice: 0 };
+    var pooled = 0, remaining = pooledCases, lower = 0, deepest = 0;
+    for (var bi = 0; bi < bands.length && remaining > 0; bi++) {
+      var upTo = bands[bi].upTo;
+      var capacity = upTo === null ? remaining : Math.min(remaining, upTo - lower);
+      if (capacity > 0) {
+        deepest = bi;
+        var w = {};
+        for (var z = 0; z < keys.length; z++) w[keys[z]] = Math.max(0, cases[keys[z]] - placed[keys[z]]);
+        var share = apportion(capacity, w);
+        for (var z2 = 0; z2 < keys.length; z2++) {
+          var give = share[keys[z2]] || 0;
+          placed[keys[z2]] += give;
+          pooled += give * bands[bi].perCaseUsd[keys[z2]];
+        }
+        remaining -= capacity;
+      }
+      if (upTo !== null) lower = upTo;
+    }
+
+    // THE CAP IS CHARGED WHEN IT IS CHEAPER. Without this a busy portfolio
+    // would be quoted above the licence it was promised as a ceiling.
+    var knowCases = per > 0;
+    var total = !knowCases ? licence : Math.min(pooled, licence);
+    var lines = [];
+    for (var L = 0; L < keys.length; L++) {
+      var nL = Math.max(0, Math.floor(counts[keys[L]] || 0));
+      if (nL === 0) continue;
+      lines.push({ key: keys[L], n: nL, cases: cases[keys[L]], per: band.perSiteUsd[keys[L]],
+                   sub: band.perSiteUsd[keys[L]] * nL });
     }
     return { paid: paid, nonprofit: Math.max(0, Math.floor(nonprofit || 0)),
-             band: band, lines: lines, total: total, saving: listTotal - total };
+             band: band, lines: lines, total: total, licence: licence,
+             pooled: pooled, pooledCases: pooledCases, deepestBand: deepest,
+             knowCases: knowCases, cappedOut: knowCases && pooled > licence,
+             perCase: pooledCases > 0 ? total / pooledCases : 0,
+             saving: listTotal - total };
   }
   // ---- END QUOTE RULE ----
 
   function table(rows, totalRow) {
     return "<div class='table-scroll'><table class='price-table'><thead><tr>" +
-      "<th>Care setting</th><th>Facilities</th><th>Per facility</th><th>Monthly</th>" +
+      "<th>Care setting</th><th>Locations</th><th>Cases a month</th><th>Ceiling</th>" +
       "</tr></thead><tbody>" + rows + totalRow + "</tbody></table></div>";
   }
 
   function render() {
     var nonprofit = whole("calc-nonprofit");
+    var casesPer = whole("calc-cases");
     var counts = SETTINGS.map(function (s) { return { s: s, n: whole(s.id) }; });
     var paid = counts.reduce(function (t, c) { return t + c.n; }, 0);
 
@@ -628,13 +717,13 @@
 
     var byKey = {};
     counts.forEach(function (c) { byKey[c.s.key] = c.n; });
-    var q = quote(BOOK, byKey, nonprofit);
+    var q = quote(BOOK, byKey, nonprofit, casesPer);
     var band = q.band;
     var total = q.total;
     var LABELS = { snf: "Skilled nursing", home_health: "Home health", hospice: "Hospice" };
     var rows = "";
     q.lines.forEach(function (l) {
-      rows += "<tr><td>" + LABELS[l.key] + "</td><td>" + l.n + "</td><td>" + money(l.per) +
+      rows += "<tr><td>" + LABELS[l.key] + "</td><td>" + l.n + "</td><td>" + l.cases +
               "</td><td>" + money(l.sub) + "</td></tr>";
     });
 
@@ -655,27 +744,44 @@
     var saving = q.saving;
     var note;
     if (band.discountPercent > 0) {
-      note = "<strong>" + esc(band.label) + "</strong> — a " + band.discountPercent +
-        "% portfolio discount on every facility, earned by the " + paid + " you pay for. " +
-        "That is " + money(saving) + " a month below the standard rate, or " + money(saving * 12) +
-        " a year. A " + BOOK.termMonths + "-month agreement applies.";
+      note = "<strong>" + esc(band.label) + "</strong> — your cases pool across all " +
+        paid + " locations, and the " + band.discountPercent + "% band sets the ceiling. " +
+        "A " + BOOK.termMonths + "-month agreement applies.";
     } else {
       var need = BOOK.minimumFacilities - paid;
-      note = "Standard rates. Portfolio discounts start at " + BOOK.minimumFacilities +
-        " paid facilities, which is " + need + " more" +
+      note = "Standard rates. Portfolio pricing starts at " + BOOK.minimumFacilities +
+        " paid locations, which is " + need + " more" +
         (nonprofit > 0 ? " — non-profit locations do not count toward that" : "") + ".";
     }
 
-    var totalRow = "<tr><td><strong>Total</strong></td><td><strong>" + paid +
-      "</strong></td><td>&mdash;</td><td><strong>" + money(total) + "</strong></td></tr>";
+    var totalRow = "<tr><td><strong>You pay</strong></td><td><strong>" + paid +
+      "</strong></td><td><strong>" + q.pooledCases + "</strong></td><td><strong>" +
+      money(total) + "</strong></td></tr>";
 
     var free = BOOK.freePeriodShort;
     free = free.charAt(0).toUpperCase() + free.slice(1);
 
+    // THE HEADLINE IS THE BLENDED PER-CASE RATE, because that is the
+    // number a reader checks against what they pay today. The monthly
+    // total alone is what this page used to lead with, and it invited the
+    // arithmetic instead of doing it.
+    var lead;
+    if (!q.knowCases) {
+      lead = "Enter cases a month to see what you would pay. Until then this is the ceiling: " +
+        money(q.licence) + " a month.";
+    } else if (q.cappedOut) {
+      lead = "At " + q.pooledCases + " cases a month, paying per case would come to " +
+        money(q.pooled) + ", so you pay the site licence instead: " + money(total) +
+        " a month, which is " + money(Math.round((total / q.pooledCases) * 100) / 100) + " a case.";
+    } else {
+      lead = money(total) + " a month for " + q.pooledCases + " cases, which is " +
+        money(Math.round(q.perCase * 100) / 100) + " a case " — and never more than " +
+        money(q.licence) + ".";
+    }
     out.innerHTML = table(rows, totalRow) +
+      "<p class='calc-note'><strong>" + lead + "</strong></p>" +
       "<p class='calc-note'>" + note + "</p>" +
-      "<p class='calc-note'>Every appeal is included at any volume. " + esc(free) +
-      ", before any of this is charged.</p>";
+      "<p class='calc-note'>" + esc(free) + ", before any of this is charged.</p>";
   }
 
   form.addEventListener("input", render);
@@ -684,35 +790,56 @@
 </script>
 
 
-  <h2>Monthly, per facility</h2>
+  <h2>What it costs</h2>
   <div class="table-scroll">
+<table class="price-table">
+  <thead><tr><th>Cases a month, across your portfolio</th><th>Skilled nursing</th><th>Home health</th><th>Hospice</th></tr></thead>
+  <tbody>
+    <tr><td>1–50</td><td>$16</td><td>$12</td><td>$12</td></tr>
+    <tr><td>51–200</td><td>$14</td><td>$10</td><td>$10</td></tr>
+    <tr><td>201–600</td><td>$12</td><td>$9</td><td>$9</td></tr>
+    <tr><td>601–1500</td><td>$10</td><td>$8</td><td>$8</td></tr>
+    <tr><td>1501+</td><td>$8</td><td>$7</td><td>$7</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Per case, pooled across every location you enrol. Each band prices only the cases inside it, so your bill never jumps — and bringing home health or hospice in alongside skilled nursing deepens the rate on all of them. Portfolio pricing starts at 2 paid locations. A 12-month term applies, billed monthly or annually, with locations added mid-term pro rata.</p>
+<h3>And never more than the site licence</h3>
+<p>If a location is busy enough that paying per case would cost more than an unlimited licence, you pay the licence instead. These are the ceilings, not the price.</p>
+<div class="table-scroll">
 <table class="price-table">
   <thead><tr><th>Paid facilities</th><th>Discount</th><th>Skilled nursing</th><th>Home health</th><th>Hospice</th></tr></thead>
   <tbody>
-    <tr><td>1–4</td><td>&mdash;</td><td>$499</td><td>$299</td><td>$199</td></tr>
-    <tr><td>5–19 — Group</td><td>15%</td><td>$424</td><td>$254</td><td>$169</td></tr>
+    <tr><td>1</td><td>&mdash;</td><td>$499</td><td>$299</td><td>$199</td></tr>
+    <tr><td>2–19 — Group</td><td>15%</td><td>$424</td><td>$254</td><td>$169</td></tr>
     <tr><td>20–99 — Enterprise</td><td>25%</td><td>$374</td><td>$224</td><td>$149</td></tr>
     <tr><td>100+ — Strategic Enterprise</td><td>35%</td><td>$324</td><td>$194</td><td>$129</td></tr>
   </tbody>
 </table>
 </div>
-<p>Per site, per month, every case included at any volume. A 12-month term applies, billed monthly or annually, with facilities added mid-term pro rata.</p>
-  <p class="caption">The discount is earned by the whole portfolio and applied to every facility in it, whichever care settings they are.</p>
+<p>Per site, per month, every case included at any volume.</p>
+  <p class="caption">The rate is earned by the whole portfolio, whichever care settings its locations are &mdash; and the licence ceiling applies to every facility in it on the same terms.</p>
 
-  <h2>What the monthly price includes</h2>
+  <h2>What every case includes</h2>
   <ul>
-    <li>Unlimited appeals at that facility &mdash; there is no per-case charge on a monthly plan.</li>
+    <li>Every appeal level on that case for 12 months, including a second or third round if it goes further.</li>
     <li>The portfolio dashboard, for everyone your structure gives access to.</li>
     <li>Deadline tracking, case assignment, and appeal preparation.</li>
+    <li>No charge for a location that files nothing in a month &mdash; you pay for cases, not for seats or sites.</li>
   </ul>
 
-  <h2>Pay per case instead</h2>
-  <p>A facility that handles a handful of appeals a year can pay per case rather than a monthly fee, with no commitment. The per-case rate steps down as volume rises, and a facility that reaches enough appeals is better off on the monthly plan &mdash; the rates are below.</p>
+  <h2>A single location</h2>
+  <p>One building has nothing to pool with, so it buys on its own: pay per case with no commitment, or take a monthly plan with cases included. Portfolio rates start at two locations.</p>
     <div class="tiers">
     <div class="tier">
       <h3>Volume</h3>
       <p class="price">$0 / month per site</p>
-      <p>No monthly fee, no commitment. $25 a case for the first 25 each month, $20 for 26-60, then $16.</p>
+      <p>No monthly fee, no commitment. $25 a case for the first 5 each month, $20 for 6-15, then $16.</p>
+    </div>
+    <div class="tier">
+      <h3>Growth</h3>
+      <p class="price">$100 / month per site</p>
+      <p>5 cases included each month, then $20 a case.</p>
     </div>
     <div class="tier">
       <h3>Standard</h3>
@@ -721,7 +848,7 @@
     </div>
   </div>
   <p class="trial-note"><strong>Your first 30 days are free, on your own cases.</strong> The 30 days start the first time you generate a letter, not when you open the account — so an account opened today and first used in six months still gets its full 30 days. After that, new skilled nursing facilities stay on Volume — there is no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>
-  <p class="caption">Portfolio discounts apply to the monthly plans. A mixed portfolio is quoted against its actual mix, which is what the calculator above does.</p>
+  <p class="caption">These are the single-location rates. A portfolio is quoted against its actual mix of care settings, which is what the calculator above does.</p>
 
   <h2>Non-profit facilities</h2>
   <p>A non-profit skilled nursing facility is not charged, and is never quoted a price. That is a standing commitment rather than a discount, and such locations are <strong>not counted</strong> toward the portfolio band &mdash; counting them would hand a portfolio a discount earned by facilities nobody pays for.</p>

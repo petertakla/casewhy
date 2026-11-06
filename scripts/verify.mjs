@@ -1386,6 +1386,37 @@ console.log("\n== Every shipped page is in the sitemap ==");
           !/\$0\b/.test(html),
           "a $0 portfolio price is what the missing pooled ladder produced, and it read as free",
         );
+
+        // THE ROWS MUST ADD UP TO THE TOTAL, which is the property Peter's
+        // question exposed: *"why is the last column is a ceiling"*.
+        //
+        // Each row showed that setting's LICENCE — a ceiling — beside a total
+        // that was the real pooled price. So the column heading was false for
+        // its own total row, and the three figures above the total could not sum
+        // to it: $2,120 + $762 + $338 against a $700 bill. Nothing was wrong
+        // with the arithmetic; the table was showing two different kinds of
+        // number in one column and inviting a reader to add them.
+        //
+        // A table whose rows do not reconcile with its total is the defect,
+        // whatever each figure means individually. This asserts the
+        // reconciliation, so the two cannot drift apart again.
+        // THE TOTAL IS NOT ONE OF THE ROWS. It is wrapped in <strong>, so the
+        // plain-cell pattern below cannot match it — and my first version then
+        // dropped the last row as well, double-counting the exclusion and
+        // reporting $580 against $700 on a table that reconciled perfectly.
+        // Fixed by reading the two groups separately rather than assuming the
+        // total sits in the same list.
+        const rowCells = [...html.matchAll(/<td>\$([\d,]+)<\/td>/g)].map((m) =>
+          Number(m[1].replace(/,/g, "")),
+        );
+        const totalCell = (html.match(/<strong>\$([\d,]+)<\/strong>/) ?? [])[1];
+        const rowSum = rowCells.reduce((a, b) => a + b, 0);
+        check(
+          `the table's rows reconcile with its total (${rowCells.join(" + ")} = $${totalCell ?? "?"})`,
+          Boolean(totalCell) && rowCells.length > 1 && rowSum === Number(String(totalCell).replace(/,/g, "")),
+          `rows sum to $${rowSum} against a total of $${totalCell ?? "(none)"} — a column mixing real ` +
+            "costs with ceilings is how that happens",
+        );
       }
       const pooledBands = pricingJson.portfolio.pooledCases.bands;
       check(

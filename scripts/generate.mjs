@@ -927,7 +927,28 @@ function pricingHtml(lane) {
   const trial = hasMonthlyPlan
     ? `  <p class="trial-note">${freePeriod} After that, new ${LANE_LABELS[lane].noun} stay on ${plans[0].label} — there is no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>`
     : `  <p class="trial-note">${freePeriod} After that, every ${LANE_LABELS[lane].noun.replace(/s$/, "")} runs on the same ${plans[0].label} pricing above — there is no monthly plan to switch to (see why, above).</p>`;
-  return `  <div class="tiers">\n${cards}\n  </div>\n${trial}`;
+  // AND THE FULL LADDER, WHICH LIVES IN ONE PLACE AND IS NOT HERE.
+  //
+  // Peter, 13 Nov 2026: *"the pricing link should be it's own url accesable
+  // from anywhere and should be the single version of the truth"*. That page is
+  // appeals.casewhy.com/pricing, built 13 Nov: five tabs, every band of every
+  // plan, and the only full price table anywhere in the product.
+  //
+  // THE HUB KEEPS ITS CARDS AND GAINS A LINK. The cards are a landing-page
+  // summary — one line a cold reader can act on — and they are already
+  // generated from the same `pricing.json` this file reads, with verify.mjs
+  // failing on any number not in it. So they cannot contradict the pricing
+  // page; they are simply shorter than it. What the hub must NOT grow is a
+  // second full table, which is the thing that drifts.
+  //
+  // THE SLUG IS READ, NOT TYPED. It arrives in pricing.json from the appeals
+  // repo's own lane list, because a mistyped slug fails SILENTLY — the page
+  // loads and shows the wrong lane, which no check here would catch.
+  const slug = pricing.laneSlugs?.[lane];
+  if (!slug) throw new Error(`[generate] no pricing-page slug for lane "${lane}" — re-run export-desk-pricing.ts in the appeals repo`);
+  const fullTable = `  <p class="tiers-more"><a href="https://appeals.casewhy.com/pricing?lane=${slug}&amp;utm_source=hub&amp;utm_medium=pricing">See every plan and every band</a> — the full table, on one page.</p>`;
+
+  return `  <div class="tiers">\n${cards}\n  </div>\n${trial}\n${fullTable}`;
 }
 
 // OPEN GRAPH AND TWITTER CARD TAGS — on every page, from the generator.

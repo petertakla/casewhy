@@ -236,6 +236,12 @@
       }
     ]
   },
+  "laneSlugs": {
+    "facility:snf": "snf",
+    "facility:home_health": "home-health",
+    "facility:hospice": "hospice",
+    "advocate": "advocates"
+  },
   "portfolio": {
     "minimumFacilities": 2,
     "termMonths": 12,

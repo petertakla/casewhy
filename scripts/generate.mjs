@@ -948,7 +948,20 @@ function pricingHtml(lane) {
   if (!slug) throw new Error(`[generate] no pricing-page slug for lane "${lane}" — re-run export-desk-pricing.ts in the appeals repo`);
   const fullTable = `  <p class="tiers-more"><a href="https://appeals.casewhy.com/pricing?lane=${slug}&amp;utm_source=hub&amp;utm_medium=pricing">See every plan and every band</a> — the full table, on one page.</p>`;
 
-  return `  <div class="tiers">\n${cards}\n  </div>\n${trial}\n${fullTable}`;
+  // AND THE LADDER, NAMED — 13 Nov 2026. Peter asked whether the roadmap could
+  // be reached from the hub and it could not: every link here pointed at a
+  // priced lane, so the five stages were two clicks away and mentioned
+  // nowhere on this site.
+  //
+  // A SEPARATE LINE FROM THE ONE ABOVE, because they answer different
+  // questions. The price link answers "what does it cost"; this answers "what
+  // am I committing to" — and the row that makes it worth reading is the one a
+  // price table has no column for: what we keep at each stage. For a facility
+  // weighing a compliance review before a purchase order, that is the question
+  // underneath the price.
+  const ladder = `  <p class="tiers-more"><a href="https://appeals.casewhy.com/pricing?lane=how-it-works&amp;utm_source=hub&amp;utm_medium=pricing">The five stages, start to finish</a> — what you give us, what you get back, what we keep and what it costs at each step.</p>`;
+
+  return `  <div class="tiers">\n${cards}\n  </div>\n${trial}\n${fullTable}\n${ladder}`;
 }
 
 // OPEN GRAPH AND TWITTER CARD TAGS — on every page, from the generator.

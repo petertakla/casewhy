@@ -559,7 +559,7 @@ function header(currentLineId, currentSharedId, siteLinkOverride) {
 ${lineLinks}
       </span>
 ${sharedLinks}
-      <a class="site-link" href="${siteLink.href}?utm_source=hub&utm_medium=header">${siteLink.label} ↗</a>
+      <a class="site-link" href="${siteLink.href}?utm_source=hub&utm_medium=header" target="_blank" rel="noopener noreferrer">${siteLink.label} ↗</a>
       ${currentLineId === "appeals"
         ? `<a class="site-link" href="https://appeals.casewhy.com/pricing?utm_source=hub&utm_medium=nav" target="_blank" rel="noopener noreferrer">Appeals pricing ↗</a>`
         : ""

@@ -568,7 +568,7 @@ ${sharedLinks}
 function footer() {
   return `<footer>
   <div class="wrap">
-    <p class="app-line">CaseWhy — the USCIS tracker: <a href="https://www.casewhy.com?utm_source=hub&utm_medium=footer">casewhy.com</a> · CaseWhy Appeals: <a href="https://appeals.casewhy.com?utm_source=hub&utm_medium=footer">appeals.casewhy.com</a> · Appeals Desk: <a href="https://appeals.casewhy.com/desk?utm_source=hub&utm_medium=footer">appeals.casewhy.com/desk</a></p>
+    <p class="app-line">CaseWhy — the USCIS tracker: <a href="https://www.casewhy.com?utm_source=hub&utm_medium=footer">casewhy.com</a> · CaseWhy Appeals: <a href="https://appeals.casewhy.com?utm_source=hub&utm_medium=footer" target="_blank" rel="noopener noreferrer">appeals.casewhy.com</a> · Appeals Desk: <a href="https://appeals.casewhy.com/desk?utm_source=hub&utm_medium=footer" target="_blank" rel="noopener noreferrer">appeals.casewhy.com/desk</a></p>
     <p class="app-line">USCIS help: <a href="https://app.casewhy.com/get-help?utm_source=hub&utm_medium=footer">app.casewhy.com/get-help</a> · Appeals help: <a href="mailto:appeals-help@casewhy.com">appeals-help@casewhy.com</a></p>
     <p>CaseWhy LLC, 7901 4th St N, Ste 300, St. Petersburg, FL 33702, US</p>
     <div class="links">
@@ -581,8 +581,8 @@ function footer() {
            linked rather than copied — a second copy on this site would drift,
            and a permanence promise sat on the enterprise page for weeks for
            exactly that reason, one repo away from the guard that forbids it. -->
-      <a href="https://appeals.casewhy.com/terms?utm_source=hub&utm_medium=footer">Terms of Service</a>
-      <a href="https://appeals.casewhy.com/privacy?utm_source=hub&utm_medium=footer">Privacy Policy</a>
+      <a href="https://appeals.casewhy.com/terms?utm_source=hub&utm_medium=footer" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+      <a href="https://appeals.casewhy.com/privacy?utm_source=hub&utm_medium=footer" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
       <a href="mailto:privacy@casewhy.com">privacy@casewhy.com</a>
       <a href="mailto:terms@casewhy.com">terms@casewhy.com</a>
     </div>
@@ -946,7 +946,7 @@ function pricingHtml(lane) {
   // loads and shows the wrong lane, which no check here would catch.
   const slug = pricing.laneSlugs?.[lane];
   if (!slug) throw new Error(`[generate] no pricing-page slug for lane "${lane}" — re-run export-desk-pricing.ts in the appeals repo`);
-  const fullTable = `  <p class="tiers-more"><a href="https://appeals.casewhy.com/pricing?lane=${slug}&amp;utm_source=hub&amp;utm_medium=pricing">See every plan and every band</a> — the full table, on one page.</p>`;
+  const fullTable = `  <p class="tiers-more"><a href="https://appeals.casewhy.com/pricing?lane=${slug}&amp;utm_source=hub&amp;utm_medium=pricing" target="_blank" rel="noopener noreferrer">See every plan and every band</a> — the full table, on one page.</p>`;
 
   // AND THE LADDER, NAMED — 13 Nov 2026. Peter asked whether the roadmap could
   // be reached from the hub and it could not: every link here pointed at a
@@ -959,7 +959,7 @@ function pricingHtml(lane) {
   // price table has no column for: what we keep at each stage. For a facility
   // weighing a compliance review before a purchase order, that is the question
   // underneath the price.
-  const ladder = `  <p class="tiers-more"><a href="https://appeals.casewhy.com/pricing?lane=how-it-works&amp;utm_source=hub&amp;utm_medium=pricing">The five stages, start to finish</a> — what you give us, what you get back, what we keep and what it costs at each step.</p>`;
+  const ladder = `  <p class="tiers-more"><a href="https://appeals.casewhy.com/pricing?lane=how-it-works&amp;utm_source=hub&amp;utm_medium=pricing" target="_blank" rel="noopener noreferrer">The five stages, start to finish</a> — what you give us, what you get back, what we keep and what it costs at each step.</p>`;
 
   return `  <div class="tiers">\n${cards}\n  </div>\n${trial}\n${fullTable}\n${ladder}`;
 }

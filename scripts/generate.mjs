@@ -2031,8 +2031,11 @@ function stageCard(stage) {
 }
 
 function stagesHtml() {
-  const cards = stages.map((s) => stageCard(s)).join("\n");
-  return `  <div class="stages">\n${cards}\n  </div>\n`;
+  const cards = stages.map((s) => {
+    const text = `${s.freeOffer}. ${s.value} ${s.experience}.`;
+    return `    <div><strong>Stage ${s.n} · ${s.name}</strong> ${text} <a href="https://appeals.casewhy.com${s.start}" target="_blank" rel="noopener noreferrer">Start here &rarr;</a></div>`;
+  }).join("\n");
+  return `  <div class="reasons">\n${cards}\n  </div>\n`;
 }
 
 writeFileSync(

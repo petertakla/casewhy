@@ -1577,6 +1577,7 @@ console.log("\n== Every shipped page is in the sitemap ==");
       ["300", "a dollar amount inside a cited rule"],
       ["38.99", "the 2026 Part D national base beneficiary premium"],
       ["0", "free — no monthly fee"],
+      ["49", "Stage 3 Facility Profile monthly fee ($49/building/month), exported separately from pricing.ts plans"],
     ]);
 
     const stray = [];

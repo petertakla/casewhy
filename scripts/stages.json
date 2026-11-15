@@ -1,0 +1,75 @@
+{
+  "generatedFrom": "appeals src/lib/desk/engagement-stages.ts",
+  "stages": [
+    {
+      "n": 1,
+      "name": "Deadline Check",
+      "status": "live",
+      "youProvide": "4 notice details; no resident name",
+      "weProvide": "Deadline, review organization, regulation",
+      "value": "Know the deadline immediately",
+      "weKeep": "Nothing",
+      "freeOffer": "Unlimited, no account",
+      "afterFree": "Stays free",
+      "approval": "No payment approval",
+      "experience": "Never blocked or asked to pay",
+      "start": "/find-your-deadline"
+    },
+    {
+      "n": 2,
+      "name": "Appeal Request",
+      "status": "live",
+      "youProvide": "Same 4 details; work email",
+      "weProvide": "Complete, addressed appeal request",
+      "value": "Generate appeals in minutes",
+      "weKeep": "No resident records, dates, or letters",
+      "freeOffer": "First 3 requests",
+      "afterFree": "Upgrade to Stage 3",
+      "approval": "No payment approval",
+      "experience": "At request 4, activate Facility Profile",
+      "start": "/appeal-request"
+    },
+    {
+      "n": 3,
+      "name": "Facility Profile",
+      "status": "live",
+      "youProvide": "Building name, address, representative",
+      "weProvide": "Pre-filled requests as PDFs",
+      "value": "No retyping; consistent letters",
+      "weKeep": "Facility business details",
+      "freeOffer": "30 days for 1 building; 60 for 2; 90 for 3+",
+      "afterFree": "$49/building/month",
+      "approval": "Facility purchasing policy",
+      "experience": "Unlimited requests, pre-filled PDFs",
+      "start": "/for-advocates?segment=facility"
+    },
+    {
+      "n": 4,
+      "name": "Group View",
+      "status": "live",
+      "youProvide": "Nothing additional",
+      "weProvide": "Multi-building usage dashboard",
+      "value": "See which buildings use the service",
+      "weKeep": "Building-level usage statistics",
+      "freeOffer": "Included during Stage 3 trial",
+      "afterFree": "Included with Stage 3",
+      "approval": "No additional purchase",
+      "experience": "Group-wide visibility and reporting",
+      "start": "/enterprise-demo"
+    },
+    {
+      "n": 5,
+      "name": "Case Management",
+      "status": "live",
+      "youProvide": "Cases as your team works them",
+      "weProvide": "Case records, letters, reminders, audit trail",
+      "value": "Track every case and deadline",
+      "weKeep": "Case records and documents",
+      "freeOffer": "30 days from first managed case",
+      "afterFree": "$25/case, or from $100/site/month — three plans by volume",
+      "approval": "BAA + purchasing approval",
+      "experience": "Persistent records, tracking, and reminders",
+      "start": "/desk"
+    }
+  ]
+}

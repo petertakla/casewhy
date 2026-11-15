@@ -560,6 +560,10 @@ ${lineLinks}
       </span>
 ${sharedLinks}
       <a class="site-link" href="${siteLink.href}?utm_source=hub&utm_medium=header">${siteLink.label} ↗</a>
+      ${currentLineId === "appeals"
+        ? `<a class="site-link" href="https://appeals.casewhy.com/pricing?utm_source=hub&utm_medium=nav" target="_blank" rel="noopener noreferrer">Appeals pricing ↗</a>`
+        : ""
+      }
     </nav>
   </div>
 </header>`;
@@ -791,6 +795,15 @@ ${facilityPrivacySentences.map(([lead, rest]) => `    <li><strong>${lead}</stron
 // any pricing change; verify.mjs fails if a page states a number that
 // isn't in the JSON.
 const pricing = JSON.parse(readFileSync(join(__dirname, "pricing.json"), "utf8"));
+
+// THE FIVE ENGAGEMENT STAGES, GENERATED IN THE APPEALS REPO LIKE EVERY OTHER
+// PRICE HERE.
+//
+// Peter, 13 Nov 2026: the five stages live in src/lib/desk/engagement-stages.ts
+// in the appeals repo, and this hub had no page for them. Now they are
+// exported here the same way pricing.json is: built from the source of truth,
+// not hand-typed, so they cannot drift.
+const stages = JSON.parse(readFileSync(join(__dirname, "stages.json"), "utf8")).stages;
 
 // THE FAMILY PRICES, GENERATED IN THE APPEALS REPO LIKE EVERY OTHER PRICE HERE.
 //
@@ -1527,6 +1540,9 @@ function pageHtml({ path, titleTag, description, contentId, body: bodyOverride, 
   if (body.includes("{{PORTFOLIO_PRICING}}")) {
     body = body.replace("{{PORTFOLIO_PRICING}}", portfolioPricingHtml());
   }
+  if (body.includes("{{STAGES}}")) {
+    body = body.replace("{{STAGES}}", stagesHtml());
+  }
   if (body.includes("{{PRICING_CALCULATOR}}")) {
     body = body.replace("{{PRICING_CALCULATOR}}", pricingCalculatorHtml());
   }
@@ -1989,6 +2005,35 @@ const sitemapUrls = allUrls
       : `  <url><loc>https://casewhyhub.com${u}</loc></url>`;
   })
   .join("\n");
+// THE FIVE ENGAGEMENT STAGES, RENDERED FROM stages.json.
+//
+// Each stage card shows what the reader gives us, what we give back, what it
+// costs, what we keep, and a start link — all read from the appeals repo's
+// engagement-stages.ts via scripts/export-stages.ts. Nothing is hand-typed
+// here, so a stage price change in appeals flows straight to the hub.
+function stageCard(stage) {
+  const statusBadge = stage.status === "live"
+    ? '<span class="badge badge-live">Live</span>'
+    : '<span class="badge badge-planned">Planned</span>';
+  return `    <div class="stage">
+      <h3>${stage.name} <span class="stage-num">Stage ${stage.n}</span> ${statusBadge}</h3>
+      <p><strong>You provide:</strong> ${stage.youProvide}</p>
+      <p><strong>We provide:</strong> ${stage.weProvide}</p>
+      <p><strong>Value:</strong> ${stage.value}</p>
+      <p><strong>We keep:</strong> ${stage.weKeep}</p>
+      <p><strong>Free offer:</strong> ${stage.freeOffer}</p>
+      <p><strong>After free offer:</strong> ${stage.afterFree}</p>
+      <p><strong>Approval:</strong> ${stage.approval}</p>
+      <p><strong>Experience:</strong> ${stage.experience}</p>
+      <p><a href="https://appeals.casewhy.com${stage.start}" target="_blank" rel="noopener noreferrer">Start here &rarr;</a></p>
+    </div>`;
+}
+
+function stagesHtml() {
+  const cards = stages.map((s) => stageCard(s)).join("\n");
+  return `  <div class="stages">\n${cards}\n  </div>\n`;
+}
+
 writeFileSync(
   join(ROOT, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls}\n</urlset>\n`

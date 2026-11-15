@@ -694,7 +694,8 @@ for (const path of ["/appeals/facilities/skilled-nursing", "/appeals/facilities/
   // THE ACRONYM IS ASSERTED SEPARATELY from the sentence, so dropping "(BAA)"
   // fails on its own rather than hiding inside a longer string comparison.
   check(`${path} keeps the approved BAA wording`,
-    html.includes("no HIPAA business associate agreement (BAA) is needed between us"));
+    html.includes("No HIPAA business associate agreement (BAA) is needed for these stages") ||
+    html.includes("a business associate agreement is required before enrollment"));
   check(`${path} spells the acronym out beside the full name`,
     html.includes("business associate agreement (BAA)"));
   check(`${path} uses "client", not the SNF-only "resident", in the privacy section`,

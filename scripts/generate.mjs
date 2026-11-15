@@ -770,7 +770,8 @@ const facilityPrivacySentences = [
   ["We don’t keep the notice you upload.", "The file is read once to pull out what the appeal needs (dates, notice type, the denial reason) and then deleted. We keep the extracted details, not the document."],
   ["We don’t ask for a client’s name.", "A case is found by your own room, file or client number and the tags you give it. There is no name field."],
   ["Your staff see your organization’s cases, and nothing else.", "Every seat is scoped to one organization."],
-  ["We don’t hold protected health information,", "so no HIPAA business associate agreement (BAA) is needed between us. If that ever changes, we will tell you first."],
+  ["No patient data in Stages 1–3.", "The free deadline checker, appeal request, and facility profile use building-level details only — no patient names, no medical records, no PHI. No HIPAA business associate agreement (BAA) is needed for these stages."],
+  ["Stage 5 Case Management requires a BAA.", "Once you move to paid case management — case records, letters, reminders, audit trail — patient data is involved and a business associate agreement is required before enrollment."],
   ["Closing your organization deletes everything under it, immediately.", "Export first if you want a copy."],
 ];
 

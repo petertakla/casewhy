@@ -2031,11 +2031,28 @@ function stageCard(stage) {
 }
 
 function stagesHtml() {
-  const cards = stages.map((s) => {
+  const top = stages.slice(0, 2).map((s) => {
     const text = `${s.freeOffer}. ${s.value} ${s.experience}.`;
     return `    <div><strong>Stage ${s.n} · ${s.name}</strong> ${text} <a href="https://appeals.casewhy.com${s.start}" target="_blank" rel="noopener noreferrer">Start here &rarr;</a></div>`;
   }).join("\n");
-  return `  <div class="reasons">\n${cards}\n  </div>\n`;
+  const bottom = stages.slice(2).map((s) => {
+    const text = `${s.freeOffer}. ${s.value} ${s.experience}.`;
+    return `    <div><strong>Stage ${s.n} · ${s.name}</strong> ${text} <a href="https://appeals.casewhy.com${s.start}" target="_blank" rel="noopener noreferrer">Start here &rarr;</a></div>`;
+  }).join("\n");
+  return `  <section class="ent-band">
+    <p class="eyebrow">Five stages</p>
+    <h2>Every appeal, stage by stage</h2>
+    <p class="sub">Each stage adds capability on top of the last.</p>
+    <div class="reasons">
+${top}
+    </div>
+    <div class="reasons">
+${bottom}
+    </div>
+    <div class="act">
+      <a class="cta" href="https://appeals.casewhy.com/pricing?lane=how-it-works" target="_blank" rel="noopener noreferrer">See all five stages &rarr;</a>
+    </div>
+  </section>`;
 }
 
 writeFileSync(

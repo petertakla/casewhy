@@ -31,6 +31,36 @@
       "permanent": false
     },
     {
+      "source": "/hh/:campaign/c/:code",
+      "destination": "/appeals/facilities/home-health?utm_source=hh&utm_medium=email&utm_campaign=facility-outreach-:campaign&rc=:code",
+      "permanent": false
+    },
+    {
+      "source": "/hh/:campaign",
+      "destination": "/appeals/facilities/home-health?utm_source=hh&utm_medium=email&utm_campaign=facility-outreach-:campaign",
+      "permanent": false
+    },
+    {
+      "source": "/hh",
+      "destination": "/appeals/facilities/home-health?utm_source=hh&utm_medium=email",
+      "permanent": false
+    },
+    {
+      "source": "/hospice/:campaign/c/:code",
+      "destination": "/appeals/facilities/hospice?utm_source=hospice&utm_medium=email&utm_campaign=facility-outreach-:campaign&rc=:code",
+      "permanent": false
+    },
+    {
+      "source": "/hospice/:campaign",
+      "destination": "/appeals/facilities/hospice?utm_source=hospice&utm_medium=email&utm_campaign=facility-outreach-:campaign",
+      "permanent": false
+    },
+    {
+      "source": "/hospice",
+      "destination": "/appeals/facilities/hospice?utm_source=hospice&utm_medium=email",
+      "permanent": false
+    },
+    {
       "source": "/demo/:campaign/c/:code",
       "destination": "https://appeals.casewhy.com/desk/demo/c/:code?utm_source=snf&utm_medium=email&utm_campaign=facility-outreach-:campaign",
       "permanent": false

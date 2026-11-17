@@ -89,6 +89,7 @@ check(
   stale.length ? `Run \`node scripts/generate.mjs\` and READ ITS EXIT CODE — these pages predate their source:\n    ${stale.map((f) => f.slice(ROOT.length + 1)).join("\n    ")}` : ""
 );
 
+const vercelConfig = JSON.parse(readFileSync(join(__dirname, "..", "vercel.json"), "utf8"));
 const vercelJson = JSON.parse(readFileSync(join(ROOT, "vercel.json"), "utf8"));
 for (const r of redirects) {
   const entry = vercelJson.redirects.find((v) => v.source === r.from);
@@ -2214,6 +2215,41 @@ console.log("\n== Every shipped page is in the sitemap ==");
       "the directory heading tells a single-facility reader it is theirs",
       /One building/.test(appeals)
     );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// EVERY CARE SETTING THE LETTERS LINK TO HAS A REDIRECT — 17 Nov 2026.
+//
+// THIS WAS A 404 IN SENT MAIL FOR TWO WEEKS. The outreach letters build their
+// main call to action as `casewhyhub.com/<prefix>/<campaign>`, and vercel.json
+// had rules for `/snf` and `/demo` only. Home health and hospice launched on
+// 4 November; 114 and 79 letters went out; every one of them offered "Start
+// Your Free 30 Days" and delivered a 404.
+//
+// It also silently cost the click: the facility pages carry the beacon that
+// reports `?rc=` back to appeals, so a reader who never reaches the page is a
+// reader who was never counted either. The campaign read as cold when it was
+// unreachable.
+//
+// PREFIXES ARE LISTED HERE RATHER THAN DERIVED from the appeals repo, because
+// this file cannot import TypeScript from it — the same constraint that gives
+// the hub its generated pricing.json. The cost of the duplication is this
+// comment; the cost of not checking was two weeks.
+{
+  const prefixes = ["snf", "hh", "hospice", "demo"];
+  const sources = new Set(vercelConfig.redirects.map((r) => r.source));
+  for (const p of prefixes) {
+    for (const shape of [`/${p}`, `/${p}/:campaign`, `/${p}/:campaign/c/:code`]) {
+      check(`the letters' "${shape}" link has a redirect`, sources.has(shape));
+    }
+  }
+  // AND THE CODE SURVIVES THE HOP. A redirect that drops `rc` leaves the page
+  // with nothing for its beacon to report, which is a click lost in a way
+  // nothing else would show.
+  for (const r of vercelConfig.redirects) {
+    if (!r.source.endsWith("/c/:code")) continue;
+    check(`${r.source} carries the click code onward`, /[?&]rc=:code|\/c\/:code/.test(r.destination));
   }
 }
 

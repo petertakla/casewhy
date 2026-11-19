@@ -941,6 +941,25 @@ function pricingHtml(lane) {
   const trial = hasMonthlyPlan
     ? `  <p class="trial-note">${freePeriod} After that, new ${LANE_LABELS[lane].noun} stay on ${plans[0].label} — there is no plan to pick up front, and you can move to a monthly plan whenever your volume makes it cheaper.</p>`
     : `  <p class="trial-note">${freePeriod} After that, every ${LANE_LABELS[lane].noun.replace(/s$/, "")} runs on the same ${plans[0].label} pricing above — there is no monthly plan to switch to (see why, above).</p>`;
+
+  // THE SIX MECHANICAL CLAIMS — added 19 Nov 2026, Peter's instruction, right
+  // below the trial note. Read from pricing.json's own `mechanicalClaims`,
+  // exported from the SAME appeals-repo module
+  // (src/lib/outreach/mechanical-claims.ts) the app's own /pricing page reads
+  // for the identical six, below its Stages table — one source, two renders,
+  // never a third copy typed here. Comments are allowed in this generator
+  // (see the note above `function stripComments`); they are stripped from
+  // every built page before it is written.
+  //
+  // FACILITY LANES ONLY — `pricingHtml` also renders for `advocate`
+  // (appeals-advocates.html, appeals-care-managers.html), and claim 4 of the
+  // six says "every case YOUR FACILITY has open", which is simply wrong for
+  // an independent advocate. Gated on `unit`, the same data already used two
+  // lines up to decide the trailing trial sentence, rather than a second
+  // lane-name check that could disagree with it.
+  const mechanicalClaims = unit === "per site" && Array.isArray(pricing.mechanicalClaims) && pricing.mechanicalClaims.length > 0
+    ? `  <ul class="checklist">\n${pricing.mechanicalClaims.map((c) => `    <li>${c}</li>`).join("\n")}\n  </ul>`
+    : "";
   // AND THE FULL LADDER, WHICH LIVES IN ONE PLACE AND IS NOT HERE.
   //
   // Peter, 13 Nov 2026: *"the pricing link should be it's own url accesable
@@ -975,7 +994,7 @@ function pricingHtml(lane) {
   // underneath the price.
   const ladder = `  <p class="tiers-more"><a href="https://appeals.casewhy.com/pricing?lane=how-it-works&amp;utm_source=hub&amp;utm_medium=pricing" target="_blank" rel="noopener noreferrer">The five stages, start to finish</a> — what you give us, what you get back, what we keep and what it costs at each step.</p>`;
 
-  return `  <div class="tiers">\n${cards}\n  </div>\n${trial}\n${fullTable}\n${ladder}`;
+  return `  <div class="tiers">\n${cards}\n  </div>\n${trial}\n${mechanicalClaims}\n${fullTable}\n${ladder}`;
 }
 
 // OPEN GRAPH AND TWITTER CARD TAGS — on every page, from the generator.

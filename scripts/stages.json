@@ -51,11 +51,11 @@
       "weProvide": "Multi-building usage dashboard",
       "value": "See which buildings use the service",
       "weKeep": "Building-level usage statistics",
-      "freeOffer": "Included during Stage 3 trial",
-      "afterFree": "Included with Stage 3",
+      "freeOffer": "Included during Stage 3 and Stage 5",
+      "afterFree": "Stays included",
       "approval": "No additional purchase",
       "experience": "Group-wide visibility and reporting",
-      "start": "/enterprise-demo"
+      "start": "/for-advocates?segment=facility"
     },
     {
       "n": 5,
@@ -67,7 +67,7 @@
       "weKeep": "Case records and documents",
       "freeOffer": "30 days from first managed case",
       "afterFree": "$25/case, or from $100/site/month — three plans by volume",
-      "approval": "BAA + purchasing approval",
+      "approval": "Purchasing approval",
       "experience": "Persistent records, tracking, and reminders",
       "start": "/desk"
     }

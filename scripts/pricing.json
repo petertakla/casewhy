@@ -4,6 +4,14 @@
   "freePeriodSentence": "Your first 30 days are free, on your own cases.",
   "freePeriodShort": "30 days free",
   "freePeriodStartsWhenYouUseIt": "The 30 days start the first time you generate a letter, not when you open the account — so an account opened today and first used in six months still gets its full 30 days.",
+  "mechanicalClaims": [
+    "Every deadline is calculated from the notice by rule — never typed, and never written by an AI.",
+    "Both clocks are tracked for you, yours and the plan's, with a reminder before each. Nothing relies on someone remembering.",
+    "Every letter cites the governing regulation, in the same words every time.",
+    "One board shows every case your facility has open, with its stage and its next date.",
+    "The dates, the citation and the form arrive already filled in. Nothing is typed twice.",
+    "Nobody types a resident's name or Medicare number. Your own reference links the case to your records."
+  ],
   "trialDays": 30,
   "trialIsBuilt": true,
   "lanes": {
